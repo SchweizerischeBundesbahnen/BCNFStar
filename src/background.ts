@@ -1,9 +1,30 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
+import { app, protocol, BrowserWindow, ipcMain } from "electron";
+import { Client } from "pg";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
+
+ipcMain.handle("getDBConnection", async function () {
+  console.log("test");
+  const client = new Client({
+    user: "mafi",
+    host: "localhost",
+    database: "postgres",
+    password: "",
+    port: 5432,
+  });
+  client.connect();
+
+  try {
+    const result = await client.query("SELECT * FROM c3_constants");
+    client.end();
+    return result.rowCount;
+  } catch (error) {
+    return error;
+  }
+});
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
