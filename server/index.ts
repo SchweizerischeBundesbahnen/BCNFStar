@@ -7,6 +7,11 @@ const port = process.env["PORT"] || 80;
 const app = express();
 app.use(express.json());
 
+// Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
+app.get("/test", (req, res) => {
+  res.json({key: 'value'})
+});
+
 app.use(expressStaticGzip(join(__dirname,'..','frontend','dist','bcnfstar'), {}));
 
 const server = app.listen(port, () => {
