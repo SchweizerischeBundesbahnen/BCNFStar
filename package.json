@@ -1,18 +1,18 @@
 {
-    "name": "bcnfstar",
-    "scripts": {
-        "build": "run-p build:*",
-        "start": "node server/dist",
-        "dev": "run-p dev:*",
-        "build:server": "cd server && npm run build",
-        "build:frontend": "cd frontend && npm run build",
-        "dev:server": "cd server && npm run dev",
-        "dev:frontend": "cd frontend && ng serve"
-    },
-    "devDependencies": {
-        "husky": "^7.0.4",
-        "npm-run-all": "^4.1.5",
-        "prettier": "^2.4.1",
-        "pretty-quick": "^3.1.2"
-    }
+  "name": "bcnfstar",
+  "scripts": {
+    "build": "run-p build:*",
+    "start": "node server/dist",
+    "dev": "run-p dev:*",
+    "build:server": "cd server && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "dev:server": "cd server && npm run dev",
+    "dev:frontend": "cd frontend && ng serve"
+  },
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.4.1",
+    "pretty-quick": "^3.1.2"
+  }
 }
