@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "module": "CommonJS",
+    "outDir": "dist",
     "paths": {
       "@common/*": ["../common/*"],
       "@/*": ["./*"]

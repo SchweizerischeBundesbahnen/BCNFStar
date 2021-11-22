@@ -9,10 +9,12 @@ app.use(express.json());
 
 // Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
 app.get("/test", (req, res) => {
-  res.json({key: 'value'})
+  res.json({ key: "value" });
 });
 
-app.use(expressStaticGzip(join(__dirname,'..','frontend','dist','bcnfstar'), {}));
+app.use(
+  expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
+);
 
 const server = app.listen(port, () => {
   console.log(`bcnfstar server started on port ${port}`);
