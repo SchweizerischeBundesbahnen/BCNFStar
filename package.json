@@ -1,0 +1,11 @@
+{
+    "name": "bcnfstar",
+    "scripts": {
+        "build": "cd server && npm run build && cd ../frontend && npm run build",
+        "start": "cd server && npm run start"
+    },
+    "devDependencies": {
+        "husky": "^7.0.4",
+        "prettier": "^2.4.1"
+    }
+}
