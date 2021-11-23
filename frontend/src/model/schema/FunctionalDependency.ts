@@ -1,5 +1,5 @@
-import ColumnCombination from "./ColumnCombination";
-import Table from "./table";
+import ColumnCombination from './ColumnCombination';
+import Table from './Table';
 
 export default class FunctionalDependency {
   table: Table;
