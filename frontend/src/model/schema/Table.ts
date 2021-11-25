@@ -1,10 +1,10 @@
-import { assert } from "console";
-import Column from "./Column";
-import ColumnCombination from "./ColumnCombination";
-import FunctionalDependency from "./FunctionalDependency";
+import { assert } from 'console';
+import Column from './Column';
+import ColumnCombination from './ColumnCombination';
+import FunctionalDependency from './FunctionalDependency';
 
 export default class Table {
-  name: string = ""
+  name: string = '';
   columns: ColumnCombination = new ColumnCombination();
   fds: FunctionalDependency[] = [];
   children: Table[] = new Array(2);
@@ -26,21 +26,18 @@ export default class Table {
   }
 
   public get hasChildren(): boolean {
-    return !!this.children[0] 
+    return !!this.children[0];
   }
 
-  
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.fds.push(new FunctionalDependency(this, lhs, rhs));
   }
 
   public allResultingTables(): Table[] {
-    if (!this.hasChildren) return [this]
-    return this.children[0].allResultingTables().concat(this.children[1].allResultingTables())
-  }
-
-  public generateName() {
-    this.name = this.columns.columnNames().join("_");
+    if (!this.hasChildren) return [this];
+    return this.children[0]
+      .allResultingTables()
+      .concat(this.children[1].allResultingTables());
   }
 
   public extendFds() {
@@ -49,12 +46,14 @@ export default class Table {
 
   public split(fd: FunctionalDependency): Table[] {
     assert(this.fds.includes(fd));
-    this.children[0] = this.constructProjection(this.columns.copy().setMinus(fd.rhs).union(fd.lhs));
+    this.children[0] = this.constructProjection(
+      this.columns.copy().setMinus(fd.rhs).union(fd.lhs)
+    );
     this.children[1] = this.constructProjection(fd.rhs.copy());
     this.children[0].referencedTables.push(this.children[1]);
     this.children[1].referencingTables.push(this.children[0]);
     this.children[0].name = this.name;
-    this.children[1].generateName();
+    this.children[1].name = fd.lhs.columnNames().join('_');
     return this.children;
   }
 
@@ -97,8 +96,8 @@ export default class Table {
   }
 
   public toString(): string {
-    let str = `${this.name}(${this.columns.columnNames().join(", ")})\n`;
-    str += this.fds.map((fd) => fd.toString()).join("\n");
+    let str = `${this.name}(${this.columns.columnNames().join(', ')})\n`;
+    str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
   }
 }
