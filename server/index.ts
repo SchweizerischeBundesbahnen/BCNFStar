@@ -1,8 +1,13 @@
 import express from "express";
 import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
+import { Pool } from "pg";
+import getTablesFunction from "./routes/tables"
+import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 
 const port = process.env["PORT"] || 80;
+
+const pool = new Pool({database: "tpc_data", host: "localhost", user: "mafi"});
 
 const app = express();
 app.use(express.json());
@@ -11,6 +16,9 @@ app.use(express.json());
 app.get("/test", (req, res) => {
   res.json({ key: "value" });
 });
+
+app.get("/tables", getTablesFunction(pool))
+app.get("/tables/:name/head", getTableHeadFromNameFunction(pool))
 
 app.use(
   expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
