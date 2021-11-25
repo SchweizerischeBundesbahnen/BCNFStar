@@ -1,0 +1,15 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "ES6",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "outDir": "dist",
+    "paths": {
+      "@common/*": ["../common/*"],
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["./**/*.ts"]
+}
