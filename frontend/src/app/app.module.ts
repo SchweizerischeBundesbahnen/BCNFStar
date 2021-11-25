@@ -7,6 +7,7 @@ import { DatabaseSelectionComponent } from './pages/database-selection/database-
 import { TableSelectionComponent } from './pages/table-selection/table-selection.component';
 import { NormalizeComponent } from './pages/normalize/normalize.component';
 import { NormalizeSideBarComponent } from './components/normalize-side-bar/normalize-side-bar.component';
+import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { NormalizeSideBarComponent } from './components/normalize-side-bar/norma
     TableSelectionComponent,
     NormalizeComponent,
     NormalizeSideBarComponent,
+    NormalizeSchemaGraphComponent,
   ],
   imports: [BrowserModule, AppRoutingModule],
   providers: [],
