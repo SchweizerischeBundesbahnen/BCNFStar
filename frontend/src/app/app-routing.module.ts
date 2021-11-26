@@ -8,7 +8,7 @@ const routes: Routes = [
   { path: '', redirectTo: '/database-selection', pathMatch: 'full' },
   { path: 'database-selection', component: DatabaseSelectionComponent },
   { path: 'table-selection', component: TableSelectionComponent },
-  { path: 'normalize/:table_name', component: NormalizeComponent },
+  { path: 'normalize', component: NormalizeComponent },
 ];
 
 @NgModule({

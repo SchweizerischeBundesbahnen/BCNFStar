@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { SchemaService } from 'src/app/schema.service';
 import { exampleTable } from 'src/model/schema/experiments';
+import Table from 'src/model/schema/Table';
 
 @Component({
   selector: 'app-table-selection',
@@ -7,7 +9,13 @@ import { exampleTable } from 'src/model/schema/experiments';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent {
-  constructor() {}
+  tables!: Array<Table>;
 
-  tables = [exampleTable()];
+  constructor(private schemaService: SchemaService) {
+    this.tables = schemaService.allTables();
+  }
+
+  public selectTable(table: Table) {
+    this.schemaService.selectedTable = table;
+  }
 }

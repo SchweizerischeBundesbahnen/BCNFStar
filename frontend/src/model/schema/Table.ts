@@ -101,10 +101,10 @@ export default class Table {
     return str;
   }
 
-  public toMermaidStringClassDiagramm(): string {
+  public toMermaidString(): string {
     let result = 'class '.concat(this.name, '{\n');
     this.columns.columnNames().forEach((columnName) => {
-      result = result.concat('datatype', ' ', columnName, '\n');
+      result = result.concat(columnName, '\n');
     });
     result = result.concat('}');
     this.referencedTables.forEach((refTable) => {
@@ -113,7 +113,7 @@ export default class Table {
     return result;
   }
 
-  public toMermaidString(): string {
+  public toMermaidStringER(): string {
     let result = this.name.concat(' {\n');
     this.columns.columnNames().forEach((columnName) => {
       result = result.concat('datatype', ' ', columnName, '\n');
@@ -128,7 +128,7 @@ export default class Table {
   public allResultingTablesToMermaidString(): string {
     let result = 'classDiagram\n';
     this.allResultingTables().forEach((table) => {
-      result = result.concat(table.toMermaidStringClassDiagramm(), '\n');
+      result = result.concat(table.toMermaidString(), '\n');
     });
     return result;
   }

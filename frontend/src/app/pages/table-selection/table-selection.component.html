@@ -3,7 +3,8 @@
 <ul>
   <li
     *ngFor="let table of tables"
-    [routerLink]="['/normalize', table.name]"
+    (click)="selectTable(table)"
+    [routerLink]="['/normalize']"
     routerLinkActive="active"
   >
     <span>{{ table.name }}</span>
