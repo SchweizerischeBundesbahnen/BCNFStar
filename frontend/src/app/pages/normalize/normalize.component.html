@@ -2,12 +2,11 @@
   <div class="row border">
     <div class="col-8 border">
       <p>normalize works!</p>
-      <p *ngIf="this.schemaService.selectedTable">
-        You are from table: {{ this.schemaService.selectedTable.name }}
+      <p *ngIf="this.schemaService.inputTable">
+        You are from table: {{ this.schemaService.inputTable.name }}
       </p>
       <app-normalize-schema-graph
-        *ngIf="this.schemaService.selectedTable"
-        [table]="this.schemaService.selectedTable"
+        *ngIf="this.schemaService.inputTable"
       ></app-normalize-schema-graph>
     </div>
     <div class="col-4 border">

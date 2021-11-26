@@ -16,6 +16,6 @@ export class TableSelectionComponent {
   }
 
   public selectTable(table: Table) {
-    this.schemaService.selectedTable = table;
+    this.schemaService.inputTable = table;
   }
 }

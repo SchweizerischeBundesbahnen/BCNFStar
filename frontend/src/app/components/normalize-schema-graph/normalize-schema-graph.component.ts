@@ -7,6 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import mermaid from 'mermaid';
+import { SchemaService } from 'src/app/schema.service';
 import Table from 'src/model/schema/Table';
 
 @Component({
@@ -15,23 +16,30 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
 export class NormalizeSchemaGraphComponent implements AfterViewInit {
-  @Input() table!: Table;
-
   @ViewChild('mermaidDiv')
   mermaidDiv?: ElementRef;
 
-  constructor() {}
+  constructor(private schemaService: SchemaService) {}
 
   ngAfterViewInit(): void {
-    console.log(this.table);
     mermaid.initialize({
       startOnLoad: false,
+      securityLevel: 'loose',
     });
     if (this.mermaidDiv) {
       const element: HTMLDivElement = this.mermaidDiv.nativeElement;
-      const graphDefinition = this.table.allResultingTablesToMermaidString();
+      const graphDefinition =
+        this.schemaService.inputTable!.allResultingTablesToMermaidString();
       mermaid.render('graphDiv', graphDefinition, (svgCode, bindFunctions) => {
         element.innerHTML = svgCode;
+        this.schemaService.inputTable!.allResultingTables().forEach((table) => {
+          document
+            .querySelector(`[id^='classid-${table.name}']`)
+            ?.addEventListener('click', () => {
+              this.schemaService.selectedTable = table;
+              console.log('clicked', table.name);
+            });
+        });
       });
     }
   }
