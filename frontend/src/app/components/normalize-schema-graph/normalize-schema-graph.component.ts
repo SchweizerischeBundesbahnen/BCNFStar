@@ -1,12 +1,11 @@
 import {
-  AfterContentInit,
   AfterViewInit,
   Component,
   ElementRef,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import * as mermaid from 'mermaid';
+import mermaid from 'mermaid';
 
 @Component({
   selector: 'app-normalize-schema-graph',
@@ -20,11 +19,10 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   constructor() {}
 
   ngAfterViewInit(): void {
-    console.log(this.mermaidDiv);
+    console.log(mermaid);
     mermaid.initialize({
       startOnLoad: false,
     });
-
     if (this.mermaidDiv) {
       const element: HTMLDivElement = this.mermaidDiv.nativeElement;
       const graphDefinition = `erDiagram

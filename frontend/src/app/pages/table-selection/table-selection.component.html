@@ -3,9 +3,9 @@
 <ul>
   <li
     *ngFor="let table of tables"
-    [routerLink]="['/normalize', table]"
+    [routerLink]="['/normalize', table.name]"
     routerLinkActive="active"
   >
-    <span>{{ table }}</span>
+    <span>{{ table.name }}</span>
   </li>
 </ul>

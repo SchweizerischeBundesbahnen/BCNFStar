@@ -1,4 +1,4 @@
-import { assert } from 'console';
+//import { assert } from 'console';
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
@@ -45,7 +45,7 @@ export default class Table {
   }
 
   public split(fd: FunctionalDependency): Table[] {
-    assert(this.fds.includes(fd));
+    //assert(this.fds.includes(fd));
     this.children[0] = this.constructProjection(
       this.columns.copy().setMinus(fd.rhs).union(fd.lhs)
     );
@@ -87,7 +87,7 @@ export default class Table {
   }
 
   public foreignKeyForReferencedTable(refTable: Table): ColumnCombination {
-    assert(this.referencedTables.includes(refTable));
+    //assert(this.referencedTables.includes(refTable));
     return this.columns.copy().intersect(refTable.columns);
   }
 
@@ -99,5 +99,37 @@ export default class Table {
     let str = `${this.name}(${this.columns.columnNames().join(', ')})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
+  }
+
+  public toMermaidStringClassDiagramm(): string {
+    let result = 'class '.concat(this.name, '{\n');
+    this.columns.columnNames().forEach((columnName) => {
+      result = result.concat('datatype', ' ', columnName, '\n');
+    });
+    result = result.concat('}');
+    this.referencedTables.forEach((refTable) => {
+      result = result.concat('\n', this.name, ' --> ', refTable.name);
+    });
+    return result;
+  }
+
+  public toMermaidString(): string {
+    let result = this.name.concat(' {\n');
+    this.columns.columnNames().forEach((columnName) => {
+      result = result.concat('datatype', ' ', columnName, '\n');
+    });
+    result = result.concat('}');
+    this.referencedTables.forEach((refTable) => {
+      result = result.concat('\n', this.name, ' ||--|| ', refTable.name);
+    });
+    return result;
+  }
+
+  public allResultingTablesToMermaidString(): string {
+    let result = 'classDiagram\n';
+    this.allResultingTables().forEach((table) => {
+      result = result.concat(table.toMermaidStringClassDiagramm(), '\n');
+    });
+    return result;
   }
 }
