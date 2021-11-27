@@ -2,6 +2,9 @@
 node_modules
 dist
 server/temp
+server/routes/results
+server/routes/temp
+server/routes/secrets
 
 # local env files
 .env.local
