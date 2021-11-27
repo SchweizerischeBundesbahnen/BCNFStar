@@ -25,6 +25,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     mermaid.initialize({
       startOnLoad: false,
       securityLevel: 'loose',
+      theme: 'forest',
     });
     if (this.mermaidDiv) {
       const element: HTMLDivElement = this.mermaidDiv.nativeElement;
@@ -39,6 +40,10 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
               this.schemaService.selectedTable = table;
               console.log('clicked', table.name);
             });
+          document
+            .querySelector(`[id^='classid-${table.name}']`)
+            ?.childNodes.item(2)
+            .remove();
         });
       });
     }

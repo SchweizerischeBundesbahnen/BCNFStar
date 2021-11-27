@@ -1,12 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
+import { SchemaService } from 'src/app/schema.service';
+import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 
 @Component({
   selector: 'app-normalize-side-bar',
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent implements OnInit {
-  constructor() {}
+export class NormalizeSideBarComponent {
+  constructor(public schemaService: SchemaService) {}
 
-  ngOnInit(): void {}
+  selectFd(fd: FunctionalDependency): void {
+    this.schemaService.selectedTable?.split(fd);
+    console.log(this.schemaService.inputTable?.allResultingTables());
+  }
 }
