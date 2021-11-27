@@ -1,6 +1,6 @@
-import { AfterViewInit, Component } from '@angular/core';
-import { SchemaService } from 'src/app/schema.service';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
+import Table from 'src/model/schema/Table';
 
 @Component({
   selector: 'app-normalize-side-bar',
@@ -8,10 +8,12 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
   styleUrls: ['./normalize-side-bar.component.css'],
 })
 export class NormalizeSideBarComponent {
-  constructor(public schemaService: SchemaService) {}
+  @Input() table!: Table;
+  @Output() splitFd = new EventEmitter<FunctionalDependency>();
+
+  constructor() {}
 
   selectFd(fd: FunctionalDependency): void {
-    this.schemaService.selectedTable?.split(fd);
-    console.log(this.schemaService.inputTable?.allResultingTables());
+    this.splitFd.emit(fd);
   }
 }

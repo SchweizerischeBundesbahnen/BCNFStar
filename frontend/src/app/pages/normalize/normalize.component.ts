@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Component } from '@angular/core';
 import { SchemaService } from 'src/app/schema.service';
+import FunctionalDependency from 'src/model/schema/FunctionalDependency';
+import Table from 'src/model/schema/Table';
 
 @Component({
   selector: 'app-normalize',
@@ -8,5 +9,26 @@ import { SchemaService } from 'src/app/schema.service';
   styleUrls: ['./normalize.component.css'],
 })
 export class NormalizeComponent {
-  constructor(public schemaService: SchemaService) {}
+  inputTable: Table;
+  tables: Array<Table> = [];
+  selectedTable?: Table;
+
+  constructor(public schemaService: SchemaService) {
+    this.inputTable = schemaService.inputTable!;
+    this.onInputTableChanged();
+  }
+
+  onInputTableChanged(): void {
+    this.tables = this.inputTable.allResultingTables();
+  }
+
+  onSelect(table: Table): void {
+    this.selectedTable = table;
+  }
+
+  onSplitFd(fd: FunctionalDependency): void {
+    this.selectedTable!.split(fd);
+    this.selectedTable = this.selectedTable!.children[0];
+    this.onInputTableChanged();
+  }
 }

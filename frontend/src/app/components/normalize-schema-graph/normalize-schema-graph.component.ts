@@ -2,12 +2,13 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
-  OnInit,
+  OnChanges,
+  Output,
   ViewChild,
 } from '@angular/core';
 import mermaid from 'mermaid';
-import { SchemaService } from 'src/app/schema.service';
 import Table from 'src/model/schema/Table';
 
 @Component({
@@ -15,30 +16,46 @@ import Table from 'src/model/schema/Table';
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements AfterViewInit {
-  @ViewChild('mermaidDiv')
-  mermaidDiv?: ElementRef;
+export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
+  @ViewChild('mermaidDiv') mermaidDiv?: ElementRef;
+  @Input() tables!: Array<Table>;
+  @Output() selected = new EventEmitter<Table>();
 
-  constructor(private schemaService: SchemaService) {}
-
-  ngAfterViewInit(): void {
+  constructor() {
     mermaid.initialize({
       startOnLoad: false,
       securityLevel: 'loose',
       theme: 'forest',
     });
+  }
+
+  private mermaidString(): string {
+    let result = 'classDiagram\n';
+    this.tables.forEach((table) => {
+      result = result.concat(table.toMermaidString(), '\n');
+    });
+    return result;
+  }
+
+  ngAfterViewInit(): void {
+    this.renderMermaid();
+  }
+
+  ngOnChanges(): void {
+    this.renderMermaid();
+  }
+
+  renderMermaid(): void {
     if (this.mermaidDiv) {
       const element: HTMLDivElement = this.mermaidDiv.nativeElement;
-      const graphDefinition =
-        this.schemaService.inputTable!.allResultingTablesToMermaidString();
+      const graphDefinition = this.mermaidString();
       mermaid.render('graphDiv', graphDefinition, (svgCode, bindFunctions) => {
         element.innerHTML = svgCode;
-        this.schemaService.inputTable!.allResultingTables().forEach((table) => {
+        this.tables.forEach((table) => {
           document
             .querySelector(`[id^='classid-${table.name}']`)
             ?.addEventListener('click', () => {
-              this.schemaService.selectedTable = table;
-              console.log('clicked', table.name);
+              this.selected.emit(table);
             });
           document
             .querySelector(`[id^='classid-${table.name}']`)

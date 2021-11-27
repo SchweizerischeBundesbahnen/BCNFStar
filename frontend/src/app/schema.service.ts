@@ -7,7 +7,6 @@ import Table from 'src/model/schema/Table';
 })
 export class SchemaService {
   public inputTable?: Table;
-  public selectedTable?: Table;
 
   constructor() {}
 

@@ -1,10 +1,7 @@
-<div *ngIf="this.schemaService.selectedTable">
-  <h3>{{ this.schemaService.selectedTable.name }}</h3>
+<div>
+  <h3>{{ table.name }}</h3>
   <ul>
-    <li
-      *ngFor="let fd of this.schemaService.selectedTable.violatingFds()"
-      (click)="selectFd(fd)"
-    >
+    <li *ngFor="let fd of table.violatingFds()" (click)="selectFd(fd)">
       <span> {{ fd.toString() }} </span>
     </li>
   </ul>
