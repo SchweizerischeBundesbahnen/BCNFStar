@@ -116,7 +116,9 @@ export default class Table {
     });
     result = result.concat('}');
     this.referencedTables.forEach((refTable) => {
-      result = result.concat('\n', this.name, ' --> ', refTable.name);
+      if (!refTable.hasChildren) {
+        result = result.concat('\n', this.name, ' --> ', refTable.name);
+      }
     });
     return result;
   }
