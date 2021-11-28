@@ -21,7 +21,7 @@ export class NormalizeSideBarComponent {
 
   constructor() {}
 
-  selectFd(): void {
+  splitSelectedFd(): void {
     this.splitFd.emit(this.fdSelectionGroup.value);
   }
 }
