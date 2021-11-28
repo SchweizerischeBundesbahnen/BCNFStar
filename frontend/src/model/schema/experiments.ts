@@ -3,7 +3,7 @@ import Table from './Table';
 
 export function exampleTable(): Table {
   const table: Table = Table.fromColumnNames('Name', 'Sportart', 'Verein');
-  table.name = 'input_table';
+  table.name = 'Example Table';
   table.addFd(
     table.columns.subsetFromIds(0, 1),
     table.columns.subsetFromIds(2)

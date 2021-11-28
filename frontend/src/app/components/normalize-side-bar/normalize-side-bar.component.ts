@@ -21,7 +21,12 @@ export class NormalizeSideBarComponent {
 
   constructor() {}
 
+  selectedFd(): FunctionalDependency | undefined {
+    if (!this.fdSelectionGroup) return undefined;
+    return this.fdSelectionGroup.value;
+  }
+
   splitSelectedFd(): void {
-    this.splitFd.emit(this.fdSelectionGroup.value);
+    this.splitFd.emit(this.selectedFd()!);
   }
 }

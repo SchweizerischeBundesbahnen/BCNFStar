@@ -22,7 +22,12 @@
           >
         </sbb-radio-group>
         <br />
-        <button type="button" sbbButton (click)="splitSelectedFd()">
+        <button
+          type="button"
+          sbbButton
+          [disabled]="!selectedFd()"
+          (click)="splitSelectedFd()"
+        >
           Split Functional Dependency
         </button>
       </div>

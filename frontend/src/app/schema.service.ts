@@ -11,8 +11,6 @@ export class SchemaService {
   constructor() {}
 
   public allTables(): Array<Table> {
-    let table2: Table = exampleTable();
-    table2.split(table2.violatingFds()[0]);
-    return [exampleTable(), table2];
+    return [exampleTable()];
   }
 }

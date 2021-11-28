@@ -70,6 +70,8 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
   }
 
   private getTableinMermaid(table: Table): Element {
-    return document.querySelector(`[id^='classid-${table.name}']`)!;
+    return document.querySelector(
+      `[id^='classid-${table.name.replace(' ', '')}']`
+    )!;
   }
 }
