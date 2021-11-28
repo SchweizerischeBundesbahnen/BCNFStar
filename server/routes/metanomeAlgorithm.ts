@@ -48,7 +48,7 @@ export default class MetanomeAlgorithm {
       return 'de.metanome.algorithms.normalize.Normi';
   }
   private command(table : string): string {
-    return `java -Xmx${this.memory} -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${PGPASS_PATH} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table + '_results'}.json --algorithm-config isHumanInTheLoop:false`;
+    return `java -Xmx${this.memory} -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${PGPASS_PATH} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_results.json --algorithm-config isHumanInTheLoop:false`;
   }
 
 }
