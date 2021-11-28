@@ -19,6 +19,7 @@ import Table from 'src/model/schema/Table';
 export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
   @ViewChild('mermaidDiv') mermaidDiv?: ElementRef;
   @Input() tables!: Array<Table>;
+  @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
 
   constructor() {
@@ -51,17 +52,24 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
       const graphDefinition = this.mermaidString();
       mermaid.render('graphDiv', graphDefinition, (svgCode, bindFunctions) => {
         element.innerHTML = svgCode;
-        this.tables.forEach((table) => {
-          this.getTableinMermaid(table)?.addEventListener('click', () => {
-            this.selected.emit(table);
-          });
-          this.getTableinMermaid(table)?.childNodes.item(2).remove();
-        });
       });
+      this.tables.forEach((table) => {
+        this.getTableinMermaid(table).addEventListener('click', () => {
+          this.selected.emit(table);
+        });
+        this.getTableinMermaid(table).childNodes.item(2).remove();
+      });
+      if (this.selectedTable && this.tables.includes(this.selectedTable)) {
+        (
+          this.getTableinMermaid(this.selectedTable).children.item(
+            0
+          )! as SVGElement
+        ).style.strokeWidth = '3px';
+      }
     }
   }
 
-  private getTableinMermaid(table: Table): Element | null {
-    return document.querySelector(`[id^='classid-${table.name}']`);
+  private getTableinMermaid(table: Table): Element {
+    return document.querySelector(`[id^='classid-${table.name}']`)!;
   }
 }

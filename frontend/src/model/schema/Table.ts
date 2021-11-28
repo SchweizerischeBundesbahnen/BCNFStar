@@ -92,7 +92,11 @@ export default class Table {
   }
 
   public keys(): ColumnCombination[] {
-    return this.fds.filter((fd) => fd.isKey()).map((fd) => fd.lhs);
+    let keys: Array<ColumnCombination> = this.fds
+      .filter((fd) => fd.isKey())
+      .map((fd) => fd.lhs);
+    if (keys.length == 0) keys.push(this.columns.copy());
+    return keys;
   }
 
   public violatingFds(): FunctionalDependency[] {

@@ -28,7 +28,7 @@ export class NormalizeComponent {
 
   onSplitFd(fd: FunctionalDependency): void {
     this.selectedTable!.split(fd);
-    this.selectedTable = this.selectedTable!.children[0];
     this.onInputTableChanged();
+    this.selectedTable = this.selectedTable!.children[0];
   }
 }
