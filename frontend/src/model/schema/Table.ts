@@ -91,6 +91,10 @@ export default class Table {
     return this.columns.copy().intersect(refTable.columns);
   }
 
+  public keys(): ColumnCombination[] {
+    return this.fds.filter((fd) => fd.isKey()).map((fd) => fd.lhs);
+  }
+
   public violatingFds(): FunctionalDependency[] {
     return this.fds.filter((fd) => fd.violatesBCNF());
   }

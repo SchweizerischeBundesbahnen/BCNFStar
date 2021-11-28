@@ -10,6 +10,8 @@ import { NormalizeSideBarComponent } from './components/normalize-side-bar/norma
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
 import { SbbRadioButtonModule } from '@sbb-esta/angular-business';
 import { SbbButtonModule } from '@sbb-esta/angular-business';
+import { SbbAccordionModule } from '@sbb-esta/angular-business';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,8 @@ import { SbbButtonModule } from '@sbb-esta/angular-business';
     AppRoutingModule,
     SbbRadioButtonModule,
     SbbButtonModule,
+    SbbAccordionModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
