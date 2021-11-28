@@ -1,8 +1,14 @@
 <div>
   <h3>{{ table.name }}</h3>
-  <ul>
-    <li *ngFor="let fd of table.violatingFds()" (click)="selectFd(fd)">
-      <span> {{ fd.toString() }} </span>
-    </li>
-  </ul>
+  <div *ngIf="table.violatingFds().length > 0">
+    <sbb-radio-group>
+      <sbb-radio-button *ngFor="let fd of table.violatingFds()" [value]="fd">{{
+        fd.toString()
+      }}</sbb-radio-button>
+    </sbb-radio-group>
+    <br />
+    <button type="button" sbbButton (click)="selectFd()">
+      Split Functional Dependency
+    </button>
+  </div>
 </div>
