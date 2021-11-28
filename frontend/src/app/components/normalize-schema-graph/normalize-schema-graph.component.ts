@@ -52,17 +52,16 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
       mermaid.render('graphDiv', graphDefinition, (svgCode, bindFunctions) => {
         element.innerHTML = svgCode;
         this.tables.forEach((table) => {
-          document
-            .querySelector(`[id^='classid-${table.name}']`)
-            ?.addEventListener('click', () => {
-              this.selected.emit(table);
-            });
-          document
-            .querySelector(`[id^='classid-${table.name}']`)
-            ?.childNodes.item(2)
-            .remove();
+          this.getTableinMermaid(table)?.addEventListener('click', () => {
+            this.selected.emit(table);
+          });
+          this.getTableinMermaid(table)?.childNodes.item(2).remove();
         });
       });
     }
+  }
+
+  private getTableinMermaid(table: Table): Element | null {
+    return document.querySelector(`[id^='classid-${table.name}']`);
   }
 }
