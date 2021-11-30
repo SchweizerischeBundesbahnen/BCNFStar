@@ -36,6 +36,6 @@ export default class FunctionalDependency {
   }
 
   public toString(): string {
-    return `${this.lhs} -> ${this.rhs}`;
+    return `${this.lhs} -> ${this.rhs.copy().setMinus(this.lhs)}`;
   }
 }
