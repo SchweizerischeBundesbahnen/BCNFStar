@@ -8,7 +8,8 @@
     "build:frontend": "cd frontend && npm run build",
     "dev:server": "cd server && npm run dev",
     "dev:frontend": "cd frontend && ng serve",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint": "prettier --write ."
   },
   "devDependencies": {
     "eslint-config-prettier": "^8.3.0",
