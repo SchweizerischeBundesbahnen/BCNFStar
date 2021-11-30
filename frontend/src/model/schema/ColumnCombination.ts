@@ -1,4 +1,4 @@
-import Column from "./Column";
+import Column from './Column';
 
 export default class ColumnCombination {
   columns: Set<Column> = new Set();
@@ -13,7 +13,7 @@ export default class ColumnCombination {
 
   public subsetFromIds(...numbers: number[]) {
     return new ColumnCombination(
-      ...this.orderedColumns().filter((col, i) => numbers.includes(i))
+      ...this.inOrder().filter((col, i) => numbers.includes(i))
     );
   }
 
@@ -54,15 +54,15 @@ export default class ColumnCombination {
     return [...this.columns].every((col) => other.includes(col));
   }
 
-  public orderedColumns(): Column[] {
+  public inOrder(): Column[] {
     return [...this.columns].sort((col1, col2) => col1.prio - col2.prio);
   }
 
   public columnNames(): string[] {
-    return this.orderedColumns().map((col) => col.name);
+    return this.inOrder().map((col) => col.name);
   }
 
   public toString(): string {
-    return this.columnNames().join(", ");
+    return this.columnNames().join(', ');
   }
 }

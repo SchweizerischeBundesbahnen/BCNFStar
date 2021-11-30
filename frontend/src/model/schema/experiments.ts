@@ -35,7 +35,3 @@ export function exampleTable(): Table {
   table.extendFds();
   return table;
 }
-const table = exampleTable();
-const fd = table.violatingFds()[0];
-table.split(fd);
-console.log(table.allResultingTablesToMermaidString());

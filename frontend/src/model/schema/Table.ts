@@ -104,41 +104,21 @@ export default class Table {
   }
 
   public toString(): string {
-    let str = `${this.name}(${this.columns.columnNames().join(', ')})\n`;
+    let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
   }
 
   public toMermaidString(): string {
     let result = 'class '.concat(this.name, '{\n');
-    this.columns.columnNames().forEach((columnName) => {
-      result = result.concat(columnName, '\n');
+    this.columns.inOrder().forEach((column) => {
+      result = result.concat(column.name, '\n');
     });
     result = result.concat('}');
     this.referencedTables.forEach((refTable) => {
       if (!refTable.hasChildren) {
         result = result.concat('\n', this.name, ' --> ', refTable.name);
       }
-    });
-    return result;
-  }
-
-  public toMermaidStringER(): string {
-    let result = this.name.concat(' {\n');
-    this.columns.columnNames().forEach((columnName) => {
-      result = result.concat('datatype', ' ', columnName, '\n');
-    });
-    result = result.concat('}');
-    this.referencedTables.forEach((refTable) => {
-      result = result.concat('\n', this.name, ' ||--|| ', refTable.name);
-    });
-    return result;
-  }
-
-  public allResultingTablesToMermaidString(): string {
-    let result = 'classDiagram\n';
-    this.allResultingTables().forEach((table) => {
-      result = result.concat(table.toMermaidString(), '\n');
     });
     return result;
   }
