@@ -5,14 +5,38 @@ import { Pool } from "pg";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import morgan from "morgan";
+import cors, { CorsOptions } from "cors";
 
 const port = process.env["PORT"] || 80;
 
-const pool = new Pool({});
+const pool = new Pool({database: "tpc_data", host: "localhost", user: "mafi"});
+
+const whitelist = [
+  "http://localhost",
+  "http://localhost:4200",
+];
+
+const corsOptions: CorsOptions = {
+  origin(
+    origin: string | undefined,
+    callback: (a: Error | null, b: boolean) => void
+  ) {
+    // callback(null, true);
+    // return;
+    if (process.execArgv.length || !origin || whitelist.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("Error! This origin is not allowed " + origin);
+      callback(new Error("Error! CORS not allowed"), false);
+    }
+  },
+  credentials: true
+};
 
 const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cors(corsOptions));
 
 // Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
 app.get("/test", (req, res) => {

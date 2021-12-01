@@ -1,16 +1,18 @@
 import { Component, OnInit } from '@angular/core';
+import { DatabaseService } from 'src/app/database.service';
+import ITable from '../../../../../server/definitions/ITable';
 
 @Component({
   selector: 'app-table-selection',
   templateUrl: './table-selection.component.html',
-  styleUrls: ['./table-selection.component.css']
+  styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-
-  constructor() { }
+  constructor(private dataService: DatabaseService) {}
 
   ngOnInit(): void {
+    this.dataService.getTableNames().subscribe((data) => (this.tables = data));
   }
 
-  tables = ["table_1", "table_2", "table_3", "table_4", "table_5"];
+  tables: ITable[] = [];
 }

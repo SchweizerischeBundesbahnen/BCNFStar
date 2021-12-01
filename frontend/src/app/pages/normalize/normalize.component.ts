@@ -1,21 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { DatabaseService } from 'src/app/database.service';
 
 @Component({
   selector: 'app-normalize',
   templateUrl: './normalize.component.html',
-  styleUrls: ['./normalize.component.css']
+  styleUrls: ['./normalize.component.css'],
 })
 export class NormalizeComponent implements OnInit {
-
   constructor(
     private route: ActivatedRoute,
-  ) { }
+    private dataService: DatabaseService
+  ) {}
 
-  name = '';
+  tableName = '';
+  functionalDependencies: string[] = [];
 
   ngOnInit(): void {
-    this.name = this.route.snapshot.paramMap.get('table_name') || '';
+    this.tableName = this.route.snapshot.paramMap.get('table_name') || '';
+    this.functionalDependencies =
+      this.dataService.getFunctionalDependenciesByTableName(this.tableName);
   }
-
 }

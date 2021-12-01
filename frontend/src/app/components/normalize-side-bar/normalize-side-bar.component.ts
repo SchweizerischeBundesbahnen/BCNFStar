@@ -1,15 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-normalize-side-bar',
   templateUrl: './normalize-side-bar.component.html',
-  styleUrls: ['./normalize-side-bar.component.css']
+  styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent implements OnInit {
+export class NormalizeSideBarComponent {
+  constructor() {}
 
-  constructor() { }
+  // ngOnInit(): void {}
 
-  ngOnInit(): void {
-  }
-
+  @Input() functionalDependencies!: string[];
 }
