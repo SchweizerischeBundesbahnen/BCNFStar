@@ -5,12 +5,12 @@ import { exec } from 'child_process';
 import {join, dirname} from "path";
 import { toNamespacedPath } from 'path/posix';
 
-config({ path: './secrets/.env' })
+config({ path: '../.env.local' })
 
 export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
 export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
 export const PGPASS_PATH = process.env.PGPASSFILE;
-export const OUTPUT_DIR = join(absoluteServerDir, "/routes/temp");
+export const OUTPUT_DIR = join(absoluteServerDir, "temp");
 
 export default class MetanomeAlgorithm {
   public memory = "12g";
@@ -43,12 +43,19 @@ export default class MetanomeAlgorithm {
       return '/metanome/Normalize-1.2-SNAPSHOT.jar';
   }
   
+  private pgpassPath(): string {
+    if (PGPASS_PATH == undefined){
+      throw new Error("missing PG_PASSFILE in env.local");
+    }
+    return PGPASS_PATH;
+  }
+
   // location in the JAR where the algorithm is located
   private algoClass(): string {
       return 'de.metanome.algorithms.normalize.Normi';
   }
   private command(table : string): string {
-    return `java -Xmx${this.memory} -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${PGPASS_PATH} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_results.json --algorithm-config isHumanInTheLoop:false`;
+    return `java -Xmx${this.memory} -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_results.json --algorithm-config isHumanInTheLoop:false`;
   }
 
 }
