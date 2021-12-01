@@ -7,12 +7,14 @@ import MetanomeAlgorithm from "./metanomeAlgorithm";
 export default function getFDsFromTableNameFunction(): RequestHandler {
     async function getFDsFromTableName(req: Request, res: Response): Promise<void> {
         try {
-            console.log("getFDsFromTableName", req.params.tableName);
+            const tableName = req.params.name;
+            const algorithm = new MetanomeAlgorithm([tableName]);
+
+            const metanomeOutputPaths = await algorithm.run();
             
-            const tableName = req.params.tableName;
-            const metanomeOutputPaths = new MetanomeAlgorithm([tableName]).run();
+            await new Promise(resolve => setTimeout(resolve, 5000));
             
-            const fds = readFileSync(metanomeOutputPaths[tableName], 'utf8').toString().trim().split('\n');
+            const fds = readFileSync(metanomeOutputPaths[tableName.split('.')[1]], 'utf8').toString().trim().split(/\r?\n/);
                           
             const result: IFunctionalDependencies = {tableName: tableName, functionalDependencies: fds}; 
             res.json(result);
