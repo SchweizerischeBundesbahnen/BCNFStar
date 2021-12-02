@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NormalizeComponent } from './normalize.component';
 
-import Table from 'src/model/schema/Table';
 import { SchemaService } from 'src/app/schema.service';
+import { exampleTable } from 'src/model/schema/exampleTables';
 
 describe('NormalizeComponent', () => {
   let component: NormalizeComponent;
@@ -12,7 +12,7 @@ describe('NormalizeComponent', () => {
 
   beforeEach(async () => {
     schemaServiceStub = {
-      inputTable: Table.fromColumnNames('a', 'b'),
+      inputTable: exampleTable(),
     };
     await TestBed.configureTestingModule({
       declarations: [NormalizeComponent],
@@ -37,10 +37,22 @@ describe('NormalizeComponent', () => {
     ).toBeTruthy();
   });
 
-  it('should have a normalize-side-bar', () => {
+  it('should have a normalize-side-bar when a table is selected', () => {
+    component.onSelect(component.inputTable);
+    fixture.detectChanges();
     const normalizeElement: HTMLElement = fixture.nativeElement;
     expect(
       normalizeElement.querySelector('app-normalize-side-bar')
     ).toBeTruthy();
+  });
+
+  it('should include the input table in tables', () => {
+    expect(component.tables).toContain(component.inputTable);
+  });
+
+  it('should not include input table after a split', () => {
+    component.onSelect(component.inputTable);
+    component.onSplitFd(component.inputTable.fds[0]);
+    expect(component.tables).not.toContain(component.inputTable);
   });
 });

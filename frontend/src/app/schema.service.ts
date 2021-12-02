@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { exampleTable } from 'src/model/schema/experiments';
+import { exampleTable } from 'src/model/schema/exampleTables';
 import Table from 'src/model/schema/Table';
 
 @Injectable({

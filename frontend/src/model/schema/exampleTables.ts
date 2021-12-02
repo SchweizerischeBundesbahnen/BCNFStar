@@ -1,4 +1,3 @@
-import FunctionalDependency from './FunctionalDependency';
 import Table from './Table';
 
 export function exampleTableSportartVerein(): Table {
