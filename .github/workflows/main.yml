@@ -5,12 +5,30 @@ on: [push]
 jobs:
   test-cypress:
     runs-on: ubuntu-latest
+    # Service containers to run with `test-cypress`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-    key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      - name: db-setup
+        run: |
+          cat << EOF > .env.local
+          PGPASSFILE=~/.pgpass
+          EOF
+          cat << EOF > ~/.pgpass
+          localhost:5432:postgres:postgres:$POSTGRES_PASSWORD
+          EOF
+          cat .env.local
+          cat ~/.pgpass
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
