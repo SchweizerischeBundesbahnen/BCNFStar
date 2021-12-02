@@ -12,6 +12,10 @@ export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
 export const PGPASS_PATH = process.env.PGPASSFILE;
 export const OUTPUT_DIR = join(absoluteServerDir, "temp");
 
+export function outputPath(schemaAndTable : string) : string{
+  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
+}
+
 export default class MetanomeAlgorithm {
   public memory = "12g";
   private tables: string[];
@@ -48,7 +52,7 @@ export default class MetanomeAlgorithm {
 
   private pgpassPath(): string {
     if (PGPASS_PATH == undefined) {
-      throw new Error("missing PG_PASSFILE in env.local");
+      throw new Error("missing PGPASSFILE in env.local");
     }
     return PGPASS_PATH;
   }
