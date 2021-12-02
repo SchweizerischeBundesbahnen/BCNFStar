@@ -34,7 +34,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           build: npm run build
-          start: sudo npm start
+          start: sudo node server/dist
           wait-on: "http://localhost:80"
           browser: chrome
           record: true
