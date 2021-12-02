@@ -1,7 +1,12 @@
 .DS_Store
 node_modules
 dist
-
+server/temp
+server/results
+/temp
+server/routes/results
+server/routes/temp
+server/routes/secrets
 
 # local env files
 .env.local

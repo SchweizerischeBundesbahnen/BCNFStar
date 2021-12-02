@@ -7,6 +7,11 @@ import { DatabaseSelectionComponent } from './pages/database-selection/database-
 import { TableSelectionComponent } from './pages/table-selection/table-selection.component';
 import { NormalizeComponent } from './pages/normalize/normalize.component';
 import { NormalizeSideBarComponent } from './components/normalize-side-bar/normalize-side-bar.component';
+import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
+import { SbbRadioButtonModule } from '@sbb-esta/angular-business';
+import { SbbButtonModule } from '@sbb-esta/angular-business';
+import { SbbAccordionModule } from '@sbb-esta/angular-business';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -14,9 +19,17 @@ import { NormalizeSideBarComponent } from './components/normalize-side-bar/norma
     DatabaseSelectionComponent,
     TableSelectionComponent,
     NormalizeComponent,
-    NormalizeSideBarComponent
+    NormalizeSideBarComponent,
+    NormalizeSchemaGraphComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    SbbRadioButtonModule,
+    SbbButtonModule,
+    SbbAccordionModule,
+    BrowserAnimationsModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

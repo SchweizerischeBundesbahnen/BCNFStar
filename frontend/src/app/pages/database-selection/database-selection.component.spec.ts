@@ -8,9 +8,8 @@ describe('DatabaseSelectionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DatabaseSelectionComponent ]
-    })
-    .compileComponents();
+      declarations: [DatabaseSelectionComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -8,9 +8,8 @@ describe('NormalizeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NormalizeComponent ]
-    })
-    .compileComponents();
+      declarations: [NormalizeComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

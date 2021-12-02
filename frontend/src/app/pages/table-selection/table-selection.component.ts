@@ -1,16 +1,21 @@
 import { Component, OnInit } from '@angular/core';
+import { SchemaService } from 'src/app/schema.service';
+import { exampleTable } from 'src/model/schema/experiments';
+import Table from 'src/model/schema/Table';
 
 @Component({
   selector: 'app-table-selection',
   templateUrl: './table-selection.component.html',
-  styleUrls: ['./table-selection.component.css']
+  styleUrls: ['./table-selection.component.css'],
 })
-export class TableSelectionComponent implements OnInit {
+export class TableSelectionComponent {
+  tables!: Array<Table>;
 
-  constructor() { }
-
-  ngOnInit(): void {
+  constructor(private schemaService: SchemaService) {
+    this.tables = schemaService.allTables();
   }
 
-  tables = ["table_1", "table_2", "table_3", "table_4", "table_5"];
+  public selectTable(table: Table) {
+    this.schemaService.inputTable = table;
+  }
 }

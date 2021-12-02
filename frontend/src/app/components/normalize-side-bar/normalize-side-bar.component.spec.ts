@@ -8,9 +8,8 @@ describe('NormalizeSideBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NormalizeSideBarComponent ]
-    })
-    .compileComponents();
+      declarations: [NormalizeSideBarComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
