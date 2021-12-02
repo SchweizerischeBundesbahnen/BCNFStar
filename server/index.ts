@@ -8,7 +8,7 @@ import morgan from "morgan";
 
 const port = process.env["PORT"] || 80;
 
-const pool = new Pool({});
+const pool = new Pool({ database: "postgres" });
 
 const app = express();
 app.use(morgan("dev"));
