@@ -1,0 +1,12 @@
+<p>table-selection works!</p>
+
+<ul>
+  <li
+    *ngFor="let table of tables"
+    (click)="selectTable(table)"
+    [routerLink]="['/normalize']"
+    routerLinkActive="active"
+  >
+    <span>{{ table.name }}</span>
+  </li>
+</ul>

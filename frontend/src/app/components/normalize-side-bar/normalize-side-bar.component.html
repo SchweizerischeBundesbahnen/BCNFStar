@@ -1,0 +1,36 @@
+<div>
+  <h3>{{ table.name }}</h3>
+  <sbb-accordion [multi]="true">
+    <sbb-expansion-panel [expanded]="true">
+      <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
+      <ul>
+        <li *ngFor="let key of table.keys()">
+          {{ key.toString() }}
+        </li>
+      </ul>
+    </sbb-expansion-panel>
+    <sbb-expansion-panel [expanded]="true">
+      <sbb-expansion-panel-header
+        >Functional Dependencies</sbb-expansion-panel-header
+      >
+      <div *ngIf="table.violatingFds().length > 0">
+        <sbb-radio-group>
+          <sbb-radio-button
+            *ngFor="let fd of table.violatingFds()"
+            [value]="fd"
+            >{{ fd.toString() }}</sbb-radio-button
+          >
+        </sbb-radio-group>
+        <br />
+        <button
+          type="button"
+          sbbButton
+          [disabled]="!selectedFd()"
+          (click)="splitSelectedFd()"
+        >
+          Split Functional Dependency
+        </button>
+      </div>
+    </sbb-expansion-panel>
+  </sbb-accordion>
+</div>

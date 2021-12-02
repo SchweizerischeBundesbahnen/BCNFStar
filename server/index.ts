@@ -1,16 +1,28 @@
 import express from "express";
 import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
+import { Pool } from "pg";
+import getTablesFunction from "./routes/tables";
+import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
+import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
+import morgan from "morgan";
 
 const port = process.env["PORT"] || 80;
 
+const pool = new Pool({});
+
 const app = express();
+app.use(morgan("dev"));
 app.use(express.json());
 
 // Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
 app.get("/test", (req, res) => {
   res.json({ key: "value" });
 });
+
+app.get("/tables", getTablesFunction(pool));
+app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
+app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 
 app.use(
   expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
