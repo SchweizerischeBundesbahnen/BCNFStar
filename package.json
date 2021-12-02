@@ -4,13 +4,16 @@
     "build": "run-p build:*",
     "start": "node server/dist",
     "dev": "run-p dev:*",
+    "install": "run-p install:*",
+    "test:dev": "CYPRESS_FRONTEND_BASEURL=http://localhost:4200 run-p dev:* cypress:open",
+    "test:prod": "CYPRESS_FRONTEND_BASEURL=http://localhost run-p start cypress:open",
+    "test:ci": "CYPRESS_FRONTEND_BASEURL=http://localhost run -p start cypress:run",
+    "install:server": "cd server && npm install",
+    "install:frontend": "cd frontend && npm install",
     "build:server": "cd server && npm run build",
     "build:frontend": "cd frontend && npm run build",
     "dev:server": "cd server && npm run dev",
     "dev:frontend": "cd frontend && ng serve",
-    "test:dev": "CYPRESS_FRONTEND_BASEURL=http://localhost:4200 run-p dev:* cypress:open",
-    "test:prod": "CYPRESS_FRONTEND_BASEURL=http://localhost run-p start cypress:open",
-    "test:ci": "CYPRESS_FRONTEND_BASEURL=http://localhost run -p start cypress:run",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "prepare": "husky install",
@@ -23,8 +26,7 @@
     "lint-staged": "^12.1.2",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.4.1",
-    "pretty-quick": "^3.1.2",
-    "ttypescript": "^1.5.13"
+    "pretty-quick": "^3.1.2"
   },
   "lint-staged": {
     "*.{js,md,ts,html}": "prettier --write"
