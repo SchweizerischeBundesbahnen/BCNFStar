@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: db-setup
@@ -27,8 +30,6 @@ jobs:
           cat << EOF > ~/.pgpass
           localhost:5432:postgres:postgres:$POSTGRES_PASSWORD
           EOF
-          cat .env.local
-          cat ~/.pgpass
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
