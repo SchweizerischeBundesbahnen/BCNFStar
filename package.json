@@ -7,8 +7,6 @@
     "install": "run-p install:*",
     "test:dev": "CYPRESS_FRONTEND_BASEURL=http://localhost:4200 run-p dev:* cypress:open",
     "test:prod": "CYPRESS_FRONTEND_BASEURL=http://localhost run-p start cypress:open",
-    "test:ci": "CYPRESS_FRONTEND_BASEURL=http://localhost run -p start cypress:run",
-    "postinstall": "npm run generateTypeGuards",
     "prebuild": "npm run generateTypeGuards",
     "install:server": "cd server && npm install",
     "install:frontend": "cd frontend && npm install",
