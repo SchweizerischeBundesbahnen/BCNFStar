@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { SchemaService } from 'src/app/schema.service';
-import { exampleTable } from 'src/model/schema/exampleTables';
 import Table from 'src/model/schema/Table';
 
 @Component({

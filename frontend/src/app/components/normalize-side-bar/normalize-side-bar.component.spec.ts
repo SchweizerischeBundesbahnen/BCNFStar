@@ -41,7 +41,6 @@ describe('NormalizeSideBarComponent', () => {
 
   it('should display all violating fds', () => {
     const sideBarElement: HTMLElement = fixture.nativeElement;
-    console.log(sideBarElement.innerHTML);
     exampleTable()
       .violatingFds()
       .forEach((fd) => {
