@@ -5,6 +5,7 @@ import { Pool } from "pg";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
+import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 
 const port = process.env["PORT"] || 80;
@@ -23,9 +24,12 @@ app.get("/test", (req, res) => {
 app.get("/tables", getTablesFunction(pool));
 app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
-
+console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
 app.use(
-  expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
+  expressStaticGzip(
+    join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
+    {}
+  )
 );
 
 const server = app.listen(port, () => {
