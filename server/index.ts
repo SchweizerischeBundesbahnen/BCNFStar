@@ -3,7 +3,7 @@ import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
 import { Pool } from "pg";
 import { setupDBCredentials } from "./setupDbCredentials";
-
+import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
@@ -25,6 +25,8 @@ app.get("/test", (req, res) => {
 app.get("/tables", getTablesFunction(pool));
 app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
+
+app.post("/persist/createTable", postCreateTable(pool));
 
 app.use(
   expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
