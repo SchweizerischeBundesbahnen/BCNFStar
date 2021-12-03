@@ -4,7 +4,9 @@ import { Request, Response, RequestHandler } from "express";
 import { readFileSync, existsSync, access, constants } from "fs";
 import MetanomeAlgorithm from "./metanomeAlgorithm";
 import { outputPath } from "./metanomeAlgorithm";
-import postRunMetanomeFDAlgorithmFunction, { runMetanomeFDAlgorithm } from "./runMetanome";
+import postRunMetanomeFDAlgorithmFunction, {
+  runMetanomeFDAlgorithm,
+} from "./runMetanome";
 
 export default function getFDsFromTableNameFunction(): RequestHandler {
   async function getFDsFromTableName(
@@ -18,28 +20,24 @@ export default function getFDsFromTableNameFunction(): RequestHandler {
       try {
         const fds: IFunctionalDependencies = {
           tableName: schemaAndTable,
-          functionalDependencies: readFDsFromFile(expectedOutputPath)
-        }
+          functionalDependencies: readFDsFromFile(expectedOutputPath),
+        };
         res.status(200).send(fds);
       } catch (e) {
-        res.json("Missing fds. Running Metanome-Algorithm. Ask again in 69h ... ;-)");
+        res.json(
+          "Missing fds. Running Metanome-Algorithm. Ask again in 69h ... ;-)"
+        );
         await runMetanomeFDAlgorithm(schemaAndTable);
       }
     } catch (error) {
       console.error(error);
-      res.json({ error: "Could not get fds for table... " });
-      res.status(502);
+      if (!res.headersSent)
+        res.status(502).json({ error: "Could not get fds for table... " });
     }
   }
   return getFDsFromTableName;
 }
 
 function readFDsFromFile(path: string): string[] {
-  return readFileSync(
-    path,
-    "utf8"
-  )
-    .toString()
-    .trim()
-    .split(/\r?\n/);
+  return readFileSync(path, "utf8").toString().trim().split(/\r?\n/);
 }
