@@ -31,8 +31,9 @@ jobs:
           localhost:5432:_test_:postgres:$POSTGRES_PASSWORD
           EOF
           chmod 600 ~/.pgpass
+          cat ~/.pgpass
           createdb _test_
-          pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
+          PGPASSFILE=~/.pgpass pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
