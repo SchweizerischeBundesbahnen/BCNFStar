@@ -1,18 +1,14 @@
 import { absoluteServerDir } from "../utils/files";
-import { config } from "dotenv";
 import { promisify } from "util";
 import { exec } from "child_process";
-import { join, dirname } from "path";
-import { toNamespacedPath } from "path/posix";
-
-config({ path: "../.env.local" });
+import { join } from "path";
 
 export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
 export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
 export const PGPASS_PATH = process.env.PGPASSFILE;
 export const OUTPUT_DIR = join(absoluteServerDir, "temp");
 
-export function outputPath(schemaAndTable : string) : string{
+export function outputPath(schemaAndTable: string): string {
   return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
 }
 
@@ -25,7 +21,9 @@ export default class MetanomeAlgorithm {
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     this.tables.forEach(async (table) => {
-      await asyncExec(this.command(table));
+      const { stderr, stdout } = await asyncExec(this.command(table));
+      // console.log(result.stdout);
+      if (stderr) throw stderr;
     });
 
     let dict = {};
