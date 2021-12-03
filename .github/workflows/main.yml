@@ -30,10 +30,10 @@ jobs:
           PGPASSFILE=~/.pgpass
           EOF
           cat << EOF > ~/.pgpass
-          localhost:5432:_test_:postgres:postgres
+          postgres:5432:_test_:postgres:postgres
           EOF
           chmod 600 ~/.pgpass
-          cat ~/.pgpass
+
           PGPASSFILE=~/.pgpass createdb _test_
           PGPASSFILE=~/.pgpass pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
       - name: Cypress run
