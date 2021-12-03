@@ -52,13 +52,13 @@ jobs:
         env:
            CYPRESS_FRONTEND_BASEURL: "http://localhost:80"
       - name: Upload screenshots
-        uses: actions/upload-artifact@2.2.4
+        uses: actions/upload-artifact@v2.2.4
         if: failure()
         with:
             name: cypress-screenshots
             path: cypress/screenshots
       - name: Upload videos
-        uses: actions/upload-artifact@latest
+        uses: actions/upload-artifact@v2.2.4
         if: failure()
         with:
             name: cypress-videos
