@@ -28,8 +28,11 @@ jobs:
           PGPASSFILE=~/.pgpass
           EOF
           cat << EOF > ~/.pgpass
-          localhost:5432:postgres:postgres:$POSTGRES_PASSWORD
+          localhost:5432:_test_:postgres:$POSTGRES_PASSWORD
           EOF
+          createdb _test_
+          pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
+          java -version
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
@@ -38,6 +41,6 @@ jobs:
           wait-on: "http://localhost:80"
           browser: chrome
           record: true
-          parallel: true
+          parallel: false
         env:
            CYPRESS_FRONTEND_BASEURL: "http://localhost:80"
