@@ -6,7 +6,7 @@ describe("The tables page", () => {
     cy.url().should("contain", "/table-selection");
     // contains asserts that a element with the content exists and selects it
     cy.contains("Example").click();
-    cy.contains("ExampleTabla");
+    cy.contains("ExampleTable");
     cy.url().should("contain", "/normalize");
   });
 });
