@@ -30,12 +30,18 @@ jobs:
           PGPASSFILE=~/.pgpass
           EOF
           cat << EOF > ~/.pgpass
-          postgres:5432:_test_:postgres:postgres
+          $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
           EOF
           chmod 600 ~/.pgpass
 
-          PGPASSFILE=~/.pgpass createdb _test_
-          PGPASSFILE=~/.pgpass pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
+          createdb _test_
+          pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
+        env:
+          PGPASSWORD: postgres
+          PGHOST: postgres
+          PGPORT: 5432
+          PGDATABASE: _test_
+          PGUSER: postgres
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
