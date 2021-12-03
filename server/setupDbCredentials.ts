@@ -6,6 +6,8 @@ import { absoluteServerDir } from "./utils/files";
 export function setupDBCredentials() {
   try {
     config({ path: join(absoluteServerDir, "..", ".env.local") });
+    if (!process.env.PGPASSFILE)
+      process.env.PGPASSFILE = getDefaultPgpassLocation();
     // .pgpass format: hostname:port:database:username:password
     const content = readFileSync(process.env.PGPASSFILE, "utf-8");
     const [hostname, port, database, username, password] = content.split(":");
@@ -21,8 +23,14 @@ export function setupDBCredentials() {
 (for more info, see https://www.postgresql.org/docs/9.3/libpq-pgpass.html)
 and save its location in a PGPASSFILE environment variable. You can do this by placing 
 the line 'PGPASSFILE=<path to file>' in a file called .env.local at the project root.
-      `);
+The current value of PGPASSFILE is ${process.env.PGPASSFILE}`);
       process.exit();
     } else throw e;
   }
+}
+
+function getDefaultPgpassLocation(): string {
+  if (process.platform == "win32")
+    return join(process.env.APPDATA, "postgresql", "pgpass.conf");
+  else return join(process.env.HOME, ".pgpass");
 }
