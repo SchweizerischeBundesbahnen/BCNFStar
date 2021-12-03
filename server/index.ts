@@ -2,13 +2,15 @@ import express from "express";
 import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
 import { Pool } from "pg";
+import { setupDBCredentials } from "./setupDbCredentials";
+
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 
-const port = process.env["PORT"] || 80;
+setupDBCredentials();
 
 const pool = new Pool({ database: "postgres" });
 
@@ -31,6 +33,8 @@ app.use(
     {}
   )
 );
+
+const port = process.env["PORT"] || 80;
 
 const server = app.listen(port, () => {
   console.log(`bcnfstar server started on port ${port}`);
