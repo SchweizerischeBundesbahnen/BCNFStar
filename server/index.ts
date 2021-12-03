@@ -8,6 +8,7 @@ import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
+import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 
 setupDBCredentials();
@@ -30,7 +31,10 @@ app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
 app.use(
-  expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
+  expressStaticGzip(
+    join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
+    {}
+  )
 );
 
 const port = process.env["PORT"] || 80;
