@@ -11,8 +11,11 @@ export default function getTablesFunction(pool: Pool): RequestHandler {
         data_type: string;
         column_name: string;
       }>(
-        "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema=$1",
-        ["public"]
+        // the last line excludes system tables
+        `SELECT table_name, column_name, data_type 
+        FROM information_schema.columns 
+        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')`,
+        []
       );
       const tempTables: Record<string, ITable> = {};
       for (const row of query_result.rows) {

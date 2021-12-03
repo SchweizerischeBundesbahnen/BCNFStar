@@ -1,11 +1,8 @@
 import { absoluteServerDir } from "../utils/files";
-import { config } from "dotenv";
 import { promisify } from "util";
 import { exec } from "child_process";
 import { join, dirname } from "path";
 import { toNamespacedPath } from "path/posix";
-
-config({ path: "../.env.local" });
 
 export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
 export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
