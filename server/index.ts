@@ -12,7 +12,7 @@ import morgan from "morgan";
 
 setupDBCredentials();
 
-const pool = new Pool({ database: "postgres" });
+const pool = new Pool({});
 
 const app = express();
 app.use(morgan("dev"));
