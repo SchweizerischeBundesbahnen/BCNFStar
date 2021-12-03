@@ -1,6 +1,8 @@
-import { dirname } from "path";
+import { join } from "path";
 
 function getAbsoluteServerDir() {
-  return dirname(__dirname);
+  // if we are compiled javascript, we need to escape one more folder (the 'dist' folder)
+  if (__dirname.endsWith("dist/utils")) return join(__dirname, "..", "..");
+  else return join(__dirname, "..");
 }
 export const absoluteServerDir = getAbsoluteServerDir();

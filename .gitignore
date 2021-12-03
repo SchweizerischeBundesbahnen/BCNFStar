@@ -26,3 +26,9 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# auto-generated type-checker functions (see ts-auto-guard)
+*.guard.ts
+
+cypress/videos
+cypress/screenshots
