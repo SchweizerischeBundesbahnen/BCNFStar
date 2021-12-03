@@ -1,9 +1,11 @@
 import { config } from "dotenv";
 import { readFileSync } from "fs";
+import { join } from "path";
+import { absoluteServerDir } from "./utils/files";
 
 export function setupDBCredentials() {
   try {
-    config({ path: "../.env.local" });
+    config({ path: join(absoluteServerDir, "..", ".env.local") });
     // .pgpass format: hostname:port:database:username:password
     const content = readFileSync(process.env.PGPASSFILE, "utf-8");
     const [hostname, port, database, username, password] = content.split(":");
