@@ -38,7 +38,7 @@ jobs:
           pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
         env:
           PGPASSWORD: postgres
-          PGHOST: postgres
+          PGHOST: 127.0.0.1
           PGPORT: 5432
           PGDATABASE: _test_
           PGUSER: postgres
