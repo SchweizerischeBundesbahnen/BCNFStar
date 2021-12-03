@@ -30,9 +30,9 @@ jobs:
           cat << EOF > ~/.pgpass
           localhost:5432:_test_:postgres:$POSTGRES_PASSWORD
           EOF
+          chmod 600 ~/.pgpass
           createdb _test_
           pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
-          java -version
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
