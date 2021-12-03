@@ -1,5 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-cd frontend && ng lint && cd ..
 npx lint-staged
+cd frontend
+npm run lint
+cd ..
