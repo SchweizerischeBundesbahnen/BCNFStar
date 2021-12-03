@@ -8,6 +8,11 @@ export function setupDBCredentials() {
     config({ path: join(absoluteServerDir, "..", ".env.local") });
     if (!process.env.PGPASSFILE)
       process.env.PGPASSFILE = getDefaultPgpassLocation();
+
+    // replace ~ with full home directory, as fs doesn't understand it
+    if (process.env.PGPASSFILE.startsWith("~"))
+      process.env.PGPASSFILE =
+        process.env.HOME + process.env.PGPASSFILE.slice(1);
     // .pgpass format: hostname:port:database:username:password
     const content = readFileSync(process.env.PGPASSFILE, "utf-8");
     const [hostname, port, database, username, password] = content.split(":");
