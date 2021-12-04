@@ -16,6 +16,30 @@ export default class FunctionalDependency {
     this.rhs = rhs;
   }
 
+  //  "[c_address] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
+  public static fromString(
+    table: Table,
+    metanomeString: string
+  ): FunctionalDependency {
+    const [lhsString, rhsString] = metanomeString
+      .split('-->')
+      .map((elem) => elem.trim());
+    // console.log("lhs: ", lhsString);
+    // console.log("rhs: ", rhsString);
+    let lhs: ColumnCombination = table.columns.columnsFromNames(
+      ...rhsString.split(',').map((elem) => elem.trim())
+    );
+    let rhs: ColumnCombination = table.columns.columnsFromNames(
+      ...lhsString
+        .replace('[', '')
+        .replace(']', '')
+        .split(',')
+        .map((elem) => elem.trim())
+    );
+
+    return new FunctionalDependency(table, lhs, rhs);
+  }
+
   public extend(): void {
     this.rhs.union(this.lhs);
     // TODO: Inter-FD-extension (maybe)

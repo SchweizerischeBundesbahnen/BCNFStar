@@ -53,6 +53,8 @@ app.get("/tables", getTablesFunction(pool));
 app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 
+// PGPASSFILE=C:\.pgpass
+// localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
 app.use(

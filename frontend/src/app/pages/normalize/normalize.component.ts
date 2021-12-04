@@ -1,9 +1,8 @@
-import { SchemaService } from 'src/app/schema.service';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import { Component } from '@angular/core';
+import { DatabaseService } from 'src/app/database.service';
 // import { ActivatedRoute } from '@angular/router';
-// import { DatabaseService } from 'src/app/database.service';
 
 @Component({
   selector: 'app-normalize',
@@ -15,9 +14,19 @@ export class NormalizeComponent {
   tables: Array<Table> = [];
   selectedTable?: Table;
 
-  constructor(public schemaService: SchemaService) {
-    this.inputTable = schemaService.inputTable!;
+  constructor(public dataService: DatabaseService) {
+    this.inputTable = dataService.inputTable!;
     this.onInputTableChanged();
+    this.dataService
+      .getFunctionalDependenciesByTable(this.inputTable)
+      .subscribe((fd) =>
+        this.inputTable.setFds(
+          ...fd.functionalDependencies.map((fds) =>
+            FunctionalDependency.fromString(this.inputTable, fds)
+          )
+        )
+      );
+    console.log(this.inputTable);
   }
 
   onInputTableChanged(): void {
@@ -33,20 +42,4 @@ export class NormalizeComponent {
     this.onInputTableChanged();
     this.selectedTable = this.selectedTable!.children[0];
   }
-  /*
-export class NormalizeComponent implements OnInit {
-  constructor(
-    private route: ActivatedRoute,
-    private dataService: DatabaseService
-  ) {}
-
-  tableName = '';
-  functionalDependencies: string[] = [];
-
-  ngOnInit(): void {
-    this.tableName = this.route.snapshot.paramMap.get('table_name') || '';
-    this.functionalDependencies =
-      this.dataService.getFunctionalDependenciesByTableName(this.tableName);
-  }
-*/
 }

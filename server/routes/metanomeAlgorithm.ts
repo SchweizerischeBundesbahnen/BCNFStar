@@ -50,7 +50,7 @@ export default class MetanomeAlgorithm {
 
   private pgpassPath(): string {
     if (PGPASS_PATH == undefined) {
-      throw new Error("missing PGPASSFILE in env.local");
+      throw new Error("missing PGPASSFILE in .env.local");
     }
     return PGPASS_PATH;
   }

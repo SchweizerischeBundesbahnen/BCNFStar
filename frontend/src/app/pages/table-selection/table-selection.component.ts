@@ -7,23 +7,16 @@ import ITable from '../../../../../server/definitions/ITable';
   templateUrl: './table-selection.component.html',
   styleUrls: ['./table-selection.component.css'],
 })
-/*export class TableSelectionComponent {
-  tables!: Array<Table>;
-
-  constructor(private schemaService: SchemaService) {
-    this.tables = schemaService.allTables();
-  }
-
-  public selectTable(table: Table) {
-    this.schemaService.inputTable = table;
-  }
-  */
 export class TableSelectionComponent implements OnInit {
   // eslint-disable-next-line no-unused-vars
   constructor(private dataService: DatabaseService) {}
 
   ngOnInit(): void {
     this.dataService.getTableNames().subscribe((data) => (this.tables = data));
+  }
+
+  public selectTable(table: ITable) {
+    this.dataService.setInputTable(table);
   }
 
   tables: ITable[] = [];

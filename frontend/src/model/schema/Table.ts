@@ -2,6 +2,7 @@
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
+import ITable from '../../../../server/definitions/ITable';
 
 export default class Table {
   name: string = '';
@@ -15,10 +16,28 @@ export default class Table {
     if (columns) this.columns = columns;
   }
 
+  public static fromITable(iTable: ITable): Table {
+    let columns = new ColumnCombination();
+    iTable.attribute.forEach((iAttribute, index) => {
+      columns.add(new Column(iAttribute.name, iAttribute.dataType, index));
+    });
+    let table = new Table(columns);
+    table.name = iTable.name; //mermaid tablenames must not contain dots
+    return table;
+  }
+
   public static fromColumnNames(...names: string[]) {
     const table: Table = new Table();
-    names.forEach((name, i) => table.columns.add(new Column(name, i)));
+    names.forEach((name, i) => table.columns.add(new Column(name, '?', i)));
     return table;
+  }
+
+  public get mermaidName(): string {
+    return this.name
+      .replace('.', '_')
+      .replace(' ', '')
+      .replace('}', '')
+      .replace('{', '');
   }
 
   public get numColumns(): number {
@@ -27,6 +46,12 @@ export default class Table {
 
   public get hasChildren(): boolean {
     return !!this.children[0];
+  }
+
+  public setFds(...fds: FunctionalDependency[]) {
+    this.fds = fds;
+    this.extendFds();
+    this.fds = fds.filter((fd) => !fd.isFullyTrivial());
   }
 
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
@@ -110,14 +135,19 @@ export default class Table {
   }
 
   public toMermaidString(): string {
-    let result = 'class '.concat(this.name, '{\n');
+    let result = 'class '.concat(this.mermaidName, '{\n');
     this.columns.inOrder().forEach((column) => {
-      result = result.concat(column.name, '\n');
+      result = result.concat(column.dataType, ' ', column.name, '\n');
     });
     result = result.concat('}');
     this.referencedTables.forEach((refTable) => {
       if (!refTable.hasChildren) {
-        result = result.concat('\n', this.name, ' --> ', refTable.name);
+        result = result.concat(
+          '\n',
+          this.mermaidName,
+          ' --> ',
+          refTable.mermaidName
+        );
       }
     });
     return result;
