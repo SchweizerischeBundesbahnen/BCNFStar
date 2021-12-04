@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
 import { SchemaService } from 'src/app/schema.service';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
+import { Component } from '@angular/core';
+// import { ActivatedRoute } from '@angular/router';
+// import { DatabaseService } from 'src/app/database.service';
 
 @Component({
   selector: 'app-normalize',
@@ -31,4 +33,20 @@ export class NormalizeComponent {
     this.onInputTableChanged();
     this.selectedTable = this.selectedTable!.children[0];
   }
+  /*
+export class NormalizeComponent implements OnInit {
+  constructor(
+    private route: ActivatedRoute,
+    private dataService: DatabaseService
+  ) {}
+
+  tableName = '';
+  functionalDependencies: string[] = [];
+
+  ngOnInit(): void {
+    this.tableName = this.route.snapshot.paramMap.get('table_name') || '';
+    this.functionalDependencies =
+      this.dataService.getFunctionalDependenciesByTableName(this.tableName);
+  }
+*/
 }

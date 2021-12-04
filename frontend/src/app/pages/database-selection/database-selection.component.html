@@ -1,14 +1,12 @@
 <p>database-selection works good!</p>
 
 <form action="getform.php" method="get">
-  First name: <input type="text" name="first_name" /><br />
-  Last name: <input type="text" name="last_name" /><br />
-  E-mail: <input type="email" name="user_email" /><br />
-  <input
-    type="submit"
-    value="Submit"
-    routerLink="/table-selection"
-    routerLinkActive="active"
-  />
+  Database: <input type="text" name="database" /><br />
+  Username: <input type="text" name="username" /><br />
+  Password: <input type="text" name="password" /><br />
+  <input type="submit" value="Submit" />
+  <button routerLink="/table-selection" routerLinkActive="active">
+    Default Connection
+  </button>
 </form>
 <router-outlet></router-outlet>
