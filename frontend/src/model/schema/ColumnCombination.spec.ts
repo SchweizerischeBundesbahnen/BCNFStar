@@ -25,10 +25,6 @@ describe('ColumnCombination', () => {
     expect(cc1.cardinality).toEqual(2);
   });
 
-  it('should have correct cardinality', () => {
-    expect(cc1.cardinality).toEqual(2);
-  });
-
   it('should check equality correctly', () => {
     expect(cc1.equals(cc1.copy())).toBeTrue();
     expect(cc1.equals(cc2)).toBeFalse();
