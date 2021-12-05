@@ -4,7 +4,7 @@
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
       <ul>
-        <li *ngFor="let key of table.keys()">
+        <li *ngFor="let key of table.keys().slice(0, 5)">
           {{ key.toString() }}
         </li>
       </ul>
@@ -16,7 +16,7 @@
       <div *ngIf="table.violatingFds().length > 0">
         <sbb-radio-group>
           <sbb-radio-button
-            *ngFor="let fd of table.violatingFds()"
+            *ngFor="let fd of table.violatingFds().slice(0, 10)"
             [value]="fd"
             >{{ fd.toString() }}</sbb-radio-button
           >
