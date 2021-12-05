@@ -69,12 +69,18 @@ export default class Table {
     this.fds.forEach((fd) => fd.extend());
   }
 
+  public remainingSchema(fd: FunctionalDependency): ColumnCombination {
+    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs);
+  }
+
+  public generatingSchema(fd: FunctionalDependency): ColumnCombination {
+    return fd.rhs.copy();
+  }
+
   public split(fd: FunctionalDependency): Table[] {
     //assert(this.fds.includes(fd));
-    this.children[0] = this.constructProjection(
-      this.columns.copy().setMinus(fd.rhs).union(fd.lhs)
-    );
-    this.children[1] = this.constructProjection(fd.rhs.copy());
+    this.children[0] = this.constructProjection(this.remainingSchema(fd));
+    this.children[1] = this.constructProjection(this.generatingSchema(fd));
     this.children[0].referencedTables.push(this.children[1]);
     this.children[1].referencingTables.push(this.children[0]);
     this.children[0].name = this.name;
@@ -122,6 +128,12 @@ export default class Table {
       .map((fd) => fd.lhs);
     if (keys.length == 0) keys.push(this.columns.copy());
     return keys;
+  }
+
+  public foreignKeys(): ColumnCombination[] {
+    return this.referencedTables.map((table) =>
+      this.foreignKeyForReferencedTable(table)
+    );
   }
 
   public violatingFds(): FunctionalDependency[] {

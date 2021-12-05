@@ -56,7 +56,16 @@ export default class FunctionalDependency {
   }
 
   public violatesBCNF(): boolean {
-    return !this.isKey();
+    if (this.isKey()) return false;
+    if (this.lhs.cardinality == 0) return false;
+    this.table.foreignKeys().forEach((fk) => {
+      if (
+        !fk.isSubsetOf(this.table.remainingSchema(this)) &&
+        !fk.isSubsetOf(this.table.generatingSchema(this))
+      )
+        return false;
+    });
+    return true;
   }
 
   public toString(): string {
