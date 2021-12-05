@@ -78,7 +78,7 @@ export default class Table {
     this.children[0].referencedTables.push(this.children[1]);
     this.children[1].referencingTables.push(this.children[0]);
     this.children[0].name = this.name;
-    this.children[1].name = fd.lhs.columnNames().join('_');
+    this.children[1].name = fd.lhs.columnNames().join('_').substring(0, 50);
     return this.children;
   }
 

@@ -26,10 +26,10 @@ export default class FunctionalDependency {
       .map((elem) => elem.trim());
     // console.log("lhs: ", lhsString);
     // console.log("rhs: ", rhsString);
-    let lhs: ColumnCombination = table.columns.columnsFromNames(
+    let rhs: ColumnCombination = table.columns.columnsFromNames(
       ...rhsString.split(',').map((elem) => elem.trim())
     );
-    let rhs: ColumnCombination = table.columns.columnsFromNames(
+    let lhs: ColumnCombination = table.columns.columnsFromNames(
       ...lhsString
         .replace('[', '')
         .replace(']', '')
