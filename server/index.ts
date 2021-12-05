@@ -14,11 +14,7 @@ import cors, { CorsOptions } from "cors";
 
 setupDBCredentials();
 
-const pool = new Pool({
-  database: "tpc_data",
-  host: "localhost",
-  user: "mafi",
-});
+const pool = new Pool();
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 

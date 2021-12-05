@@ -7,6 +7,7 @@ import ITable from '../../../../server/definitions/ITable';
 export default class Table {
   name: string = '';
   columns: ColumnCombination = new ColumnCombination();
+  pk?: ColumnCombination;
   fds: FunctionalDependency[] = [];
   children: Table[] = new Array(2);
   referencedTables: Table[] = [];
@@ -81,6 +82,8 @@ export default class Table {
     //assert(this.fds.includes(fd));
     this.children[0] = this.constructProjection(this.remainingSchema(fd));
     this.children[1] = this.constructProjection(this.generatingSchema(fd));
+    this.children[0].pk = this.pk;
+    this.children[1].pk = fd.lhs.copy();
     this.children[0].referencedTables.push(this.children[1]);
     this.children[1].referencingTables.push(this.children[0]);
     this.children[0].name = this.name;
@@ -127,7 +130,7 @@ export default class Table {
       .filter((fd) => fd.isKey())
       .map((fd) => fd.lhs);
     if (keys.length == 0) keys.push(this.columns.copy());
-    return keys;
+    return keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
   }
 
   public foreignKeys(): ColumnCombination[] {
@@ -137,7 +140,9 @@ export default class Table {
   }
 
   public violatingFds(): FunctionalDependency[] {
-    return this.fds.filter((fd) => fd.violatesBCNF());
+    return this.fds
+      .filter((fd) => fd.violatesBCNF())
+      .sort((fd1, fd2) => fd1.lhs.cardinality - fd2.lhs.cardinality);
   }
 
   public toString(): string {

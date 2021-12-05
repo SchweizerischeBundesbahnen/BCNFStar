@@ -58,13 +58,20 @@ export default class FunctionalDependency {
   public violatesBCNF(): boolean {
     if (this.isKey()) return false;
     if (this.lhs.cardinality == 0) return false;
-    this.table.foreignKeys().forEach((fk) => {
-      if (
-        !fk.isSubsetOf(this.table.remainingSchema(this)) &&
-        !fk.isSubsetOf(this.table.generatingSchema(this))
-      )
-        return false;
-    });
+    if (
+      this.table.foreignKeys().some((fk) => {
+        return (
+          !fk.isSubsetOf(this.table.remainingSchema(this)) &&
+          !fk.isSubsetOf(this.table.generatingSchema(this))
+        );
+      })
+    )
+      return false;
+    if (
+      this.table.pk &&
+      !this.table.pk.isSubsetOf(this.table.remainingSchema(this))
+    )
+      return false;
     return true;
   }
 
