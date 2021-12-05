@@ -142,7 +142,12 @@ export default class Table {
   public violatingFds(): FunctionalDependency[] {
     return this.fds
       .filter((fd) => fd.violatesBCNF())
-      .sort((fd1, fd2) => fd1.lhs.cardinality - fd2.lhs.cardinality);
+      .sort((fd1, fd2) => {
+        let comparison = fd1.lhs.cardinality - fd2.lhs.cardinality;
+        if (comparison == 0)
+          comparison = fd2.rhs.cardinality - fd1.rhs.cardinality;
+        return comparison;
+      });
   }
 
   public toString(): string {
