@@ -11,8 +11,12 @@
       "extends": [
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates",
+        "eslint:recommended",
         "prettier"
       ],
+      "env": {
+        "browser": true
+      },
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
@@ -30,6 +34,12 @@
             "style": "kebab-case"
           }
         ]
+      }
+    },
+    {
+      "files": ["*.spec.ts"],
+      "rules": {
+        "no-undef": ["off"]
       }
     },
     {
