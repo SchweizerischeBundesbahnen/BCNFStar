@@ -4,7 +4,6 @@ import {
   Input,
   Output,
   ViewChild,
-  OnInit,
 } from '@angular/core';
 import { SbbRadioGroup } from '@sbb-esta/angular-core/radio-button';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
@@ -15,17 +14,13 @@ import Table from 'src/model/schema/Table';
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent implements OnInit {
+export class NormalizeSideBarComponent {
   @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
   @Input() table!: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
   // @Input() functionalDependencies!: string[];
   constructor() {}
-
-  ngOnInit() {
-    console.log(this.table.violatingFds());
-  }
 
   selectedFd(): FunctionalDependency | undefined {
     if (!this.fdSelectionGroup) return undefined;
