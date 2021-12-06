@@ -49,16 +49,12 @@ describe('NormalizeComponent', () => {
   });
 
   it('should have a normalize-schema-graph', () => {
-    const schemaGraph = fixture.debugElement.query(
-      By.directive(NormalizeSchemaGraphComponent)
-    ).componentInstance;
+    const schemaGraph = getSchemaGraph(fixture);
     expect(schemaGraph).toBeTruthy();
   });
 
   it("'s normalize-schema-graph should have correct tables", () => {
-    const schemaGraph = fixture.debugElement.query(
-      By.directive(NormalizeSchemaGraphComponent)
-    ).componentInstance;
+    const schemaGraph = getSchemaGraph(fixture);
     expect(schemaGraph.tables).toEqual(component.tables);
     component.tables.push(new Table());
     expect(schemaGraph.tables).toEqual(component.tables);
@@ -67,46 +63,30 @@ describe('NormalizeComponent', () => {
   });
 
   it("'s normalize-schema-graph should have correct selected table", () => {
-    const schemaGraph = fixture.debugElement.query(
-      By.directive(NormalizeSchemaGraphComponent)
-    ).componentInstance;
+    const schemaGraph = getSchemaGraph(fixture);
     component.onSelect(component.inputTable);
     fixture.detectChanges();
     expect(schemaGraph.selectedTable).toEqual(component.selectedTable);
   });
 
   it("'s normalize-schema-graph should set selected table", () => {
-    const schemaGraph = fixture.debugElement.query(
-      By.directive(NormalizeSchemaGraphComponent)
-    ).componentInstance;
+    const schemaGraph = getSchemaGraph(fixture);
     schemaGraph.selected.emit(schemaGraph.tables[0]);
     expect(component.selectedTable).toEqual(schemaGraph.tables[0]);
   });
 
   it('should have a normalize-side-bar when a table is selected', () => {
-    component.onSelect(component.inputTable);
-    fixture.detectChanges();
-    const sideBar = fixture.debugElement.query(
-      By.directive(NormalizeSideBarComponent)
-    ).componentInstance;
+    const sideBar = getSideBar(fixture, component);
     expect(sideBar).toBeTruthy();
   });
 
   it("'s normalize-side-bar should have correct table", () => {
-    component.onSelect(component.inputTable);
-    fixture.detectChanges();
-    const sideBar = fixture.debugElement.query(
-      By.directive(NormalizeSideBarComponent)
-    ).componentInstance;
-    expect(sideBar.table).toEqual(component.selectedTable);
+    const sideBar = getSideBar(fixture, component);
+    expect(sideBar.table).toEqual(component.selectedTable!);
   });
 
   it("'s normalize-side-bar should trigger splitting", () => {
-    component.onSelect(component.inputTable);
-    fixture.detectChanges();
-    const sideBar = fixture.debugElement.query(
-      By.directive(NormalizeSideBarComponent)
-    ).componentInstance;
+    const sideBar = getSideBar(fixture, component);
     sideBar.splitFd.emit(sideBar.table.violatingFds()[0]);
     expect(component.tables.includes(component.inputTable)).toBeFalse();
   });
@@ -127,3 +107,20 @@ describe('NormalizeComponent', () => {
     ).toBeTruthy();
   });*/
 });
+
+function getSchemaGraph(
+  fixture: ComponentFixture<NormalizeComponent>
+): NormalizeSchemaGraphComponent {
+  return fixture.debugElement.query(By.directive(NormalizeSchemaGraphComponent))
+    .componentInstance;
+}
+
+function getSideBar(
+  fixture: ComponentFixture<NormalizeComponent>,
+  component: NormalizeComponent
+): NormalizeSideBarComponent {
+  component.onSelect(component.inputTable);
+  fixture.detectChanges();
+  return fixture.debugElement.query(By.directive(NormalizeSideBarComponent))
+    .componentInstance;
+}
