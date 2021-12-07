@@ -9,8 +9,8 @@ describe('Table', () => {
     table = exampleTable();
   });
 
-  it('should initially have no children', () => {
-    expect(table.hasChildren).toBeFalse();
+  it('should initially be its own origin', () => {
+    expect(table.origin).toBe(table);
   });
 
   it('should split columns correctly', () => {
@@ -25,11 +25,18 @@ describe('Table', () => {
   it('should split references correctly', () => {
     let children = table.split(table.fds[1]);
 
-    expect(children[0].referencedTables).toEqual([children[1]]);
-    expect(children[0].referencingTables.length).toEqual(0);
+    expect(children[0].referencedTables).toEqual(new Set([children[1]]));
+    expect(children[0].referencingTables.size).toEqual(0);
 
-    expect(children[1].referencingTables).toEqual([children[0]]);
-    expect(children[1].referencedTables.length).toEqual(0);
+    expect(children[1].referencingTables).toEqual(new Set([children[0]]));
+    expect(children[1].referencedTables.size).toEqual(0);
+  });
+
+  it('should pass the origin reference when splitting', () => {
+    let children = table.split(table.fds[1]);
+
+    expect(children[0].origin).toBe(table.origin);
+    expect(children[1].origin).toBe(table.origin);
   });
 
   it('should split fds correctly', () => {

@@ -17,7 +17,7 @@ describe('NormalizeSchemaGraphComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(NormalizeSchemaGraphComponent);
     component = fixture.componentInstance;
-    component.tables = [exampleTable()];
+    component.tables = new Set([exampleTable()]);
     fixture.detectChanges();
     // htmlElement = fixture.nativeElement;
   });
