@@ -23,12 +23,12 @@ export function exampleTable(): Table {
   );
   table.name = 'Example Table';
   table.addFd(
-    table.columns.subsetFromIds(0),
-    table.columns.subsetFromIds(1, 2, 3, 4)
-  );
-  table.addFd(
     table.columns.subsetFromIds(0, 5),
     table.columns.subsetFromIds(1, 2, 3, 4, 6)
+  );
+  table.addFd(
+    table.columns.subsetFromIds(0),
+    table.columns.subsetFromIds(1, 2, 3, 4)
   );
   table.addFd(table.columns.subsetFromIds(2), table.columns.subsetFromIds(3));
   table.extendFds();
