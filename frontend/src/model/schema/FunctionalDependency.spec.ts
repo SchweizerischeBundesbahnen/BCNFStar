@@ -1,5 +1,4 @@
 import { exampleTable } from './exampleTables';
-import FunctionalDependency from './FunctionalDependency';
 import Table from './Table';
 
 describe('FunctionalDependency', () => {
