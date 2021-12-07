@@ -3,23 +3,23 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { TableSelectionComponent } from './table-selection.component';
 
-import { SchemaService } from 'src/app/schema.service';
+import { DatabaseService } from 'src/app/database.service';
 import { exampleTable } from 'src/model/schema/exampleTables';
 import Table from 'src/model/schema/Table';
 
 describe('TableSelectionComponent', () => {
   let component: TableSelectionComponent;
   let fixture: ComponentFixture<TableSelectionComponent>;
-  let schemaServiceStub: any;
+  let databaseServiceStub: any;
 
   beforeEach(async () => {
-    schemaServiceStub = {
+    databaseServiceStub = {
       allTables: () => [exampleTable()],
     };
     await TestBed.configureTestingModule({
       declarations: [TableSelectionComponent],
       imports: [HttpClientModule],
-      providers: [{ provide: SchemaService, useValue: schemaServiceStub }],
+      providers: [{ provide: DatabaseService, useValue: databaseServiceStub }],
     }).compileComponents();
   });
 
@@ -35,7 +35,7 @@ describe('TableSelectionComponent', () => {
 
   it('should display all tables', () => {
     const tableSelectionElement: HTMLElement = fixture.nativeElement;
-    (schemaServiceStub.allTables() as Table[]).forEach((table) => {
+    (databaseServiceStub.allTables() as Table[]).forEach((table) => {
       expect(tableSelectionElement.innerHTML).toContain(table.name);
     });
   });
