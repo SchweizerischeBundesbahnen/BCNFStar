@@ -1,17 +1,17 @@
 import Column from './Column';
 
 export default class ColumnCombination {
-  columns: Set<Column> = new Set();
+  columns = new Set<Column>();
 
-  public constructor(...columns: Column[]) {
+  public constructor(...columns: Array<Column>) {
     this.add(...columns);
   }
 
   public copy(): ColumnCombination {
-    return new ColumnCombination(...this.columns);
+    return new ColumnCombination(...this.columns.values());
   }
 
-  public columnsFromNames(...names: string[]) {
+  public columnsFromNames(...names: Array<string>) {
     return new ColumnCombination(
       ...[...this.columns].filter((column: Column) =>
         names.includes(column.name)
@@ -19,13 +19,13 @@ export default class ColumnCombination {
     );
   }
 
-  public subsetFromIds(...numbers: number[]) {
+  public subsetFromIds(...numbers: Array<number>) {
     return new ColumnCombination(
       ...this.inOrder().filter((col, i) => numbers.includes(i))
     );
   }
 
-  public add(...columns: Column[]) {
+  public add(...columns: Array<Column>) {
     columns.forEach((col) => this.columns.add(col));
   }
 
@@ -62,11 +62,11 @@ export default class ColumnCombination {
     return [...this.columns].every((col) => other.includes(col));
   }
 
-  public inOrder(): Column[] {
+  public inOrder(): Array<Column> {
     return [...this.columns].sort((col1, col2) => col1.prio - col2.prio);
   }
 
-  public columnNames(): string[] {
+  public columnNames(): Array<string> {
     return this.inOrder().map((col) => col.name);
   }
 

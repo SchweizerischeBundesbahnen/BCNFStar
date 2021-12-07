@@ -2,6 +2,7 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import { Component } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
+import Schema from 'src/model/schema/Schema';
 // import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -10,27 +11,21 @@ import { DatabaseService } from 'src/app/database.service';
   styleUrls: ['./normalize.component.css'],
 })
 export class NormalizeComponent {
-  inputTable: Table;
-  tables: Array<Table> = [];
+  schema!: Schema;
   selectedTable?: Table;
 
   constructor(public dataService: DatabaseService) {
-    this.inputTable = dataService.inputTable!;
-    this.onInputTableChanged();
+    let inputTable: Table = dataService.inputTable!;
+    this.schema = new Schema(inputTable);
     this.dataService
-      .getFunctionalDependenciesByTable(this.inputTable)
+      .getFunctionalDependenciesByTable(inputTable)
       .subscribe((fd) =>
-        this.inputTable.setFds(
+        inputTable.setFds(
           ...fd.functionalDependencies.map((fds) =>
-            FunctionalDependency.fromString(this.inputTable, fds)
+            FunctionalDependency.fromString(inputTable, fds)
           )
         )
       );
-    console.log(this.inputTable);
-  }
-
-  onInputTableChanged(): void {
-    this.tables = this.inputTable.allResultingTables();
   }
 
   onSelect(table: Table): void {
@@ -38,8 +33,7 @@ export class NormalizeComponent {
   }
 
   onSplitFd(fd: FunctionalDependency): void {
-    this.selectedTable!.split(fd);
-    this.onInputTableChanged();
-    this.selectedTable = this.selectedTable!.children[0];
+    let tables = this.schema.split(this.selectedTable!, fd);
+    this.selectedTable = tables[0];
   }
 }

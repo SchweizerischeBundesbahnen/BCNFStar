@@ -2,7 +2,7 @@
   <div class="row border">
     <div class="col-8 border">
       <app-normalize-schema-graph
-        [tables]="this.tables"
+        [tables]="this.schema.tables"
         [selectedTable]="this.selectedTable"
         (selected)="onSelect($event)"
       ></app-normalize-schema-graph>
