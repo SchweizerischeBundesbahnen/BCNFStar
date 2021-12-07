@@ -52,7 +52,7 @@ export default class FunctionalDependency {
   }
 
   public isFullyTrivial(): boolean {
-    return this.lhs.equals(this.rhs);
+    return this.rhs.isSubsetOf(this.lhs);
   }
 
   public violatesBCNF(): boolean {
