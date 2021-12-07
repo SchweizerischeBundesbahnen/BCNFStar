@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientModule } from '@angular/common/http';
 
 import { TableSelectionComponent } from './table-selection.component';
 
@@ -17,6 +18,7 @@ describe('TableSelectionComponent', () => {
     };
     await TestBed.configureTestingModule({
       declarations: [TableSelectionComponent],
+      imports: [HttpClientModule],
       providers: [{ provide: SchemaService, useValue: schemaServiceStub }],
     }).compileComponents();
   });

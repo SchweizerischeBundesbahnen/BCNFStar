@@ -16,6 +16,30 @@ export default class FunctionalDependency {
     this.rhs = rhs;
   }
 
+  //  "[c_address] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
+  public static fromString(
+    table: Table,
+    metanomeString: string
+  ): FunctionalDependency {
+    const [lhsString, rhsString] = metanomeString
+      .split('-->')
+      .map((elem) => elem.trim());
+    // console.log("lhs: ", lhsString);
+    // console.log("rhs: ", rhsString);
+    let rhs: ColumnCombination = table.columns.columnsFromNames(
+      ...rhsString.split(',').map((elem) => elem.trim())
+    );
+    let lhs: ColumnCombination = table.columns.columnsFromNames(
+      ...lhsString
+        .replace('[', '')
+        .replace(']', '')
+        .split(',')
+        .map((elem) => elem.trim())
+    );
+
+    return new FunctionalDependency(table, lhs, rhs);
+  }
+
   public extend(): void {
     this.rhs.union(this.lhs);
     // TODO: Inter-FD-extension (maybe)
@@ -32,7 +56,23 @@ export default class FunctionalDependency {
   }
 
   public violatesBCNF(): boolean {
-    return !this.isKey();
+    if (this.isKey()) return false;
+    if (this.lhs.cardinality == 0) return false;
+    if (
+      this.table.foreignKeys().some((fk) => {
+        return (
+          !fk.isSubsetOf(this.table.remainingSchema(this)) &&
+          !fk.isSubsetOf(this.table.generatingSchema(this))
+        );
+      })
+    )
+      return false;
+    if (
+      this.table.pk &&
+      !this.table.pk.isSubsetOf(this.table.remainingSchema(this))
+    )
+      return false;
+    return true;
   }
 
   public toString(): string {
