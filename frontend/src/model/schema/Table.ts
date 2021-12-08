@@ -83,18 +83,11 @@ export default class Table {
     remaining.pk = this.pk;
     generating.pk = fd.lhs.copy();
 
-    remaining.referencedTables.add(generating);
-    generating.referencingTables.add(remaining);
-
-    this.referencedTables.forEach((table) =>
-      table.referencingTables.delete(this)
-    );
-    this.referencingTables.forEach((table) =>
-      table.referencedTables.delete(this)
-    );
-
     remaining.name = this.name;
     generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
+
+    remaining.referencedTables.add(generating);
+    generating.referencingTables.add(remaining);
 
     return [remaining, generating];
   }
@@ -130,6 +123,44 @@ export default class Table {
     });
 
     return table;
+  }
+
+  public merge(otherTable: Table): Table {
+    let newTable = this._origin!.constructProjection(
+      this.columns.copy().union(otherTable.columns)
+    );
+
+    this.referencedTables.forEach((refTable) =>
+      newTable.referencedTables.add(refTable)
+    );
+    otherTable.referencedTables.forEach((refTable) =>
+      newTable.referencedTables.add(refTable)
+    );
+
+    this.referencingTables.forEach((refTable) =>
+      newTable.referencingTables.add(refTable)
+    );
+    otherTable.referencingTables.forEach((refTable) =>
+      newTable.referencingTables.add(refTable)
+    );
+
+    let remaining: Table;
+    let generating: Table;
+    if (this.referencedTables.has(otherTable)) {
+      remaining = this;
+      generating = otherTable;
+    } else {
+      remaining = otherTable;
+      generating = this;
+    }
+
+    newTable.referencedTables.delete(generating);
+    newTable.referencingTables.delete(remaining);
+
+    newTable.name = remaining.name;
+    newTable.pk = remaining.pk;
+
+    return newTable;
   }
 
   public foreignKeyForReferencedTable(refTable: Table): ColumnCombination {
