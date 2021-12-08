@@ -9,17 +9,27 @@ export default class Schema {
   }
 
   public add(...tables: Array<Table>) {
-    tables.forEach((table) => this.tables.add(table));
+    tables.forEach((table) => {
+      this.tables.add(table);
+      table.referencedTables.forEach((refTable) =>
+        refTable.referencingTables.add(table)
+      );
+      table.referencingTables.forEach((refTable) =>
+        refTable.referencedTables.add(table)
+      );
+    });
   }
 
-  public delete(table: Table) {
-    this.tables.delete(table);
-    table.referencedTables.forEach((refTable) =>
-      refTable.referencingTables.delete(table)
-    );
-    table.referencingTables.forEach((refTable) =>
-      refTable.referencedTables.delete(table)
-    );
+  public delete(...tables: Array<Table>) {
+    tables.forEach((table) => {
+      this.tables.delete(table);
+      table.referencedTables.forEach((refTable) =>
+        refTable.referencingTables.delete(table)
+      );
+      table.referencingTables.forEach((refTable) =>
+        refTable.referencedTables.delete(table)
+      );
+    });
   }
 
   public split(table: Table, fd: FunctionalDependency) {

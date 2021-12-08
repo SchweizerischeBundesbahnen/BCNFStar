@@ -10,24 +10,26 @@ export default class CommandProcessor {
     return this.commands.length - 1 - this.currentUndos;
   }
 
-  public do(command: Command) {
-    for (let i = 0; i < this.currentUndos; i++) {
+  public do<T, V>(command: Command<T, V>): T {
+    while (this.currentUndos > 0) {
       this.commands.pop();
+      this.currentUndos--;
     }
     if (this.commands.length == this.MAX_UNDOS) this.commands.shift();
     this.commands.push(command);
-    command.do();
+    return command.do();
   }
 
-  public undo() {
-    if (this.index < 0) return;
-    this.commands[this.index].undo();
+  public undo(): any {
+    if (this.index < 0) return undefined;
+    let result: any = this.commands[this.index].undo();
     this.currentUndos++;
+    return result;
   }
 
-  public redo() {
+  public redo(): any {
     if (this.currentUndos == 0) return;
     this.currentUndos--;
-    this.commands[this.index].do();
+    return this.commands[this.index].do();
   }
 }
