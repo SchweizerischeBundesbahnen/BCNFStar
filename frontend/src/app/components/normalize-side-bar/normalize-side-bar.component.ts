@@ -16,8 +16,10 @@ import Table from 'src/model/schema/Table';
 })
 export class NormalizeSideBarComponent {
   @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
-  @Input() table!: Table;
+  @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
+  @Output() undo = new EventEmitter();
+  @Output() redo = new EventEmitter();
 
   // @Input() functionalDependencies!: string[];
   constructor() {}

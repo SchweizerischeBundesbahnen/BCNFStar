@@ -1,4 +1,8 @@
 <div>
+  <button type="button" sbbButton (click)="this.undo.emit()">Undo</button>
+  <button type="button" sbbButton (click)="this.redo.emit()">Redo</button>
+</div>
+<div *ngIf="this.table">
   <h3>{{ table.name }}</h3>
   <sbb-accordion [multi]="true">
     <sbb-expansion-panel [expanded]="true">
