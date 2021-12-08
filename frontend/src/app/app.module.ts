@@ -13,6 +13,7 @@ import { SbbRadioButtonModule } from '@sbb-esta/angular-business';
 import { SbbButtonModule } from '@sbb-esta/angular-business';
 import { SbbAccordionModule } from '@sbb-esta/angular-business';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TestJoinJsComponent } from './test-join-js/test-join-js.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     NormalizeComponent,
     NormalizeSideBarComponent,
     NormalizeSchemaGraphComponent,
+    TestJoinJsComponent,
   ],
   imports: [
     BrowserModule,
