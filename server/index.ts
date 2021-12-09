@@ -7,16 +7,39 @@ import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
+import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
+import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
+import cors, { CorsOptions } from "cors";
 
 setupDBCredentials();
 
-const pool = new Pool({});
+const pool = new Pool();
+
+const whitelist = ["http://localhost", "http://localhost:4200"];
+
+const corsOptions: CorsOptions = {
+  origin(
+    origin: string | undefined,
+    callback: (a: Error | null, b: boolean) => void
+  ) {
+    // callback(null, true);
+    // return;
+    if (process.execArgv.length || !origin || whitelist.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("Error! This origin is not allowed " + origin);
+      callback(new Error("Error! CORS not allowed"), false);
+    }
+  },
+  credentials: true,
+};
 
 const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cors(corsOptions));
 
 // Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
 app.get("/test", (req, res) => {
@@ -29,9 +52,15 @@ app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 
 app.post("/persist/createTable", postCreateTable(pool));
 app.post("/persist/createForeignKey", postCreateForeignKey(pool));
+// PGPASSFILE=C:\.pgpass
+// localhost:80/tables/public.customer/fds
+app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
 app.use(
-  expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
+  expressStaticGzip(
+    join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
+    {}
+  )
 );
 
 const port = process.env["PORT"] || 80;

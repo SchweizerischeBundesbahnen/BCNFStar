@@ -4,14 +4,27 @@
     "build": "run-p build:*",
     "start": "node server/dist",
     "dev": "run-p dev:*",
+    "install": "run-p install:*",
+    "test:dev": "CYPRESS_FRONTEND_BASEURL=http://localhost:4200 run-p dev:* cypress:open",
+    "test:prod": "CYPRESS_FRONTEND_BASEURL=http://localhost run-p start cypress:open",
+    "prebuild": "npm run generateTypeGuards",
+    "install:server": "cd server && npm install",
+    "install:frontend": "cd frontend && npm install",
     "build:server": "cd server && npm run build",
     "build:frontend": "cd frontend && npm run build",
     "dev:server": "cd server && npm run dev",
     "dev:frontend": "cd frontend && ng serve",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "generateTypeGuards": "ts-auto-guard --export-all --debug",
     "prepare": "husky install",
-    "lint": "prettier --write ."
+    "lint": "run-s lint:*",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:prettier": "prettier --write ."
   },
   "devDependencies": {
+    "@cypress/schema-tools": "^4.7.9",
+    "cypress": "^9.1.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.1.2",
@@ -20,6 +33,11 @@
     "pretty-quick": "^3.1.2"
   },
   "lint-staged": {
-    "*.{js,md,ts,html}": "prettier --write"
+    "*.{js,md,ts,html,json}": "prettier --write"
+  },
+  "dependencies": {
+    "@types/node": "^16.11.11",
+    "ts-auto-guard": "^1.0.0-alpha.29",
+    "typescript": "~4.4.4"
   }
 }

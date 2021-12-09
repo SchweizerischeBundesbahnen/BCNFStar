@@ -46,3 +46,9 @@ export async function attributesExistInTable(
   const originTableColumns = query_result.rows.map((row) => row.column_name);
   return attributeNames.every((name) => originTableColumns.includes(name));
 }
+
+export function split(schemaAndTable: string): string[] {
+  const schema = schemaAndTable.split(".")[0];
+  const table = schemaAndTable.split(".").slice(1).join(".");
+  return [schema, table];
+}

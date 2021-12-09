@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { SchemaService } from 'src/app/schema.service';
-import { exampleTable } from 'src/model/schema/experiments';
-import Table from 'src/model/schema/Table';
+import { DatabaseService } from 'src/app/database.service';
+import ITable from '../../../../../server/definitions/ITable';
 
 @Component({
   selector: 'app-table-selection',
   templateUrl: './table-selection.component.html',
   styleUrls: ['./table-selection.component.css'],
 })
-export class TableSelectionComponent {
-  tables!: Array<Table>;
+export class TableSelectionComponent implements OnInit {
+  // eslint-disable-next-line no-unused-vars
+  constructor(private dataService: DatabaseService) {}
 
-  constructor(private schemaService: SchemaService) {
-    this.tables = schemaService.allTables();
+  ngOnInit(): void {
+    this.dataService.getTableNames().subscribe((data) => (this.tables = data));
   }
 
-  public selectTable(table: Table) {
-    this.schemaService.inputTable = table;
+  public selectTable(table: ITable) {
+    this.dataService.setInputTable(table);
   }
+
+  tables: ITable[] = [];
 }

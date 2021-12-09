@@ -1,13 +1,16 @@
 import { absoluteServerDir } from "../utils/files";
 import { promisify } from "util";
 import { exec } from "child_process";
-import { join, dirname } from "path";
-import { toNamespacedPath } from "path/posix";
+import { join } from "path";
 
 export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
 export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
 export const PGPASS_PATH = process.env.PGPASSFILE;
 export const OUTPUT_DIR = join(absoluteServerDir, "temp");
+
+export function outputPath(schemaAndTable: string): string {
+  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
+}
 
 export default class MetanomeAlgorithm {
   public memory = "12g";
@@ -18,7 +21,9 @@ export default class MetanomeAlgorithm {
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     this.tables.forEach(async (table) => {
-      await asyncExec(this.command(table));
+      const { stderr, stdout } = await asyncExec(this.command(table));
+      // console.log(result.stdout);
+      if (stderr) throw stderr;
     });
 
     let dict = {};
@@ -45,7 +50,7 @@ export default class MetanomeAlgorithm {
 
   private pgpassPath(): string {
     if (PGPASS_PATH == undefined) {
-      throw new Error("missing PG_PASSFILE in env.local");
+      throw new Error("missing PGPASSFILE in .env.local");
     }
     return PGPASS_PATH;
   }
@@ -57,6 +62,6 @@ export default class MetanomeAlgorithm {
   private command(table: string): string {
     return `java -Xmx${
       this.memory
-    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_results.json --algorithm-config isHumanInTheLoop:false`;
+    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_normalize_results.json --algorithm-config isHumanInTheLoop:false`;
   }
 }

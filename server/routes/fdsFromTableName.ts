@@ -1,8 +1,12 @@
 import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
 import { table } from "console";
 import { Request, Response, RequestHandler } from "express";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync, access, constants } from "fs";
 import MetanomeAlgorithm from "./metanomeAlgorithm";
+import { outputPath } from "./metanomeAlgorithm";
+import postRunMetanomeFDAlgorithmFunction, {
+  runMetanomeFDAlgorithm,
+} from "./runMetanome";
 
 export default function getFDsFromTableNameFunction(): RequestHandler {
   async function getFDsFromTableName(
@@ -10,31 +14,30 @@ export default function getFDsFromTableNameFunction(): RequestHandler {
     res: Response
   ): Promise<void> {
     try {
-      const tableName = req.params.name;
-      const algorithm = new MetanomeAlgorithm([tableName]);
+      const schemaAndTable = req.params.name;
+      const expectedOutputPath = outputPath(schemaAndTable);
 
-      const metanomeOutputPaths = await algorithm.run();
-
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-
-      const fds = readFileSync(
-        metanomeOutputPaths[tableName.split(".")[1]],
-        "utf8"
-      )
-        .toString()
-        .trim()
-        .split(/\r?\n/);
-
-      const result: IFunctionalDependencies = {
-        tableName: tableName,
-        functionalDependencies: fds,
-      };
-      res.json(result);
+      try {
+        const fds: IFunctionalDependencies = {
+          tableName: schemaAndTable,
+          functionalDependencies: readFDsFromFile(expectedOutputPath),
+        };
+        res.status(200).send(fds);
+      } catch (e) {
+        res.json(
+          "Missing fds. Running Metanome-Algorithm. Ask again in 69h ... ;-)"
+        );
+        await runMetanomeFDAlgorithm(schemaAndTable);
+      }
     } catch (error) {
       console.error(error);
-      res.json({ error: "Could not get fds for table... " });
-      res.status(502);
+      if (!res.headersSent)
+        res.status(502).json({ error: "Could not get fds for table... " });
     }
   }
   return getFDsFromTableName;
+}
+
+function readFDsFromFile(path: string): string[] {
+  return readFileSync(path, "utf8").toString().trim().split(/\r?\n/);
 }

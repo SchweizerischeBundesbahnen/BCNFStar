@@ -19,6 +19,7 @@ export class NormalizeSideBarComponent {
   @Input() table!: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
+  // @Input() functionalDependencies!: string[];
   constructor() {}
 
   selectedFd(): FunctionalDependency | undefined {
