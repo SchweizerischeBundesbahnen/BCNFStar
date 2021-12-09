@@ -15,6 +15,7 @@ async function prepareDatabase(
   await client.query(`DROP TABLE IF EXISTS ${newSchema}.${newTable};`);
 }
 
+// Catches "SQL-Injection"-Requests
 function isInvalidName(name: string): boolean {
   return !/^[a-zA-Z\_]+$/.test(name);
 }
@@ -42,7 +43,7 @@ async function executeCreateTable(
   newSchema: string,
   newTable: string
 ): Promise<void> {
-  await client.query(`CREATE TABLE ${newSchema}.${newTable} AS SELECT
+  await client.query(`CREATE TABLE ${newSchema}.${newTable} AS SELECT DISTINCT
         ${attributeNames
           .map((a) => '"' + a + '"')
           .join(", ")} FROM ${originSchema}.${originTable};`);
@@ -87,7 +88,6 @@ export default function postCreateTable(pool: Pool): RequestHandler {
         return;
       }
 
-      console.log(primaryKey);
       prepareDatabase(client, newSchema, newTable).then(async () => {
         if (
           attributesExistInTable(
