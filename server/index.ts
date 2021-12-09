@@ -8,6 +8,7 @@ import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import morgan from "morgan";
+import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 
 setupDBCredentials();
 
@@ -27,6 +28,7 @@ app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 
 app.post("/persist/createTable", postCreateTable(pool));
+app.post("/persist/createForeignKey", postCreateForeignKey(pool));
 
 app.use(
   expressStaticGzip(join(__dirname, "..", "frontend", "dist", "bcnfstar"), {})
