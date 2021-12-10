@@ -1,11 +1,10 @@
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
-import { ApplicationRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
-// import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-normalize',
@@ -17,8 +16,7 @@ export class NormalizeComponent {
   selectedTable?: Table;
   commandProcessor = new CommandProcessor();
 
-  // eslint-disable-next-line no-unused-vars
-  constructor(public dataService: DatabaseService, private ar: ApplicationRef) {
+  constructor(public dataService: DatabaseService) {
     let inputTable: Table = dataService.inputTable!;
     this.schema = new Schema(inputTable);
     this.dataService
@@ -38,19 +36,26 @@ export class NormalizeComponent {
 
   onSplitFd(fd: FunctionalDependency): void {
     let command = new SplitCommand(this.schema, this.selectedTable!, fd);
-    let tables = this.commandProcessor.do(command);
-    this.selectedTable = tables[0];
-    console.log();
+    // TODO: proper change detection: currently schema graph is only updated due to
+    // selectedTable being changed. It should already be updated, because of the changes
+    // happening in the schema tables.
+
+    // WARNING: To reference the command object from inside the function we need to define
+    // the function via function(){}. If we used arrow functions ()=>{} 'this' would still
+    // refer to this normalize component. We assign self to this, to keep a reference of this
+    // component anyway.
+    let self = this;
+    command.onDo = function () {
+      self.selectedTable = this.children![0];
+    };
+    command.onUndo = function () {
+      self.selectedTable = this.table;
+    };
+    this.commandProcessor.do(command);
   }
 
   onUndo() {
-    console.log(this.schema);
     this.commandProcessor.undo();
-    // eslint-disable-next-line no-self-assign
-    //this.schema.tables = new Set([...this.schema.tables]);
-    //this.ar.tick();
-    this.ar.tick();
-    console.log(this.schema);
   }
 
   onRedo() {

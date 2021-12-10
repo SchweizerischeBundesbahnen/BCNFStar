@@ -43,7 +43,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    console.log('changed');
     this.renderMermaid();
   }
 

@@ -1,5 +1,18 @@
-export default abstract class Command<T = any, V = any> {
-  public abstract do(): T;
+export default abstract class Command {
+  public onDo: Function = function () {};
+  public onUndo: Function = function () {};
 
-  public abstract undo(): V;
+  protected abstract _do(): void;
+
+  public do(): void {
+    this._do();
+    if (this.onDo) this.onDo();
+  }
+
+  protected abstract _undo(): void;
+
+  public undo(): void {
+    this._undo();
+    if (this.onUndo) this.onUndo();
+  }
 }

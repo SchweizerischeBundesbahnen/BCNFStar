@@ -3,7 +3,7 @@ import Schema from '../schema/Schema';
 import Table from '../schema/Table';
 import Command from './Command';
 
-export default class SplitCommand extends Command<Array<Table>, Table> {
+export default class SplitCommand extends Command {
   schema: Schema;
   table: Table;
   fd: FunctionalDependency;
@@ -17,14 +17,12 @@ export default class SplitCommand extends Command<Array<Table>, Table> {
     this.fd = fd;
   }
 
-  public override do(): Array<Table> {
+  protected override _do(): void {
     this.children = this.schema.split(this.table, this.fd);
-    return this.children;
   }
 
-  public override undo(): Table {
+  protected override _undo(): void {
     this.schema.delete(...this.children!);
     this.schema.add(this.table);
-    return this.table;
   }
 }

@@ -2,7 +2,7 @@ import Schema from '../schema/Schema';
 import Table from '../schema/Table';
 import Command from './Command';
 
-export default class MergeCommand extends Command<Table, Array<Table>> {
+export default class MergeCommand extends Command {
   schema: Schema;
   tables: Array<Table>;
 
@@ -14,14 +14,12 @@ export default class MergeCommand extends Command<Table, Array<Table>> {
     this.tables = [table1, table2];
   }
 
-  public override do(): Table {
+  protected override _do(): void {
     this.parent = this.schema.merge(this.tables[0], this.tables[1]);
-    return this.parent;
   }
 
-  public override undo(): Array<Table> {
+  protected override _undo(): void {
     this.schema.delete(this.parent!);
     this.schema.add(...this.tables);
-    return this.tables;
   }
 }
