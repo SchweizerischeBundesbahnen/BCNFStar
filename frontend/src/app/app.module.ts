@@ -8,12 +8,14 @@ import { DatabaseSelectionComponent } from './pages/database-selection/database-
 import { TableSelectionComponent } from './pages/table-selection/table-selection.component';
 import { NormalizeComponent } from './pages/normalize/normalize.component';
 import { NormalizeSideBarComponent } from './components/normalize-side-bar/normalize-side-bar.component';
+import {
+  SbbRadioButtonModule,
+  SbbAccordionModule,
+  SbbButtonModule,
+} from '@sbb-esta/angular-business';
+import { SbbIconModule } from '@sbb-esta/angular-core';
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
-import { SbbRadioButtonModule } from '@sbb-esta/angular-business';
-import { SbbButtonModule } from '@sbb-esta/angular-business';
-import { SbbAccordionModule } from '@sbb-esta/angular-business';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TestJoinJsComponent } from './test-join-js/test-join-js.component';
 import { GraphElementComponent } from './graph-element/graph-element.component';
 
 @NgModule({
@@ -24,7 +26,6 @@ import { GraphElementComponent } from './graph-element/graph-element.component';
     NormalizeComponent,
     NormalizeSideBarComponent,
     NormalizeSchemaGraphComponent,
-    TestJoinJsComponent,
     GraphElementComponent,
   ],
   imports: [
@@ -33,6 +34,7 @@ import { GraphElementComponent } from './graph-element/graph-element.component';
     SbbRadioButtonModule,
     SbbButtonModule,
     SbbAccordionModule,
+    SbbIconModule,
     BrowserAnimationsModule,
     HttpClientModule,
   ],

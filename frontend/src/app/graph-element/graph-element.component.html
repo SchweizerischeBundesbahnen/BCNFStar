@@ -1,10 +1,16 @@
 <div class="container px-0" [ngStyle]="bbox">
-  <div class="table-head">{{ table.name }}</div>
+  <div class="table-head" (click)="select()">{{ table.name }}</div>
   <div
     *ngFor="let column of table.columns.inOrder()"
     class="row justify-content-between table-body"
   >
     <div class="col-6">{{ column.name }}</div>
     <div class="col-6 text-end">{{ column.dataType }}</div>
+  </div>
+  <div class="row">
+    <sbb-icon
+      class="text-end"
+      svgIcon="kom:arrows-left-right-down-up-medium"
+    ></sbb-icon>
   </div>
 </div>

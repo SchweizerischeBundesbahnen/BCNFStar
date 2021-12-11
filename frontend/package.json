@@ -44,7 +44,6 @@
     "@angular-eslint/template-parser": "13.0.1",
     "@types/backbone": "^1.4.14",
     "@types/jasmine": "~3.10.0",
-    "@types/jointjs": "^2.0.0",
     "@types/jquery": "^3.5.9",
     "@types/lodash": "^4.14.177",
     "@types/mermaid": "^8.2.7",

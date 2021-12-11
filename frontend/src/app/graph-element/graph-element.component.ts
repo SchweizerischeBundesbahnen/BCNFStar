@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import Table from 'src/model/schema/Table';
 
 @Component({
@@ -9,6 +9,12 @@ import Table from 'src/model/schema/Table';
 export class GraphElementComponent {
   @Input() table!: Table;
   @Input() bbox!: Record<string, string>;
+  @Output() selected = new EventEmitter<Table>();
 
   constructor() {}
+
+  select() {
+    console.log('selecting');
+    this.selected.emit(this.table);
+  }
 }

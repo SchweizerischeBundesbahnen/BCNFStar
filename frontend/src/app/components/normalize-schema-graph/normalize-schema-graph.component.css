@@ -1,0 +1,7 @@
+#paper {
+    position: relative;
+    border: 1px solid gray;
+    display: inline-block;
+    background: transparent;
+    overflow: hidden;
+}

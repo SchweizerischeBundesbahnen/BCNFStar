@@ -1,5 +1,6 @@
 .table-head {
     background-color: lightgray;
+    pointer-events: visibleFill;
     border-top: solid 3px rgb(18, 54, 131);
     font-weight: bold;
     font-size: 1rem;
@@ -8,6 +9,7 @@
 
 .table-body {
     font-size: 1rem;
+    pointer-events: visibleFill;
     font-weight: normal;
 }
 
