@@ -1,1 +1,8 @@
-<div id="paper"></div>
+<div *ngFor="let item of graphStorage | keyvalue">
+  <app-graph-element
+    [table]="item.value.table"
+    [bbox]="item.value.style"
+  ></app-graph-element>
+</div>
+
+<div id="paper" #paper></div>

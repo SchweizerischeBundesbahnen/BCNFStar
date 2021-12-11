@@ -1,0 +1,25 @@
+.table-head {
+    background-color: lightgray;
+    border-top: solid 3px rgb(18, 54, 131);
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.table-body {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.table-body:hover {
+    background-color: rgb(197, 194, 194);
+    margin: 0;
+}
+
+.container {
+    position: absolute;
+    /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
+    pointer-events: none;
+    user-select: none;
+    z-index: 2;
+}
