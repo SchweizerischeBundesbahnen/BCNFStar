@@ -15,7 +15,9 @@ export function setupDBCredentials() {
         process.env.HOME + process.env.PGPASSFILE.slice(1);
     // .pgpass format: hostname:port:database:username:password
     const content = readFileSync(process.env.PGPASSFILE, "utf-8");
-    const [hostname, port, database, username, password] = content.split(":");
+    const [hostname, port, database, username, password] = content
+      .split(":")
+      .map((v) => v.trim());
 
     process.env.PGHOST = hostname;
     process.env.PGPORT = port;

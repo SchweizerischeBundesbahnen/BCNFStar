@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import ITable from '../../../server/definitions/ITable';
-import IFunctionalDependencies from '../../../server/definitions/IFunctionalDependencies';
+import ITable from '@server/definitions/ITable';
+import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import Table from '../model/schema/Table';
 
 @Injectable({

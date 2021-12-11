@@ -1,4 +1,4 @@
-import { isITable } from "../../../server/definitions/ITable.guard";
+import { isITable } from "@server/definitions/ITable.guard";
 
 describe("The /tables route", () => {
   // see https://www.cypress.io/blog/2017/11/07/add-gui-to-your-e2e-api-tests/
