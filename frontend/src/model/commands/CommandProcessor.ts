@@ -3,11 +3,23 @@ import Command from './Command';
 export default class CommandProcessor {
   MAX_UNDOS = 10;
 
-  commands = new Array<Command | undefined>(this.MAX_UNDOS);
-  currentUndos: number = 0;
+  private commands = new Array<Command | undefined>(this.MAX_UNDOS);
+  private currentUndos: number = 0;
 
   private get index(): number {
     return this.MAX_UNDOS - 1 - this.currentUndos;
+  }
+
+  public get length(): number {
+    return this.commands.filter((command) => command).length;
+  }
+
+  public canUndo(): boolean {
+    return this.length > this.currentUndos;
+  }
+
+  public canRedo(): boolean {
+    return this.currentUndos > 0;
   }
 
   public do(command: Command): void {
@@ -22,13 +34,13 @@ export default class CommandProcessor {
   }
 
   public undo(): void {
-    if (this.index < 0) return;
+    if (!this.canUndo()) return;
     this.top().undo();
     this.currentUndos++;
   }
 
   public redo(): void {
-    if (this.currentUndos == 0) return;
+    if (!this.canRedo()) return;
     this.currentUndos--;
     this.top().do();
   }

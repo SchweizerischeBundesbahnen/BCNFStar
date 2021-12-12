@@ -1,0 +1,18 @@
+<div>
+  <button
+    type="button"
+    sbbButton
+    [disabled]="!this.canUndo"
+    (click)="this.undo.emit()"
+  >
+    Undo
+  </button>
+  <button
+    type="button"
+    sbbButton
+    [disabled]="!this.canRedo"
+    (click)="this.redo.emit()"
+  >
+    Redo
+  </button>
+</div>

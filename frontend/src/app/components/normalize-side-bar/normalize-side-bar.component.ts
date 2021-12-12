@@ -18,10 +18,7 @@ export class NormalizeSideBarComponent {
   @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
   @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() undo = new EventEmitter();
-  @Output() redo = new EventEmitter();
 
-  // @Input() functionalDependencies!: string[];
   constructor() {}
 
   selectedFd(): FunctionalDependency | undefined {

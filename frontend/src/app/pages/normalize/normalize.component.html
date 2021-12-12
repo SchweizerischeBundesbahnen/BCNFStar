@@ -8,12 +8,16 @@
       ></app-normalize-schema-graph>
     </div>
     <div class="col-4 border">
+      <app-normalize-undo-redo
+        [canUndo]="this.commandProcessor.canUndo()"
+        [canRedo]="this.commandProcessor.canRedo()"
+        (undo)="onUndo()"
+        (redo)="onRedo()"
+      ></app-normalize-undo-redo>
       <app-normalize-side-bar
         class="normalize-sidebar"
         [table]="this.selectedTable"
         (splitFd)="onSplitFd($event)"
-        (undo)="onUndo()"
-        (redo)="onRedo()"
       ></app-normalize-side-bar>
     </div>
   </div>
