@@ -3,16 +3,21 @@ export default abstract class Command {
   public onUndo: Function = function () {};
 
   protected abstract _do(): void;
+  protected abstract _undo(): void;
+  protected abstract _redo(): void;
 
   public do(): void {
     this._do();
     if (this.onDo) this.onDo();
   }
 
-  protected abstract _undo(): void;
-
   public undo(): void {
     this._undo();
     if (this.onUndo) this.onUndo();
+  }
+
+  public redo(): void {
+    this._redo();
+    if (this.onDo) this.onDo();
   }
 }

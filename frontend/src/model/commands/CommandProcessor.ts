@@ -42,7 +42,7 @@ export default class CommandProcessor {
   public redo(): void {
     if (!this.canRedo()) return;
     this.currentUndos--;
-    this.top().do();
+    this.top().redo();
   }
 
   public top(): Command {

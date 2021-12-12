@@ -22,4 +22,9 @@ export default class MergeCommand extends Command {
     this.schema.delete(this.parent!);
     this.schema.add(...this.tables);
   }
+
+  protected override _redo(): void {
+    this.schema.delete(...this.tables);
+    this.schema.add(this.parent!);
+  }
 }

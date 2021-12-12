@@ -25,4 +25,9 @@ export default class SplitCommand extends Command {
     this.schema.delete(...this.children!);
     this.schema.add(this.table);
   }
+
+  protected override _redo(): void {
+    this.schema.delete(this.table);
+    this.schema.add(...this.children!);
+  }
 }
