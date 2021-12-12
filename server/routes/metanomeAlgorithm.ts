@@ -2,10 +2,10 @@ import { absoluteServerDir } from "../utils/files";
 import { promisify } from "util";
 import { exec } from "child_process";
 import { join } from "path";
+import { setupDBCredentials } from "../setupDbCredentials";
 
 export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
 export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
-export const PGPASS_PATH = process.env.PGPASSFILE;
 export const OUTPUT_DIR = join(absoluteServerDir, "temp");
 
 export function outputPath(schemaAndTable: string): string {
@@ -22,7 +22,6 @@ export default class MetanomeAlgorithm {
     const asyncExec = promisify(exec);
     this.tables.forEach(async (table) => {
       const { stderr, stdout } = await asyncExec(this.command(table));
-      // console.log(result.stdout);
       if (stderr) throw stderr;
     });
 
@@ -49,10 +48,10 @@ export default class MetanomeAlgorithm {
   }
 
   private pgpassPath(): string {
-    if (PGPASS_PATH == undefined) {
+    if (process.env.PGPASSFILE == undefined) {
       throw new Error("missing PGPASSFILE in .env.local");
     }
-    return PGPASS_PATH;
+    return process.env.PGPASSFILE;
   }
 
   // location in the JAR where the algorithm is located

@@ -29,7 +29,7 @@ export async function runMetanomeFDAlgorithm(
 ): Promise<void> {
   const algorithm = new MetanomeAlgorithm([schemaAndTable]);
   const metanomeOutputPaths = await algorithm.run();
-
+  console.log("runMetanomeFDAlgorithm... OutputPath: ", metanomeOutputPaths);
   // TODO: .....
   await new Promise((r) => setTimeout(r, 500));
 

@@ -42,4 +42,18 @@ export class NormalizeComponent {
     this.onInputTableChanged();
     this.selectedTable = this.selectedTable!.children[0];
   }
+
+  persistSchema(schemaName: string): void {
+    console.log(this.tables.map((table) => table.name));
+
+    this.tables.forEach((table) => {
+      this.dataService.postCreateTable(schemaName, table);
+    });
+
+    // this.tables.forEach(table => {
+    //   this.
+    // });
+
+    console.log('Persist to ' + schemaName);
+  }
 }

@@ -9,6 +9,8 @@ export function setupDBCredentials() {
     if (!process.env.PGPASSFILE)
       process.env.PGPASSFILE = getDefaultPgpassLocation();
 
+    console.log(process.env.PGPASSFILE);
+
     // replace ~ with full home directory, as fs doesn't understand it
     if (process.env.PGPASSFILE.startsWith("~"))
       process.env.PGPASSFILE =

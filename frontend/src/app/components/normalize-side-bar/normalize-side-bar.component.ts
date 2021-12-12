@@ -16,8 +16,11 @@ import Table from 'src/model/schema/Table';
 })
 export class NormalizeSideBarComponent {
   @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
-  @Input() table!: Table;
+  @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
+  @Output() persistSchema = new EventEmitter<string>();
+
+  schemaName: string = '';
 
   // @Input() functionalDependencies!: string[];
   constructor() {}
@@ -25,6 +28,10 @@ export class NormalizeSideBarComponent {
   selectedFd(): FunctionalDependency | undefined {
     if (!this.fdSelectionGroup) return undefined;
     return this.fdSelectionGroup.value;
+  }
+
+  onInputChange(value: Event): void {
+    this.schemaName = (value.target! as HTMLInputElement).value;
   }
 
   splitSelectedFd(): void {

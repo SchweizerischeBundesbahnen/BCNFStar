@@ -42,12 +42,25 @@ export class DatabaseService {
     const result = this.http.get<IFunctionalDependencies>(
       `http://localhost:80/tables/${table.name}/fds`
     );
+    console.log(result);
     // let fds2: FunctionalDependency[] = [];
     // result.subscribe(fd =>  fds2 = fd.functionalDependencies.map(fds => FunctionalDependency.fromString(table, fds)));
     // console.log("FDS");
     // console.log(fds2);
     return result;
   }
+
+  // postForeignKey(
+  //   referencingTable: Table,
+  //   referencedTable: Table,
+  //   schema: string
+  // ) {}
+
+  // postCreateTable(schema: string, table: Table) {
+  //   // füllen des Body wie wir es im Backend erwarten.
+  //   const body: any = null;
+  //   // this.http.post(body);
+  // }
 
   // async getFunctionalDEpendenciesByTable2(table: Table): Promise<FunctionalDependency[]>{
 
