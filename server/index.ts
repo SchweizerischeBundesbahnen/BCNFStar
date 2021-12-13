@@ -56,6 +56,7 @@ app.post("/persist/createForeignKey", postCreateForeignKey(pool));
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
+console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
 app.use(
   expressStaticGzip(
     join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
