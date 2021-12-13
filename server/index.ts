@@ -12,6 +12,7 @@ import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
+import { readdir } from "fs";
 
 setupDBCredentials();
 
@@ -60,8 +61,15 @@ console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
 app.use(
   expressStaticGzip(
     join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
-    {}
+    { serveStatic: {} }
   )
+);
+console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
+readdir(
+  join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
+  (err, files) => {
+    console.log(files);
+  }
 );
 
 const port = process.env["PORT"] || 80;
