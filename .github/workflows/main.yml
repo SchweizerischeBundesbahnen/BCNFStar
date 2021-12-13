@@ -1,67 +1,67 @@
-# name: Cypress Tests
+name: Cypress Tests
 
-# on: [push]
+on: [push]
 
-# jobs:
-#   test-cypress:
-#     runs-on: ubuntu-latest
-#     # Service containers to run with `test-cypress`
-#     services:
-#       # Label used to access the service container
-#       postgres:
-#         # Docker Hub image
-#         image: postgres
-#         # Provide the password for postgres
-#         env:
-#           POSTGRES_PASSWORD: postgres
-#         ports:
-#          - 5432:5432
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
-#       - uses: actions/setup-java@v1
-#         with:
-#           java-version: '11'
-#       # Install NPM dependencies, cache them correctly
-#       # and run all Cypress tests
-#       - name: db-setup
-#         run: |
-#           cat << EOF > .env.local
-#           PGPASSFILE=~/.pgpass
-#           EOF
-#           cat << EOF > ~/.pgpass
-#           $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
-#           EOF
-#           chmod 600 ~/.pgpass
+jobs:
+  test-cypress:
+    runs-on: ubuntu-latest
+    # Service containers to run with `test-cypress`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+         - 5432:5432
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: db-setup
+        run: |
+          cat << EOF > .env.local
+          PGPASSFILE=~/.pgpass
+          EOF
+          cat << EOF > ~/.pgpass
+          $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
+          EOF
+          chmod 600 ~/.pgpass
 
-#           createdb _test_
-#           pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
-#           sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 80 -j REDIRECT --to-ports 8080
-#         env:
-#           PGPASSWORD: postgres
-#           PGHOST: 127.0.0.1
-#           PGPORT: 5432
-#           PGDATABASE: _test_
-#           PGUSER: postgres
-#       - name: Cypress run
-#         uses: cypress-io/github-action@v2
-#         with:
-#           build: npm run build
-#           start: node server/dist
-#           wait-on: "http://localhost:80"
-#           browser: chrome
-#         env:
-#            CYPRESS_FRONTEND_BASEURL: "http://localhost:80"
-#            PORT: 8080
-#       - name: Upload screenshots
-#         uses: actions/upload-artifact@v2.2.4
-#         if: failure()
-#         with:
-#             name: cypress-screenshots
-#             path: cypress/screenshots
-#       - name: Upload videos
-#         uses: actions/upload-artifact@v2.2.4
-#         if: failure()
-#         with:
-#             name: cypress-videos
-#             path: cypress/videos
+          createdb _test_
+          pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
+          sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 80 -j REDIRECT --to-ports 8080
+        env:
+          PGPASSWORD: postgres
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGDATABASE: _test_
+          PGUSER: postgres
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          build: npm run build
+          start: node server/dist
+          wait-on: "http://localhost:80"
+          browser: chrome
+        env:
+           CYPRESS_FRONTEND_BASEURL: "http://localhost:80"
+           PORT: 8080
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v2.2.4
+        if: failure()
+        with:
+            name: cypress-screenshots
+            path: cypress/screenshots
+      - name: Upload videos
+        uses: actions/upload-artifact@v2.2.4
+        if: failure()
+        with:
+            name: cypress-videos
+            path: cypress/videos
