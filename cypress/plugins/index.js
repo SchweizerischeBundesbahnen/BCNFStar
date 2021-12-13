@@ -19,4 +19,6 @@
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
+  if (!process.env.CYPRESS_BACKEND_BASEURL)
+    process.env.CYPRESS_BACKEND_BASEURL = "http://localhost:80";
 };
