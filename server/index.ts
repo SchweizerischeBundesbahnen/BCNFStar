@@ -16,21 +16,12 @@ setupDBCredentials();
 
 const pool = new Pool();
 
-const whitelist = ["http://localhost", "http://localhost:4200"];
-
 const corsOptions: CorsOptions = {
   origin(
     origin: string | undefined,
     callback: (a: Error | null, b: boolean) => void
   ) {
-    // callback(null, true);
-    // return;
-    if (process.execArgv.length || !origin || whitelist.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("Error! This origin is not allowed " + origin);
-      callback(new Error("Error! CORS not allowed"), false);
-    }
+    callback(null, true);
   },
   credentials: true,
 };
