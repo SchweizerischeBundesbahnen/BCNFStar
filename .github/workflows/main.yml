@@ -38,7 +38,8 @@ jobs:
           pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
           echo 'SHOW password_encryption' | psql
           echo 'SHOW config_file' | psql
-          sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 80 -j REDIRECT --to-ports 8080
+          cat /var/lib/postgresql/data/postgresql.conf
+          cat /var/lib/postgresql/data/pg_hba.conf          
         env:
           PGPASSWORD: postgres
           PGHOST: 127.0.0.1
