@@ -13,8 +13,13 @@ import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 
 setupDBCredentials();
-
-const pool = new Pool();
+let pool: Pool;
+try {
+  pool = new Pool();
+} catch (e) {
+  console.error("Postgres pool failed:");
+  console.error(e);
+}
 
 const corsOptions: CorsOptions = {
   origin(
