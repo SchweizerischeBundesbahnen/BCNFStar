@@ -4,6 +4,7 @@ import ITable from '../../../server/definitions/ITable';
 import IFunctionalDependencies from '../../../server/definitions/IFunctionalDependencies';
 import Table from '../model/schema/Table';
 import { Observable, shareReplay } from 'rxjs';
+import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,13 @@ export class DatabaseService {
 
   setInputTable(table: ITable) {
     this.inputTable = Table.fromITable(table);
+    this.getFunctionalDependenciesByTable(this.inputTable).subscribe((fd) =>
+      this.inputTable!.setFds(
+        ...fd.functionalDependencies.map((fds) =>
+          FunctionalDependency.fromString(this.inputTable!, fds)
+        )
+      )
+    );
   }
 
   /*
