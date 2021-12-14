@@ -11,6 +11,9 @@ declare global {
       PGUSER?: string;
       PGPASSWORD?: string;
     }
+    interface Global {
+      __coverage__?: any;
+    }
   }
 }
 

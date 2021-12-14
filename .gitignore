@@ -32,3 +32,6 @@ pnpm-debug.log*
 
 cypress/videos
 cypress/screenshots
+# Code coverage reports
+.nyc_output
+coverage

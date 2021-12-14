@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "postbuild": "gzip dist/bcnfstar/*",
+    "postbuild": "npm run build:coverage && gzip -f dist/**/*",
+    "build:coverage": "rm -rf dist/bcnfstar-coverage && nyc instrument dist/bcnfstar dist/bcnfstar-coverage --complete-copy",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"

@@ -1,6 +1,5 @@
 import express from "express";
 import expressStaticGzip from "express-static-gzip";
-import { join } from "path";
 import { Pool } from "pg";
 import { setupDBCredentials } from "./setupDbCredentials";
 import postCreateTable from "./routes/persist_schema/createTable";
@@ -8,11 +7,10 @@ import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
-import { absoluteServerDir } from "./utils/files";
+import { getStaticDir } from "./utils/files";
 import morgan from "morgan";
 import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
-import { readdir } from "fs";
 
 setupDBCredentials();
 
@@ -38,9 +36,15 @@ const corsOptions: CorsOptions = {
 };
 
 const app = express();
-app.use(morgan("dev"));
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms")
+);
 app.use(express.json());
 app.use(cors(corsOptions));
+if (global.__coverage__) {
+  console.log("enabling code coverage reporting");
+  require("@cypress/code-coverage/middleware/express")(app);
+}
 
 // Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
 app.get("/test", (req, res) => {
@@ -57,20 +61,7 @@ app.post("/persist/createForeignKey", postCreateForeignKey(pool));
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
-console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
-app.use(
-  expressStaticGzip(
-    join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
-    { serveStatic: {} }
-  )
-);
-console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
-readdir(
-  join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),
-  (err, files) => {
-    console.log(files);
-  }
-);
+app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 
 const port = process.env["PORT"] || 80;
 

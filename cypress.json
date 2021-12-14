@@ -1,6 +1,7 @@
 {
   "env": {
     "serverUrl": "http://localhost",
-    "angularDevServerUrl": "http://localhost:4200"
+    "angularDevServerUrl": "http://localhost:4200",
+    "baseUrl": "http://localhost:80"
   }
 }
