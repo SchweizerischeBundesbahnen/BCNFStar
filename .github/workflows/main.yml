@@ -36,6 +36,8 @@ jobs:
 
           createdb _test_
           pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
+          echo 'SHOW password_encryption' | psql
+          echo 'SHOW config_file' | psql
           sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 80 -j REDIRECT --to-ports 8080
         env:
           PGPASSWORD: postgres
