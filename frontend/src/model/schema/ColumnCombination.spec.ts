@@ -6,9 +6,9 @@ describe('ColumnCombination', () => {
   let cc1: ColumnCombination;
   let cc2: ColumnCombination;
 
-  let columnA = new Column('A', '', 0);
-  let columnB = new Column('B', '', 1);
-  let columnC = new Column('C', '', 2);
+  let columnA = new Column('A', 'varchar', 0);
+  let columnB = new Column('B', 'varchar', 1);
+  let columnC = new Column('C', 'varchar', 2);
 
   beforeEach(() => {
     cc1 = new ColumnCombination(columnA, columnB);

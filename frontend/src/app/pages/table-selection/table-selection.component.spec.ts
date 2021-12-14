@@ -1,32 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientModule } from '@angular/common/http';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 
 import { TableSelectionComponent } from './table-selection.component';
 
 import { DatabaseService } from 'src/app/database.service';
-import { exampleTable } from 'src/model/schema/exampleTables';
-import Table from 'src/model/schema/Table';
+import { exampleITable } from 'src/model/schema/exampleTables';
+import { Type } from '@angular/core';
 
 describe('TableSelectionComponent', () => {
   let component: TableSelectionComponent;
   let fixture: ComponentFixture<TableSelectionComponent>;
-  let databaseServiceStub: any;
+  let httpMock: HttpTestingController;
 
   beforeEach(async () => {
-    databaseServiceStub = {
-      allTables: () => [exampleTable()],
-    };
     await TestBed.configureTestingModule({
       declarations: [TableSelectionComponent],
-      imports: [HttpClientModule],
-      providers: [{ provide: DatabaseService, useValue: databaseServiceStub }],
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: DatabaseService }],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TableSelectionComponent);
     component = fixture.componentInstance;
+    httpMock = fixture.debugElement.injector.get<HttpTestingController>(
+      HttpTestingController as Type<HttpTestingController>
+    );
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   it('should create', () => {
@@ -35,7 +40,13 @@ describe('TableSelectionComponent', () => {
 
   it('should display all tables', () => {
     const tableSelectionElement: HTMLElement = fixture.nativeElement;
-    (databaseServiceStub.allTables() as Table[]).forEach((table) => {
+    const req = httpMock.expectOne(
+      `http://${window.location.hostname}:80/tables`
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(exampleITable);
+    expect(fixture.componentInstance.tables.length).toBe(exampleITable.length);
+    exampleITable.forEach((table) => {
       expect(tableSelectionElement.innerHTML).toContain(table.name);
     });
   });

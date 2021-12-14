@@ -4,25 +4,18 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { NormalizeComponent } from './normalize.component';
 
-import { DatabaseService } from 'src/app/database.service';
-import { exampleTable } from 'src/model/schema/exampleTables';
 import { NormalizeSchemaGraphComponent } from 'src/app/components/normalize-schema-graph/normalize-schema-graph.component';
 import { NormalizeSideBarComponent } from 'src/app/components/normalize-side-bar/normalize-side-bar.component';
 import { By } from '@angular/platform-browser';
+
+import { DatabaseService } from 'src/app/database.service';
 import Table from 'src/model/schema/Table';
 
 describe('NormalizeComponent', () => {
   let component: NormalizeComponent;
   let fixture: ComponentFixture<NormalizeComponent>;
-  let databaseServiceStub: any;
 
   beforeEach(async () => {
-    databaseServiceStub = {
-      inputTable: exampleTable(),
-      getTableNames: () => {
-        /*Hier muss ein Observable zurückgegeben werden, der sich wie ein http get verhält*/
-      },
-    };
     await TestBed.configureTestingModule({
       declarations: [
         NormalizeComponent,
@@ -30,7 +23,7 @@ describe('NormalizeComponent', () => {
         NormalizeSideBarComponent,
       ],
       imports: [RouterTestingModule, HttpClientModule],
-      providers: [{ provide: DatabaseService, useValue: databaseServiceStub }],
+      providers: [{ provide: DatabaseService }],
     }).compileComponents();
   });
 
