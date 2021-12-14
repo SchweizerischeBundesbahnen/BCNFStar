@@ -36,10 +36,6 @@ jobs:
 
           createdb _test_
           pg_restore -d _test_ cypress/1MB_testdata_denormalized.sql
-          echo 'SHOW password_encryption' | psql
-          echo 'SHOW config_file' | psql
-          cat /var/lib/postgresql/data/postgresql.conf
-          cat /var/lib/postgresql/data/pg_hba.conf          
         env:
           PGPASSWORD: postgres
           PGHOST: 127.0.0.1

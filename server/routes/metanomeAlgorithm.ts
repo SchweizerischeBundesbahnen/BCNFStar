@@ -4,7 +4,7 @@ import { exec } from "child_process";
 import { join } from "path";
 
 export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
-export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
+export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-42.3.1.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "temp");
 
 export function outputPath(schemaAndTable: string): string {
