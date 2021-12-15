@@ -15,17 +15,8 @@ export class NormalizeComponent {
   selectedTable?: Table;
 
   constructor(public dataService: DatabaseService) {
-    let inputTable: Table = dataService.inputTable!;
+    let inputTable = dataService.inputTable!;
     this.schema = new Schema(inputTable);
-    this.dataService
-      .getFunctionalDependenciesByTable(inputTable)
-      .subscribe((fd) =>
-        inputTable.setFds(
-          ...fd.functionalDependencies.map((fds) =>
-            FunctionalDependency.fromString(inputTable, fds)
-          )
-        )
-      );
   }
 
   onSelect(table: Table): void {

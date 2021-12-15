@@ -1,7 +1,7 @@
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
-import ITable from '../../../../server/definitions/ITable';
+import ITable from '@server/definitions/ITable';
 
 export default class Table {
   name = '';

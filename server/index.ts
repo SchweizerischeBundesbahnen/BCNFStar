@@ -3,13 +3,14 @@ import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
 import { Pool } from "pg";
 import { setupDBCredentials } from "./setupDbCredentials";
-
+import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
 import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
+import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 
 setupDBCredentials();
@@ -49,6 +50,8 @@ app.get("/tables", getTablesFunction(pool));
 app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 
+app.post("/persist/createTable", postCreateTable(pool));
+app.post("/persist/createForeignKey", postCreateForeignKey(pool));
 // PGPASSFILE=C:\.pgpass
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
