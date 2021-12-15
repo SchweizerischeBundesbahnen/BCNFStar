@@ -3,7 +3,6 @@ import Table from 'src/model/schema/Table';
 import { Component } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
-// import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-normalize',
