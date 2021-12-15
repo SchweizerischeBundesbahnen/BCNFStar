@@ -17,15 +17,6 @@ export class NormalizeComponent {
   constructor(public dataService: DatabaseService) {
     this.inputTable = dataService.inputTable!;
     this.onInputTableChanged();
-    this.dataService
-      .getFunctionalDependenciesByTable(this.inputTable)
-      .subscribe((fd) =>
-        this.inputTable.setFds(
-          ...fd.functionalDependencies.map((fds) =>
-            FunctionalDependency.fromString(this.inputTable, fds)
-          )
-        )
-      );
     console.log(this.inputTable);
   }
 

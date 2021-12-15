@@ -1,29 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { TableSelectionComponent } from './table-selection.component';
 
-import { SchemaService } from 'src/app/schema.service';
-import { exampleTable } from 'src/model/schema/exampleTables';
-import Table from 'src/model/schema/Table';
+import { DatabaseService } from 'src/app/database.service';
+import { exampleITable } from 'src/model/schema/exampleTables';
+import { of } from 'rxjs';
 
 describe('TableSelectionComponent', () => {
   let component: TableSelectionComponent;
   let fixture: ComponentFixture<TableSelectionComponent>;
-  let schemaServiceStub: any;
+  let databaseServiceStub: any;
 
   beforeEach(async () => {
-    schemaServiceStub = {
-      allTables: () => [exampleTable()],
+    databaseServiceStub = {
+      getTableNames: () => of(exampleITable),
     };
     await TestBed.configureTestingModule({
       declarations: [TableSelectionComponent],
-      imports: [HttpClientModule],
-      providers: [{ provide: SchemaService, useValue: schemaServiceStub }],
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: DatabaseService, useValue: databaseServiceStub }],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TableSelectionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -35,7 +33,9 @@ describe('TableSelectionComponent', () => {
 
   it('should display all tables', () => {
     const tableSelectionElement: HTMLElement = fixture.nativeElement;
-    (schemaServiceStub.allTables() as Table[]).forEach((table) => {
+
+    expect(component.tables).toEqual(exampleITable);
+    exampleITable.forEach((table) => {
       expect(tableSelectionElement.innerHTML).toContain(table.name);
     });
   });
