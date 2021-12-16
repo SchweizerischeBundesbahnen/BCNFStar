@@ -26,7 +26,6 @@ export class NormalizeComponent {
           )
         )
       );
-    console.log(this.inputTable);
   }
 
   onInputTableChanged(): void {
