@@ -144,6 +144,9 @@ export default class Table {
   public minimalReferencedTables(): Array<Table> {
     var result: Array<Table> = [...this.referencedTables];
 
+    var visited: Array<Table> = [...this.referencedTables];
+    visited.push(this);
+
     var queue: Array<Table> = [];
     this.referencedTables.forEach((refTable) => {
       queue.push(...refTable.referencedTables);
@@ -155,7 +158,10 @@ export default class Table {
         if (result.includes(refTable)) {
           result.splice(result.indexOf(refTable), 1); // i just want to delete :C
         }
-        queue.push(refTable);
+        if (!visited.includes(refTable)) {
+          visited.push(refTable);
+          queue.push(refTable);
+        }
       });
     }
     return result;
