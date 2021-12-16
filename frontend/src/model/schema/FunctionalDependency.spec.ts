@@ -13,7 +13,6 @@ describe('FunctionalDependency', () => {
       table.columns.subsetFromIds(2),
       table.columns.subsetFromIds(3, 4)
     );
-    table.extendFds();
     expect(table.fds[3].lhs).toEqual(table.columns.subsetFromIds(2));
     expect(table.fds[3].rhs).toEqual(table.columns.subsetFromIds(2, 3, 4));
   });

@@ -24,7 +24,6 @@ export function exampleTableSportartVerein(): Table {
     table.columns.subsetFromIds(2)
   );
   table.addFd(table.columns.subsetFromIds(2), table.columns.subsetFromIds(1));
-  table.extendFds();
   return table;
 }
 export function exampleTable(): Table {
@@ -39,6 +38,5 @@ export function exampleTable(): Table {
     table.columns.subsetFromIds(1, 2, 3, 4)
   );
   table.addFd(table.columns.subsetFromIds(2), table.columns.subsetFromIds(3));
-  table.extendFds();
   return table;
 }

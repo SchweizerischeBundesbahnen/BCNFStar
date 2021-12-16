@@ -56,16 +56,11 @@ export default class Table {
 
   public setFds(...fds: Array<FunctionalDependency>) {
     this.fds = fds;
-    this.extendFds();
     this.fds = fds.filter((fd) => !fd.isFullyTrivial());
   }
 
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.fds.push(new FunctionalDependency(this, lhs, rhs));
-  }
-
-  public extendFds() {
-    this.fds.forEach((fd) => fd.extend());
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
