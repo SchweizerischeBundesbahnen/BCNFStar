@@ -44,7 +44,6 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
   }
 
   public graphStorage: Record<string, GraphStorageItem> = {};
-  protected i = 0;
   createDefaultGraph() {
     let graph = new joint.dia.Graph();
 
@@ -60,17 +59,12 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
       },
     });
     graph.on('change:position', (element) => {
-      try {
-        if (element.isElement) {
-          for (const item of Object.values(this.graphStorage)) {
-            if (item.jointjsEl == element) {
-              this.updateBBox(item);
-            }
+      if (element.isElement)
+        for (const item of Object.values(this.graphStorage)) {
+          if (item.jointjsEl == element) {
+            this.updateBBox(item);
           }
         }
-      } catch (e) {
-        console.error("Something bad might have happened, but don't worry :)");
-      }
     });
 
     // generate elements
@@ -129,14 +123,12 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
   get paperOffset() {
     const { top, left } =
       this.paperHtmlObject.nativeElement.getBoundingClientRect();
-    console.log(this.paperHtmlObject.nativeElement.getBoundingClientRect());
     return { top, left };
   }
 
   updateBBox(item: GraphStorageItem) {
     const bbox = item.jointjsEl.getBBox();
     item.jointjsEl.position(bbox.x, bbox.y);
-    console.log(this.paperOffset);
     item.style = {
       width: bbox.width + 'px',
       height: bbox.height + 'px',
@@ -144,7 +136,6 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
       top: bbox.y + this.paperOffset.top + 'px ',
       // transform: 'rotate(' + (this.get('angle') || 0) + 'deg)'
     };
-    console.log(item.style);
 
     const domel = document.getElementById('__jointel__' + item.table.name);
     domel?.setAttribute('transform', `translate(${bbox.x}, ${bbox.y})`);
