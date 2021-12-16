@@ -134,29 +134,27 @@ export default class Table {
   }
 
   public minimalReferencedTables(): Array<Table> {
-    var result: Array<Table> = [...this.referencedTables];
+    var result: Set<Table> = new Set(this.referencedTables);
 
-    var visited: Array<Table> = [...this.referencedTables];
+    var visited: Array<Table> = [];
     visited.push(this);
 
     var queue: Array<Table> = [];
-    this.referencedTables.forEach((refTable) => {
-      queue.push(...refTable.referencedTables);
-    });
-
+    queue.push(...this.referencedTables);
+    console.log('ho');
     while (queue.length > 0) {
       var current = queue.shift();
-      current!.referencedTables.forEach((refTable) => {
-        if (result.includes(refTable)) {
-          result.splice(result.indexOf(refTable), 1); // i just want to delete :C
+      visited.push(current!);
+      for (const refTable of current!.referencedTables) {
+        if (result.has(refTable)) {
+          result.delete(refTable);
         }
         if (!visited.includes(refTable)) {
-          visited.push(refTable);
           queue.push(refTable);
         }
-      });
+      }
     }
-    return result;
+    return [...result];
   }
 
   public violatingFds(): FunctionalDependency[] {
