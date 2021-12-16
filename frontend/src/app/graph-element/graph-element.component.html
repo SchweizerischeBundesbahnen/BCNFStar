@@ -8,7 +8,12 @@
     *ngFor="let column of table.columns.inOrder()"
     class="row justify-content-between table-body"
   >
-    <div class="col-6 attributes">{{ column.name }}</div>
+    <div
+      [ngClass]="{ pk: table.pk && table.pk.includes(column) }"
+      class="col-6 attributes"
+    >
+      {{ column.name }}
+    </div>
     <div class="col-6 text-end attributes">{{ column.dataType }}</div>
   </div>
   <div class="row">

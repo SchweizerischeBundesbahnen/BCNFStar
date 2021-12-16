@@ -35,14 +35,6 @@ export default class Table {
     return table;
   }
 
-  public get mermaidName(): string {
-    return this.name
-      .replace('.', '_')
-      .replace(' ', '')
-      .replace('}', '')
-      .replace('{', '');
-  }
-
   public get numColumns(): number {
     return this.columns.cardinality;
   }
@@ -141,6 +133,32 @@ export default class Table {
     );
   }
 
+  public minimalReferencedTables(): Array<Table> {
+    var result: Array<Table> = [...this.referencedTables];
+
+    var visited: Array<Table> = [...this.referencedTables];
+    visited.push(this);
+
+    var queue: Array<Table> = [];
+    this.referencedTables.forEach((refTable) => {
+      queue.push(...refTable.referencedTables);
+    });
+
+    while (queue.length > 0) {
+      var current = queue.shift();
+      current!.referencedTables.forEach((refTable) => {
+        if (result.includes(refTable)) {
+          result.splice(result.indexOf(refTable), 1); // i just want to delete :C
+        }
+        if (!visited.includes(refTable)) {
+          visited.push(refTable);
+          queue.push(refTable);
+        }
+      });
+    }
+    return result;
+  }
+
   public violatingFds(): FunctionalDependency[] {
     return this.fds
       .filter((fd) => fd.violatesBCNF())
@@ -156,24 +174,5 @@ export default class Table {
     let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
-  }
-
-  public toMermaidString(): string {
-    let result = 'class '.concat(this.mermaidName, '{\n');
-    this.columns.inOrder().forEach((column) => {
-      result = result.concat(column.dataType, ' ', column.name, '\n');
-    });
-    result = result.concat('}');
-    this.referencedTables.forEach((refTable) => {
-      if (!refTable.hasChildren) {
-        result = result.concat(
-          '\n',
-          this.mermaidName,
-          ' --> ',
-          refTable.mermaidName
-        );
-      }
-    });
-    return result;
   }
 }
