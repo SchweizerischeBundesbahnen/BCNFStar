@@ -2,7 +2,7 @@ import Schema from '../schema/Schema';
 import Table from '../schema/Table';
 import Command from './Command';
 
-export default class MergeCommand extends Command {
+export default class JoinCommand extends Command {
   schema: Schema;
   tables: Array<Table>;
 
@@ -15,7 +15,7 @@ export default class MergeCommand extends Command {
   }
 
   protected override _do(): void {
-    this.parent = this.schema.merge(this.tables[0], this.tables[1]);
+    this.parent = this.schema.join(this.tables[0], this.tables[1]);
   }
 
   protected override _undo(): void {

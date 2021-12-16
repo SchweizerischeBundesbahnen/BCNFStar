@@ -116,7 +116,7 @@ export default class Table {
     return table;
   }
 
-  public merge(otherTable: Table): Table {
+  public join(otherTable: Table): Table {
     let newTable = this.origin.constructProjection(
       this.columns.copy().union(otherTable.columns)
     );

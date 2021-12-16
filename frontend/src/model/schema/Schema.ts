@@ -39,8 +39,8 @@ export default class Schema {
     return tables;
   }
 
-  public merge(table1: Table, table2: Table) {
-    let newTable = table1.merge(table2);
+  public join(table1: Table, table2: Table) {
+    let newTable = table1.join(table2);
     this.add(newTable);
     this.delete(table1);
     this.delete(table2);
