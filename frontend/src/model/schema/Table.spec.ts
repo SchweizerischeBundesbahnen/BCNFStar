@@ -16,9 +16,9 @@ describe('Table', () => {
   it('should split columns correctly', () => {
     let children = table.split(table.fds[1]);
 
-    expect(children[0].columns).toEqual(table.columns.subsetFromIds(0, 5, 6));
+    expect(children[0].columns).toEqual(table.columns.columnsFromIds(0, 5, 6));
     expect(children[1].columns).toEqual(
-      table.columns.subsetFromIds(0, 1, 2, 3, 4)
+      table.columns.columnsFromIds(0, 1, 2, 3, 4)
     );
   });
 
@@ -44,20 +44,20 @@ describe('Table', () => {
 
     let fd1 = new FunctionalDependency(
       children[0],
-      children[0].columns.subsetFromIds(0, 1),
-      children[0].columns.subsetFromIds(0, 1, 2)
+      children[0].columns.columnsFromIds(0, 1),
+      children[0].columns.columnsFromIds(0, 1, 2)
     );
     expect(children[0].fds).toEqual([fd1]);
 
     let fd2 = new FunctionalDependency(
       children[1],
-      children[1].columns.subsetFromIds(0),
-      children[1].columns.subsetFromIds(0, 1, 2, 3, 4, 5)
+      children[1].columns.columnsFromIds(0),
+      children[1].columns.columnsFromIds(0, 1, 2, 3, 4, 5)
     );
     let fd3 = new FunctionalDependency(
       children[1],
-      children[1].columns.subsetFromIds(2),
-      children[1].columns.subsetFromIds(2, 3)
+      children[1].columns.columnsFromIds(2),
+      children[1].columns.columnsFromIds(2, 3)
     );
     expect(children[1].fds).toEqual([fd2, fd3]);
   });
