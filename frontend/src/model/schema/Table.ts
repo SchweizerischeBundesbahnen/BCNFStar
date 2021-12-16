@@ -35,14 +35,6 @@ export default class Table {
     return table;
   }
 
-  public get mermaidName(): string {
-    return this.name
-      .replace('.', '_')
-      .replace(' ', '')
-      .replace('}', '')
-      .replace('{', '');
-  }
-
   public get numColumns(): number {
     return this.columns.cardinality;
   }
@@ -182,24 +174,5 @@ export default class Table {
     let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
-  }
-
-  public toMermaidString(): string {
-    let result = 'class '.concat(this.mermaidName, '{\n');
-    this.columns.inOrder().forEach((column) => {
-      result = result.concat(column.dataType, ' ', column.name, '\n');
-    });
-    result = result.concat('}');
-    this.referencedTables.forEach((refTable) => {
-      if (!refTable.hasChildren) {
-        result = result.concat(
-          '\n',
-          this.mermaidName,
-          ' --> ',
-          refTable.mermaidName
-        );
-      }
-    });
-    return result;
   }
 }
