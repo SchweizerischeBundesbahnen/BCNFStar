@@ -1,20 +1,20 @@
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
-import ITable from '../../../../server/definitions/ITable';
+import ITable from '@server/definitions/ITable';
 
 export default class Table {
   name = '';
   columns = new ColumnCombination();
-  pk?: ColumnCombination;
+  pk?: ColumnCombination = undefined;
   fds: Array<FunctionalDependency> = [];
-  _origin?: Table;
+  origin: Table;
   referencedTables = new Set<Table>();
   referencingTables = new Set<Table>();
 
   public constructor(columns?: ColumnCombination, origin?: Table) {
     if (columns) this.columns = columns;
-    this._origin = origin;
+    this.origin = origin ? origin : this;
   }
 
   public static fromITable(iTable: ITable): Table {
@@ -31,15 +31,6 @@ export default class Table {
     const table: Table = new Table();
     names.forEach((name, i) => table.columns.add(new Column(name, '?', i)));
     return table;
-  }
-
-  public get origin(): Table {
-    if (this._origin) return this._origin;
-    else return this;
-  }
-
-  public set origin(origin: Table) {
-    this._origin = origin;
   }
 
   public get mermaidName(): string {
@@ -126,7 +117,7 @@ export default class Table {
   }
 
   public merge(otherTable: Table): Table {
-    let newTable = this._origin!.constructProjection(
+    let newTable = this.origin.constructProjection(
       this.columns.copy().union(otherTable.columns)
     );
 
