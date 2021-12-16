@@ -79,7 +79,7 @@ export class NormalizeSchemaGraphComponent implements OnChanges {
 
     // generate links
     for (const table of this.tables) {
-      for (const otherTable of table.referencedTables) {
+      for (const otherTable of table.minimalReferencedTables()) {
         this.graphStorage[table.name].links[otherTable.name] =
           new joint.dia.Link({
             source: { id: this.graphStorage[table.name].jointjsEl.id },

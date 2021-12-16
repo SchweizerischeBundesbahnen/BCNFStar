@@ -141,6 +141,26 @@ export default class Table {
     );
   }
 
+  public minimalReferencedTables(): Array<Table> {
+    var result: Array<Table> = [...this.referencedTables];
+
+    var queue: Array<Table> = [];
+    this.referencedTables.forEach((refTable) => {
+      queue.push(...refTable.referencedTables);
+    });
+
+    while (queue.length > 0) {
+      var current = queue.shift();
+      current!.referencedTables.forEach((refTable) => {
+        if (result.includes(refTable)) {
+          result.splice(result.indexOf(refTable), 1); // i just want to delete :C
+        }
+        queue.push(refTable);
+      });
+    }
+    return result;
+  }
+
   public violatingFds(): FunctionalDependency[] {
     return this.fds
       .filter((fd) => fd.violatesBCNF())
