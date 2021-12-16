@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { NormalizeComponent } from './normalize.component';
 
-import { SchemaService } from 'src/app/schema.service';
+import { DatabaseService } from 'src/app/database.service';
 import { exampleTable } from 'src/model/schema/exampleTables';
 import { NormalizeSchemaGraphComponent } from 'src/app/components/normalize-schema-graph/normalize-schema-graph.component';
 import { NormalizeSideBarComponent } from 'src/app/components/normalize-side-bar/normalize-side-bar.component';
@@ -14,10 +14,10 @@ import Table from 'src/model/schema/Table';
 describe('NormalizeComponent', () => {
   let component: NormalizeComponent;
   let fixture: ComponentFixture<NormalizeComponent>;
-  let schemaServiceStub: any;
+  let databaseServiceStub: any;
 
   beforeEach(async () => {
-    schemaServiceStub = {
+    databaseServiceStub = {
       inputTable: exampleTable(),
     };
     await TestBed.configureTestingModule({
@@ -27,7 +27,7 @@ describe('NormalizeComponent', () => {
         NormalizeSideBarComponent,
       ],
       imports: [RouterTestingModule, HttpClientModule],
-      providers: [{ provide: SchemaService, useValue: schemaServiceStub }],
+      providers: [{ provide: DatabaseService, useValue: databaseServiceStub }],
     }).compileComponents();
   });
 
