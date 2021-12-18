@@ -43,6 +43,8 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
     }
   }
 
+  protected attributeWidth = 22.5;
+
   public graphStorage: Record<string, GraphStorageItem> = {};
   createDefaultGraph() {
     let graph = new joint.dia.Graph();
@@ -76,9 +78,56 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
         body: {
           strokeWidth: 0,
         },
+        '.': { magnet: true },
       });
-      jointjsEl.resize(300, 60 + 22.5 * table.columns.columns.size);
+      jointjsEl.resize(
+        300,
+        60 + this.attributeWidth * table.columns.columns.size
+      );
       jointjsEl.position(50, 10);
+      for (let i = 0; i < table.columns.columns.size; i++) {
+        jointjsEl.addPort({
+          // id: 'abc', // generated if `id` value is not present
+          group: 'ports-right',
+          args: {}, // extra arguments for the port layout function, see `layout.Port` section
+          label: {
+            position: {
+              name: 'right',
+              // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
+            },
+          },
+          attrs: {
+            text: { text: 'port1' },
+            // portBody: {
+            //   magnet: true
+            // }
+            // y: 70 + 22.5 * i
+          },
+          markup: `<rect width="8" height="${this.attributeWidth}" x="-8" y="${
+            25 + this.attributeWidth * i
+          }" strokegit ="green" fill="white"/>`,
+        });
+        jointjsEl.addPort({
+          // id: 'abc', // generated if `id` value is not present
+          group: 'ports-left',
+          args: {}, // extra arguments for the port layout function, see `layout.Port` section
+          label: {
+            position: {
+              name: 'left',
+              // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
+            },
+          },
+          attrs: {
+            text: { text: 'port1' },
+            // portBody: {
+            //   magnet: true
+            // }
+          },
+          markup: `<rect width="8" height="${this.attributeWidth}" x="300" y="${
+            25 + this.attributeWidth * i
+          }" strokegit ="red" fill="white"/>`,
+        });
+      }
 
       this.graphStorage[table.name] = {
         // alternative to HtmlElement: joint.shapes.html.Element
