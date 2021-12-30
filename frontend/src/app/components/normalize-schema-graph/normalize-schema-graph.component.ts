@@ -18,7 +18,7 @@ import Table from 'src/model/schema/Table';
 })
 export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
   @ViewChild('mermaidDiv') mermaidDiv?: ElementRef;
-  @Input() tables!: Array<Table>;
+  @Input() tables!: Set<Table>;
   @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
 
@@ -59,7 +59,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
         });
         this.getTableinMermaid(table).childNodes.item(2).remove();
       });
-      if (this.selectedTable && this.tables.includes(this.selectedTable)) {
+      if (this.selectedTable && this.tables.has(this.selectedTable)) {
         (
           this.getTableinMermaid(this.selectedTable).children.item(
             0

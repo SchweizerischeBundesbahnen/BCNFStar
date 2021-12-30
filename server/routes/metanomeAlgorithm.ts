@@ -22,7 +22,8 @@ export default class MetanomeAlgorithm {
     const asyncExec = promisify(exec);
     this.tables.forEach(async (table) => {
       const { stderr, stdout } = await asyncExec(this.command(table));
-      if (stderr) throw stderr;
+      // console.log(result.stdout);
+      if (stderr) console.error(stderr);
     });
 
     let dict = {};
