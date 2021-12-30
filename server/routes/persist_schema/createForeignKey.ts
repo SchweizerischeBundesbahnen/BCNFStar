@@ -1,5 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { Pool, PoolClient } from "pg";
+import { isConstructorDeclaration } from "typescript";
 import {
   tableExistsInSchema,
   schemaExistsInDatabase,
@@ -15,6 +16,11 @@ function parseBody(body: any): string[] {
   ];
 }
 
+interface IDict {
+  key: string;
+  value: string;
+}
+
 export default function postCreateForeignKey(pool: Pool): RequestHandler {
   async function createForeignKey(req: Request, res: Response): Promise<void> {
     try {
@@ -26,9 +32,11 @@ export default function postCreateForeignKey(pool: Pool): RequestHandler {
         referencedTable,
         constraintName,
       ]: string[] = parseBody(body);
-      const columnMapping: {} = body.mapping;
+      const columnMapping: IDict[] = body.mapping;
 
       const client: PoolClient = await pool.connect();
+
+      await new Promise((r) => setTimeout(r, 1000));
 
       if (
         !tableExistsInSchema(client, referencingSchema, referencingTable) ||
@@ -41,15 +49,28 @@ export default function postCreateForeignKey(pool: Pool): RequestHandler {
         return;
       }
 
+      console.log("referencing", referencingTable);
+      console.log("referenced", referencedTable);
+      //     console.log(`
+      //     ALTER TABLE ${referencingSchema}.${referencingTable}
+      //         ADD CONSTRAINT ${constraintName}
+      //         FOREIGN KEY (${columnMapping.map(mapping => mapping.key)
+      //           .map((a) => '"' + a + '"')
+      //           .join(", ")})
+      //         REFERENCES ${referencedSchema}.${referencedTable} (${columnMapping.map(mapping => mapping.value)
+      // .map((a) => '"' + a + '"')
+      // .join(", ")});
+      //     `);
+
       await client.query(`
             ALTER TABLE ${referencingSchema}.${referencingTable} 
                 ADD CONSTRAINT ${constraintName}
-                FOREIGN KEY (${Object.keys(columnMapping)
+                FOREIGN KEY (${columnMapping
+                  .map((mapping) => mapping.key)
                   .map((a) => '"' + a + '"')
                   .join(", ")})
-                REFERENCES ${referencedSchema}.${referencedTable} (${Object.values(
-        columnMapping
-      )
+                REFERENCES ${referencedSchema}.${referencedTable} (${columnMapping
+        .map((mapping) => mapping.value)
         .map((a) => '"' + a + '"')
         .join(", ")});
             `);
