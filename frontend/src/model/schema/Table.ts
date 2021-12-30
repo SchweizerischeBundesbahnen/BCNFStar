@@ -10,8 +10,8 @@ export default class Table {
   pk?: ColumnCombination;
   fds: FunctionalDependency[] = [];
   children: Table[] = new Array(2);
-  referencedTables: Table[] = [];
-  referencingTables: Table[] = [];
+  referencedTables: Set<Table> = new Set<Table>();
+  referencingTables: Set<Table> = new Set<Table>();
 
   public constructor(columns?: ColumnCombination) {
     if (columns) this.columns = columns;
@@ -84,8 +84,8 @@ export default class Table {
     this.children[1] = this.constructProjection(this.generatingSchema(fd));
     this.children[0].pk = this.pk;
     this.children[1].pk = fd.lhs.copy();
-    this.children[0].referencedTables.push(this.children[1]);
-    this.children[1].referencingTables.push(this.children[0]);
+    this.children[0].referencedTables.add(this.children[1]);
+    this.children[1].referencingTables.add(this.children[0]);
     this.children[0].name = this.name;
     this.children[1].name = fd.lhs.columnNames().join('_').substring(0, 50);
     return this.children;
@@ -105,16 +105,23 @@ export default class Table {
         }
       }
     });
+
+    /*
+    Table1 -> Table2
+    und jetzt splitten wir Table2 
+    
+    */
+
     this.referencedTables.forEach((refTable) => {
       if (this.foreignKeyForReferencedTable(refTable).isSubsetOf(cc)) {
-        table.referencedTables.push(refTable);
-        refTable.referencingTables.push(table);
+        table.referencedTables.add(refTable);
+        refTable.referencingTables.add(table);
       }
     });
     this.referencingTables.forEach((refTable) => {
       if (refTable.foreignKeyForReferencedTable(this).isSubsetOf(cc)) {
-        table.referencingTables.push(refTable);
-        refTable.referencedTables.push(table);
+        table.referencingTables.add(refTable);
+        refTable.referencedTables.add(table);
       }
     });
     return table;
@@ -134,7 +141,7 @@ export default class Table {
   }
 
   public foreignKeys(): ColumnCombination[] {
-    return this.referencedTables.map((table) =>
+    return Array.from(this.referencedTables).map((table) =>
       this.foreignKeyForReferencedTable(table)
     );
   }

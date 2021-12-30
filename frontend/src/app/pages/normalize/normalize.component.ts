@@ -49,44 +49,39 @@ export class NormalizeComponent {
       this.dataService.postCreateTable(schemaName, table, this.inputTable);
     });
 
-    console.log('Creating Foreign Keys');
-    console.log(
-      this.tables.map(
-        (table) =>
-          'Tablle: ' +
-          table.name +
-          ' referenziert: ' +
-          Array.from(new Set(table.referencedTables.map((table) => table.name)))
-      )
-    );
+    // for (let i = this.tables.length - 1; i >= 0; i--) {
+    //   for (let j = 0; j < this.tables[i].referencedTables.length; j++) {
+    //     this.dataService.postForeignKey(
+    //       this.tables[i],
+    //       this.tables[i].referencedTables[j],
+    //       schemaName
+    //     );
+    //   }
+    // }
 
-    for (let i = this.tables.length - 1; i >= 0; i--) {
-      for (let j = 0; j < this.tables[i].referencedTables.length; j++) {
-        console.log(
-          'Tablle: ' +
-            this.tables[i].name +
-            ' referenziert: ' +
-            this.tables[i].referencedTables[j].name
-        );
+    this.tables.forEach((referencingTable) => {
+      console.log(referencingTable.referencedTables);
+      referencingTable.referencedTables.forEach((referencedTable) => {
+        // console.log("Tabelle: " + referencingTable.name + " referenziert: " + referencedTable.name);
         this.dataService.postForeignKey(
-          this.tables[i],
-          this.tables[i].referencedTables[j],
+          referencingTable,
+          referencedTable,
           schemaName
         );
-      }
-    }
+      });
+    });
 
     // this.tables.forEach(
     //   (referencingTable) => {
     //     referencingTable.referencedTables.forEach(
     //       (referencedTable) => {
-    //         console.log("Tablle: " + referencingTable.name + " referenziert: " + referencedTable.name);
+    //         console.log("Tabelle: " + referencingTable.name + " referenziert: " + referencedTable.name);
     //         this.dataService.postForeignKey(referencingTable, referencedTable, schemaName);
     //       }
     //     )
     //   }
     // );
 
-    console.log('Finished!!' + schemaName);
+    console.log('Finished!' + schemaName);
   }
 }

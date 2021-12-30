@@ -23,8 +23,6 @@ export class DatabaseService {
   }
 
   /*
-  localhost:80/tables/public.customer/fds
-
   {
     "tableName": "public.customer",
     "functionalDependencies": [
@@ -42,10 +40,6 @@ export class DatabaseService {
     const result = this.http.get<IFunctionalDependencies>(
       `http://localhost:80/tables/${table.name}/fds`
     );
-    // let fds2: FunctionalDependency[] = [];
-    // result.subscribe(fd =>  fds2 = fd.functionalDependencies.map(fds => FunctionalDependency.fromString(table, fds)));
-    // console.log("FDS");
-    // console.log(fds2);
     return result;
   }
 
@@ -54,6 +48,7 @@ export class DatabaseService {
     referencedTable: Table,
     schema: string
   ) {
+    // TODO: Tabellen-Objekt sollte auch schema bekommen.... dann kann das hier weg...
     if (referencingTable.name.startsWith('public.')) {
       referencingTable.name = referencingTable.name.substring(7);
     }
@@ -61,21 +56,18 @@ export class DatabaseService {
       referencedTable.name = referencedTable.name.substring(7);
     }
 
-    // console.log("ReferencingTable: ", referencingTable.name);
-    // console.log("ReferencedTable: ", referencedTable.name);
-
     const key_columns: string[] = referencingTable
       .foreignKeyForReferencedTable(referencedTable)
       .columnNames();
-    // console.log(key_columns);
-    const fk_name: string = 'fk_' + Math.random().toString(16).slice(2); // + referencingTable.columns.columnNames().join("_") + "_" + referencedTable.columns.columnNames().join("_") + key_columns.join("_");
+
+    // Da FK nur 40 Zeichen lang sein darf...
+    const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
 
     const mapping: {}[] = [];
     for (let i = 0; i < key_columns.length; i++) {
       mapping.push({ key: key_columns[i], value: key_columns[i] });
     }
 
-    // const mapping = key_columns.map(key => { return { key: key } });
     const data = {
       referencingSchema: schema,
       referencingTable: referencingTable.name,
@@ -87,8 +79,8 @@ export class DatabaseService {
 
     this.http
       .post(`http://localhost:80/persist/createForeignKey`, data)
-      .subscribe((res3: any) => {
-        console.log(res3);
+      .subscribe((result: any) => {
+        console.log(result);
       });
   }
 
@@ -120,13 +112,4 @@ export class DatabaseService {
         console.log(res3);
       });
   }
-
-  // async getFunctionalDEpendenciesByTable2(table: Table): Promise<FunctionalDependency[]>{
-
-  //   const tableName = table.name;
-  //   const result = this.http.get<IFunctionalDependencies>(`http://localhost:80/tables/${tableName.replace('/', '.')}/fds`);
-  //   let fds2: FunctionalDependency[] = [];
-  //   result.subscribe(fd =>  fds2 = fd.functionalDependencies.map(fds => FunctionalDependency.fromString(table, fds)));
-
-  // }
 }
