@@ -54,16 +54,11 @@ export class DatabaseService {
     table: Table
   ): Observable<IFunctionalDependencies> {
     if (!this.fdResult[table.name])
-      // const tableName = table.name;
       this.fdResult[table.name] = this.http
         .get<IFunctionalDependencies>(
           `http://localhost:80/tables/${table.name}/fds`
         )
         .pipe(shareReplay(1));
-    // let fds2: FunctionalDependency[] = [];
-    // result.subscribe(fd =>  fds2 = fd.functionalDependencies.map(fds => FunctionalDependency.fromString(table, fds)));
-    // console.log("FDS");
-    // console.log(fds2);
     return this.fdResult[table.name];
   }
 
@@ -108,13 +103,12 @@ export class DatabaseService {
       });
   }
 
-  postCreateTable(schema: string, table: Table, origin: Table) {
-    // füllen des Body wie wir es im Backend erwarten.
+  postCreateTable(schema: string, table: Table) {
     if (table.name.startsWith('public.')) {
       table.name = table.name.substring(7);
     }
 
-    const [originSchema, originTable]: string[] = origin.name.split('.');
+    const [originSchema, originTable]: string[] = table.origin.name.split('.');
     const [newSchema, newTable]: string[] = [schema, table.name];
     const primaryKey: string[] = table.keys()[0].columnNames();
 
@@ -123,7 +117,6 @@ export class DatabaseService {
       originTable: originTable,
       newSchema: newSchema,
       newTable: newTable,
-
       attribute: table.columns.columnNames().map((str) => {
         return { name: str };
       }),
@@ -132,8 +125,8 @@ export class DatabaseService {
 
     this.http
       .post(`http://localhost:80/persist/createTable`, data)
-      .subscribe((res3: any) => {
-        console.log(res3);
+      .subscribe((result: any) => {
+        console.log(result);
       });
   }
 }
