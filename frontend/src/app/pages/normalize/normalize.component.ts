@@ -10,8 +10,8 @@ import Schema from 'src/model/schema/Schema';
   styleUrls: ['./normalize.component.css'],
 })
 export class NormalizeComponent {
-  schema!: Schema;
-  selectedTable?: Table;
+  public readonly schema!: Schema;
+  public selectedTable?: Table;
 
   constructor(public dataService: DatabaseService) {
     let inputTable = dataService.inputTable!;

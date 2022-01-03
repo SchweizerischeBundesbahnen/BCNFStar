@@ -4,13 +4,14 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 
 export default class Table {
-  name = '';
-  columns = new ColumnCombination();
-  pk?: ColumnCombination;
-  fds: Array<FunctionalDependency> = [];
-  _origin?: Table;
-  referencedTables = new Set<Table>();
-  referencingTables = new Set<Table>();
+  public name = '';
+  public readonly columns = new ColumnCombination();
+  public pk?: ColumnCombination;
+  public fds: Array<FunctionalDependency> = [];
+  public readonly referencedTables = new Set<Table>();
+  public readonly referencingTables = new Set<Table>();
+
+  private _origin?: Table;
 
   public constructor(columns?: ColumnCombination, origin?: Table) {
     if (columns) this.columns = columns;
