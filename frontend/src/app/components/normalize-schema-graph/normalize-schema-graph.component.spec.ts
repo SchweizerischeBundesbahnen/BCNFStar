@@ -6,7 +6,6 @@ import { NormalizeSchemaGraphComponent } from './normalize-schema-graph.componen
 describe('NormalizeSchemaGraphComponent', () => {
   let component: NormalizeSchemaGraphComponent;
   let fixture: ComponentFixture<NormalizeSchemaGraphComponent>;
-  // let htmlElement: HTMLElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -17,9 +16,8 @@ describe('NormalizeSchemaGraphComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(NormalizeSchemaGraphComponent);
     component = fixture.componentInstance;
-    component.tables = [exampleTable()];
+    component.tables = new Set([exampleTable()]);
     fixture.detectChanges();
-    // htmlElement = fixture.nativeElement;
   });
 
   it('should create', () => {

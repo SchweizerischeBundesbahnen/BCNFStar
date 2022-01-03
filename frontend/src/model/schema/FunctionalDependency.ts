@@ -14,6 +14,7 @@ export default class FunctionalDependency {
     this.table = table;
     this.lhs = lhs;
     this.rhs = rhs;
+    this.extend();
   }
 
   //  "[c_address] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
@@ -40,7 +41,7 @@ export default class FunctionalDependency {
     return new FunctionalDependency(table, lhs, rhs);
   }
 
-  public extend(): void {
+  private extend(): void {
     this.rhs.union(this.lhs);
     // TODO: Inter-FD-extension (maybe)
   }

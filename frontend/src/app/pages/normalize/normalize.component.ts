@@ -2,7 +2,7 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import { Component } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
-// import { ActivatedRoute } from '@angular/router';
+import Schema from 'src/model/schema/Schema';
 
 @Component({
   selector: 'app-normalize',
@@ -10,18 +10,12 @@ import { DatabaseService } from 'src/app/database.service';
   styleUrls: ['./normalize.component.css'],
 })
 export class NormalizeComponent {
-  inputTable: Table;
-  tables: Array<Table> = [];
-  selectedTable?: Table;
+  public readonly schema!: Schema;
+  public selectedTable?: Table;
 
   constructor(public dataService: DatabaseService) {
-    this.inputTable = dataService.inputTable!;
-    this.onInputTableChanged();
-    console.log(this.inputTable);
-  }
-
-  onInputTableChanged(): void {
-    this.tables = this.inputTable.allResultingTables();
+    let inputTable = dataService.inputTable!;
+    this.schema = new Schema(inputTable);
   }
 
   onSelect(table: Table): void {
@@ -29,8 +23,7 @@ export class NormalizeComponent {
   }
 
   onSplitFd(fd: FunctionalDependency): void {
-    this.selectedTable!.split(fd);
-    this.onInputTableChanged();
-    this.selectedTable = this.selectedTable!.children[0];
+    let tables = this.schema.split(this.selectedTable!, fd);
+    this.selectedTable = tables[0];
   }
 }
