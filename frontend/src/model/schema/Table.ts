@@ -4,13 +4,13 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 
 export default class Table {
-  name = '';
-  columns = new ColumnCombination();
-  pk?: ColumnCombination = undefined;
-  fds: Array<FunctionalDependency> = [];
-  origin: Table;
-  referencedTables = new Set<Table>();
-  referencingTables = new Set<Table>();
+  public name = '';
+  public readonly columns = new ColumnCombination();
+  public pk?: ColumnCombination = undefined;
+  public fds: Array<FunctionalDependency> = [];
+  public readonly referencedTables = new Set<Table>();
+  public readonly referencingTables = new Set<Table>();
+  public readonly origin: Table;
 
   public constructor(columns?: ColumnCombination, origin?: Table) {
     if (columns) this.columns = columns;
@@ -47,16 +47,11 @@ export default class Table {
 
   public setFds(...fds: Array<FunctionalDependency>) {
     this.fds = fds;
-    this.extendFds();
     this.fds = fds.filter((fd) => !fd.isFullyTrivial());
   }
 
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.fds.push(new FunctionalDependency(this, lhs, rhs));
-  }
-
-  public extendFds() {
-    this.fds.forEach((fd) => fd.extend());
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {

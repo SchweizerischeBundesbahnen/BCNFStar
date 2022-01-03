@@ -19,7 +19,7 @@ export default class ColumnCombination {
     );
   }
 
-  public subsetFromIds(...numbers: Array<number>) {
+  public columnsFromIds(...numbers: Array<number>) {
     return new ColumnCombination(
       ...this.inOrder().filter((col, i) => numbers.includes(i))
     );

@@ -12,9 +12,9 @@ import SplitCommand from 'src/model/commands/SplitCommand';
   styleUrls: ['./normalize.component.css'],
 })
 export class NormalizeComponent {
-  schema: Schema;
-  selectedTable?: Table;
-  commandProcessor = new CommandProcessor();
+  public readonly schema!: Schema;
+  public readonly commandProcessor = new CommandProcessor();
+  public selectedTable?: Table;
 
   constructor(public dataService: DatabaseService) {
     let inputTable = dataService.inputTable!;

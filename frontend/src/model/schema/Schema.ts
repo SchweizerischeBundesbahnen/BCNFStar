@@ -2,7 +2,7 @@ import FunctionalDependency from './FunctionalDependency';
 import Table from './Table';
 
 export default class Schema {
-  tables = new Set<Table>();
+  public readonly tables = new Set<Table>();
 
   public constructor(...tables: Array<Table>) {
     this.add(...tables);
