@@ -9,8 +9,10 @@
     class="row justify-content-between table-body"
   >
     <div
-      [ngClass]="{ pk: table.pk && table.pk.includes(column) }"
-      [ngClass]="{ fk: table.hasForeignKeyWith(column) }"
+      [ngClass]="{
+        pk: table.pk && table.pk.includes(column),
+        fk: table.hasForeignKeyWith(column)
+      }"
       class="col-6 ellipses"
     >
       {{ column.name }}
