@@ -37,13 +37,13 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    for (const name in this.graphStorage) {
-      const item = this.graphStorage[name];
-      this.updateBBox(item);
-    }
+    setTimeout(() => this.updateAllBBoxes(), 100);
   }
 
+  protected attributeWidth = 22.5;
+
   public graphStorage: Record<string, GraphStorageItem> = {};
+
   createDefaultGraph() {
     let graph = new joint.dia.Graph();
 
@@ -76,9 +76,45 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
         body: {
           strokeWidth: 0,
         },
+        '.': { magnet: true },
       });
-      jointjsEl.resize(300, 60 + 22.5 * table.columns.columns.size);
+      jointjsEl.resize(
+        300,
+        60 + this.attributeWidth * table.columns.columns.size
+      );
       jointjsEl.position(50, 10);
+      let counter = 0;
+      for (let column of table.columns.inOrder()) {
+        jointjsEl.addPort({
+          id: column.name + '_right', // generated if `id` value is not present
+          group: 'ports-right',
+          args: {}, // extra arguments for the port layout function, see `layout.Port` section
+          label: {
+            position: {
+              name: 'right',
+              // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
+            },
+          },
+          markup: `<circle r="${this.attributeWidth / 2}" cx="0" cy="${
+            25 + this.attributeWidth / 2 + this.attributeWidth * counter
+          }" strokegit ="green" fill="white" />`,
+        });
+        jointjsEl.addPort({
+          id: column.name + '_left', // generated if `id` value is not present
+          group: 'ports-left',
+          args: {}, // extra arguments for the port layout function, see `layout.Port` section
+          label: {
+            position: {
+              name: 'left',
+              // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
+            },
+          },
+          markup: `<circle r="${this.attributeWidth / 2}" cx="300" cy="${
+            25 + this.attributeWidth / 2 + this.attributeWidth * counter
+          }" strokegit ="red" fill="white" />`,
+        });
+        counter++;
+      }
 
       this.graphStorage[table.name] = {
         // alternative to HtmlElement: joint.shapes.html.Element
@@ -93,10 +129,20 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
     // generate links
     for (const table of this.tables) {
       for (const otherTable of table.minimalReferencedTables()) {
+        let foreignKey = table
+          .foreignKeyForReferencedTable(otherTable)
+          .columns.values()
+          .next().value;
         this.graphStorage[table.name].links[otherTable.name] =
           new joint.dia.Link({
-            source: { id: this.graphStorage[table.name].jointjsEl.id },
-            target: { id: this.graphStorage[otherTable.name].jointjsEl.id },
+            source: {
+              id: this.graphStorage[table.name].jointjsEl.id,
+              port: foreignKey.name + '_left',
+            },
+            target: {
+              id: this.graphStorage[otherTable.name].jointjsEl.id,
+              port: foreignKey.name + '_right',
+            },
           });
       }
       graph.addCells(Object.values(this.graphStorage[table.name].links));
@@ -123,12 +169,17 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
   get paperOffset() {
     const { top, left } =
       this.paperHtmlObject.nativeElement.getBoundingClientRect();
-    return { top, left };
+    return { top: top + window.scrollY, left: left + window.scrollX };
+  }
+
+  updateAllBBoxes() {
+    for (const item in this.graphStorage) {
+      this.updateBBox(this.graphStorage[item]);
+    }
   }
 
   updateBBox(item: GraphStorageItem) {
     const bbox = item.jointjsEl.getBBox();
-    item.jointjsEl.position(bbox.x, bbox.y);
     item.style = {
       width: bbox.width + 'px',
       height: bbox.height + 'px',

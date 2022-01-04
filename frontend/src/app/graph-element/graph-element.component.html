@@ -1,5 +1,5 @@
 <div class="container px-0" [ngStyle]="bbox">
-  <div class="table-head">
+  <div class="table-head ellipses">
     <span class="table-head-title" (click)="select()">
       {{ table.name }}
     </span>
@@ -11,11 +11,11 @@
     <div
       [ngClass]="{ pk: table.pk && table.pk.includes(column) }"
       [ngClass]="{ fk: table.hasForeignKeyWith(column) }"
-      class="col-6 attributes"
+      class="col-6 ellipses"
     >
       {{ column.name }}
     </div>
-    <div class="col-6 text-end attributes">{{ column.dataType }}</div>
+    <div class="col-6 text-end ellipses">{{ column.dataType }}</div>
   </div>
   <div class="row">
     <sbb-icon
