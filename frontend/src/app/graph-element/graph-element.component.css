@@ -15,6 +15,10 @@
   text-decoration: underline;
 }
 
+.fk {
+  font-style: italic;
+}
+
 .table-head {
   background-color: lightgray;
   border-top: solid 3px rgb(18, 54, 131);

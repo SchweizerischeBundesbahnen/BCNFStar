@@ -133,6 +133,10 @@ export default class Table {
     );
   }
 
+  public hasForeignKeyWith(column: Column): boolean {
+    return this.foreignKeys().some((cc) => cc.includes(column));
+  }
+
   public minimalReferencedTables(): Array<Table> {
     var result: Set<Table> = new Set(this.referencedTables);
 
@@ -141,7 +145,6 @@ export default class Table {
 
     var queue: Array<Table> = [];
     queue.push(...this.referencedTables);
-    console.log('ho');
     while (queue.length > 0) {
       var current = queue.shift();
       visited.push(current!);

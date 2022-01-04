@@ -10,6 +10,7 @@
   >
     <div
       [ngClass]="{ pk: table.pk && table.pk.includes(column) }"
+      [ngClass]="{ fk: table.hasForeignKeyWith(column) }"
       class="col-6 attributes"
     >
       {{ column.name }}
