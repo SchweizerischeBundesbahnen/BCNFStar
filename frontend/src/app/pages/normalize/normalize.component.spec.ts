@@ -83,7 +83,7 @@ describe('NormalizeComponent', () => {
 
   it('its normalize-side-bar should trigger splitting', () => {
     const sideBar = getSideBar(fixture, component);
-    let table = sideBar.table;
+    let table = sideBar.table!;
     sideBar.splitFd.emit(table.violatingFds()[0]);
     expect(component.schema.tables).not.toContain(table);
   });

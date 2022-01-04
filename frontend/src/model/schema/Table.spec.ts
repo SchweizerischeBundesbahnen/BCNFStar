@@ -61,4 +61,12 @@ describe('Table', () => {
     );
     expect(children[1].fds).toEqual([fd2, fd3]);
   });
+
+  it('should join correctly', () => {
+    let [remaining, generating] = table.split(table.violatingFds()[0]);
+    let mergedTable = remaining.join(generating);
+    expect(mergedTable).toEqual(table);
+    let mergedTable2 = generating.join(remaining);
+    expect(mergedTable2).toEqual(table);
+  });
 });
