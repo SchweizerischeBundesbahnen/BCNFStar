@@ -37,10 +37,7 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    for (const name in this.graphStorage) {
-      const item = this.graphStorage[name];
-      this.updateBBox(item);
-    }
+    setTimeout(() => this.updateAllBBoxes(), 100);
   }
 
   protected attributeWidth = 22.5;
@@ -172,12 +169,17 @@ export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
   get paperOffset() {
     const { top, left } =
       this.paperHtmlObject.nativeElement.getBoundingClientRect();
-    return { top, left };
+    return { top: top + window.scrollY, left: left + window.scrollX };
+  }
+
+  updateAllBBoxes() {
+    for (const item in this.graphStorage) {
+      this.updateBBox(this.graphStorage[item]);
+    }
   }
 
   updateBBox(item: GraphStorageItem) {
     const bbox = item.jointjsEl.getBBox();
-    item.jointjsEl.position(bbox.x, bbox.y);
     item.style = {
       width: bbox.width + 'px',
       height: bbox.height + 'px',
