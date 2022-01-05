@@ -15,7 +15,7 @@ export default function getTablesFunction(pool: Pool): RequestHandler {
         // the last line excludes system tables
         `SELECT table_name, column_name, data_type, table_schema 
         FROM information_schema.columns 
-        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')`,
+        WHERE table_schema NOT IN ('information_schema')`,
         []
       );
       const tempTables: Record<string, ITable> = {};
