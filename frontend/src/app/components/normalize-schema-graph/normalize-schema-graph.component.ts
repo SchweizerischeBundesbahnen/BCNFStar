@@ -1,10 +1,10 @@
 import {
   AfterViewInit,
   Component,
+  DoCheck,
   ElementRef,
   EventEmitter,
   Input,
-  OnChanges,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -16,7 +16,7 @@ import Table from 'src/model/schema/Table';
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
+export class NormalizeSchemaGraphComponent implements AfterViewInit, DoCheck {
   @ViewChild('mermaidDiv') mermaidDiv?: ElementRef;
   @Input() tables!: Set<Table>;
   @Input() selectedTable?: Table;
@@ -42,7 +42,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
     this.renderMermaid();
   }
 
-  ngOnChanges(): void {
+  ngDoCheck(): void {
     this.renderMermaid();
   }
 
