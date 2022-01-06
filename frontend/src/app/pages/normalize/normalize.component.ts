@@ -5,6 +5,7 @@ import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
+import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 
 @Component({
   selector: 'app-normalize',
@@ -41,6 +42,19 @@ export class NormalizeComponent {
     };
     command.onUndo = function () {
       self.selectedTable = this.table;
+    };
+    this.commandProcessor.do(command);
+  }
+
+  onAutoNormalize(): void {
+    let command = new AutoNormalizeCommand(this.schema);
+    let self = this;
+    let previousSelectedTable = this.selectedTable;
+    command.onDo = function () {
+      self.selectedTable = undefined;
+    };
+    command.onUndo = function () {
+      self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
   }

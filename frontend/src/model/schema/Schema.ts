@@ -39,6 +39,19 @@ export default class Schema {
     return tables;
   }
 
+  public autoNormalize() {
+    let action: boolean;
+    do {
+      action = false;
+      for (let table of this.tables) {
+        if (table.violatingFds().length > 0) {
+          this.split(table, table.violatingFds()[0]);
+          action = true;
+        }
+      }
+    } while (action);
+  }
+
   public join(table1: Table, table2: Table) {
     let newTable = table1.join(table2);
     this.add(newTable);

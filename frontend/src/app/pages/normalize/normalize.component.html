@@ -19,6 +19,9 @@
         [table]="this.selectedTable"
         (splitFd)="onSplitFd($event)"
       ></app-normalize-side-bar>
+      <button type="button" sbbButton (click)="this.onAutoNormalize()">
+        Auto Normalize
+      </button>
     </div>
   </div>
 </div>
