@@ -27,9 +27,8 @@ type GraphStorageItem = {
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements OnChanges, AfterViewInit {
-  constructor() {}
-  @Input() tables!: Array<Table>;
+export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
+  @Input() tables!: Set<Table>;
   @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
 

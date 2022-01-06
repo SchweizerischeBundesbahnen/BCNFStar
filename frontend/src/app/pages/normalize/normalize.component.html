@@ -4,15 +4,21 @@
       <!-- [selectedTable]="this.selectedTable" -->
       <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
+        [tables]="this.schema.tables"
         [selectedTable]="this.selectedTable"
         (selected)="onSelect($event)"
         [tables]="this.tables"
       ></app-normalize-schema-graph>
     </div>
     <div class="col-4 border">
+      <app-normalize-undo-redo
+        [canUndo]="this.commandProcessor.canUndo()"
+        [canRedo]="this.commandProcessor.canRedo()"
+        (undo)="onUndo()"
+        (redo)="onRedo()"
+      ></app-normalize-undo-redo>
       <app-normalize-side-bar
         class="normalize-sidebar"
-        *ngIf="this.selectedTable"
         [table]="this.selectedTable"
         (splitFd)="onSplitFd($event)"
       ></app-normalize-side-bar>

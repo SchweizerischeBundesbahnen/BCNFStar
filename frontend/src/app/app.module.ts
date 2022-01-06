@@ -17,6 +17,7 @@ import { SbbIconModule } from '@sbb-esta/angular-core';
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './graph-element/graph-element.component';
+import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/normalize-undo-redo.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { GraphElementComponent } from './graph-element/graph-element.component';
     NormalizeSideBarComponent,
     NormalizeSchemaGraphComponent,
     GraphElementComponent,
+    NormalizeUndoRedoComponent,
   ],
   imports: [
     BrowserModule,

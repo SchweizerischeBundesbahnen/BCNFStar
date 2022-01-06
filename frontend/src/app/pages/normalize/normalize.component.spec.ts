@@ -41,41 +41,34 @@ describe('NormalizeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should include the input table in tables', () => {
-    expect(component.tables).toContain(component.inputTable);
-  });
-
-  it('should not include input table after a split', () => {
-    component.onSelect(component.inputTable);
-    component.onSplitFd(component.inputTable.fds[0]);
-    expect(component.tables).not.toContain(component.inputTable);
-  });
-
   it('should have a normalize-schema-graph', () => {
     const schemaGraph = getSchemaGraph(fixture);
     expect(schemaGraph).toBeTruthy();
   });
 
-  it("'s normalize-schema-graph should have correct tables", () => {
+  it('its normalize-schema-graph should have correct tables', () => {
     const schemaGraph = getSchemaGraph(fixture);
-    expect(schemaGraph.tables).toEqual(component.tables);
-    component.tables.push(new Table());
-    expect(schemaGraph.tables).toEqual(component.tables);
-    component.tables.pop();
-    expect(schemaGraph.tables).toEqual(component.tables);
+    expect(schemaGraph.tables).toEqual(component.schema.tables);
+    let table = new Table();
+    component.schema.tables.add(table);
+    expect(schemaGraph.tables).toEqual(component.schema.tables);
+    component.schema.tables.delete(table);
+    expect(schemaGraph.tables).toEqual(component.schema.tables);
   });
 
-  it("'s normalize-schema-graph should have correct selected table", () => {
+  it('its normalize-schema-graph should have correct selected table', () => {
     const schemaGraph = getSchemaGraph(fixture);
-    component.onSelect(component.inputTable);
+    let table = [...component.schema.tables][0];
+    component.onSelect(table);
     fixture.detectChanges();
     expect(schemaGraph.selectedTable).toEqual(component.selectedTable);
   });
 
-  it("'s normalize-schema-graph should set selected table", () => {
+  it('its normalize-schema-graph should set selected table', () => {
     const schemaGraph = getSchemaGraph(fixture);
-    schemaGraph.selected.emit(schemaGraph.tables[0]);
-    expect(component.selectedTable).toEqual(schemaGraph.tables[0]);
+    let table = [...component.schema.tables][0];
+    schemaGraph.selected.emit(table);
+    expect(component.selectedTable).toEqual(table);
   });
 
   it('should have a normalize-side-bar when a table is selected', () => {
@@ -83,32 +76,25 @@ describe('NormalizeComponent', () => {
     expect(sideBar).toBeTruthy();
   });
 
-  it("'s normalize-side-bar should have correct table", () => {
+  it('its normalize-side-bar should have correct table', () => {
     const sideBar = getSideBar(fixture, component);
     expect(sideBar.table).toEqual(component.selectedTable!);
   });
 
-  it("'s normalize-side-bar should trigger splitting", () => {
+  it('its normalize-side-bar should trigger splitting', () => {
     const sideBar = getSideBar(fixture, component);
-    sideBar.splitFd.emit(sideBar.table.violatingFds()[0]);
-    expect(component.tables.includes(component.inputTable)).toBeFalse();
+    let table = sideBar.table!;
+    sideBar.splitFd.emit(table.violatingFds()[0]);
+    expect(component.schema.tables).not.toContain(table);
   });
 
-  /*it('should have a normalize-schema-graph', () => {
-    const normalizeElement: HTMLElement = fixture.nativeElement;
-    expect(
-      normalizeElement.querySelector('app-normalize-schema-graph')
-    ).toBeTruthy();
+  it('should have a normalize-schema-graph', () => {
+    expect(getSchemaGraph(fixture)).toBeTruthy();
   });
 
   it('should have a normalize-side-bar when a table is selected', () => {
-    component.onSelect(component.inputTable);
-    fixture.detectChanges();
-    const normalizeElement: HTMLElement = fixture.nativeElement;
-    expect(
-      normalizeElement.querySelector('app-normalize-side-bar')
-    ).toBeTruthy();
-  });*/
+    expect(getSideBar(fixture, component)).toBeTruthy();
+  });
 });
 
 function getSchemaGraph(
@@ -122,7 +108,8 @@ function getSideBar(
   fixture: ComponentFixture<NormalizeComponent>,
   component: NormalizeComponent
 ): NormalizeSideBarComponent {
-  component.onSelect(component.inputTable);
+  let table = [...component.schema.tables][0];
+  component.onSelect(table);
   fixture.detectChanges();
   return fixture.debugElement.query(By.directive(NormalizeSideBarComponent))
     .componentInstance;
