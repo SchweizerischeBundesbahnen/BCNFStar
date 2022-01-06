@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import Table from '../model/schema/Table';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, shareReplay, map } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 
 @Injectable({
@@ -12,45 +12,42 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 export class DatabaseService {
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
+  public inputTables?: Array<Table>;
+  private tableResult?: Observable<Array<Table>>;
 
-  public inputTable?: Table;
-
-  private tableResult?: Observable<ITable[]>;
-  getTableNames(): Observable<ITable[]> {
+  getITables(): Observable<Array<Table>> {
     if (!this.tableResult)
       this.tableResult = this.http
         .get<ITable[]>(`http://localhost:80/tables`)
         // required for caching
-        .pipe(shareReplay(1));
+        .pipe(shareReplay(1))
+        .pipe(
+          map((iTables: Array<ITable>) =>
+            iTables.map((iTable) => Table.fromITable(iTable))
+          )
+        );
     return this.tableResult;
   }
 
-  setInputTable(table: ITable) {
-    this.inputTable = Table.fromITable(table);
-    this.getFunctionalDependenciesByTable(this.inputTable).subscribe((fd) =>
-      this.inputTable!.setFds(
-        ...fd.functionalDependencies.map((fds) =>
-          FunctionalDependency.fromString(this.inputTable!, fds)
+  // mapToTable(): Observable<Array<Table>> {
+  //   return this.getITables().pipe(
+  //     map((iTables: Array<ITable>) => iTables.map(iTable => Table.fromITable(iTable)))
+  //   )
+  // }
+
+  setInputTables(tables: Array<Table>) {
+    this.inputTables = tables;
+    this.inputTables.forEach((inputTable) => {
+      this.getFunctionalDependenciesByTable(inputTable).subscribe((fd) =>
+        inputTable.setFds(
+          ...fd.functionalDependencies.map((fds) =>
+            FunctionalDependency.fromString(inputTable, fds)
+          )
         )
-      )
-    );
+      );
+    });
   }
 
-  /*
-  localhost:80/tables/public.customer/fds
-
-  {
-    "tableName": "public.customer",
-    "functionalDependencies": [
-        "[c_name] --> c_acctbal, c_address, c_comment, c_custkey, c_mktsegment, c_nationkey, c_phone",
-        "[c_phone] --> c_acctbal, c_address, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey",
-        "[c_comment] --> c_acctbal, c_address, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone",
-        "[c_acctbal] --> c_address, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone",
-        "[c_custkey] --> c_acctbal, c_address, c_comment, c_mktsegment, c_name, c_nationkey, c_phone",
-        "[c_address] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
-    ]
-  }
-  */
   protected fdResult: Record<string, Observable<IFunctionalDependencies>> = {};
   getFunctionalDependenciesByTable(
     table: Table
@@ -62,19 +59,6 @@ export class DatabaseService {
           `http://localhost:80/tables/${table.name}/fds`
         )
         .pipe(shareReplay(1));
-    // let fds2: FunctionalDependency[] = [];
-    // result.subscribe(fd =>  fds2 = fd.functionalDependencies.map(fds => FunctionalDependency.fromString(table, fds)));
-    // console.log("FDS");
-    // console.log(fds2);
     return this.fdResult[table.name];
   }
-
-  // async getFunctionalDEpendenciesByTable2(table: Table): Promise<FunctionalDependency[]>{
-
-  //   const tableName = table.name;
-  //   const result = this.http.get<IFunctionalDependencies>(`http://localhost:80/tables/${tableName.replace('/', '.')}/fds`);
-  //   let fds2: FunctionalDependency[] = [];
-  //   result.subscribe(fd =>  fds2 = fd.functionalDependencies.map(fds => FunctionalDependency.fromString(table, fds)));
-
-  // }
 }
