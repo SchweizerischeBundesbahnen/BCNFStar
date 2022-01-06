@@ -33,7 +33,9 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
   @Output() selected = new EventEmitter<Table>();
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['tables']) this.createDefaultGraph();
+    if (changes['tables']) {
+      this.createDefaultGraph();
+    }
   }
 
   private panzoomTransform!: Transform;
