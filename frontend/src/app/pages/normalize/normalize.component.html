@@ -20,7 +20,11 @@
         (splitFd)="onSplitFd($event)"
       ></app-normalize-side-bar>
       <button type="button" sbbButton (click)="this.onAutoNormalize()">
-        Auto Normalize
+        {{
+          this.selectedTable !== undefined
+            ? "Auto-Normalize this table"
+            : "Auto-Normalize all tables"
+        }}
       </button>
     </div>
   </div>

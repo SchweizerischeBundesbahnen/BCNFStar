@@ -47,7 +47,10 @@ export class NormalizeComponent {
   }
 
   onAutoNormalize(): void {
-    let command = new AutoNormalizeCommand(this.schema);
+    let tables = this.selectedTable
+      ? new Array(this.selectedTable)
+      : new Array(...this.schema.tables);
+    let command = new AutoNormalizeCommand(this.schema, ...tables);
     let self = this;
     let previousSelectedTable = this.selectedTable;
     command.onDo = function () {

@@ -4,29 +4,28 @@ import Command from './Command';
 
 export default class AutoNormalizeCommand extends Command {
   schema: Schema;
-  previousTables: Array<Table>;
+  tables: Array<Table>;
   resultingTables?: Array<Table>;
 
-  public constructor(schema: Schema) {
+  public constructor(schema: Schema, ...tables: Array<Table>) {
     super();
     this.schema = schema;
-    this.previousTables = new Array(...this.schema.tables);
+    this.tables = tables;
   }
 
   protected override _do(): void {
-    this.schema.autoNormalize();
-    this.resultingTables = new Array(...this.schema.tables);
+    this.resultingTables = this.schema.autoNormalize(...this.tables);
     console.log('do\n');
   }
 
   protected override _undo(): void {
     this.schema.delete(...this.resultingTables!);
-    this.schema.add(...this.previousTables);
+    this.schema.add(...this.tables);
     console.log('undo\n');
   }
 
   protected override _redo(): void {
-    this.schema.delete(...this.previousTables);
+    this.schema.delete(...this.tables);
     this.schema.add(...this.resultingTables!);
   }
 }
