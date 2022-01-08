@@ -14,24 +14,10 @@ export class TableSelectionComponent implements OnInit {
   constructor(private dataService: DatabaseService) {}
 
   ngOnInit(): void {
-    console.log('ngOnInit');
-    // let tempTables = this.dataService.getTables();
-    // tempTables.forEach((table) => this.tables.set(table, false));
-    // this.dataService.loadTableCallback$.subscribe((data) =>
-    //   data.forEach((table) => this.tables.set(table, false))
-    // );
-    let tempTables: Array<Table> = [];
-    this.dataService.getAllTables().subscribe((data) => {
-      tempTables.push(...data);
-      console.log('Nach Table: ');
-      console.log(tempTables);
-      this.dataService.getFks().subscribe((data) => {
-        this.dataService.resolveIFks(data, tempTables);
-        tempTables.forEach((table) => this.tables.set(table, false));
-        console.log('Nach fks: ');
-        console.log(tempTables);
-      });
-    });
+    this.dataService.loadTableCallback$.subscribe((data) =>
+      data.forEach((table) => this.tables.set(table, false))
+    );
+    this.dataService.loadTables();
   }
 
   public toggleCheckStatus(table: Table) {

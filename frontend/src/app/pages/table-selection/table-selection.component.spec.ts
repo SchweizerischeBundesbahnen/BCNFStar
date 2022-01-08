@@ -4,17 +4,24 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TableSelectionComponent } from './table-selection.component';
 
 import { DatabaseService } from 'src/app/database.service';
-import { exampleITable } from 'src/model/schema/exampleTables';
-import { of } from 'rxjs';
+import { exampleTableSportartVerein } from 'src/model/schema/exampleTables';
+import { Observable, Subject } from 'rxjs';
+import Table from 'src/model/schema/Table';
 
 describe('TableSelectionComponent', () => {
   let component: TableSelectionComponent;
   let fixture: ComponentFixture<TableSelectionComponent>;
   let databaseServiceStub: any;
+  let loadTableCallback1 = new Subject<Array<Table>>();
+  let loadTableCallback1$: Observable<Array<Table>> =
+    loadTableCallback1.asObservable();
 
   beforeEach(async () => {
     databaseServiceStub = {
-      getTableNames: () => of(exampleITable),
+      loadTableCallback$: loadTableCallback1$,
+      loadTables: () => {
+        loadTableCallback1.next([exampleTableSportartVerein()]);
+      },
     };
     await TestBed.configureTestingModule({
       declarations: [TableSelectionComponent],
@@ -34,8 +41,10 @@ describe('TableSelectionComponent', () => {
   it('should display all tables', () => {
     const tableSelectionElement: HTMLElement = fixture.nativeElement;
 
-    expect(component.tables).toEqual(exampleITable);
-    exampleITable.forEach((table) => {
+    expect([...component.tables.keys()]).toEqual([
+      exampleTableSportartVerein(),
+    ]);
+    [exampleTableSportartVerein()].forEach((table) => {
       expect(tableSelectionElement.innerHTML).toContain(table.name);
     });
   });
