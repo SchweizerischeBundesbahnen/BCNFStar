@@ -37,7 +37,8 @@
               "node_modules/lodash/index.js",
               "node_modules/backbone/backbone.js",
               "node_modules/jointjs/dist/joint.js"
-            ]
+            ],
+            "allowedCommonJsDependencies": ["panzoom", "graphlib", "dagre"]
           },
           "configurations": {
             "production": {
