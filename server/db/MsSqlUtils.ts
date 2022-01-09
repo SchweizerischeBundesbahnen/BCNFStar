@@ -48,7 +48,8 @@ export default class MsSqlUtils {
     | { data: Array<Record<string, any>>; columns: Array<string> }
     | { error: string }
   > {
-    if (this.tableExistsInSchema(schemaname, tablename)) {
+    const tableExists = await this.tableExistsInSchema(schemaname, tablename);
+    if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
         `SELECT TOP (10) * FROM [${schemaname}].[${tablename}]`
       );
@@ -76,6 +77,3 @@ export default class MsSqlUtils {
     return result.recordset.length > 0;
   }
 }
-
-const mssql = new MsSqlUtils("localhost", "master", "sa", "71FplJob1lvQ");
-mssql.init().then(() => mssql.getSchema());

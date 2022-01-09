@@ -1,11 +1,8 @@
 import ITable from "@/definitions/ITable";
-import MsSqlUtils from "@/mssql";
+import SqlUtils from "@/db/SqlUtils";
 import { Request, Response, RequestHandler } from "express";
-import { Pool } from "pg";
 
-export default function getTablesFunction(
-  sqlutils: MsSqlUtils
-): RequestHandler {
+export default function getTablesFunction(sqlutils: SqlUtils): RequestHandler {
   async function getTables(req: Request, res: Response): Promise<void> {
     try {
       const query_result = await sqlutils.getSchema();

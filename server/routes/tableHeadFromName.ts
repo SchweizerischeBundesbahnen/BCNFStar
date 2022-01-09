@@ -1,10 +1,9 @@
+import SqlUtils from "@/db/SqlUtils";
 import ITableHead from "@/definitions/ITableHead";
-import MsSqlUtils from "@/mssql";
-import { Request, Response, RequestHandler, query } from "express";
-import { Pool } from "pg";
+import { Request, Response, RequestHandler } from "express";
 
 export default function getTableHeadFromNameFunction(
-  sqlUtils: MsSqlUtils
+  sqlUtils: SqlUtils
 ): RequestHandler {
   async function getTableHeadFromName(
     req: Request,

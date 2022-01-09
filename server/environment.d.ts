@@ -10,6 +10,7 @@ declare global {
       PGDATABASE?: string;
       PGUSER?: string;
       PGPASSWORD?: string;
+      DB_TYPE?: string;
     }
   }
 }
