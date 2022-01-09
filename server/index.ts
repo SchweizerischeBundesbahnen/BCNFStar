@@ -12,6 +12,7 @@ import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
+import getFksFunction from "./routes/fks";
 
 setupDBCredentials();
 
@@ -49,6 +50,7 @@ app.get("/test", (req, res) => {
 app.get("/tables", getTablesFunction(pool));
 app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
+app.get("/fks", getFksFunction(pool));
 
 app.post("/persist/createTable", postCreateTable(pool));
 app.post("/persist/createForeignKey", postCreateForeignKey(pool));
