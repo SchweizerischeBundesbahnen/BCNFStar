@@ -7,7 +7,6 @@ import {
   EventEmitter,
   OnChanges,
   SimpleChanges,
-  AfterViewInit,
 } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
@@ -27,27 +26,17 @@ type GraphStorageItem = {
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
+export class NormalizeSchemaGraphComponent implements OnChanges {
   @Input() tables!: Set<Table>;
   @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['tables']) {
-      this.createDefaultGraph();
-    }
+    changes;
+    this.createDefaultGraph();
   }
 
-  private panzoomTransform!: Transform;
-  ngAfterViewInit(): void {
-    setTimeout(() => this.updateAllBBoxes(), 100);
-    const panzoomHandler = panzoom(document.querySelector('svg') as SVGElement);
-    // move all HTML overlays whenever the user zoomed or panned
-    panzoomHandler.on('transform', (e: PanZoom) => {
-      this.panzoomTransform = e.getTransform();
-      this.updateAllBBoxes();
-    });
-  }
+  private panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
   protected attributeWidth = 22.5;
 
@@ -55,16 +44,15 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
 
   protected graph!: joint.dia.Graph;
 
+  private height = 10000;
   createDefaultGraph() {
     this.graph = new joint.dia.Graph();
 
     new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
       model: this.graph,
-      height: 1000,
+      height: this.height,
       width: '100%',
-      gridSize: 1,
-      drawGrid: true,
       background: {
         color: 'rgba(200, 200, 200, 0.3)',
       },
@@ -88,12 +76,28 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
       edgeSep: 80,
       rankDir: 'LR',
     });
+
+    setTimeout(() => {
+      const panzoomHandler = panzoom(
+        document.querySelector('#paper svg') as SVGElement
+      );
+      // move all HTML overlays whenever the user zoomed or panned
+      panzoomHandler.on('transform', (e: PanZoom) => {
+        this.panzoomTransform = e.getTransform();
+        this.updateAllBBoxes();
+      });
+      this.updateAllBBoxes();
+    }, 10);
   }
   @ViewChild('paper') paperHtmlObject!: ElementRef<HTMLDivElement>;
   get paperOffset() {
-    const { top, left } =
-      this.paperHtmlObject.nativeElement.getBoundingClientRect();
-    return { top: top + window.scrollY, left: left + window.scrollX };
+    try {
+      const { top, left } =
+        this.paperHtmlObject.nativeElement.getBoundingClientRect();
+      return { top: top + window.scrollY, left: left + window.scrollX };
+    } catch (e) {
+      return { top: 0, left: 0 };
+    }
   }
 
   generateElements() {
@@ -188,13 +192,22 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, OnChanges {
     }
   }
 
+  // call this whenever the graph element has moved, this moves the angular component on top of the graph element
   updateBBox(item: GraphStorageItem) {
     const bbox = item.jointjsEl.getBBox();
     item.style = {
       width: bbox.width + 'px',
       height: bbox.height + 'px',
-      left: bbox.x + this.paperOffset.left + this.panzoomTransform.x + 'px',
-      top: bbox.y + this.paperOffset.top + this.panzoomTransform.y + 'px ',
+      left:
+        bbox.x * this.panzoomTransform.scale +
+        this.paperOffset.left +
+        this.panzoomTransform.x +
+        'px',
+      top:
+        bbox.y * this.panzoomTransform.scale +
+        this.paperOffset.top +
+        this.panzoomTransform.y +
+        'px ',
       transform: `scale(${this.panzoomTransform.scale})`,
       'transform-origin': 'left top',
     };

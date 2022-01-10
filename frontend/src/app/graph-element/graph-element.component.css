@@ -8,7 +8,7 @@
   /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
   pointer-events: none;
   user-select: none;
-  z-index: 2;
+  z-index: 1;
 }
 
 .pk {
