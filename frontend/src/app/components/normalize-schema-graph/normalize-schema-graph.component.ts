@@ -194,25 +194,21 @@ export class NormalizeSchemaGraphComponent implements OnChanges {
 
   // call this whenever the graph element has moved, this moves the angular component on top of the graph element
   updateBBox(item: GraphStorageItem) {
-    const bbox = item.jointjsEl.getBBox();
+    const bbox = document
+      .getElementById('__jointel__' + item.table.name)
+      ?.children[0].getBoundingClientRect();
+    if (!bbox) return;
+
     item.style = {
-      width: bbox.width + 'px',
-      height: bbox.height + 'px',
-      left:
-        bbox.x * this.panzoomTransform.scale +
-        this.paperOffset.left +
-        this.panzoomTransform.x +
-        'px',
-      top:
-        bbox.y * this.panzoomTransform.scale +
-        this.paperOffset.top +
-        this.panzoomTransform.y +
-        'px ',
+      width: bbox.width / this.panzoomTransform.scale + 'px',
+      height: bbox.height / this.panzoomTransform.scale + 'px',
+      left: bbox.left + window.scrollX + 'px',
+      top: bbox.top + window.scrollY + 'px ',
       transform: `scale(${this.panzoomTransform.scale})`,
       'transform-origin': 'left top',
     };
 
-    const domel = document.getElementById('__jointel__' + item.table.name);
-    domel?.setAttribute('transform', `translate(${bbox.x}, ${bbox.y})`);
+    // const domel = document.getElementById('__jointel__' + item.table.name);
+    // domel?.setAttribute('transform', `translate(${bbox.x}, ${bbox.y})`);
   }
 }
