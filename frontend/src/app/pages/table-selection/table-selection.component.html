@@ -1,17 +1,29 @@
-<div class="sbb-checkbox-group-vertical">
-  <sbb-checkbox
-    *ngFor="let table of this.tables.keys()"
-    (change)="toggleCheckStatus(table)"
-    >{{ table.name }}</sbb-checkbox
-  >
-</div>
+<div class="container-fluid ml-2 mr-2">
+  <div class="row">
+    <div class="col-6">
+      <div class="sbb-checkbox-group-vertical">
+        <sbb-checkbox
+          *ngFor="let table of this.tables.keys()"
+          (change)="toggleCheckStatus(table)"
+          (mouseenter)="mouseEnter(table)"
+          >{{ table.name }}</sbb-checkbox
+        >
+      </div>
 
-<button
-  type="button"
-  sbb-button
-  [disabled]="!hasSelectedTables()"
-  (click)="selectTable()"
-  [routerLink]="['/normalize']"
->
-  Go
-</button>
+      <button
+        type="button"
+        sbb-button
+        [disabled]="!hasSelectedTables()"
+        (click)="selectTable()"
+        [routerLink]="['/normalize']"
+      >
+        Go
+      </button>
+    </div>
+    <div class="col-6">
+      <div>
+        {{ hoveredTable.name }}
+      </div>
+    </div>
+  </div>
+</div>

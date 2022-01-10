@@ -1,6 +1,7 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
+import ITableHead from '@server/definitions/ITableHead';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import Table from '../model/schema/Table';
 import { Observable, shareReplay, map, Subject } from 'rxjs';
@@ -87,6 +88,15 @@ export class DatabaseService {
         referenced_table.pk.union(pk_column);
       }
     });
+  }
+
+  public loadTableHeads(): Observable<Array<ITableHead>> {
+    let tableHeads;
+    tableHeads = this.http
+      .get<Array<ITableHead>>(`http://localhost:80/tables/head`)
+      // required for caching
+      .pipe(shareReplay(1));
+    return tableHeads;
   }
 
   public setInputTables(tables: Array<Table>) {

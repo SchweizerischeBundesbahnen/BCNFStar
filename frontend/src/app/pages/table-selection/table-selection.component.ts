@@ -1,5 +1,6 @@
 import Table from '@/src/model/schema/Table';
 import { Component, OnInit } from '@angular/core';
+import ITableHead from '@server/definitions/ITableHead';
 import { DatabaseService } from 'src/app/database.service';
 
 @Component({
@@ -9,6 +10,8 @@ import { DatabaseService } from 'src/app/database.service';
 })
 export class TableSelectionComponent implements OnInit {
   tables: Map<Table, Boolean> = new Map();
+  tableHeads: Array<ITableHead> = [];
+  hoveredTable: Table = new Table();
 
   // eslint-disable-next-line no-unused-vars
   constructor(private dataService: DatabaseService) {}
@@ -18,6 +21,9 @@ export class TableSelectionComponent implements OnInit {
       data.forEach((table) => this.tables.set(table, false))
     );
     this.dataService.loadTables();
+    this.dataService
+      .loadTableHeads()
+      .subscribe((data) => (this.tableHeads = data));
   }
 
   public toggleCheckStatus(table: Table) {
@@ -34,5 +40,10 @@ export class TableSelectionComponent implements OnInit {
         .filter((entry) => entry[1])
         .map((entry) => entry[0])
     );
+  }
+
+  public mouseEnter(table: Table) {
+    this.hoveredTable = table;
+    this.hoveredTableHead = this.tableHeads[table.name];
   }
 }
