@@ -2,7 +2,7 @@ import Table from '@/src/model/schema/Table';
 import { Component, OnInit } from '@angular/core';
 import ITableHead from '@server/definitions/ITableHead';
 import { DatabaseService } from 'src/app/database.service';
-import { SbbTableDataSource } from '@sbb-esta/angular-business/table';
+import { SbbTableDataSource } from '@sbb-esta/angular/table';
 
 @Component({
   selector: 'app-table-selection',
