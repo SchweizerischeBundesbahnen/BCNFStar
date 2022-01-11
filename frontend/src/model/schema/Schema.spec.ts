@@ -20,7 +20,7 @@ describe('Schema', () => {
 
   it('should auto-normalize correctly', () => {
     let table = [...schema.tables][0];
-    schema.autoNormalize(...schema.tables);
+    schema.autoNormalize(table);
     let schema2 = new Schema(table);
     let children = schema2.split(table, table.violatingFds()[0]);
     schema2.split(children[1], children[1].violatingFds()[0]);
