@@ -79,7 +79,8 @@ export class NormalizeSchemaGraphComponent implements OnChanges {
 
     setTimeout(() => {
       const panzoomHandler = panzoom(
-        document.querySelector('#paper svg') as SVGElement
+        document.querySelector('#paper svg') as SVGElement,
+        { smoothScroll: false }
       );
       // move all HTML overlays whenever the user zoomed or panned
       panzoomHandler.on('transform', (e: PanZoom) => {
