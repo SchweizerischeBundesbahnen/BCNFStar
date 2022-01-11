@@ -11,6 +11,7 @@ import morgan from "morgan";
 // import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
+import getTableHeadFunction from "./routes/tableHeads";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -38,6 +39,7 @@ app.use(cors(corsOptions));
 
 app.get("/tables", getTablesFunction());
 app.get("/tables/head", getTableHeadFromNameFunction());
+app.get("/tables/heads", getTableHeadFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 app.get("/fks", getFksFunction);
 

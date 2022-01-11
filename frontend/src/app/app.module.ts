@@ -14,6 +14,7 @@ import { SbbButtonModule } from '@sbb-esta/angular/button';
 import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
 import { SbbDialogModule } from '@sbb-esta/angular/dialog';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
+import { SbbTableModule } from '@sbb-esta/angular/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/normalize-undo-redo.component';
@@ -38,6 +39,7 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
     SbbAccordionModule,
     SbbCheckboxModule,
     SbbDialogModule,
+    SbbTableModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

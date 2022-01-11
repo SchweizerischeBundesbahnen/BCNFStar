@@ -90,10 +90,10 @@ export class DatabaseService {
     });
   }
 
-  public loadTableHeads(): Observable<Array<ITableHead>> {
+  public loadTableHeads(): Observable<Record<string, ITableHead>> {
     let tableHeads;
     tableHeads = this.http
-      .get<Array<ITableHead>>(`http://localhost:80/tables/head`)
+      .get<Record<string, ITableHead>>(`http://localhost:80/tables/heads`)
       // required for caching
       .pipe(shareReplay(1));
     return tableHeads;
