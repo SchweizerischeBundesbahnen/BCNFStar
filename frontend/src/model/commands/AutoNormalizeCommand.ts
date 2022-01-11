@@ -15,13 +15,11 @@ export default class AutoNormalizeCommand extends Command {
 
   protected override _do(): void {
     this.resultingTables = this.schema.autoNormalize(...this.tables);
-    console.log('do\n');
   }
 
   protected override _undo(): void {
     this.schema.delete(...this.resultingTables!);
     this.schema.add(...this.tables);
-    console.log('undo\n');
   }
 
   protected override _redo(): void {
