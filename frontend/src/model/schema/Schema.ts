@@ -39,6 +39,21 @@ export default class Schema {
     return tables;
   }
 
+  public autoNormalize(...table: Array<Table>): Array<Table> {
+    let queue = new Array(...table);
+    let resultingTables = new Array<Table>();
+    while (queue.length > 0) {
+      let current = queue.shift()!;
+      if (current.violatingFds().length > 0) {
+        let children = this.split(current, current.violatingFds()[0]);
+        queue.push(...children);
+      } else {
+        resultingTables.push(current);
+      }
+    }
+    return resultingTables;
+  }
+
   public join(table1: Table, table2: Table) {
     let newTable = table1.join(table2);
     this.add(newTable);
