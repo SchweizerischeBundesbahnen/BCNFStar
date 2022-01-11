@@ -168,6 +168,7 @@ export default class Table {
   }
 
   public minimalReferencedTables(): Array<Table> {
+    // Annahme: keine Zyklen in references
     var result: Set<Table> = new Set(this.referencedTables);
 
     var visited: Array<Table> = [];
