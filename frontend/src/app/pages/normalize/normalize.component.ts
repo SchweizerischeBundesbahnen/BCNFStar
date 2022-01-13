@@ -28,10 +28,6 @@ export class NormalizeComponent {
 
   onSplitFd(fd: FunctionalDependency): void {
     let command = new SplitCommand(this.schema, this.selectedTable!, fd);
-    // TODO: proper change detection: currently schema graph is only updated due to
-    // selectedTable being changed. It should already be updated, because of the changes
-    // happening in the schema tables.
-
     // WARNING: To reference the command object from inside the function we need to define
     // the function via function(){}. If we used arrow functions ()=>{} 'this' would still
     // refer to this normalize component. We assign self to this, to keep a reference of this

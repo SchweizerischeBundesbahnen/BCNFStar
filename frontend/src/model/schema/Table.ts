@@ -10,26 +10,28 @@ export default class Table {
   public fds: Array<FunctionalDependency> = [];
   public referencedTables = new Set<Table>();
   public referencingTables = new Set<Table>();
-  public readonly origin: Table;
 
-  public constructor(columns?: ColumnCombination, origin?: Table) {
+  public constructor(columns?: ColumnCombination) {
     if (columns) this.columns = columns;
-    this.origin = origin ? origin : this;
   }
 
   public static fromITable(iTable: ITable): Table {
     let columns = new ColumnCombination();
-    iTable.attribute.forEach((iAttribute, index) => {
-      columns.add(new Column(iAttribute.name, iAttribute.dataType, index));
-    });
     let table = new Table(columns);
+    iTable.attribute.forEach((iAttribute, index) => {
+      columns.add(
+        new Column(iAttribute.name, iAttribute.dataType, index, table)
+      );
+    });
     table.name = iTable.name; //mermaid tablenames must not contain dots
     return table;
   }
 
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
-    names.forEach((name, i) => table.columns.add(new Column(name, '?', i)));
+    names.forEach((name, i) =>
+      table.columns.add(new Column(name, '?', i, table))
+    );
     return table;
   }
 
@@ -78,21 +80,25 @@ export default class Table {
     return [remaining, generating];
   }
 
-  public constructProjection(cc: ColumnCombination): Table {
-    const table: Table = new Table(cc, this.origin);
-
+  public projectFds(table: Table): void {
     this.fds.forEach((fd) => {
-      if (fd.lhs.isSubsetOf(cc)) {
+      if (fd.lhs.isSubsetOf(table.columns)) {
         fd = new FunctionalDependency(
           table,
           fd.lhs.copy(),
-          fd.rhs.copy().intersect(cc)
+          fd.rhs.copy().intersect(table.columns)
         );
         if (!fd.isFullyTrivial()) {
           table.fds.push(fd);
         }
       }
     });
+  }
+
+  public constructProjection(cc: ColumnCombination): Table {
+    const table: Table = new Table(cc);
+
+    this.projectFds(table);
 
     this.referencedTables.forEach((refTable) => {
       if (this.foreignKeyForReferencedTable(refTable).isSubsetOf(cc)) {
@@ -112,9 +118,7 @@ export default class Table {
   }
 
   public join(otherTable: Table): Table {
-    let newTable = this.origin.constructProjection(
-      this.columns.copy().union(otherTable.columns)
-    );
+    let newTable = new Table();
 
     this.referencedTables.forEach((refTable) =>
       newTable.referencedTables.add(refTable)
