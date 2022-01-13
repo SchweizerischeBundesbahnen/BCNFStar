@@ -1,12 +1,11 @@
 import {
   Component,
+  DoCheck,
   ElementRef,
   Input,
   Output,
   ViewChild,
   EventEmitter,
-  OnChanges,
-  SimpleChanges,
 } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
@@ -26,13 +25,12 @@ type GraphStorageItem = {
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements OnChanges {
+export class NormalizeSchemaGraphComponent implements DoCheck {
   @Input() tables!: Set<Table>;
   @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
 
-  ngOnChanges(changes: SimpleChanges) {
-    changes;
+  ngDoCheck(): void {
     this.createDefaultGraph();
   }
 

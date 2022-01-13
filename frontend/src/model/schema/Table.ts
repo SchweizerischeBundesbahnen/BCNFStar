@@ -5,11 +5,11 @@ import ITable from '@server/definitions/ITable';
 
 export default class Table {
   public name = '';
-  public readonly columns = new ColumnCombination();
+  public columns = new ColumnCombination();
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
-  public readonly referencedTables = new Set<Table>();
-  public readonly referencingTables = new Set<Table>();
+  public referencedTables = new Set<Table>();
+  public referencingTables = new Set<Table>();
   public readonly origin: Table;
 
   public constructor(columns?: ColumnCombination, origin?: Table) {
@@ -195,10 +195,7 @@ export default class Table {
     return this.fds
       .filter((fd) => fd.violatesBCNF())
       .sort((fd1, fd2) => {
-        let comparison = fd1.lhs.cardinality - fd2.lhs.cardinality;
-        if (comparison == 0)
-          comparison = fd2.rhs.cardinality - fd1.rhs.cardinality;
-        return comparison;
+        return fd2.fdScore() - fd1.fdScore();
       });
   }
 
