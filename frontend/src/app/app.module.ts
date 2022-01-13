@@ -13,9 +13,11 @@ import { SbbRadioButtonModule } from '@sbb-esta/angular-business';
 import { SbbButtonModule } from '@sbb-esta/angular-business';
 import { SbbAccordionModule } from '@sbb-esta/angular-business';
 import { SbbCheckboxModule } from '@sbb-esta/angular-business';
+import { SbbDialogModule } from '@sbb-esta/angular-business';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/normalize-undo-redo.component';
+import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,7 @@ import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/nor
     NormalizeSideBarComponent,
     NormalizeSchemaGraphComponent,
     NormalizeUndoRedoComponent,
+    SplitDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -34,6 +37,7 @@ import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/nor
     SbbButtonModule,
     SbbAccordionModule,
     SbbCheckboxModule,
+    SbbDialogModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
