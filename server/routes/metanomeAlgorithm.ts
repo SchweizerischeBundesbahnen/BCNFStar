@@ -4,7 +4,8 @@ import { exec } from "child_process";
 import { join } from "path";
 
 export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
-export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
+export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-42.3.1.jar";
+export const MSSQL_JDBC_JAR_PATH = "metanome/mssql-jdbc-9.4.1.jre8.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "temp");
 
 export function outputPath(schemaAndTable: string): string {
@@ -20,6 +21,7 @@ export default class MetanomeAlgorithm {
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     this.tables.forEach(async (table) => {
+      console.log(this.command(table));
       const { stderr, stdout } = await asyncExec(this.command(table));
       // console.log(result.stdout);
       if (stderr) console.error(stderr);
@@ -37,7 +39,7 @@ export default class MetanomeAlgorithm {
 
   private classpath(): string {
     const classpath_separator = process.platform === "win32" ? ";" : ":";
-    return [METANOME_CLI_JAR_PATH, POSTGRES_JDBC_JAR_PATH, this.algoJarPath()]
+    return [METANOME_CLI_JAR_PATH, this.jdbcPath(), this.algoJarPath()]
       .map((jarpath) => absoluteServerDir + "/" + jarpath)
       .join(classpath_separator);
   }
@@ -45,6 +47,17 @@ export default class MetanomeAlgorithm {
   // location of the algorithm JAR relative to the package.json directory
   private algoJarPath(): string {
     return "/metanome/Normalize-1.2-SNAPSHOT.jar";
+  }
+
+  private jdbcPath(): string {
+    if (process.env.DB_TYPE == "sqlserver" || process.env.DB_TYPE == "mssql") {
+      return MSSQL_JDBC_JAR_PATH;
+    } else if (process.env.DB_TYPE == "postgres") {
+      return POSTGRES_JDBC_JAR_PATH;
+    } else {
+      throw Error(`Error: Unknown value for environment variable DB_TYPE: ${process.env.DB_TYPE}
+      Valid values are 'mssql', 'sqledge', 'postgres'`);
+    }
   }
 
   private pgpassPath(): string {
@@ -61,6 +74,8 @@ export default class MetanomeAlgorithm {
   private command(table: string): string {
     return `java -Xmx${
       this.memory
-    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_normalize_results.json --algorithm-config isHumanInTheLoop:false`;
+    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type ${
+      process.env.DB_TYPE
+    } --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_normalize_results.json --algorithm-config isHumanInTheLoop:false`;
   }
 }
