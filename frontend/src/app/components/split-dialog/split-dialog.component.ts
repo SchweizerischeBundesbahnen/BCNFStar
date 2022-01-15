@@ -1,6 +1,6 @@
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import { Component, Inject } from '@angular/core';
-import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular-business';
+import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 
 @Component({
   selector: 'app-split-dialog',
