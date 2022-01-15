@@ -118,7 +118,7 @@ export default class Table {
   }
 
   public join(otherTable: Table): Table {
-    let newTable = new Table();
+    let newTable = new Table(this.columns.copy().union(otherTable.columns));
 
     this.referencedTables.forEach((refTable) =>
       newTable.referencedTables.add(refTable)

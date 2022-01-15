@@ -1,4 +1,3 @@
-import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import Table from './Table';
 
@@ -75,36 +74,25 @@ export default class Schema {
     sourceTables.forEach((sourceTable) => {
       sourceTable.projectFds(table);
     });*/
+
     parent1.projectFds(table);
     parent2.projectFds(table);
 
     // extension
     let fk = parent1.columns.copy().intersect(parent2.columns);
-    let fkFds1 = new Map<ColumnCombination, ColumnCombination>(); // fds from parent1 where lhs isSubsetOf fk
-    let fkFds2 = new Map<ColumnCombination, ColumnCombination>(); // fds from parent2 where lhs isSubsetOf fk
+    let fkFds1 = parent1.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
+    let fkFds2 = parent2.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
 
-    parent1.fds.forEach((fd) => {
-      if (fd.lhs.isSubsetOf(fk)) fkFds1.set(fd.lhs, fd.rhs);
-    });
-    parent2.fds.forEach((fd) => {
-      if (fd.lhs.isSubsetOf(fk)) fkFds2.set(fd.lhs, fd.rhs);
-    });
-
-    parent1.fds.forEach((fd) => {
+    table.fds.forEach((fd) => {
       let rhsFkPart = fd.rhs.copy().intersect(fk);
-      if (fkFds2.has(rhsFkPart)) {
-        table.fds
-          .filter((fd1) => fd1 == fd)[0]
-          .rhs.union(fkFds2.get(rhsFkPart)!);
-      }
-    });
-    parent2.fds.forEach((fd) => {
-      let rhsFkPart = fd.rhs.copy().intersect(fk);
-      if (fkFds1.has(rhsFkPart)) {
-        table.fds
-          .filter((fd1) => fd1 == fd)[0]
-          .rhs.union(fkFds1.get(rhsFkPart)!);
-      }
+      let extension1 = fkFds1.filter((parentFd) =>
+        parentFd.lhs.equals(rhsFkPart)
+      );
+      let extension2 = fkFds2.filter((parentFd) =>
+        parentFd.lhs.equals(rhsFkPart)
+      );
+      if (extension1.length > 0) fd.rhs.union(extension1[0].rhs);
+      if (extension2.length > 0) fd.rhs.union(extension2[0].rhs);
     });
 
     table.setFds(...new Set(table.fds)); //remove duplicate fds with lhs = fk subset
