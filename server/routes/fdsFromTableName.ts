@@ -2,8 +2,8 @@ import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
 import { table } from "console";
 import { Request, Response, RequestHandler } from "express";
 import { readFileSync, existsSync, access, constants } from "fs";
-import MetanomeAlgorithm from "./metanomeAlgorithm";
-import { outputPath } from "./metanomeAlgorithm";
+import MetanomeAlgorithm from "../metanome/metanomeAlgorithm";
+import { outputPath } from "../metanome/metanomeAlgorithm";
 import postRunMetanomeFDAlgorithmFunction, {
   runMetanomeFDAlgorithm,
 } from "./runMetanome";
