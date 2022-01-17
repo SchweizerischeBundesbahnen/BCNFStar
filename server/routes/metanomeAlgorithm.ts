@@ -2,10 +2,9 @@ import { absoluteServerDir } from "../utils/files";
 import { promisify } from "util";
 import { exec } from "child_process";
 import { join } from "path";
+import { sqlUtils } from "../db";
 
-export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
-export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-42.3.1.jar";
-export const MSSQL_JDBC_JAR_PATH = "metanome/mssql-jdbc-9.4.1.jre8.jar";
+export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "temp");
 
 export function outputPath(schemaAndTable: string): string {
@@ -22,7 +21,9 @@ export default class MetanomeAlgorithm {
     const asyncExec = promisify(exec);
     this.tables.forEach(async (table) => {
       console.log(this.command(table));
-      const { stderr, stdout } = await asyncExec(this.command(table));
+      const { stderr, stdout } = await asyncExec(this.command(table), {
+        cwd: "metanome/",
+      });
       // console.log(result.stdout);
       if (stderr) console.error(stderr);
     });
@@ -39,25 +40,16 @@ export default class MetanomeAlgorithm {
 
   private classpath(): string {
     const classpath_separator = process.platform === "win32" ? ";" : ":";
-    return [METANOME_CLI_JAR_PATH, this.jdbcPath(), this.algoJarPath()]
-      .map((jarpath) => absoluteServerDir + "/" + jarpath)
-      .join(classpath_separator);
+    return [
+      METANOME_CLI_JAR_PATH,
+      sqlUtils.getJdbcPath(),
+      this.algoJarPath(),
+    ].join(classpath_separator);
   }
 
   // location of the algorithm JAR relative to the package.json directory
   private algoJarPath(): string {
-    return "/metanome/Normalize-1.2-SNAPSHOT.jar";
-  }
-
-  private jdbcPath(): string {
-    if (process.env.DB_TYPE == "sqlserver" || process.env.DB_TYPE == "mssql") {
-      return MSSQL_JDBC_JAR_PATH;
-    } else if (process.env.DB_TYPE == "postgres") {
-      return POSTGRES_JDBC_JAR_PATH;
-    } else {
-      throw Error(`Error: Unknown value for environment variable DB_TYPE: ${process.env.DB_TYPE}
-      Valid values are 'mssql', 'sqledge', 'postgres'`);
-    }
+    return "Normalize-1.2-SNAPSHOT.jar";
   }
 
   private pgpassPath(): string {

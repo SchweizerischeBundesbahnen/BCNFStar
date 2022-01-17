@@ -1,4 +1,5 @@
 import sql from "mssql";
+import SqlUtils from "./SqlUtils";
 
 type SchemaQueryRow = {
   table_name: string;
@@ -6,7 +7,7 @@ type SchemaQueryRow = {
   data_type: string;
   table_schema: string;
 };
-export default class MsSqlUtils {
+export default class MsSqlUtils extends SqlUtils {
   private config: sql.config;
   public connection: sql.ConnectionPool;
   public constructor(
@@ -16,6 +17,7 @@ export default class MsSqlUtils {
     password: string,
     port: number = 1433
   ) {
+    super();
     this.config = {
       user,
       database,
@@ -75,5 +77,8 @@ export default class MsSqlUtils {
     );
     const result = await ps.execute({ schema, table });
     return result.recordset.length > 0;
+  }
+  public getJdbcPath(): String {
+    return "mssql-jdbc-9.4.1.jre8.jar";
   }
 }

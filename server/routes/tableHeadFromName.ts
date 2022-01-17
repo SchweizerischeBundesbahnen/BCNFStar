@@ -1,10 +1,8 @@
-import SqlUtils from "@/db/SqlUtils";
+import { sqlUtils } from "../db";
 import ITableHead from "@/definitions/ITableHead";
 import { Request, Response, RequestHandler } from "express";
 
-export default function getTableHeadFromNameFunction(
-  sqlUtils: SqlUtils
-): RequestHandler {
+export default function getTableHeadFromNameFunction(): RequestHandler {
   async function getTableHeadFromName(
     req: Request,
     res: Response

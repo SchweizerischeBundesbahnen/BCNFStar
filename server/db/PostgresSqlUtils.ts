@@ -54,4 +54,7 @@ export default class PostgresSqlUtils extends SqlUtils {
       return { error: "Table or schema doesn't exist" };
     }
   }
+  public getJdbcPath(): String {
+    return "postgresql-42.3.1.jar";
+  }
 }

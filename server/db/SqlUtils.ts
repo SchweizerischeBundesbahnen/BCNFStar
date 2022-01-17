@@ -22,4 +22,6 @@ export default abstract class SqlUtils {
     schema: string,
     table: string
   ): Promise<boolean>;
+
+  public abstract getJdbcPath(): String;
 }

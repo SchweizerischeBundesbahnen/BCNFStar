@@ -1,7 +1,6 @@
 import express from "express";
 import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
-import { setupDBCredentials } from "./db/setupDb";
 // import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
@@ -11,9 +10,6 @@ import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 // import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
-
-const sqlUtils = setupDBCredentials();
-sqlUtils.init();
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -44,8 +40,8 @@ app.get("/test", (req, res) => {
   res.json({ key: "value" });
 });
 
-app.get("/tables", getTablesFunction(sqlUtils));
-app.get("/tables/head", getTableHeadFromNameFunction(sqlUtils));
+app.get("/tables", getTablesFunction());
+app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 
 // app.post("/persist/createTable", postCreateTable(pool));
@@ -54,6 +50,7 @@ app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
+console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
 app.use(
   expressStaticGzip(
     join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),

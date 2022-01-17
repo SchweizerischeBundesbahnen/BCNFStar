@@ -1,11 +1,11 @@
 import ITable from "@/definitions/ITable";
-import SqlUtils from "@/db/SqlUtils";
 import { Request, Response, RequestHandler } from "express";
+import { sqlUtils } from "../db";
 
-export default function getTablesFunction(sqlutils: SqlUtils): RequestHandler {
+export default function getTablesFunction(): RequestHandler {
   async function getTables(req: Request, res: Response): Promise<void> {
     try {
-      const query_result = await sqlutils.getSchema();
+      const query_result = await sqlUtils.getSchema();
 
       const tempTables: Record<string, ITable> = {};
       for (const row of query_result) {

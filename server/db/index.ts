@@ -62,3 +62,7 @@ function createDbUtils() {
 Valid values are 'mssql', 'sqledge', 'postgres'`);
   }
 }
+
+setupDBCredentials();
+export const sqlUtils = createDbUtils();
+sqlUtils.init();
