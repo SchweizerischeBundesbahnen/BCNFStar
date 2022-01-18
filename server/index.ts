@@ -50,7 +50,6 @@ app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
-console.log(join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"));
 app.use(
   expressStaticGzip(
     join(absoluteServerDir, "..", "frontend", "dist", "bcnfstar"),

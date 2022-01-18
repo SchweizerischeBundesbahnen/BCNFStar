@@ -8,12 +8,7 @@ export default class PostgresSqlUtils extends SqlUtils {
   }
   public async getSchema(): Promise<SchemaQueryRow[]> {
     const client = await this.pool.connect();
-    const query_result = await client.query<{
-      table_name: string;
-      data_type: string;
-      column_name: string;
-      table_schema: string;
-    }>(
+    const query_result = await client.query<SchemaQueryRow>(
       // the last line excludes system tables
       `SELECT table_name, column_name, data_type, table_schema 
         FROM information_schema.columns 

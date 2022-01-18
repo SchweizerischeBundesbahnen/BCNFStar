@@ -20,10 +20,11 @@ export default class MetanomeAlgorithm {
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     this.tables.forEach(async (table) => {
-      console.log(this.command(table));
+      console.log("Executing metanome on " + table);
       const { stderr, stdout } = await asyncExec(this.command(table), {
         cwd: "metanome/",
       });
+      console.log(`Metanome execution on ${table} finished`);
       // console.log(result.stdout);
       if (stderr) console.error(stderr);
     });

@@ -1,12 +1,5 @@
 import sql from "mssql";
-import SqlUtils from "./SqlUtils";
-
-type SchemaQueryRow = {
-  table_name: string;
-  column_name: string;
-  data_type: string;
-  table_schema: string;
-};
+import SqlUtils, { SchemaQueryRow } from "./SqlUtils";
 export default class MsSqlUtils extends SqlUtils {
   private config: sql.config;
   public connection: sql.ConnectionPool;
