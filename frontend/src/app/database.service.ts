@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
@@ -15,6 +15,11 @@ export class DatabaseService {
   public inputTables?: Array<Table>;
   private loadTableCallback = new Subject<Array<Table>>(); // Source
   loadTableCallback$ = this.loadTableCallback.asObservable(); // Stream
+  // when using the angular dev server, you need to access another adress
+  // for the BCNFStar express server. It is assumed that this server is
+  // at http://localhost:80. In production mode, the serving server is assumed
+  // to be the BCNFStar express server (found in backend/index.ts)
+  public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   private fks: Array<IFk> = [];
 
   // eslint-disable-next-line no-unused-vars
@@ -37,7 +42,7 @@ export class DatabaseService {
     let tableResult;
     if (!tableResult) {
       tableResult = this.http
-        .get<ITable[]>(`http://localhost:80/tables`)
+        .get<ITable[]>(`${this.baseUrl}/tables`)
         // required for caching
         .pipe(shareReplay(1))
         .pipe(
@@ -52,7 +57,7 @@ export class DatabaseService {
   private getIFks(): Observable<Array<IFk>> {
     let fks;
     fks = this.http
-      .get<IFk[]>(`http://localhost:80/fks`)
+      .get<IFk[]>(`${this.baseUrl}/fks`)
       // required for caching
       .pipe(shareReplay(1));
     return fks;
@@ -105,7 +110,7 @@ export class DatabaseService {
     if (!this.fdResult[table.name])
       this.fdResult[table.name] = this.http
         .get<IFunctionalDependencies>(
-          `http://localhost:80/tables/${table.name}/fds`
+          `${this.baseUrl}/tables/${table.name}/fds`
         )
         .pipe(shareReplay(1));
     return this.fdResult[table.name];
