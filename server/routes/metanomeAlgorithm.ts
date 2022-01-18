@@ -54,10 +54,10 @@ export default class MetanomeAlgorithm {
   }
 
   private pgpassPath(): string {
-    if (process.env.PGPASSFILE == undefined) {
-      throw new Error("missing PGPASSFILE in env.local");
+    if (process.env.DB_PASSFILE == undefined) {
+      throw new Error("missing DB_PASSFILE in env.local");
     }
-    return process.env.PGPASSFILE;
+    return process.env.DB_PASSFILE;
   }
 
   // location in the JAR where the algorithm is located
