@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import Table from '../model/schema/Table';
+import Schema from '../model/schema/Schema';
+import Relationship from '../model/schema/Relationship';
 import { Observable, shareReplay, map, Subject } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IFk from '@server/definitions/IFk';
@@ -12,7 +14,7 @@ import ColumnCombination from '../model/schema/ColumnCombination';
   providedIn: 'root',
 })
 export class DatabaseService {
-  public inputTables?: Array<Table>;
+  public inputTables?: Schema;
   private loadTableCallback = new Subject<Array<Table>>(); // Source
   loadTableCallback$ = this.loadTableCallback.asObservable(); // Stream
   private fks: Array<IFk> = [];
@@ -58,35 +60,44 @@ export class DatabaseService {
     return fks;
   }
 
-  private resolveIFks(fks: Array<IFk>, tables: Array<Table>) {
+  private resolveIFks(fks: Array<IFk>) {
     fks.forEach((fk) => {
-      let referencing_table: Table = tables.filter(
-        (table) => fk.name == table.name
+      let referencingTable: Table = [...this.inputTables!.tables].filter(
+        (table: Table) => fk.name == table.name
       )[0];
-      let referenced_table: Table = tables.filter(
-        (table) => fk.foreignName == table.name
+      let referencedTable: Table = [...this.inputTables!.tables].filter(
+        (table: Table) => fk.foreignName == table.name
       )[0];
 
-      if (referencing_table && referenced_table) {
-        referencing_table.referencedTables.add(referenced_table);
-        referenced_table.referencingTables.add(referencing_table);
+      if (referencingTable && referencedTable) {
+        let fkColumn: ColumnCombination =
+          referencingTable.columns.columnsFromNames(fk.column);
+        let pkColumn: ColumnCombination =
+          referencedTable.columns.columnsFromNames(fk.foreignColumn);
 
-        let fk_column: ColumnCombination =
-          referencing_table.columns.columnsFromNames(fk.column);
-        let pk_column: ColumnCombination =
-          referenced_table.columns.columnsFromNames(fk.foreignColumn);
+        if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
+        referencedTable.pk.union(pkColumn);
 
-        referencing_table.columns.setMinus(fk_column).union(pk_column);
-
-        if (!referenced_table.pk) referenced_table.pk = new ColumnCombination();
-        referenced_table.pk.union(pk_column);
+        let relExistsAlready = false;
+        this.inputTables!.fkRelationships.forEach((rel) => {
+          if (rel.appliesTo(referencingTable, referencedTable)) {
+            rel.referencing.union(fkColumn);
+            rel.referenced.union(pkColumn);
+            relExistsAlready = true;
+          }
+        });
+        if (!relExistsAlready)
+          this.inputTables!.fkRelationships.add(
+            new Relationship(fkColumn, pkColumn)
+          );
       }
     });
   }
 
   public setInputTables(tables: Array<Table>) {
-    this.inputTables = tables;
-    this.inputTables.forEach((inputTable) => {
+    this.inputTables = new Schema(...tables);
+    this.inputTables.tables.forEach((inputTable: Table) => {
+      inputTable.schema = this.inputTables;
       this.getFunctionalDependenciesByTable(inputTable).subscribe((fd) =>
         inputTable.setFds(
           ...fd.functionalDependencies.map((fds) =>
@@ -95,7 +106,7 @@ export class DatabaseService {
         )
       );
     });
-    this.resolveIFks(this.fks, this.inputTables);
+    this.resolveIFks(this.fks);
   }
 
   protected fdResult: Record<string, Observable<IFunctionalDependencies>> = {};

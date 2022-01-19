@@ -1,36 +1,58 @@
 import FunctionalDependency from './FunctionalDependency';
+import Relationship from './Relationship';
 import Table from './Table';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
   public readonly sourceTables = new Set<Table>();
+  public readonly fkRelationships = new Set<Relationship>();
 
   public constructor(...tables: Array<Table>) {
     tables.forEach((table) => this.sourceTables.add(table));
     this.add(...tables);
   }
 
+  public referencedTablesOf(table: Table): Set<Table> {
+    let referencedTables = new Set<Table>();
+    let references = [...this.fkRelationships].filter((rel) =>
+      rel.referencing.isSubsetOf(table.columns)
+    );
+    this.tables.forEach((t) => {
+      let intersect = table.columns.copy().intersect(t.columns);
+      if (
+        (intersect.cardinality > 0 && t.pk && t.pk!.equals(intersect)) ||
+        references.filter((rel) => rel.referenced.isSubsetOf(t.columns))[0]
+      ) {
+        referencedTables.add(t);
+      }
+    });
+    return referencedTables;
+
+    // referenzen + tables*relevante_referenzen
+  }
+
+  public foreignKeyBetween(referencing: Table, referenced: Table) {
+    let intersect = referencing.columns.copy().intersect(referenced.columns);
+    if (
+      intersect.cardinality > 0 &&
+      referenced.pk &&
+      referenced.pk!.equals(intersect)
+    )
+      for (const rel of this.fkRelationships) {
+        if (rel.appliesTo(referencing, referenced)) return rel;
+      }
+    return undefined;
+  }
+
   public add(...tables: Array<Table>) {
     tables.forEach((table) => {
       this.tables.add(table);
-      table.referencedTables.forEach((refTable) =>
-        refTable.referencingTables.add(table)
-      );
-      table.referencingTables.forEach((refTable) =>
-        refTable.referencedTables.add(table)
-      );
     });
   }
 
   public delete(...tables: Array<Table>) {
     tables.forEach((table) => {
       this.tables.delete(table);
-      table.referencedTables.forEach((refTable) =>
-        refTable.referencingTables.delete(table)
-      );
-      table.referencingTables.forEach((refTable) =>
-        refTable.referencedTables.delete(table)
-      );
     });
   }
 
