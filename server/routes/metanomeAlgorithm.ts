@@ -19,15 +19,18 @@ export default class MetanomeAlgorithm {
   }
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
-    this.tables.forEach(async (table) => {
+    for (const table of this.tables) {
       console.log("Executing metanome on " + table);
       const { stderr, stdout } = await asyncExec(this.command(table), {
         cwd: "metanome/",
       });
       console.log(`Metanome execution on ${table} finished`);
-      // console.log(result.stdout);
-      if (stderr) console.error(stderr);
-    });
+      // console.log(stdout);
+      if (stderr) {
+        console.error(stderr);
+        throw Error("Metanome execution failed");
+      }
+    }
 
     let dict = {};
     this.tables

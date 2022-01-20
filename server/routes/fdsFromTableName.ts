@@ -1,6 +1,6 @@
 import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
 import { Request, Response, RequestHandler } from "express";
-import { readFileSync } from "fs";
+import { readFile } from "fs/promises";
 import { outputPath } from "./metanomeAlgorithm";
 import { runMetanomeFDAlgorithm } from "./runMetanome";
 
@@ -12,28 +12,35 @@ export default function getFDsFromTableNameFunction(): RequestHandler {
     try {
       const schemaAndTable = req.params.name;
       const expectedOutputPath = outputPath(schemaAndTable);
-
       try {
-        const fds: IFunctionalDependencies = {
-          tableName: schemaAndTable,
-          functionalDependencies: readFDsFromFile(expectedOutputPath),
-        };
-        res.status(200).send(fds);
-      } catch (e) {
-        res.json(
-          "Missing fds. Running Metanome-Algorithm. Ask again in 69h ... ;-)"
-        );
-        await runMetanomeFDAlgorithm(schemaAndTable);
+        await sendFDs(schemaAndTable, expectedOutputPath);
+      } catch (err) {
+        // means file not found
+        if (err.code === "ENOENT") {
+          await runMetanomeFDAlgorithm(schemaAndTable);
+          await sendFDs(schemaAndTable, expectedOutputPath);
+        } else {
+          throw err;
+        }
       }
     } catch (error) {
       console.error(error);
       if (!res.headersSent)
         res.status(502).json({ error: "Could not get fds for table... " });
     }
+
+    async function sendFDs(schemaAndTable: string, expectedOutputPath: string) {
+      const fds = {
+        tableName: schemaAndTable,
+        functionalDependencies: await readFDsFromFile(expectedOutputPath),
+      };
+      res.status(200).send(fds);
+    }
   }
   return getFDsFromTableName;
 }
 
-function readFDsFromFile(path: string): string[] {
-  return readFileSync(path, "utf8").toString().trim().split(/\r?\n/);
+async function readFDsFromFile(path: string): Promise<string[]> {
+  const result = await readFile(path, "utf8");
+  return result.trim().split(/\r?\n/);
 }

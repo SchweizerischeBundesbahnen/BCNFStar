@@ -35,11 +35,6 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
-app.get("/test", (req, res) => {
-  res.json({ key: "value" });
-});
-
 app.get("/tables", getTablesFunction());
 app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());

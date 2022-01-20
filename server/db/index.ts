@@ -50,13 +50,19 @@ function createDbUtils() {
   if (process.env.DB_TYPE == "mssql" || process.env.DB_TYPE == "sqlserver") {
     return new MsSqlUtils(
       process.env.DB_HOST,
-      process.env.PGDATABASE,
-      process.env.PGUSER,
-      process.env.PGPASSWORD,
-      +process.env.PGPORT
+      process.env.DB_DATABASE,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD,
+      +process.env.DB_PORT
     );
   } else if (process.env.DB_TYPE == "postgres") {
-    return new PostgresSqlUtils();
+    return new PostgresSqlUtils(
+      process.env.DB_HOST,
+      process.env.DB_DATABASE,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD,
+      +process.env.DB_PORT
+    );
   } else {
     throw Error(`Error: Unknown value for environment variable DB_TYPE: ${process.env.DB_TYPE}
 Valid values are 'mssql', 'sqlserver', 'postgres'`);

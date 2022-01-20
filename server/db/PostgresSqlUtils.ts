@@ -1,10 +1,28 @@
 import SqlUtils, { SchemaQueryRow, TableHead } from "./SqlUtils";
-import { Pool, QueryConfig } from "pg";
+import { Pool, QueryConfig, PoolConfig } from "pg";
 
 export default class PostgresSqlUtils extends SqlUtils {
+  protected config: PoolConfig;
+  public constructor(
+    host: string,
+    database: string,
+    user: string,
+    password: string,
+    port: number = 1433
+  ) {
+    super();
+    this.config = {
+      user,
+      database,
+      password,
+      host,
+      port,
+    };
+  }
+
   protected pool: Pool;
   init(): void {
-    this.pool = new Pool({});
+    this.pool = new Pool(this.config);
   }
   public async getSchema(): Promise<SchemaQueryRow[]> {
     const client = await this.pool.connect();
