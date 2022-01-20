@@ -18,7 +18,7 @@ export class NormalizeComponent {
   public selectedTable?: Table;
 
   constructor(public dataService: DatabaseService) {
-    this.schema = dataService.inputTables!;
+    this.schema = dataService.inputSchema!;
   }
 
   onSelect(table: Table): void {

@@ -3,6 +3,7 @@ import Schema from './Schema';
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
+import Relationship from './Relationship';
 
 export default class Table {
   public name = '';
@@ -64,12 +65,24 @@ export default class Table {
     return fd.rhs.copy();
   }
 
-  public split(fd: FunctionalDependency): Array<Table> {
+  public split(
+    fd: FunctionalDependency,
+    relationship: Relationship
+  ): Array<Table> {
     let remaining: Table = new Table(this.remainingSchema(fd));
     let generating: Table = new Table(this.generatingSchema(fd));
 
+    remaining.schema = this.schema;
+    generating.schema = this.schema;
+
     this.projectFds(remaining);
     this.projectFds(generating);
+
+    relationship.referencedToReferencingColumnsIn(remaining.columns);
+    remaining.fds.forEach((fd) => {
+      relationship.referencedToReferencingColumnsIn(fd.lhs);
+      relationship.referencedToReferencingColumnsIn(fd.rhs);
+    });
 
     remaining.pk = this.pk;
     generating.pk = fd.lhs.copy();
@@ -95,8 +108,14 @@ export default class Table {
     });
   }
 
-  public join(otherTable: Table): Table {
-    let newTable = new Table(this.columns.copy().union(otherTable.columns));
+  public join(otherTable: Table, relationship: Relationship): Table {
+    let newTable = new Table(
+      this.columns
+        .copy()
+        .union(otherTable.columns)
+        .setMinus(relationship.referencing())
+    );
+    newTable.schema = this.schema;
 
     let remaining: Table;
     if (this.referencedTables().has(otherTable)) {
@@ -118,7 +137,7 @@ export default class Table {
   public foreignKeyForReferencedTable(
     refTable: Table
   ): ColumnCombination | undefined {
-    return this.schema!.foreignKeyBetween(this, refTable)?.referencing;
+    return this.schema!.foreignKeyBetween(this, refTable);
   }
 
   public keys(): Array<ColumnCombination> {
@@ -131,9 +150,9 @@ export default class Table {
 
   public foreignKeys(): Array<ColumnCombination> {
     let foreignKeys: Array<ColumnCombination> = [];
-    this.referencedTables().forEach((table) =>
-      foreignKeys.push(this.foreignKeyForReferencedTable(table)!)
-    );
+    this.referencedTables().forEach((table) => {
+      foreignKeys.push(this.foreignKeyForReferencedTable(table)!);
+    });
     return foreignKeys;
   }
 

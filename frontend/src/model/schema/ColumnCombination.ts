@@ -19,6 +19,12 @@ export default class ColumnCombination {
     );
   }
 
+  public columnFromName(names: string) {
+    return [...this.columns].filter((column: Column) =>
+      names.includes(column.name)
+    )[0];
+  }
+
   public columnsFromIds(...numbers: Array<number>) {
     return new ColumnCombination(
       ...this.inOrder().filter((col, i) => numbers.includes(i))

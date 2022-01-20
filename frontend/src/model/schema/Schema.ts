@@ -1,3 +1,4 @@
+import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import Relationship from './Relationship';
 import Table from './Table';
@@ -15,13 +16,12 @@ export default class Schema {
   public referencedTablesOf(table: Table): Set<Table> {
     let referencedTables = new Set<Table>();
     let references = [...this.fkRelationships].filter((rel) =>
-      rel.referencing.isSubsetOf(table.columns)
+      rel.referencing().isSubsetOf(table.columns)
     );
     this.tables.forEach((t) => {
-      let intersect = table.columns.copy().intersect(t.columns);
       if (
-        (intersect.cardinality > 0 && t.pk && t.pk!.equals(intersect)) ||
-        references.filter((rel) => rel.referenced.isSubsetOf(t.columns))[0]
+        references.filter((rel) => rel.referenced().isSubsetOf(t.columns))
+          .length > 0
       ) {
         referencedTables.add(t);
       }
@@ -31,16 +31,13 @@ export default class Schema {
     // referenzen + tables*relevante_referenzen
   }
 
-  public foreignKeyBetween(referencing: Table, referenced: Table) {
-    let intersect = referencing.columns.copy().intersect(referenced.columns);
-    if (
-      intersect.cardinality > 0 &&
-      referenced.pk &&
-      referenced.pk!.equals(intersect)
-    )
-      for (const rel of this.fkRelationships) {
-        if (rel.appliesTo(referencing, referenced)) return rel;
-      }
+  public foreignKeyBetween(
+    referencing: Table,
+    referenced: Table
+  ): ColumnCombination | undefined {
+    for (let rel of this.fkRelationships) {
+      if (rel.appliesTo(referencing, referenced)) return rel.referencing();
+    }
     return undefined;
   }
 
@@ -57,9 +54,14 @@ export default class Schema {
   }
 
   public split(table: Table, fd: FunctionalDependency) {
-    let tables = table.split(fd);
+    let relationship = new Relationship();
+    fd.lhs.columns.forEach((column) => {
+      relationship.add(column.copy(), column);
+    });
+    let tables = table.split(fd, relationship);
     this.add(...tables);
     this.delete(table);
+    this.fkRelationships.add(relationship);
     return tables;
   }
 
@@ -79,15 +81,24 @@ export default class Schema {
   }
 
   public join(table1: Table, table2: Table) {
-    let newTable = table1.join(table2);
-    this.setFdsFor(newTable, table1, table2);
+    let relationship = [...this.fkRelationships].filter(
+      (rel) => rel.appliesTo(table1, table2) || rel.appliesTo(table2, table1)
+    )[0];
+    let newTable = table1.join(table2, relationship);
+    this.setFdsFor(newTable, table1, table2, relationship);
     this.add(newTable);
     this.delete(table1);
     this.delete(table2);
+    this.fkRelationships.delete(relationship);
     return newTable;
   }
 
-  private setFdsFor(table: Table, parent1: Table, parent2: Table) {
+  private setFdsFor(
+    table: Table,
+    parent1: Table,
+    parent2: Table,
+    relationship: Relationship
+  ) {
     /*let sourceTables = new Set<Table>();
     table.columns.columns.forEach((column) => {
       sourceTables.add(column.sourceTable);
@@ -97,26 +108,33 @@ export default class Schema {
       sourceTable.projectFds(table);
     });*/
 
-    parent1.projectFds(table);
-    parent2.projectFds(table);
+    let remaining = relationship.appliesTo(parent1, parent2)
+      ? parent1
+      : parent2;
+    let generating = relationship.appliesTo(parent1, parent2)
+      ? parent2
+      : parent1;
+
+    remaining.projectFds(table);
+    table.fds.forEach((fd) => {
+      relationship.referencingToReferencedColumnsIn(fd.lhs);
+      relationship.referencingToReferencedColumnsIn(fd.rhs);
+    });
+    generating.projectFds(table);
 
     // extension
-    let fk = parent1.columns.copy().intersect(parent2.columns);
-    let fkFds1 = parent1.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
-    let fkFds2 = parent2.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
+    let fk = relationship.referenced();
+    let fkFds = table.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
 
     table.fds.forEach((fd) => {
       let rhsFkPart = fd.rhs.copy().intersect(fk);
-      let extension1 = fkFds1.filter((parentFd) =>
-        parentFd.lhs.equals(rhsFkPart)
-      );
-      let extension2 = fkFds2.filter((parentFd) =>
-        parentFd.lhs.equals(rhsFkPart)
-      );
-      if (extension1.length > 0) fd.rhs.union(extension1[0].rhs);
-      if (extension2.length > 0) fd.rhs.union(extension2[0].rhs);
+      fkFds
+        .filter((fkFd) => fkFd.lhs.isSubsetOf(rhsFkPart))
+        .forEach((fkFd) => {
+          fd.rhs.union(fkFd.rhs);
+        });
     });
 
-    table.setFds(...new Set(table.fds)); //remove duplicate fds with lhs = fk subset
+    //TODO remove duplicate fds (lhs = fk subset)
   }
 }

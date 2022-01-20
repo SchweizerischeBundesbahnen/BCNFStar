@@ -9,12 +9,13 @@ import { Observable, shareReplay, map, Subject } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IFk from '@server/definitions/IFk';
 import ColumnCombination from '../model/schema/ColumnCombination';
+import Column from '../model/schema/Column';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatabaseService {
-  public inputTables?: Schema;
+  public inputSchema?: Schema;
   private loadTableCallback = new Subject<Array<Table>>(); // Source
   loadTableCallback$ = this.loadTableCallback.asObservable(); // Stream
   private fks: Array<IFk> = [];
@@ -28,7 +29,6 @@ export class DatabaseService {
       tables.push(...data);
       this.getIFks().subscribe((data) => {
         this.fks = data;
-        // this.resolveIFks(data, tables);
         this.loadTableCallback.next(tables);
       });
     });
@@ -62,42 +62,40 @@ export class DatabaseService {
 
   private resolveIFks(fks: Array<IFk>) {
     fks.forEach((fk) => {
-      let referencingTable: Table = [...this.inputTables!.tables].filter(
+      let referencingTable: Table = [...this.inputSchema!.tables].filter(
         (table: Table) => fk.name == table.name
       )[0];
-      let referencedTable: Table = [...this.inputTables!.tables].filter(
+      let referencedTable: Table = [...this.inputSchema!.tables].filter(
         (table: Table) => fk.foreignName == table.name
       )[0];
 
       if (referencingTable && referencedTable) {
-        let fkColumn: ColumnCombination =
-          referencingTable.columns.columnsFromNames(fk.column);
-        let pkColumn: ColumnCombination =
-          referencedTable.columns.columnsFromNames(fk.foreignColumn);
+        let fkColumn: Column = referencingTable.columns.columnFromName(
+          fk.column
+        );
+        let pkColumn: Column = referencedTable.columns.columnFromName(
+          fk.foreignColumn
+        );
 
         if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
-        referencedTable.pk.union(pkColumn);
+        referencedTable.pk.add(pkColumn);
 
-        let relExistsAlready = false;
-        this.inputTables!.fkRelationships.forEach((rel) => {
+        let relationship = new Relationship();
+        this.inputSchema!.fkRelationships.forEach((rel) => {
           if (rel.appliesTo(referencingTable, referencedTable)) {
-            rel.referencing.union(fkColumn);
-            rel.referenced.union(pkColumn);
-            relExistsAlready = true;
+            relationship = rel;
           }
         });
-        if (!relExistsAlready)
-          this.inputTables!.fkRelationships.add(
-            new Relationship(fkColumn, pkColumn)
-          );
+        relationship.add(fkColumn, pkColumn);
+        this.inputSchema!.fkRelationships.add(relationship);
       }
     });
   }
 
   public setInputTables(tables: Array<Table>) {
-    this.inputTables = new Schema(...tables);
-    this.inputTables.tables.forEach((inputTable: Table) => {
-      inputTable.schema = this.inputTables;
+    this.inputSchema = new Schema(...tables);
+    this.inputSchema.tables.forEach((inputTable: Table) => {
+      inputTable.schema = this.inputSchema;
       this.getFunctionalDependenciesByTable(inputTable).subscribe((fd) =>
         inputTable.setFds(
           ...fd.functionalDependencies.map((fds) =>

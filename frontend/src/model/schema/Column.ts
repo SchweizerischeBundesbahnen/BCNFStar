@@ -17,4 +17,8 @@ export default class Column {
     this.prio = prio;
     this.sourceTable = sourceTable;
   }
+
+  public copy(): Column {
+    return new Column(this.name, this.dataType, this.prio, this.sourceTable);
+  }
 }
