@@ -1,7 +1,7 @@
 import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
 import { Request, Response, RequestHandler } from "express";
 import { readFile } from "fs/promises";
-import { outputPath } from "./metanomeAlgorithm";
+import { outputPath } from "../metanome/metanomeAlgorithm";
 import { runMetanomeFDAlgorithm } from "./runMetanome";
 
 export default function getFDsFromTableNameFunction(): RequestHandler {

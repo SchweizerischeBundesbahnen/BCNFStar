@@ -6,7 +6,7 @@ import { join } from "path";
 import promiseRetry from "promise-retry";
 import { split } from "../utils/databaseUtils";
 import { pathSplit } from "../utils/files";
-import MetanomeAlgorithm from "./metanomeAlgorithm";
+import MetanomeAlgorithm from "../metanome/metanomeAlgorithm";
 
 export default function postRunMetanomeFDAlgorithmFunction(): RequestHandler {
   async function MetanomeFDAlgorithm(
