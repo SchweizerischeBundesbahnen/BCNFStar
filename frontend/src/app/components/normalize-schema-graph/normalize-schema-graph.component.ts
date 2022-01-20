@@ -1,10 +1,8 @@
 import {
   Component,
   AfterViewInit,
-  ElementRef,
   Input,
   Output,
-  ViewChild,
   EventEmitter,
 } from '@angular/core';
 import * as joint from 'jointjs';
@@ -34,9 +32,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
   protected localTables: Set<Table> = new Set();
 
-  // ngDoCheck(): void {
-  //   this.createDefaultGraph();
-  // }
   ngAfterViewInit(): void {
     this.tables.asObservable().subscribe((v) => {
       console.log('new tables');
@@ -101,16 +96,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     //   });
     //   this.updateAllBBoxes();
     // }, 10);
-  }
-  @ViewChild('paper') paperHtmlObject!: ElementRef<HTMLDivElement>;
-  get paperOffset() {
-    try {
-      const { top, left } =
-        this.paperHtmlObject.nativeElement.getBoundingClientRect();
-      return { top, left };
-    } catch (e) {
-      return { top: 0, left: 0 };
-    }
   }
 
   generateElements() {
@@ -207,10 +192,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
   // call this whenever the graph element has moved, this moves the angular component on top of the graph element
   updateBBox(item: GraphStorageItem) {
-    //   const bbox = document
-    //   .getElementById('__jointel__' + item.table.name)
-    //   ?.children[0].getBoundingClientRect();
-    // if (!bbox) return;
     const bbox = item.jointjsEl.getBBox();
 
     item.style = {
@@ -221,9 +202,5 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
       transform: `scale(${this.panzoomTransform.scale})`,
       'transform-origin': 'left top',
     };
-
-    // console.log(item.style, this.paperOffset, this.panzoomTransform);
-    // const domel = document.getElementById('__jointel__' + item.table.name);
-    // domel?.setAttribute('transform', `translate(${bbox.x}, ${bbox.y})`);
   }
 }
