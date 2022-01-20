@@ -39,7 +39,7 @@ app.use(cors(corsOptions));
 app.get("/tables", getTablesFunction());
 app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
-app.get("/fks", getFksFunction(pool));
+app.get("/fks", getFksFunction);
 
 // app.post("/persist/createTable", postCreateTable(pool));
 // app.post("/persist/createForeignKey", postCreateForeignKey(pool));
