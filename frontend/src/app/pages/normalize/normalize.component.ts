@@ -38,7 +38,7 @@ export class NormalizeComponent {
     });
 
     dialogRef.afterClosed().subscribe((fd) => {
-      this.onSplitFd(fd);
+      if (fd) this.onSplitFd(fd);
     });
   }
 

@@ -11,6 +11,7 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 })
 export class SplitDialogComponent {
   selectedColumns = new Map<Column, Boolean>();
+  columns = new Array<Column>();
 
   constructor(
     // eslint-disable-next-line no-unused-vars
@@ -18,9 +19,17 @@ export class SplitDialogComponent {
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA) public fd: FunctionalDependency
   ) {
-    fd.rhs.columns.forEach((column) => {
-      this.selectedColumns.set(column, true);
-    });
+    fd.rhs
+      .copy()
+      .setMinus(fd.lhs)
+      .columns.forEach((column) => {
+        this.selectedColumns.set(column, true);
+        this.columns.push(column);
+      });
+  }
+
+  canConfirm() {
+    return [...this.selectedColumns.values()].some((bool) => bool);
   }
 
   confirm() {
@@ -32,7 +41,6 @@ export class SplitDialogComponent {
       this.fd.lhs,
       new ColumnCombination(...new_rhs)
     );
-    console.log(new_fd);
     this.dialogRef.close(new_fd);
   }
 }
