@@ -1,11 +1,17 @@
-<p>table-selection works!</p>
-<ul>
-  <li
-    *ngFor="let table of tables"
-    (click)="selectTable(table)"
-    [routerLink]="['/normalize', table.name]"
-    routerLinkActive="active"
+<div class="sbb-checkbox-group-vertical">
+  <sbb-checkbox
+    *ngFor="let table of this.tables.keys()"
+    (change)="toggleCheckStatus(table)"
+    >{{ table.name }}</sbb-checkbox
   >
-    <span>{{ table.name }}</span>
-  </li>
-</ul>
+</div>
+
+<button
+  type="button"
+  sbbButton
+  [disabled]="!hasSelectedTables()"
+  (click)="selectTable()"
+  [routerLink]="['/normalize']"
+>
+  Go
+</button>
