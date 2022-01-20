@@ -1,9 +1,9 @@
-<div *ngFor="let item of graphStorage | keyvalue">
+<div id="graph">
+  <div id="paper" #paper></div>
   <app-graph-element
+    *ngFor="let item of graphStorage | keyvalue"
     (selected)="selected.emit($event)"
     [table]="item.value.table"
     [bbox]="item.value.style"
   ></app-graph-element>
 </div>
-
-<div id="paper" #paper></div>

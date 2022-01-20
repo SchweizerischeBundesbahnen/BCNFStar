@@ -1,6 +1,6 @@
 import {
   Component,
-  DoCheck,
+  AfterViewInit,
   ElementRef,
   Input,
   Output,
@@ -11,7 +11,9 @@ import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
-import panzoom, { PanZoom, Transform } from 'panzoom';
+// import panzoom, { PanZoom, Transform } from 'panzoom';
+import { Transform } from 'panzoom';
+import { Subject } from 'rxjs';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -25,13 +27,22 @@ type GraphStorageItem = {
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements DoCheck {
-  @Input() tables!: Set<Table>;
+export class NormalizeSchemaGraphComponent implements AfterViewInit {
+  @Input() tables!: Subject<Set<Table>>;
   @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
 
-  ngDoCheck(): void {
-    this.createDefaultGraph();
+  protected localTables: Set<Table> = new Set();
+
+  // ngDoCheck(): void {
+  //   this.createDefaultGraph();
+  // }
+  ngAfterViewInit(): void {
+    this.tables.asObservable().subscribe((v) => {
+      console.log('new tables');
+      this.localTables = v;
+      this.createDefaultGraph();
+    });
   }
 
   private panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
@@ -42,15 +53,14 @@ export class NormalizeSchemaGraphComponent implements DoCheck {
 
   protected graph!: joint.dia.Graph;
 
-  private height = 10000;
   createDefaultGraph() {
     this.graph = new joint.dia.Graph();
 
     new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
       model: this.graph,
-      height: this.height,
-      width: '100%',
+      height: null,
+      width: null,
       background: {
         color: 'rgba(200, 200, 200, 0.3)',
       },
@@ -71,36 +81,40 @@ export class NormalizeSchemaGraphComponent implements DoCheck {
       dagre,
       graphlib,
       nodeSep: 40,
+      // prevent left ports from being cut off
+      marginX: this.attributeWidth / 2,
       edgeSep: 80,
       rankDir: 'LR',
     });
 
-    setTimeout(() => {
-      const panzoomHandler = panzoom(
-        document.querySelector('#paper svg') as SVGElement,
-        { smoothScroll: false }
-      );
-      // move all HTML overlays whenever the user zoomed or panned
-      panzoomHandler.on('transform', (e: PanZoom) => {
-        this.panzoomTransform = e.getTransform();
-        this.updateAllBBoxes();
-      });
-      this.updateAllBBoxes();
-    }, 10);
+    // setTimeout(() => {
+    //   const panzoomHandler = panzoom(
+    //     document.querySelector('#paper svg') as SVGElement,
+    //     { smoothScroll: false,
+    //     pinchSpeed:0,
+    //   zoomSpeed: 0 }
+    //   );
+    //   // move all HTML overlays whenever the user zoomed or panned
+    //   panzoomHandler.on('transform', (e: PanZoom) => {
+    //     this.panzoomTransform = e.getTransform();
+    //     this.updateAllBBoxes();
+    //   });
+    //   this.updateAllBBoxes();
+    // }, 10);
   }
   @ViewChild('paper') paperHtmlObject!: ElementRef<HTMLDivElement>;
   get paperOffset() {
     try {
       const { top, left } =
         this.paperHtmlObject.nativeElement.getBoundingClientRect();
-      return { top: top + window.scrollY, left: left + window.scrollX };
+      return { top, left };
     } catch (e) {
       return { top: 0, left: 0 };
     }
   }
 
   generateElements() {
-    for (const table of this.tables) {
+    for (const table of this.localTables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
         attrs: { root: { id: '__jointel__' + table.name } },
       });
@@ -128,7 +142,7 @@ export class NormalizeSchemaGraphComponent implements DoCheck {
   }
 
   generateLinks() {
-    for (const table of this.tables) {
+    for (const table of this.localTables) {
       for (const otherTable of table.minimalReferencedTables()) {
         let foreignKey = table
           .foreignKeyForReferencedTable(otherTable)
@@ -193,20 +207,22 @@ export class NormalizeSchemaGraphComponent implements DoCheck {
 
   // call this whenever the graph element has moved, this moves the angular component on top of the graph element
   updateBBox(item: GraphStorageItem) {
-    const bbox = document
-      .getElementById('__jointel__' + item.table.name)
-      ?.children[0].getBoundingClientRect();
-    if (!bbox) return;
+    //   const bbox = document
+    //   .getElementById('__jointel__' + item.table.name)
+    //   ?.children[0].getBoundingClientRect();
+    // if (!bbox) return;
+    const bbox = item.jointjsEl.getBBox();
 
     item.style = {
       width: bbox.width / this.panzoomTransform.scale + 'px',
       height: bbox.height / this.panzoomTransform.scale + 'px',
-      left: bbox.left + window.scrollX + 'px',
-      top: bbox.top + window.scrollY + 'px ',
+      left: bbox.x + 'px',
+      top: bbox.y + 'px ',
       transform: `scale(${this.panzoomTransform.scale})`,
       'transform-origin': 'left top',
     };
 
+    // console.log(item.style, this.paperOffset, this.panzoomTransform);
     // const domel = document.getElementById('__jointel__' + item.table.name);
     // domel?.setAttribute('transform', `translate(${bbox.x}, ${bbox.y})`);
   }

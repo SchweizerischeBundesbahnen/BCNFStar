@@ -4,10 +4,9 @@
       <!-- [selectedTable]="this.selectedTable" -->
       <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
-        [tables]="this.schema.tables"
+        [tables]="this.tablesEventEmitter"
         [selectedTable]="this.selectedTable"
         (selected)="onSelect($event)"
-        [tables]="this.schema.tables"
       ></app-normalize-schema-graph>
     </div>
     <div class="col-4 border">

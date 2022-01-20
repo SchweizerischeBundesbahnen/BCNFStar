@@ -1,14 +1,15 @@
 .ellipses {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .container {
   position: absolute;
   /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
   pointer-events: none;
-  user-select: none;
-  z-index: 1;
+  -webkit-user-select: none;
+  box-sizing: border-box;
+  z-index: 2;
 }
 
 .pk {

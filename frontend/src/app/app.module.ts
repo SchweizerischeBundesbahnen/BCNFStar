@@ -12,6 +12,7 @@ import {
   SbbRadioButtonModule,
   SbbAccordionModule,
   SbbButtonModule,
+  SbbCheckboxModule,
 } from '@sbb-esta/angular-business';
 import { SbbIconModule } from '@sbb-esta/angular-core';
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
@@ -37,6 +38,7 @@ import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/nor
     SbbButtonModule,
     SbbAccordionModule,
     SbbIconModule,
+    SbbCheckboxModule,
     BrowserAnimationsModule,
     HttpClientModule,
   ],
