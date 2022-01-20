@@ -12,7 +12,10 @@ import { NormalizeSchemaGraphComponent } from './components/normalize-schema-gra
 import { SbbRadioButtonModule } from '@sbb-esta/angular-business';
 import { SbbButtonModule } from '@sbb-esta/angular-business';
 import { SbbAccordionModule } from '@sbb-esta/angular-business';
+import { SbbCheckboxModule } from '@sbb-esta/angular-business';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/normalize-undo-redo.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     NormalizeComponent,
     NormalizeSideBarComponent,
     NormalizeSchemaGraphComponent,
+    NormalizeUndoRedoComponent,
   ],
   imports: [
     BrowserModule,
@@ -29,6 +33,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SbbRadioButtonModule,
     SbbButtonModule,
     SbbAccordionModule,
+    SbbCheckboxModule,
+    FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     HttpClientModule,
   ],
