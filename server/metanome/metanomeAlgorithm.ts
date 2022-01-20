@@ -2,10 +2,10 @@ import { absoluteServerDir } from "../utils/files";
 import { promisify } from "util";
 import { exec } from "child_process";
 import { join } from "path";
+import { sqlUtils } from "../db";
 
-export const METANOME_CLI_JAR_PATH = "metanome/metanome-cli-1.1.0.jar";
-export const POSTGRES_JDBC_JAR_PATH = "metanome/postgresql-9.3-1102-jdbc41.jar";
-export const OUTPUT_DIR = join(absoluteServerDir, "temp");
+export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
+export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
 export function outputPath(schemaAndTable: string): string {
   return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
@@ -19,11 +19,18 @@ export default class MetanomeAlgorithm {
   }
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
-    this.tables.forEach(async (table) => {
-      const { stderr, stdout } = await asyncExec(this.command(table));
-      // console.log(result.stdout);
-      if (stderr) console.error(stderr);
-    });
+    for (const table of this.tables) {
+      console.log("Executing metanome on " + table);
+      const { stderr, stdout } = await asyncExec(this.command(table), {
+        cwd: "metanome/",
+      });
+      console.log(`Metanome execution on ${table} finished`);
+      // console.log(stdout);
+      if (stderr) {
+        console.error(stderr);
+        throw Error("Metanome execution failed");
+      }
+    }
 
     let dict = {};
     this.tables
@@ -37,21 +44,23 @@ export default class MetanomeAlgorithm {
 
   private classpath(): string {
     const classpath_separator = process.platform === "win32" ? ";" : ":";
-    return [METANOME_CLI_JAR_PATH, POSTGRES_JDBC_JAR_PATH, this.algoJarPath()]
-      .map((jarpath) => absoluteServerDir + "/" + jarpath)
-      .join(classpath_separator);
+    return [
+      METANOME_CLI_JAR_PATH,
+      sqlUtils.getJdbcPath(),
+      this.algoJarPath(),
+    ].join(classpath_separator);
   }
 
   // location of the algorithm JAR relative to the package.json directory
   private algoJarPath(): string {
-    return "/metanome/Normalize-1.2-SNAPSHOT.jar";
+    return "Normalize-1.2-SNAPSHOT.jar";
   }
 
   private pgpassPath(): string {
-    if (process.env.PGPASSFILE == undefined) {
-      throw new Error("missing PGPASSFILE in env.local");
+    if (process.env.DB_PASSFILE == undefined) {
+      throw new Error("missing DB_PASSFILE in env.local");
     }
-    return process.env.PGPASSFILE;
+    return process.env.DB_PASSFILE;
   }
 
   // location in the JAR where the algorithm is located
@@ -61,6 +70,8 @@ export default class MetanomeAlgorithm {
   private command(table: string): string {
     return `java -Xmx${
       this.memory
-    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type postgresql --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_normalize_results.json --algorithm-config isHumanInTheLoop:false`;
+    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type ${
+      process.env.DB_TYPE
+    } --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_normalize_results.json --algorithm-config isHumanInTheLoop:false`;
   }
 }
