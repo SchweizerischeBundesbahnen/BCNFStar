@@ -22,10 +22,6 @@ export class NormalizeComponent {
     this.schema = new Schema(...inputTables);
   }
 
-  onSelect(table: Table): void {
-    this.selectedTable = table;
-  }
-
   onSplitFd(fd: FunctionalDependency): void {
     let command = new SplitCommand(this.schema, this.selectedTable!, fd);
     // TODO: proper change detection: currently schema graph is only updated due to

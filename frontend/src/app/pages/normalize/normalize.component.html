@@ -3,8 +3,7 @@
     <div class="col-8 border">
       <app-normalize-schema-graph
         [tables]="this.schema.tables"
-        [selectedTable]="this.selectedTable"
-        (selected)="onSelect($event)"
+        [(selection)]="this.selectedTable"
       ></app-normalize-schema-graph>
     </div>
     <div class="col-4 border">

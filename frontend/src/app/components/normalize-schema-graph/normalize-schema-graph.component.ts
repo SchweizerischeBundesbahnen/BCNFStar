@@ -19,8 +19,8 @@ import Table from 'src/model/schema/Table';
 export class NormalizeSchemaGraphComponent implements AfterViewInit, DoCheck {
   @ViewChild('mermaidDiv') mermaidDiv?: ElementRef;
   @Input() tables!: Set<Table>;
-  @Input() selectedTable?: Table;
-  @Output() selected = new EventEmitter<Table>();
+  @Input() selection?: Table;
+  @Output() selectionChange = new EventEmitter<Table>();
 
   constructor() {
     mermaid.initialize({
@@ -28,6 +28,11 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, DoCheck {
       securityLevel: 'loose',
       theme: 'forest',
     });
+  }
+
+  private changeSelection(table: Table) {
+    this.selection = table;
+    this.selectionChange.emit(this.selection);
   }
 
   private mermaidString(): string {
@@ -55,15 +60,13 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, DoCheck {
       });
       this.tables.forEach((table) => {
         this.getTableinMermaid(table).addEventListener('click', () => {
-          this.selected.emit(table);
+          this.changeSelection(table);
         });
         this.getTableinMermaid(table).childNodes.item(2).remove();
       });
-      if (this.selectedTable && this.tables.has(this.selectedTable)) {
+      if (this.selection && this.tables.has(this.selection)) {
         (
-          this.getTableinMermaid(this.selectedTable).children.item(
-            0
-          )! as SVGElement
+          this.getTableinMermaid(this.selection).children.item(0)! as SVGElement
         ).style.strokeWidth = '3px';
       }
     }
