@@ -5,7 +5,8 @@ import { join } from "path";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
-import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
+import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanomeFD";
+import postRunMetanomeINDAlgorithmFunction from "./routes/runMetanomeIND";
 import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
 // import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
@@ -46,6 +47,7 @@ app.get("/fks", getFksFunction);
 // DB_PASSFILE=C:\.pgpass
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
+app.post("/tables/inds/run", postRunMetanomeINDAlgorithmFunction());
 
 app.use(
   expressStaticGzip(
