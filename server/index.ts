@@ -5,6 +5,7 @@ import { join } from "path";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
+import getINDsForTableFunction from "./routes/indsForTable";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanomeFD";
 import postRunMetanomeINDAlgorithmFunction from "./routes/runMetanomeIND";
 import { absoluteServerDir } from "./utils/files";
@@ -41,6 +42,8 @@ app.get("/tables", getTablesFunction());
 app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 app.get("/fks", getFksFunction);
+
+app.get("/tables/:name/inds", getINDsForTableFunction());
 
 // app.post("/persist/createTable", postCreateTable(pool));
 // app.post("/persist/createForeignKey", postCreateForeignKey(pool));

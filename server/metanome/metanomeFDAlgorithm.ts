@@ -46,6 +46,10 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
     return "Normalize-1.2-SNAPSHOT.jar";
   }
 
+  public static outputPath(schemaAndTable: string): string {
+    return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
+  }
+
   // location in the JAR where the algorithm is located
   protected override algoClass(): string {
     return "de.metanome.algorithms.normalize.Normi";

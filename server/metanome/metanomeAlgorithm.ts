@@ -7,10 +7,6 @@ import { sqlUtils } from "../db";
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
-export function outputPath(schemaAndTable: string): string {
-  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
-}
-
 export default abstract class MetanomeAlgorithm {
   public memory = "12g";
   protected classpath_separator = process.platform === "win32" ? ";" : ":";
