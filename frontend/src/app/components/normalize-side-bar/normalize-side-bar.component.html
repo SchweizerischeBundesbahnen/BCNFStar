@@ -11,9 +11,9 @@
     </sbb-expansion-panel>
 
     <sbb-expansion-panel [expanded]="true">
-      <sbb-expansion-panel-header
-        >Functional Dependencies</sbb-expansion-panel-header
-      >
+      <sbb-expansion-panel-header>
+        Functional Dependencies
+      </sbb-expansion-panel-header>
       <div *ngIf="table.violatingFds().length > 0">
         <sbb-radio-group #fdSelection>
           <sbb-radio-button
@@ -48,7 +48,7 @@
         <br />
         <button
           type="button"
-          sbbButton
+          sbb-button
           [disabled]="!selectedInd()"
           (click)="joinSelectedInd()"
         >

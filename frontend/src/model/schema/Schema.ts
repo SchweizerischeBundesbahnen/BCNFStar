@@ -33,7 +33,12 @@ export default class Schema {
   public fksOf(table: Table): Set<Table> {
     let fks = this.referencesOf(table, this.fkRelationships);
     this.tables.forEach((otherTable) => {
-      if (table.columns.copy().intersect(otherTable.columns).cardinality > 0)
+      let intersect = table.columns.copy().intersect(otherTable.columns);
+      if (
+        intersect.cardinality > 0 &&
+        otherTable.pk &&
+        otherTable.pk!.equals(intersect)
+      )
         fks.add(otherTable);
     });
     fks.delete(table);
@@ -51,7 +56,11 @@ export default class Schema {
       )
     );
     let intersect = referencing.columns.copy().intersect(referenced.columns);
-    if (intersect.cardinality > 0)
+    if (
+      intersect.cardinality > 0 &&
+      referenced.pk &&
+      referenced.pk!.equals(intersect)
+    )
       fks.add(Relationship.fromTables(referencing, referenced));
     return fks;
   }
