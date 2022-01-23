@@ -20,6 +20,8 @@ type GraphStorageItem = {
   links: Record<string, joint.dia.Link>;
 };
 
+const jointJsPrefix = '__jointel__';
+
 @Component({
   selector: 'app-normalize-schema-graph',
   templateUrl: './normalize-schema-graph.component.html',
@@ -29,8 +31,10 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   @Input() tables!: Subject<Set<Table>>;
   @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
+  @Output() join = new EventEmitter<{ source: Table; target: Table }>();
 
   protected localTables: Set<Table> = new Set();
+  public paper?: joint.dia.Paper;
 
   ngAfterViewInit(): void {
     this.tables.asObservable().subscribe((v) => {
@@ -51,7 +55,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   createDefaultGraph() {
     this.graph = new joint.dia.Graph();
 
-    new joint.dia.Paper({
+    this.paper = new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
       model: this.graph,
       height: null,
@@ -68,6 +72,18 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
             this.updateBBox(item);
           }
         }
+    });
+
+    this.paper.on('link:pointerclick', (linkView) => {
+      // resetAll(this);
+      console.log('Klick');
+      let sourceId = linkView.sourceView.el.id.replace(jointJsPrefix, '');
+      let targetId = linkView.targetView.el.id.replace(jointJsPrefix, '');
+      this.join.emit({
+        source: this.graphStorage[sourceId].table,
+        target: this.graphStorage[targetId].table,
+      });
+      this.createDefaultGraph();
     });
 
     this.generateElements();
@@ -101,7 +117,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   generateElements() {
     for (const table of this.localTables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
-        attrs: { root: { id: '__jointel__' + table.name } },
+        attrs: { root: { id: jointJsPrefix + table.name } },
       });
       jointjsEl.attr({
         body: {
@@ -126,24 +142,65 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     }
   }
 
+  private addJoinButton(link: joint.shapes.standard.Link) {
+    let joinButton = new joint.linkTools.Button({
+      markup: [
+        {
+          tagName: 'circle',
+          selector: 'button',
+          attributes: {
+            r: 7,
+            fill: '#001DFF',
+            cursor: 'pointer',
+          },
+        },
+        {
+          tagName: 'path',
+          selector: 'icon',
+          attributes: {
+            d: 'M -2 4 2 4 M 0 3 0 0 M -2 -1 1 -1 M -1 -4 1 -4',
+            fill: 'none',
+            stroke: '#FFFFFF',
+            'stroke-width': 2,
+            'pointer-events': 'none',
+          },
+        },
+      ],
+      distance: 60,
+      offset: 0,
+      action: function () {
+        alert(link);
+      },
+    });
+
+    var toolsView = new joint.dia.ToolsView({
+      tools: [joinButton],
+    });
+
+    var linkView = link.findView(this.paper!);
+    linkView.addTools(toolsView);
+  }
+
   generateLinks() {
     for (const table of this.localTables) {
       for (const otherTable of table.minimalReferencedTables()) {
         let foreignKey = table
-          .foreignKeyForReferencedTable(otherTable)
+          .foreignKeyForReferencedTable(otherTable)!
           .columns.values()
           .next().value;
-        this.graphStorage[table.name].links[otherTable.name] =
-          new joint.dia.Link({
-            source: {
-              id: this.graphStorage[table.name].jointjsEl.id,
-              port: foreignKey.name + '_left',
-            },
-            target: {
-              id: this.graphStorage[otherTable.name].jointjsEl.id,
-              port: foreignKey.name + '_right',
-            },
-          });
+        let link = new joint.shapes.standard.Link({
+          source: {
+            id: this.graphStorage[table.name].jointjsEl.id,
+            port: foreignKey.sourceTable.name + '.' + foreignKey.name + '_left',
+          },
+          target: {
+            id: this.graphStorage[otherTable.name].jointjsEl.id,
+            port:
+              foreignKey.sourceTable.name + '.' + foreignKey.name + '_right',
+          },
+        });
+        this.addJoinButton(link);
+        link = this.graphStorage[table.name].links[otherTable.name];
       }
       this.graph.addCells(Object.values(this.graphStorage[table.name].links));
     }
