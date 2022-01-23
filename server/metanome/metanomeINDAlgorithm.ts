@@ -8,6 +8,7 @@ import fs from "fs";
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
+const OUTPUT_SUFFIX = "_inds_binder.json_inds";
 
 export function outputPath(schemaAndTable: string): string {
   return join(OUTPUT_DIR, schemaAndTable + "-binder.txt");
@@ -53,15 +54,16 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
     return files
       .filter(
         (file) =>
-          file.endsWith("_inds_binder.json_inds") &&
+          file.endsWith(OUTPUT_SUFFIX) &&
           file.includes(schemaAndTable.replace(".", "_"))
       )
       .map((file) => join(OUTPUT_DIR, file));
   }
 
   private outputFileName(tables: string[]): string {
-    const suffix = "_inds_binder.json";
-    return tables.join("_").replace(".", "_") + suffix;
+    return (
+      tables.map((table) => table.replace(".", "_")).join("_") + OUTPUT_SUFFIX
+    );
   }
 
   protected command(tables: string[]): string {
