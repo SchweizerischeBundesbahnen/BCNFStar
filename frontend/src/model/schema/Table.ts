@@ -130,6 +130,10 @@ export default class Table {
     return newTable;
   }
 
+  public indReferencedRelationships(): Set<Relationship> {
+    return this.schema!.indReferencedRelationshipsOf(this);
+  }
+
   public referencedTables(): Set<Table> {
     return this.schema!.referencedTablesOf(this);
   }

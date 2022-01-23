@@ -7,6 +7,7 @@ export default class Schema {
   public readonly tables = new Set<Table>();
   public readonly sourceTables = new Set<Table>();
   public readonly fkRelationships = new Set<Relationship>();
+  public readonly indRelationships = new Set<Relationship>();
 
   public constructor(...tables: Array<Table>) {
     tables.forEach((table) => this.sourceTables.add(table));
@@ -27,8 +28,14 @@ export default class Schema {
       }
     });
     return referencedTables;
+  }
 
-    // referenzen + tables*relevante_referenzen
+  public indReferencedRelationshipsOf(table: Table): Set<Relationship> {
+    return new Set(
+      [...this.indRelationships].filter((rel) =>
+        rel.referencing().isSubsetOf(table.columns)
+      )
+    );
   }
 
   public foreignKeyBetween(
@@ -51,6 +58,23 @@ export default class Schema {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
+  }
+
+  public fkRelationshipBetween(table1: Table, table2: Table): Relationship {
+    return [...this.fkRelationships].filter(
+      (rel) => rel.appliesTo(table1, table2) || rel.appliesTo(table2, table1)
+    )[0];
+  }
+
+  public indRelationshipBetween(
+    table1: Table,
+    table2: Table
+  ): Set<Relationship> {
+    return new Set(
+      [...this.indRelationships].filter(
+        (rel) => rel.appliesTo(table1, table2) || rel.appliesTo(table2, table1)
+      )
+    );
   }
 
   public split(table: Table, fd: FunctionalDependency) {
@@ -80,10 +104,7 @@ export default class Schema {
     return resultingTables;
   }
 
-  public join(table1: Table, table2: Table) {
-    let relationship = [...this.fkRelationships].filter(
-      (rel) => rel.appliesTo(table1, table2) || rel.appliesTo(table2, table1)
-    )[0];
+  public basicJoin(table1: Table, table2: Table, relationship: Relationship) {
     let newTable = table1.join(table2, relationship);
     this.setFdsFor(newTable, table1, table2, relationship);
     this.add(newTable);
@@ -91,6 +112,27 @@ export default class Schema {
     this.delete(table2);
     this.fkRelationships.delete(relationship);
     return newTable;
+  }
+
+  public joinFk(table1: Table, table2: Table) {
+    let relationship = [...this.fkRelationships].filter(
+      (rel) => rel.appliesTo(table1, table2) || rel.appliesTo(table2, table1)
+    )[0];
+    return this.basicJoin(table1, table2, relationship);
+  }
+
+  public tablesForInd(relationship: Relationship): Array<Table> {
+    let tables = new Array<Table>();
+    for (let table of this.tables) {
+      if (
+        relationship.referencing().isSubsetOf(table.columns) ||
+        relationship.referenced().isSubsetOf(table.columns)
+      ) {
+        tables.push(table);
+        if (tables.length == 2) break;
+      }
+    }
+    return tables;
   }
 
   private setFdsFor(

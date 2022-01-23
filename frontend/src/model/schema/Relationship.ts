@@ -45,4 +45,8 @@ export default class Relationship {
       }
     }
   }
+
+  public toString(): String {
+    return this.referencing().toString() + '->' + this.referenced().toString();
+  }
 }

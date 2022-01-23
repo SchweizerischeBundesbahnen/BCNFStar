@@ -1,3 +1,4 @@
+import Relationship from '@/src/model/schema/Relationship';
 import {
   Component,
   EventEmitter,
@@ -15,9 +16,13 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./normalize-side-bar.component.css'],
 })
 export class NormalizeSideBarComponent {
-  @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
+  @ViewChild('fdSelection', { read: SbbRadioGroup })
+  fdSelectionGroup!: SbbRadioGroup;
+  @ViewChild('indSelection', { read: SbbRadioGroup })
+  indSelectionGroup!: SbbRadioGroup;
   @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
+  @Output() joinInd = new EventEmitter<Relationship>();
 
   constructor() {}
 
@@ -28,5 +33,14 @@ export class NormalizeSideBarComponent {
 
   splitSelectedFd(): void {
     this.splitFd.emit(this.selectedFd()!);
+  }
+
+  selectedInd(): Relationship | undefined {
+    if (!this.indSelectionGroup) return undefined;
+    return this.indSelectionGroup.value;
+  }
+
+  joinSelectedInd(): void {
+    this.joinInd.emit(this.selectedInd()!);
   }
 }

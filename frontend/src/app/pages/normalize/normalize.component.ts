@@ -6,6 +6,7 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
+import Relationship from '@/src/model/schema/Relationship';
 
 @Component({
   selector: 'app-normalize',
@@ -23,6 +24,10 @@ export class NormalizeComponent {
 
   onSelect(table: Table): void {
     this.selectedTable = table;
+  }
+
+  onJoinInd(relationship: Relationship): void {
+    alert('Hier wird später mal Inds gejoint :)' + relationship);
   }
 
   onSplitFd(fd: FunctionalDependency): void {
