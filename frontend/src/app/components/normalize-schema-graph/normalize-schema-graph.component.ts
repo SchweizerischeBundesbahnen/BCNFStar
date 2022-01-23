@@ -9,8 +9,7 @@ import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
-// import panzoom, { PanZoom, Transform } from 'panzoom';
-import { Transform } from 'panzoom';
+import panzoom, { Transform } from 'panzoom';
 import { Subject } from 'rxjs';
 
 type GraphStorageItem = {
@@ -82,20 +81,40 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
       rankDir: 'LR',
     });
 
-    // setTimeout(() => {
-    //   const panzoomHandler = panzoom(
-    //     document.querySelector('#paper svg') as SVGElement,
-    //     { smoothScroll: false,
-    //     pinchSpeed:0,
-    //   zoomSpeed: 0 }
-    //   );
-    //   // move all HTML overlays whenever the user zoomed or panned
-    //   panzoomHandler.on('transform', (e: PanZoom) => {
-    //     this.panzoomTransform = e.getTransform();
-    //     this.updateAllBBoxes();
-    //   });
-    //   this.updateAllBBoxes();
-    // }, 10);
+    setTimeout(() => {
+      this.updateAllBBoxes();
+    }, 10);
+    this.addZoomHandler();
+  }
+
+  protected previousTransform: Transform = { x: 1, y: 0, scale: 1 };
+  addZoomHandler() {
+    panzoom(document.querySelector('#paper svg') as SVGElement, {
+      smoothScroll: false,
+      controller: {
+        getOwner() {
+          return document.querySelector('#paper') as HTMLElement;
+        },
+        applyTransform: (transform) => {
+          const delta = {
+            x: transform.x - this.previousTransform.x,
+            y: transform.y - this.previousTransform.y,
+            scale: transform.scale / this.previousTransform.scale,
+          };
+          this.panzoomTransform = transform;
+          for (const el of this.graph.getElements()) {
+            const position = el.position();
+            el.set(
+              'position',
+              new joint.g.Point(position.x + delta.x, position.y + delta.y)
+            );
+            el.scale(delta.scale, delta.scale);
+          }
+          this.updateAllBBoxes();
+          this.previousTransform = Object.assign({}, transform);
+        },
+      },
+    });
   }
 
   generateElements() {
