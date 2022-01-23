@@ -1,0 +1,14 @@
+#graph {
+  position: relative;
+  border: 1px solid gray;
+  display: inline-block;
+  background: transparent;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+#paper {
+    position: relative;
+    height: 90vh;
+}

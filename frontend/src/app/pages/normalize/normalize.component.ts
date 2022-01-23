@@ -7,6 +7,7 @@ import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 import Relationship from '@/src/model/schema/Relationship';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-normalize',
@@ -17,9 +18,13 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
+  public tablesEventEmitter: BehaviorSubject<Set<Table>> = new BehaviorSubject(
+    new Set<Table>()
+  );
 
   constructor(public dataService: DatabaseService) {
     this.schema = dataService.inputSchema!;
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onSelect(table: Table): void {
@@ -44,6 +49,7 @@ export class NormalizeComponent {
       self.selectedTable = this.table;
     };
     this.commandProcessor.do(command);
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onAutoNormalize(): void {
@@ -60,13 +66,17 @@ export class NormalizeComponent {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
+    console.log('pushing');
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onUndo() {
     this.commandProcessor.undo();
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onRedo() {
     this.commandProcessor.redo();
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 }

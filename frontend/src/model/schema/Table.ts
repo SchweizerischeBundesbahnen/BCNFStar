@@ -24,24 +24,16 @@ export default class Table {
         new Column(iAttribute.name, iAttribute.dataType, index, table)
       );
     });
-    table.name = iTable.name; //mermaid tablenames must not contain dots
+    table.name = iTable.name;
     return table;
   }
 
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
     names.forEach((name, i) =>
-      table.columns.add(new Column(name, '?', i, table))
+      table.columns.add(new Column(name, 'unkown data type', i, table))
     );
     return table;
-  }
-
-  public get mermaidName(): string {
-    return this.name
-      .replace('.', '_')
-      .replace(' ', '')
-      .replace('}', '')
-      .replace('{', '');
   }
 
   public get numColumns(): number {
@@ -160,6 +152,34 @@ export default class Table {
     return foreignKeys;
   }
 
+  public hasForeignKeyWith(column: Column): boolean {
+    return this.foreignKeys().some((cc) => cc.includes(column));
+  }
+
+  public minimalReferencedTables(): Array<Table> {
+    // Annahme: keine Zyklen in references
+    var result: Set<Table> = new Set(this.referencedTables());
+
+    var visited: Array<Table> = [];
+    visited.push(this);
+
+    var queue: Array<Table> = [];
+    queue.push(...this.referencedTables());
+    while (queue.length > 0) {
+      var current = queue.shift();
+      visited.push(current!);
+      for (const refTable of current!.referencedTables()) {
+        if (result.has(refTable)) {
+          result.delete(refTable);
+        }
+        if (!visited.includes(refTable)) {
+          queue.push(refTable);
+        }
+      }
+    }
+    return [...result];
+  }
+
   public violatingFds(): Array<FunctionalDependency> {
     return this.fds
       .filter((fd) => fd.violatesBCNF())
@@ -172,22 +192,5 @@ export default class Table {
     let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
-  }
-
-  public toMermaidString(): string {
-    let result = 'class '.concat(this.mermaidName, '{\n');
-    this.columns.inOrder().forEach((column) => {
-      result = result.concat(column.dataType, ' ', column.name, '\n');
-    });
-    result = result.concat('}');
-    this.referencedTables().forEach((refTable) => {
-      result = result.concat(
-        '\n',
-        this.mermaidName,
-        ' --> ',
-        refTable.mermaidName
-      );
-    });
-    return result;
   }
 }
