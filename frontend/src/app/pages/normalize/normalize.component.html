@@ -14,7 +14,7 @@
         (redo)="onRedo()"
       ></app-normalize-undo-redo>
       <app-normalize-side-bar
-        class="normalize-sidebar"
+        *ngIf="this.selectedTable"
         [table]="this.selectedTable"
         (splitFd)="onSplitFd($event)"
       ></app-normalize-side-bar>
