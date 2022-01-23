@@ -34,3 +34,21 @@
     </sbb-expansion-panel>
   </sbb-accordion>
 </div>
+
+<sbb-form-field label="Schema Name">
+  <input
+    type="text"
+    sbbInput
+    placeholder="Schema Name"
+    (input)="onInputChange($event)"
+  />
+</sbb-form-field>
+
+<button
+  type="button"
+  sbbButton
+  [disabled]="!this.schemaName"
+  (click)="persistSchema.emit(this.schemaName)"
+>
+  Persist Schema
+</button>

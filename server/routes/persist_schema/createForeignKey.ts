@@ -32,6 +32,8 @@ export default function getCreateForeignKey(): RequestHandler {
       // const columnMapping: {} = {BusinessEntityID : "BusinessEntityID"};
       // const constraintName = "ABC";
 
+      await new Promise((r) => setTimeout(r, 1000));
+
       if (
         !(await sqlUtils.tableExistsInSchema(
           referencingSchema,

@@ -115,4 +115,72 @@ export class DatabaseService {
         .pipe(shareReplay(1));
     return this.fdResult[table.name];
   }
+
+  postForeignKey(
+    referencingTable: Table,
+    referencedTable: Table,
+    schema: string
+  ) {
+    // TODO: Tabellen-Objekt sollte auch schema bekommen.... dann kann das hier weg...
+    if (referencingTable.name.startsWith('public.')) {
+      referencingTable.name = referencingTable.name.substring(7);
+    }
+    if (referencedTable.name.startsWith('public.')) {
+      referencedTable.name = referencedTable.name.substring(7);
+    }
+
+    const key_columns: string[] = referencingTable
+      .foreignKeyForReferencedTable(referencedTable)
+      .columnNames();
+
+    // Da FK nur 40 Zeichen lang sein darf...
+    const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
+
+    const mapping: {}[] = [];
+    for (let i = 0; i < key_columns.length; i++) {
+      mapping.push({ key: key_columns[i], value: key_columns[i] });
+    }
+
+    const data = {
+      referencingSchema: schema,
+      referencingTable: referencingTable.name,
+      referencedSchema: schema,
+      referencedTable: referencedTable.name,
+      constraintName: fk_name,
+      mapping: mapping,
+    };
+
+    this.http
+      .post(`http://localhost:80/persist/createForeignKey`, data)
+      .subscribe((result: any) => {
+        console.log(result);
+      });
+  }
+
+  postCreateTable(schema: string, table: Table) {
+    if (table.name.startsWith('public.')) {
+      table.name = table.name.substring(7);
+    }
+
+    const [originSchema, originTable]: string[] = table.origin.name.split('.');
+    const [newSchema, newTable]: string[] = [schema, table.name];
+    const primaryKey: string[] = table.keys()[0].columnNames();
+
+    const data = {
+      originSchema: originSchema,
+      originTable: originTable,
+      newSchema: newSchema,
+      newTable: newTable,
+      attribute: table.columns.columnNames().map((str) => {
+        return { name: str };
+      }),
+      primaryKey: primaryKey,
+    };
+
+    this.http
+      .post(`http://localhost:80/persist/createTable`, data)
+      .subscribe((result: any) => {
+        console.log(result);
+      });
+  }
 }

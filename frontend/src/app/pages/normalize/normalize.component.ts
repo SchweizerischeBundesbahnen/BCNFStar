@@ -69,4 +69,23 @@ export class NormalizeComponent {
   onRedo() {
     this.commandProcessor.redo();
   }
+
+  persistSchema(schemaName: string): void {
+    console.log('Creating Tables');
+    this.schema.tables.forEach((table) => {
+      this.dataService.postCreateTable(schemaName, table);
+    });
+
+    this.schema.tables.forEach((referencingTable) => {
+      console.log(referencingTable.referencedTables);
+      referencingTable.referencedTables.forEach((referencedTable) => {
+        this.dataService.postForeignKey(
+          referencingTable,
+          referencedTable,
+          schemaName
+        );
+      });
+    });
+    console.log('Finished!' + schemaName);
+  }
 }

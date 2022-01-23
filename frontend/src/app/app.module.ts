@@ -9,7 +9,10 @@ import { TableSelectionComponent } from './pages/table-selection/table-selection
 import { NormalizeComponent } from './pages/normalize/normalize.component';
 import { NormalizeSideBarComponent } from './components/normalize-side-bar/normalize-side-bar.component';
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
-import { SbbRadioButtonModule } from '@sbb-esta/angular-business';
+import {
+  SbbFormFieldModule,
+  SbbRadioButtonModule,
+} from '@sbb-esta/angular-business';
 import { SbbButtonModule } from '@sbb-esta/angular-business';
 import { SbbAccordionModule } from '@sbb-esta/angular-business';
 import { SbbCheckboxModule } from '@sbb-esta/angular-business';
@@ -32,6 +35,7 @@ import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/nor
     AppRoutingModule,
     SbbRadioButtonModule,
     SbbButtonModule,
+    SbbFormFieldModule,
     SbbAccordionModule,
     SbbCheckboxModule,
     FormsModule,

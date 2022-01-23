@@ -18,12 +18,19 @@ export class NormalizeSideBarComponent {
   @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
   @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
+  @Output() persistSchema = new EventEmitter<string>();
+
+  schemaName: string = '';
 
   constructor() {}
 
   selectedFd(): FunctionalDependency | undefined {
     if (!this.fdSelectionGroup) return undefined;
     return this.fdSelectionGroup.value;
+  }
+
+  onInputChange(value: Event): void {
+    this.schemaName = (value.target! as HTMLInputElement).value;
   }
 
   splitSelectedFd(): void {

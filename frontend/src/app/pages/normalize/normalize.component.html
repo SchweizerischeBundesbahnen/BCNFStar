@@ -18,6 +18,7 @@
         class="normalize-sidebar"
         [table]="this.selectedTable"
         (splitFd)="onSplitFd($event)"
+        (persistSchema)="persistSchema($event)"
       ></app-normalize-side-bar>
       <button type="button" sbbButton (click)="this.onAutoNormalize()">
         {{
