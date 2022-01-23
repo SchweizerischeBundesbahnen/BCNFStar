@@ -1,10 +1,10 @@
-import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
 import { Request, Response, RequestHandler } from "express";
 import { readFile } from "fs/promises";
 import MetanomeINDAlgorithm from "../metanome/metanomeINDAlgorithm";
-import { runMetanomeFDAlgorithm } from "./runMetanomeFD";
 import { split } from "../utils/databaseUtils";
-import IInd from "@/definitions/IInd";
+import BinderInclusionDependency, {
+  ColumnIdentifier,
+} from "../definitions/IBinderInclusionDependencies";
 
 export default function getINDsForTableFunction(): RequestHandler {
   async function getINDsForTable(req: Request, res: Response): Promise<void> {
@@ -12,27 +12,13 @@ export default function getINDsForTableFunction(): RequestHandler {
       const schemaAndTable: string = req.params.name;
       const expectedOutputPath: string[] =
         MetanomeINDAlgorithm.outputPath(schemaAndTable);
-      // console.log(expectedOutputPath)
-      const [table, schema] = split(schemaAndTable);
-      let inds: IInd[] = [];
-      console.log("expectedOutputPath: ", expectedOutputPath);
-      async function appendPath(path: string) {
-        console.log("HEEEEREEEE");
-        const binder_inds: IInd[] = await readINDsFromFile(path);
-        console.log("INDS: ", binder_inds);
-        binder_inds
-          .filter(
-            (ind) =>
-              ind.dependant[0].tableIdentifier == table ||
-              ind.referenced[0].tableIdentifier == table
-          )
-          .forEach((ind) => {
-            // ind.dependant.forEach(column => { column.schemaIdentifier = schema; })
-            // ind.referenced.forEach(column => { column.schemaIdentifier = schema; })
-          });
-        inds.concat(binder_inds);
+
+      let inds: BinderInclusionDependency[] = [];
+      for (let i: number = 0; i < expectedOutputPath.length; i++) {
+        inds = inds.concat(
+          await getRelevantInds(expectedOutputPath[i], schemaAndTable)
+        );
       }
-      expectedOutputPath.forEach((path) => appendPath(path));
       res.json(inds);
       res.status(200);
     } catch (error) {
@@ -44,10 +30,41 @@ export default function getINDsForTableFunction(): RequestHandler {
   return getINDsForTable;
 }
 
-async function readINDsFromFile(path: string): Promise<IInd[]> {
+async function getRelevantInds(
+  path: string,
+  schemaAndTable: string
+): Promise<BinderInclusionDependency[]> {
+  const binderINDs: BinderInclusionDependency[] = await readINDsFromFile(path);
+  binderINDs
+    .filter(
+      (ind) =>
+        ind.dependant.columnIdentifiers[0].tableIdentifier == schemaAndTable ||
+        ind.referenced.columnIdentifiers[0].tableIdentifier == schemaAndTable
+    )
+    .forEach((ind) => {
+      ind.dependant.columnIdentifiers.forEach((column) =>
+        splitTableIdentifier(column)
+      );
+      ind.referenced.columnIdentifiers.forEach((column) =>
+        splitTableIdentifier(column)
+      );
+    });
+  return binderINDs;
+}
+
+async function readINDsFromFile(
+  path: string
+): Promise<BinderInclusionDependency[]> {
   const result = await readFile(path, "utf8");
   return result
     .trim()
     .split(/\r?\n/)
-    .map((json_strings) => JSON.parse(json_strings) as IInd);
+    .map(
+      (json_strings) => JSON.parse(json_strings) as BinderInclusionDependency
+    );
+}
+
+function splitTableIdentifier(column: ColumnIdentifier) {
+  column.schemaIdentifier = split(column.tableIdentifier)[0];
+  column.tableIdentifier = split(column.tableIdentifier)[1];
 }
