@@ -72,6 +72,34 @@ export default class MsSqlUtils extends SqlUtils {
     return result.recordset.length > 0;
   }
 
+  public async attributesExistInTable(
+    attributeNames: string[],
+    schema: string,
+    table: string
+  ): Promise<boolean> {
+    const ps = new sql.PreparedStatement();
+    ps.input("table", sql.NVarChar);
+    ps.input("schema", sql.NVarChar);
+
+    await ps.prepare(
+      "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = @schema AND TABLE_NAME = @table"
+    );
+    const result = await ps.execute({ schema, table });
+    console.log("result.recordSet: ", result.recordset);
+    return attributeNames.every((name) => result.recordset.includes(name));
+  }
+
+  public async schemaExistsInDatabase(schema: string): Promise<boolean> {
+    const ps = new sql.PreparedStatement();
+    ps.input("table", sql.NVarChar);
+
+    await ps.prepare(
+      "SELECT 1 FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = @schema"
+    );
+    const result = await ps.execute({ schema });
+    return result.recordset.length > 0;
+  }
+
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
     const result = await sql.query<ForeignKeyResult>(`SELECT
       tc.table_schema,
@@ -93,6 +121,7 @@ export default class MsSqlUtils extends SqlUtils {
     console.log(result);
     return result.recordset;
   }
+
   public getJdbcPath(): String {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }

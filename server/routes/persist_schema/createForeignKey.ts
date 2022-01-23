@@ -1,9 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { Pool, PoolClient } from "pg";
-import {
-  tableExistsInSchema,
-  schemaExistsInDatabase,
-} from "../../utils/databaseUtils";
+import { sqlUtils } from "../../db";
 
 function parseBody(body: any): string[] {
   return [
@@ -31,10 +28,10 @@ export default function postCreateForeignKey(pool: Pool): RequestHandler {
       const client: PoolClient = await pool.connect();
 
       if (
-        !tableExistsInSchema(client, referencingSchema, referencingTable) ||
-        !schemaExistsInDatabase(client, referencingSchema) ||
-        !tableExistsInSchema(client, referencedSchema, referencedTable) ||
-        !schemaExistsInDatabase(client, referencedSchema)
+        !sqlUtils.tableExistsInSchema(referencingSchema, referencingTable) ||
+        !sqlUtils.schemaExistsInDatabase(referencingSchema) ||
+        !sqlUtils.tableExistsInSchema(referencedSchema, referencedTable) ||
+        !sqlUtils.schemaExistsInDatabase(referencedSchema)
       ) {
         res.json("please type in a schema/table that exists");
         res.status(400);

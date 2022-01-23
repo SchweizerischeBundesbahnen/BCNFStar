@@ -1,10 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { Pool, PoolClient } from "pg";
-import {
-  tableExistsInSchema,
-  schemaExistsInDatabase,
-  attributesExistInTable,
-} from "../../utils/databaseUtils";
+import { sqlUtils } from "../../db";
 
 async function prepareDatabase(
   client: PoolClient,
@@ -80,8 +76,8 @@ export default function postCreateTable(pool: Pool): RequestHandler {
       const client = await pool.connect();
 
       if (
-        !tableExistsInSchema(client, originSchema, originTable) ||
-        !schemaExistsInDatabase(client, originSchema)
+        !sqlUtils.tableExistsInSchema(originSchema, originTable) ||
+        !sqlUtils.schemaExistsInDatabase(originSchema)
       ) {
         res.json("please type in a schema/table that exists");
         res.status(400);
@@ -90,8 +86,7 @@ export default function postCreateTable(pool: Pool): RequestHandler {
 
       prepareDatabase(client, newSchema, newTable).then(async () => {
         if (
-          attributesExistInTable(
-            client,
+          sqlUtils.attributesExistInTable(
             attributeNames,
             originSchema,
             originTable

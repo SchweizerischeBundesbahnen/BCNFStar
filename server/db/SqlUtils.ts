@@ -32,6 +32,14 @@ export default abstract class SqlUtils {
     table: string
   ): Promise<boolean>;
 
+  public abstract schemaExistsInDatabase(schema: string): Promise<boolean>;
+
+  public abstract attributesExistInTable(
+    attributeNames: string[],
+    schema: string,
+    table: string
+  ): Promise<boolean>;
+
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
   public abstract getJdbcPath(): String;
 }

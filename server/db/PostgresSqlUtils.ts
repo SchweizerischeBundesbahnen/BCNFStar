@@ -53,6 +53,35 @@ export default class PostgresSqlUtils extends SqlUtils {
     const table_exists = await client.query(queryConfig);
     return table_exists.rowCount > 0;
   }
+
+  public async attributesExistInTable(
+    attributeNames: string[],
+    originSchema: string,
+    originTable: string
+  ): Promise<boolean> {
+    const client = await this.pool.connect();
+    const query_result = await client.query<{
+      column_name: string;
+    }>(
+      `SELECT column_name 
+          FROM information_schema.columns
+          WHERE table_schema = $1 AND table_name = $2;`,
+      [originSchema, originTable]
+    );
+    const originTableColumns = query_result.rows.map((row) => row.column_name);
+    return attributeNames.every((name) => originTableColumns.includes(name));
+  }
+
+  public async schemaExistsInDatabase(schema: string): Promise<boolean> {
+    const client = await this.pool.connect();
+    return client
+      .query(
+        `SELECT 1 FROM information_schema.schemata WHERE schema_name = $1`,
+        [schema]
+      )
+      .then((queryResult) => queryResult.rowCount > 0);
+  }
+
   public async getTableHead(
     tableschema: string,
     tablename: string
