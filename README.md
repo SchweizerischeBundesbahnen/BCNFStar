@@ -16,9 +16,9 @@ npm install
 
 from the project root folder, which will also install all dependencies in the server and frontend projects.
 
-### Postgres
+### Database
 
-BCNFStar can currently only work on Postgres databases. You need a running postgres database server, a [.pgpass](https://www.postgresql.org/docs/9.3/libpq-pgpass.html) with credentials for it and you need to set the PGPASSFILE environment variable containing the path of that .pgpass file. Environment variables can be placed in a .env.local file in the project root.
+BCNFStar currently works on Postgres and Microsoft SQL Server databases. You need to set an environment variable called DB_TYPE to either postgres, mssql (or sqledge). Regardless of the database type, a [.pgpass-like](https://www.postgresql.org/docs/9.3/libpq-pgpass.html) is needed. Its path needs to be in an environment variable called DB_PASSFILE. Environment variables can be placed in a .env.local file in the project root.
 
 ## Development
 

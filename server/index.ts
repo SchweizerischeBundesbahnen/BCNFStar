@@ -1,22 +1,16 @@
 import express from "express";
 import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
-import { Pool } from "pg";
-import { setupDBCredentials } from "./setupDbCredentials";
-import postCreateTable from "./routes/persist_schema/createTable";
+// import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
 import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
-import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
+// import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
-
-setupDBCredentials();
-
-const pool = new Pool();
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -42,19 +36,14 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// Beispiel: Gebe beim Aufrufen von /test eine Antwort zurück
-app.get("/test", (req, res) => {
-  res.json({ key: "value" });
-});
-
-app.get("/tables", getTablesFunction(pool));
-app.get("/tables/:name/head", getTableHeadFromNameFunction(pool));
+app.get("/tables", getTablesFunction());
+app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
-app.get("/fks", getFksFunction(pool));
+app.get("/fks", getFksFunction);
 
-app.post("/persist/createTable", postCreateTable(pool));
-app.post("/persist/createForeignKey", postCreateForeignKey(pool));
-// PGPASSFILE=C:\.pgpass
+// app.post("/persist/createTable", postCreateTable(pool));
+// app.post("/persist/createForeignKey", postCreateForeignKey(pool));
+// DB_PASSFILE=C:\.pgpass
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
 
