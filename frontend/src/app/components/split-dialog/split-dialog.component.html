@@ -1,0 +1,26 @@
+<div sbbDialogTitle>Auslagern einer Tabelle</div>
+<div sbbDialogContent>
+  <div>
+    Welche dieser Attribute werden von {{ fd.lhs.toString() }} bestimmt:
+  </div>
+  <div class="sbb-checkbox-group-vertical">
+    <sbb-checkbox
+      [ngModel]="selectedColumns.get(column)"
+      (ngModelChange)="selectedColumns.set(column, $event)"
+      *ngFor="let column of columns"
+    >
+      {{ column.name }}
+    </sbb-checkbox>
+  </div>
+</div>
+<div sbbDialogActions>
+  <button
+    sbb-button
+    [disabled]="!canConfirm()"
+    (click)="confirm()"
+    cdkFocusInitial
+  >
+    Ok
+  </button>
+  <button sbb-secondary-button sbbDialogClose>Cancel</button>
+</div>

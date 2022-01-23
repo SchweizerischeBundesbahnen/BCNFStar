@@ -11,6 +11,8 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public schema?: Schema;
+  private _violatingFds?: Array<FunctionalDependency>;
+  private _keys?: Array<ColumnCombination>;
 
   public constructor(columns?: ColumnCombination) {
     if (columns) this.columns = columns;
@@ -158,19 +160,26 @@ export default class Table {
   }
 
   public keys(): Array<ColumnCombination> {
-    let keys: Array<ColumnCombination> = this.fds
-      .filter((fd) => fd.isKey())
-      .map((fd) => fd.lhs);
-    if (keys.length == 0) keys.push(this.columns.copy());
-    return keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
+    if (!this._keys) {
+      let keys: Array<ColumnCombination> = this.fds
+        .filter((fd) => fd.isKey())
+        .map((fd) => fd.lhs);
+      if (keys.length == 0) keys.push(this.columns.copy());
+      this._keys = keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
+    }
+    return this._keys;
   }
 
   public violatingFds(): Array<FunctionalDependency> {
-    return this.fds
-      .filter((fd) => fd.violatesBCNF())
-      .sort((fd1, fd2) => {
-        return fd2.fdScore() - fd1.fdScore();
-      });
+    if (!this._violatingFds) {
+      this._violatingFds = this.fds
+        .filter((fd) => fd.violatesBCNF())
+        .sort((fd1, fd2) => {
+          return fd2.fdScore() - fd1.fdScore();
+        })
+        .slice(0, 100);
+    }
+    return this._violatingFds;
   }
 
   public toString(): string {

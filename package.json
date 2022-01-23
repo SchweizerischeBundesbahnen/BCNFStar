@@ -1,8 +1,12 @@
 {
   "name": "bcnfstar",
+  "engines": {
+    "npm": ">=7",
+    "node": "^16.10 || ^14.15"
+  },
   "scripts": {
     "build": "run-p build:*",
-    "start": "node server/dist",
+    "start": "cd server && npm run start",
     "dev": "run-p dev:*",
     "install": "run-p install:*",
     "test:dev": "CYPRESS_FRONTEND_BASEURL=http://localhost:4200 run-p dev:* cypress:open",

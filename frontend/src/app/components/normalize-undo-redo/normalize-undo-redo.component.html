@@ -1,7 +1,7 @@
 <div>
   <button
     type="button"
-    sbbButton
+    sbb-button
     [disabled]="!this.canUndo"
     (click)="this.undo.emit()"
   >
@@ -9,7 +9,7 @@
   </button>
   <button
     type="button"
-    sbbButton
+    sbb-button
     [disabled]="!this.canRedo"
     (click)="this.redo.emit()"
   >
