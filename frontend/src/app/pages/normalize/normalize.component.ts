@@ -43,6 +43,7 @@ export class NormalizeComponent {
       self.selectedTable = undefined;
     };
     this.commandProcessor.do(command);
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onJoinInd(relationship: Relationship): void {
