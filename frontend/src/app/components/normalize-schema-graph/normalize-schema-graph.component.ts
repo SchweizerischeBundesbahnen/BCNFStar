@@ -19,6 +19,11 @@ type GraphStorageItem = {
   links: Record<string, joint.dia.Link>;
 };
 
+enum PortSide {
+  Left,
+  Right,
+}
+
 @Component({
   selector: 'app-normalize-schema-graph',
   templateUrl: './normalize-schema-graph.component.html',
@@ -39,7 +44,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     });
   }
 
-  protected portWidth = 22.5;
+  protected portDiameter = 22.5;
 
   public graphStorage: Record<string, GraphStorageItem> = {};
 
@@ -80,7 +85,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
       graphlib,
       nodeSep: 40,
       // prevent left ports from being cut off
-      marginX: this.portWidth / 2,
+      marginX: this.portDiameter / 2,
       edgeSep: 80,
       rankDir: 'LR',
     });
@@ -114,13 +119,19 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
             const position = el.position();
             el.position(position.x + delta.x, position.y + delta.y);
             el.scale(delta.scale, delta.scale);
+
+            for (const port of el.getPorts()) {
+              port.markup = this.generatePortMarkup(port.args as any);
+            }
           }
+
           this.updateAllBBoxes();
         },
       },
     });
   }
 
+  protected elementWidth = 300;
   generateElements() {
     for (const table of this.localTables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
@@ -132,8 +143,10 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
         },
         '.': { magnet: true },
       });
-      jointjsEl.resize(300, 60 + this.portWidth * table.columns.columns.size);
-      jointjsEl.position(50, 10);
+      jointjsEl.resize(
+        this.elementWidth,
+        60 + this.portDiameter * table.columns.columns.size
+      );
       this.graphStorage[table.name] = {
         // alternative to HtmlElement: joint.shapes.html.Element
         jointjsEl,
@@ -169,36 +182,36 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     }
   }
 
+  generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
+    const sclaedPortRadius =
+      (this.portDiameter * this.panzoomTransform.scale) / 2;
+    console.log(sclaedPortRadius);
+
+    const cx =
+      side == PortSide.Left
+        ? 0
+        : this.elementWidth * this.panzoomTransform.scale;
+    return `<circle r="${sclaedPortRadius}" cx="${cx}" cy="${
+      25 + sclaedPortRadius + sclaedPortRadius * 2 * counter
+    }" strokegit ="green" fill="white"/>`;
+  }
+
   generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
     for (let column of table.columns.inOrder()) {
+      let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
         id: column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
-        args: {}, // extra arguments for the port layout function, see `layout.Port` section
-        label: {
-          position: {
-            name: 'right',
-            // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
-          },
-        },
-        markup: `<circle r="${this.portWidth / 2}" cx="0" cy="${
-          25 + this.portWidth / 2 + this.portWidth * counter
-        }" strokegit ="green" fill="white" />`,
+        args,
+        markup: this.generatePortMarkup(args),
       });
+      args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
         id: column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
-        args: {}, // extra arguments for the port layout function, see `layout.Port` section
-        label: {
-          position: {
-            name: 'left',
-            // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
-          },
-        },
-        markup: `<circle r="${this.portWidth / 2}" cx="300" cy="${
-          25 + this.portWidth / 2 + this.portWidth * counter
-        }" strokegit ="red" fill="white" />`,
+        args,
+        markup: this.generatePortMarkup(args),
       });
       counter++;
     }
