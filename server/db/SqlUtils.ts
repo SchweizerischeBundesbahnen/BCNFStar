@@ -42,4 +42,38 @@ export default abstract class SqlUtils {
 
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
   public abstract getJdbcPath(): String;
+
+  public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
+  public abstract SQL_DROP_TABLE_IF_EXISTS(
+    newSchema: string,
+    newTable: string
+  ): string;
+  public abstract SQL_CREATE_TABLE(
+    attributeNames: string[],
+    originSchema: string,
+    originTable: string,
+    newSchema: string,
+    newTable: string
+  ): Promise<string>;
+  public abstract SQL_INSERT_DATA(
+    attributeNames: string[],
+    originSchema: string,
+    originTable: string,
+    newSchema: string,
+    newTable: string
+  ): string;
+  public abstract SQL_ADD_PRIMARY_KEY(
+    newSchema: string,
+    newTable: string,
+    primaryKey: string[]
+  ): string;
+  public abstract SQL_FOREIGN_KEY(
+    constraintName: string,
+    referencingSchema: string,
+    referencingTable: string,
+    referencingColumns: string[],
+    referencedSchema: string,
+    referencedTable: string,
+    referencedColumns: string[]
+  ): string;
 }

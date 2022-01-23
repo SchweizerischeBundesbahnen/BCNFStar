@@ -1,5 +1,12 @@
 import sql from "mssql";
+import { env } from "process";
 import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
+import { EOL } from "os";
+
+type Attribute = {
+  type: string;
+};
+
 export default class MsSqlUtils extends SqlUtils {
   private config: sql.config;
   public connection: sql.ConnectionPool;
@@ -91,7 +98,7 @@ export default class MsSqlUtils extends SqlUtils {
 
   public async schemaExistsInDatabase(schema: string): Promise<boolean> {
     const ps = new sql.PreparedStatement();
-    ps.input("table", sql.NVarChar);
+    ps.input("schema", sql.NVarChar);
 
     await ps.prepare(
       "SELECT 1 FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = @schema"
@@ -120,6 +127,103 @@ export default class MsSqlUtils extends SqlUtils {
       AND tc.table_schema NOT IN ('pg_catalog', 'information_schema');`);
     console.log(result);
     return result.recordset;
+  }
+
+  public override SQL_CREATE_SCHEMA(newSchema: string): string {
+    return `IF NOT EXISTS ( SELECT  *
+      FROM    sys.schemas
+      WHERE   name = N'${newSchema}' )
+EXEC('CREATE SCHEMA [${newSchema}]');
+GO`;
+  }
+  public override SQL_DROP_TABLE_IF_EXISTS(newSchema, newTable): string {
+    return `DROP TABLE IF EXISTS ${newSchema}.${newTable}; GO`;
+  }
+  public async SQL_CREATE_TABLE(
+    attributeNames,
+    originSchema,
+    originTable,
+    newSchema,
+    newTable
+  ): Promise<string> {
+    const copy: string[] = [];
+    console.log(attributeNames);
+    for (let i: number = 0; i < attributeNames.length; i++) {
+      copy[i] =
+        attributeNames[i] +
+        " " +
+        (await this.datatypeOf(originSchema, originTable, attributeNames[i]));
+    }
+    const attributeString: string = copy.join(",");
+    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) GO`;
+  }
+
+  public override SQL_FOREIGN_KEY(
+    constraintName: string,
+    referencingSchema: string,
+    referencingTable: string,
+    referencingColumns: string[],
+    referencedSchema: string,
+    referencedTable: string,
+    referencedColumns: string[]
+  ): string {
+    return `
+    ALTER TABLE ${referencingSchema}.${referencingTable} 
+    ADD CONSTRAINT ${constraintName}
+    FOREIGN KEY (${referencingColumns.join(", ")})
+    REFERENCES ${referencedSchema}.${referencedTable} (${referencedColumns.join(
+      ", "
+    )});
+`;
+  }
+
+  public async datatypeOf(
+    schema: string,
+    table: string,
+    attribute: string
+  ): Promise<string> {
+    const ps = new sql.PreparedStatement();
+    ps.input("schema", sql.NVarChar);
+    ps.input("table", sql.NVarChar);
+    ps.input("attribute", sql.NVarChar);
+
+    await ps.prepare(
+      `SELECT 
+    [type]         = 
+       CASE 
+         WHEN tp.[name] IN ('varchar', 'char') THEN tp.[name] + '(' + IIF(c.max_length = -1, 'max', CAST(c.max_length AS VARCHAR(25))) + ')' 
+         WHEN tp.[name] IN ('nvarchar','nchar') THEN tp.[name] + '(' + IIF(c.max_length = -1, 'max', CAST(c.max_length / 2 AS VARCHAR(25)))+ ')'      
+         WHEN tp.[name] IN ('decimal', 'numeric') THEN tp.[name] + '(' + CAST(c.[precision] AS VARCHAR(25)) + ', ' + CAST(c.[scale] AS VARCHAR(25)) + ')'
+         WHEN tp.[name] IN ('datetime2') THEN tp.[name] + '(' + CAST(c.[scale] AS VARCHAR(25)) + ')'
+         ELSE tp.[name]
+       END
+   FROM sys.tables t 
+   JOIN sys.schemas s ON t.schema_id = s.schema_id
+   JOIN sys.columns c ON t.object_id = c.object_id
+   JOIN sys.types tp ON c.user_type_id = tp.user_type_id
+   WHERE s.[name] = @schema AND t.[name] = @table AND c.name = @attribute`
+    );
+
+    const result = await ps.execute({ schema, table, attribute });
+
+    return (result.recordset[0] as Attribute).type;
+  }
+
+  public override SQL_INSERT_DATA(
+    attributeNames,
+    originSchema,
+    originTable,
+    newSchema,
+    newTable
+  ): string {
+    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributeNames.join(
+      ", "
+    )} FROM ${originSchema}.${originTable}`;
+  }
+  public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
+    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey.join(
+      ", "
+    )});`;
   }
 
   public getJdbcPath(): String {

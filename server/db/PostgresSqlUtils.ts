@@ -121,6 +121,58 @@ export default class PostgresSqlUtils extends SqlUtils {
             AND tc.table_schema NOT IN ('pg_catalog', 'information_schema')`);
     return result.rows;
   }
+
+  public override SQL_CREATE_SCHEMA(newSchema: string): string {
+    return `CREATE SCHEMA IF NOT EXISTS ${newSchema};`;
+  }
+  public override SQL_DROP_TABLE_IF_EXISTS(newSchema, newTable): string {
+    return `DROP TABLE IF EXISTS ${newSchema}.${newTable};`;
+  }
+  public async SQL_CREATE_TABLE(
+    attributeNames,
+    originSchema,
+    originTable,
+    newSchema,
+    newTable
+  ): Promise<string> {
+    // return `CREATE TABLE ${newSchema}.${newTable} AS SELECT DISTINCT
+    // ${attributeNames.map((a) => '"' + a + '"').join(", ")} FROM ${originSchema}.${originTable};`;
+
+    return "";
+  }
+  public override SQL_INSERT_DATA(
+    attributeNames,
+    originSchema,
+    originTable,
+    newSchema,
+    newTable
+  ): string {
+    return "";
+  }
+  public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
+    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey
+      .map((a) => '"' + a + '"')
+      .join(", ")});`;
+  }
+
+  public override SQL_FOREIGN_KEY(
+    constraintName: string,
+    referencingSchema: string,
+    referencingTable: string,
+    referencingColumns: string[],
+    referencedSchema: string,
+    referencedTable: string,
+    referencedColumns: string[]
+  ): string {
+    return `ALTER TABLE ${referencingSchema}.${referencingTable} 
+    ADD CONSTRAINT ${constraintName}
+    FOREIGN KEY (${referencingColumns.map((a) => '"' + a + '"').join(", ")})
+    REFERENCES ${referencedSchema}.${referencedTable} (${referencedColumns
+      .map((a) => '"' + a + '"')
+      .join(", ")});
+`;
+  }
+
   public getJdbcPath(): String {
     return "postgresql-42.3.1.jar";
   }
