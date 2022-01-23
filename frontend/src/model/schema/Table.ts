@@ -50,7 +50,7 @@ export default class Table {
 
   public setFds(...fds: Array<FunctionalDependency>) {
     this.fds = fds;
-    this.fds = fds.filter((fd) => !fd.isFullyTrivial());
+    this.fds = fds.filter((fd) => !fd.isFullyTrivial()); // needed?
   }
 
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
@@ -65,11 +65,9 @@ export default class Table {
     return fd.rhs.copy();
   }
 
-  public split(
-    fd: FunctionalDependency,
-    relationship: Relationship
-  ): Array<Table> {
-    let remaining: Table = new Table(this.remainingSchema(fd));
+  public split(fd: FunctionalDependency): Array<Table> {
+    let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
+    fd.lhs.columns.forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
 
     remaining.schema = this.schema;
@@ -77,12 +75,6 @@ export default class Table {
 
     this.projectFds(remaining);
     this.projectFds(generating);
-
-    relationship.referencedToReferencingColumnsIn(remaining.columns);
-    remaining.fds.forEach((fd) => {
-      relationship.referencedToReferencingColumnsIn(fd.lhs);
-      relationship.referencedToReferencingColumnsIn(fd.rhs);
-    });
 
     remaining.pk = this.pk;
     generating.pk = fd.lhs.copy();
@@ -109,20 +101,20 @@ export default class Table {
   }
 
   public join(otherTable: Table, relationship: Relationship): Table {
+    let remaining = relationship.appliesTo(this, otherTable)
+      ? this
+      : otherTable;
+    let generating = relationship.appliesTo(this, otherTable)
+      ? otherTable
+      : this;
+
     let newTable = new Table(
-      this.columns
+      generating.columns
         .copy()
-        .union(otherTable.columns)
+        .union(remaining.columns) // problematic?
         .setMinus(relationship.referencing())
     );
     newTable.schema = this.schema;
-
-    let remaining: Table;
-    if (this.referencedTables().has(otherTable)) {
-      remaining = this;
-    } else {
-      remaining = otherTable;
-    }
 
     newTable.name = remaining.name;
     newTable.pk = remaining.pk;
@@ -130,18 +122,39 @@ export default class Table {
     return newTable;
   }
 
-  public indReferencedRelationships(): Set<Relationship> {
-    return this.schema!.indReferencedRelationshipsOf(this);
-  }
-
   public referencedTables(): Set<Table> {
-    return this.schema!.referencedTablesOf(this);
+    return this.schema!.fksOf(this);
   }
 
-  public foreignKeyForReferencedTable(
+  /*public indReferencedTables(): Set<Table> {
+    return this.schema!.indsOf(this);
+  }
+
+  public fksForTable(
     refTable: Table
-  ): ColumnCombination | undefined {
-    return this.schema!.foreignKeyBetween(this, refTable);
+  ): Set<Relationship> {
+    return this.schema!.fksBetween(this, refTable);
+  }*/
+
+  public fks(): Array<[Relationship, Table]> {
+    console.log(':C');
+    let fks = new Array<[Relationship, Table]>();
+    this.schema!.fksOf(this).forEach((table) => {
+      this.schema!.fksBetween(this, table).forEach((relationship) => {
+        fks.push([relationship, table]);
+      });
+    });
+    return fks;
+  }
+
+  public inds(): Array<[Relationship, Table]> {
+    let inds = new Array<[Relationship, Table]>();
+    this.schema!.indsOf(this).forEach((table) => {
+      this.schema!.indsBetween(this, table).forEach((relationship) => {
+        inds.push([relationship, table]);
+      });
+    });
+    return inds;
   }
 
   public keys(): Array<ColumnCombination> {
@@ -150,14 +163,6 @@ export default class Table {
       .map((fd) => fd.lhs);
     if (keys.length == 0) keys.push(this.columns.copy());
     return keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
-  }
-
-  public foreignKeys(): Array<ColumnCombination> {
-    let foreignKeys: Array<ColumnCombination> = [];
-    this.referencedTables().forEach((table) => {
-      foreignKeys.push(this.foreignKeyForReferencedTable(table)!);
-    });
-    return foreignKeys;
   }
 
   public violatingFds(): Array<FunctionalDependency> {

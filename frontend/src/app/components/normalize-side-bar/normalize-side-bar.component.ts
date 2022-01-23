@@ -22,7 +22,7 @@ export class NormalizeSideBarComponent {
   indSelectionGroup!: SbbRadioGroup;
   @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() joinInd = new EventEmitter<Relationship>();
+  @Output() joinInd = new EventEmitter<[Relationship, Table]>();
 
   constructor() {}
 
@@ -35,7 +35,7 @@ export class NormalizeSideBarComponent {
     this.splitFd.emit(this.selectedFd()!);
   }
 
-  selectedInd(): Relationship | undefined {
+  selectedInd(): [Relationship, Table] | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
   }

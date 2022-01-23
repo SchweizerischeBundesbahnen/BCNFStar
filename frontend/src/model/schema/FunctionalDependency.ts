@@ -60,15 +60,15 @@ export default class FunctionalDependency {
   public violatesBCNF(): boolean {
     if (this.isKey()) return false;
     if (this.lhs.cardinality == 0) return false;
-    if (
-      this.table.foreignKeys().some((fk) => {
+    /*if (
+      this.table.fks().some((fk) => {
         return (
-          !fk.isSubsetOf(this.table.remainingSchema(this)) &&
-          !fk.isSubsetOf(this.table.generatingSchema(this))
+          !fk[0].referencing().isSubsetOf(this.table.remainingSchema(this)) &&
+          !fk[0].referencing().isSubsetOf(this.table.generatingSchema(this))
         );
       })
     )
-      return false;
+      return false;*/
     if (
       this.table.pk &&
       !this.table.pk.isSubsetOf(this.table.remainingSchema(this))

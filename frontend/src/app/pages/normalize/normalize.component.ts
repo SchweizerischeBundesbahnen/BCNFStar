@@ -7,6 +7,7 @@ import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 import Relationship from '@/src/model/schema/Relationship';
+import JoinCommand from '@/src/model/commands/JoinCommand';
 
 @Component({
   selector: 'app-normalize',
@@ -26,8 +27,22 @@ export class NormalizeComponent {
     this.selectedTable = table;
   }
 
-  onJoinInd(relationship: Relationship): void {
-    alert('Hier wird später mal Inds gejoint :)' + relationship);
+  onJoin(joinRelationship: [Relationship, Table]): void {
+    let command = new JoinCommand(
+      this.schema,
+      this.selectedTable!,
+      joinRelationship[1],
+      joinRelationship[0]
+    );
+
+    let self = this;
+    command.onDo = function () {
+      self.selectedTable = undefined;
+    };
+    command.onUndo = function () {
+      self.selectedTable = undefined;
+    };
+    this.commandProcessor.do(command);
   }
 
   onSplitFd(fd: FunctionalDependency): void {

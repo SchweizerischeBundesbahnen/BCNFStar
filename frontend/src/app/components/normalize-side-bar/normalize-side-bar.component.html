@@ -39,13 +39,11 @@
       <sbb-expansion-panel-header
         >Inclusion Dependencies</sbb-expansion-panel-header
       >
-      <div *ngIf="table.indReferencedRelationships().size > 0">
+      <div *ngIf="table.fks().length > 0">
         <sbb-radio-group #indSelection>
-          <sbb-radio-button
-            *ngFor="let rel of table.indReferencedRelationships()"
-            [value]="rel"
-            >{{ rel.toString() }}</sbb-radio-button
-          >
+          <sbb-radio-button *ngFor="let rel of table.fks()" [value]="rel">{{
+            rel[0].toString()
+          }}</sbb-radio-button>
         </sbb-radio-group>
         <br />
         <button

@@ -50,7 +50,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit, DoCheck {
     if (this.mermaidDiv) {
       const element: HTMLDivElement = this.mermaidDiv.nativeElement;
       const graphDefinition = this.mermaidString();
-      mermaid.render('graphDiv', graphDefinition, (svgCode) => {
+      mermaid.render('graphDiv', graphDefinition, (svgCode: string) => {
         element.innerHTML = svgCode;
       });
       this.tables.forEach((table) => {
