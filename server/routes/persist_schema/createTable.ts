@@ -1,15 +1,21 @@
 import { Request, Response, RequestHandler } from "express";
+import { EOL } from "os";
 import { Pool, PoolClient } from "pg";
 import { sqlUtils } from "../../db";
 
-async function prepareDatabase(
-  client: PoolClient,
-  newSchema: string,
-  newTable: string
-) {
-  await client.query(`CREATE SCHEMA IF NOT EXISTS ${newSchema}`);
-  await client.query(`DROP TABLE IF EXISTS ${newSchema}.${newTable};`);
+function jsonEscape(str) {
+  return str
+    .replace(/\n/g, "\\\\n")
+    .replace(/\r/g, "\\\\r")
+    .replace(/\t/g, "\\\\t");
 }
+// async function buildPrepareDatabaseStatement(
+//   newSchema: string,
+//   newTable: string
+// ) {
+//   await sqlUtils.query(`CREATE SCHEMA IF NOT EXISTS ${newSchema}`);
+//   await client.query(`DROP TABLE IF EXISTS ${newSchema}.${newTable};`);
+// }
 
 // Catches "SQL-Injection"-Requests
 function isInvalidName(name: string): boolean {
@@ -31,7 +37,7 @@ function parseBody(body: any): string[][] {
   ];
 }
 
-async function executeCreateTable(
+async function buildCreateTableStatement(
   client: PoolClient,
   attributeNames: string[],
   originSchema: string,
@@ -45,7 +51,7 @@ async function executeCreateTable(
           .join(", ")} FROM ${originSchema}.${originTable};`);
 }
 
-async function addPrimaryKey(
+async function buildAddPrimaryKeyStatement(
   client: PoolClient,
   newSchema: string,
   newTable: string,
@@ -58,7 +64,7 @@ async function addPrimaryKey(
   );
 }
 
-export default function postCreateTable(pool: Pool): RequestHandler {
+export default function getCreateTableStatement(): RequestHandler {
   async function createTable(req: Request, res: Response): Promise<void> {
     try {
       const [
@@ -67,48 +73,61 @@ export default function postCreateTable(pool: Pool): RequestHandler {
         [newSchema, newTable, originSchema, originTable],
       ] = parseBody(req.body);
 
+      // const attributeNames =  ["BusinessEntityID", "PersonType", "EmailPromotion", "Suffix", "ModifiedDate"];
+      // const primaryKey= ["BusinessEntityID"];
+      // const [newSchema, newTable, originSchema, originTable]: string[]= ["new", "NewPerson","Person", "Person"];
+
       if (isInvalidName(newSchema) || isInvalidName(newTable)) {
         res.json("invalid characters in new schema/table name");
         res.status(400);
         return;
       }
-
-      const client = await pool.connect();
-
       if (
-        !sqlUtils.tableExistsInSchema(originSchema, originTable) ||
-        !sqlUtils.schemaExistsInDatabase(originSchema)
+        !(await sqlUtils.tableExistsInSchema(originSchema, originTable)) ||
+        !(await sqlUtils.schemaExistsInDatabase(originSchema))
       ) {
         res.json("please type in a schema/table that exists");
         res.status(400);
         return;
       }
+      if (
+        await sqlUtils.attributesExistInTable(
+          attributeNames,
+          originSchema,
+          originTable
+        )
+      ) {
+        let sqlStatement: string = "";
 
-      prepareDatabase(client, newSchema, newTable).then(async () => {
-        if (
-          sqlUtils.attributesExistInTable(
-            attributeNames,
-            originSchema,
-            originTable
-          )
-        ) {
-          executeCreateTable(
-            client,
+        sqlStatement = sqlUtils.SQL_CREATE_SCHEMA(newSchema) + EOL;
+        sqlStatement +=
+          sqlUtils.SQL_DROP_TABLE_IF_EXISTS(newSchema, newTable) + EOL;
+        sqlStatement +=
+          (await sqlUtils.SQL_CREATE_TABLE(
             attributeNames,
             originSchema,
             originTable,
             newSchema,
             newTable
-          ).then(async () => {
-            await addPrimaryKey(client, newSchema, newTable, primaryKey);
-          });
-          res.json("successfull");
-          res.status(200);
-        } else {
-          res.json("attributes dont exist");
-          res.status(400);
-        }
-      });
+          )) + EOL;
+
+        sqlStatement +=
+          sqlUtils.SQL_INSERT_DATA(
+            attributeNames,
+            originSchema,
+            originTable,
+            newSchema,
+            newTable
+          ) + EOL;
+        sqlStatement +=
+          sqlUtils.SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey) + EOL;
+
+        res.json({ sql: sqlStatement });
+        res.status(200);
+      } else {
+        res.json("attributes dont exist");
+        res.status(400);
+      }
     } catch (error) {
       console.error(error);
       res.json({ error: "Could not create tables" });

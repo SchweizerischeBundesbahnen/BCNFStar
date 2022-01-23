@@ -12,7 +12,7 @@ function parseBody(body: any): string[] {
   ];
 }
 
-export default function postCreateForeignKey(pool: Pool): RequestHandler {
+export default function getCreateForeignKey(): RequestHandler {
   async function createForeignKey(req: Request, res: Response): Promise<void> {
     try {
       const body = req.body;
@@ -25,32 +25,47 @@ export default function postCreateForeignKey(pool: Pool): RequestHandler {
       ]: string[] = parseBody(body);
       const columnMapping: {} = body.mapping;
 
-      const client: PoolClient = await pool.connect();
+      // const referencingSchema: string = "new";
+      // const referencingTable: string = "NewPerson";
+      // const referencedSchema: string = "Person";
+      // const referencedTable: string = "Person";
+      // const columnMapping: {} = {BusinessEntityID : "BusinessEntityID"};
+      // const constraintName = "ABC";
 
       if (
-        !sqlUtils.tableExistsInSchema(referencingSchema, referencingTable) ||
-        !sqlUtils.schemaExistsInDatabase(referencingSchema) ||
-        !sqlUtils.tableExistsInSchema(referencedSchema, referencedTable) ||
-        !sqlUtils.schemaExistsInDatabase(referencedSchema)
+        !(await sqlUtils.tableExistsInSchema(
+          referencingSchema,
+          referencingTable
+        )) ||
+        !(await sqlUtils.schemaExistsInDatabase(referencingSchema)) ||
+        !(await sqlUtils.tableExistsInSchema(
+          referencedSchema,
+          referencedTable
+        )) ||
+        !(await sqlUtils.schemaExistsInDatabase(referencedSchema))
       ) {
         res.json("please type in a schema/table that exists");
         res.status(400);
         return;
       }
 
-      await client.query(`
-            ALTER TABLE ${referencingSchema}.${referencingTable} 
-                ADD CONSTRAINT ${constraintName}
-                FOREIGN KEY (${Object.keys(columnMapping)
-                  .map((a) => '"' + a + '"')
-                  .join(", ")})
-                REFERENCES ${referencedSchema}.${referencedTable} (${Object.values(
-        columnMapping
-      )
-        .map((a) => '"' + a + '"')
-        .join(", ")});
-            `);
-      res.json("works");
+      const referencingColumns: string[] = Object.keys(columnMapping);
+      const referencedColumns: string[] = Object.values(columnMapping);
+
+      console.log("referencingColumns", referencingColumns);
+      console.log("referencedColumns", referencedColumns);
+
+      const sqlStatement: string = sqlUtils.SQL_FOREIGN_KEY(
+        constraintName,
+        referencingSchema,
+        referencingTable,
+        referencingColumns,
+        referencedSchema,
+        referencedTable,
+        referencedColumns
+      );
+
+      res.json({ sql: sqlStatement });
       res.status(200);
     } catch (error) {
       console.error(error);

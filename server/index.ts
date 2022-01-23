@@ -8,9 +8,10 @@ import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
 import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
-// import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
+import getCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
+import getCreateTableStatement from "./routes/persist_schema/createTable";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -41,8 +42,8 @@ app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 app.get("/fks", getFksFunction);
 
-// app.post("/persist/createTable", postCreateTable(pool));
-// app.post("/persist/createForeignKey", postCreateForeignKey(pool));
+app.get("/persist/createTable", getCreateTableStatement());
+app.get("/persist/createForeignKey", getCreateForeignKey());
 // DB_PASSFILE=C:\.pgpass
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
