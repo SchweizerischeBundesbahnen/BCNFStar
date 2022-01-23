@@ -39,14 +39,15 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     });
   }
 
-  private panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
-
-  protected attributeWidth = 22.5;
+  protected portWidth = 22.5;
 
   public graphStorage: Record<string, GraphStorageItem> = {};
 
   protected graph!: joint.dia.Graph;
 
+  // The graph helps us with creating links, moving elements and rendering them as SVG
+  // However, we only create blank elements and put custom Angular components over them
+  // Idea is from here: https://resources.jointjs.com/tutorial/html-elements
   createDefaultGraph() {
     this.graph = new joint.dia.Graph();
 
@@ -59,6 +60,11 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
         color: 'rgba(200, 200, 200, 0.3)',
       },
     });
+
+    // Order is important, elements need to be there when links are generated
+    this.generateElements();
+    this.generateLinks();
+
     // move the corresponding HTML overlay whenever a graph element changes position
     this.graph.on('change:position', (element) => {
       if (element.isElement)
@@ -69,14 +75,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
         }
     });
 
-    this.generateElements();
-    this.generateLinks();
     joint.layout.DirectedGraph.layout(this.graph, {
       dagre,
       graphlib,
       nodeSep: 40,
       // prevent left ports from being cut off
-      marginX: this.attributeWidth / 2,
+      marginX: this.portWidth / 2,
       edgeSep: 80,
       rankDir: 'LR',
     });
@@ -84,11 +88,15 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     setTimeout(() => {
       this.updateAllBBoxes();
     }, 10);
-    this.addZoomHandler();
+    this.addPanzoomHandler();
   }
 
-  protected previousTransform: Transform = { x: 1, y: 0, scale: 1 };
-  addZoomHandler() {
+  // We use the panzoom library becuase pan and zoom detection is difficult and must
+  // feel intuitive on a range of devices. We just take the transform and override the
+  // default panzoom conotroller to move both the graph elements and the associated Angular
+  // components
+  protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
+  addPanzoomHandler() {
     panzoom(document.querySelector('#paper svg') as SVGElement, {
       smoothScroll: false,
       controller: {
@@ -97,21 +105,17 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
         },
         applyTransform: (transform) => {
           const delta = {
-            x: transform.x - this.previousTransform.x,
-            y: transform.y - this.previousTransform.y,
-            scale: transform.scale / this.previousTransform.scale,
+            x: transform.x - this.panzoomTransform.x,
+            y: transform.y - this.panzoomTransform.y,
+            scale: transform.scale / this.panzoomTransform.scale,
           };
-          this.panzoomTransform = transform;
+          this.panzoomTransform = Object.assign({}, transform);
           for (const el of this.graph.getElements()) {
             const position = el.position();
-            el.set(
-              'position',
-              new joint.g.Point(position.x + delta.x, position.y + delta.y)
-            );
+            el.position(position.x + delta.x, position.y + delta.y);
             el.scale(delta.scale, delta.scale);
           }
           this.updateAllBBoxes();
-          this.previousTransform = Object.assign({}, transform);
         },
       },
     });
@@ -128,10 +132,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
         },
         '.': { magnet: true },
       });
-      jointjsEl.resize(
-        300,
-        60 + this.attributeWidth * table.columns.columns.size
-      );
+      jointjsEl.resize(300, 60 + this.portWidth * table.columns.columns.size);
       jointjsEl.position(50, 10);
       this.graphStorage[table.name] = {
         // alternative to HtmlElement: joint.shapes.html.Element
@@ -181,8 +182,8 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
             // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
           },
         },
-        markup: `<circle r="${this.attributeWidth / 2}" cx="0" cy="${
-          25 + this.attributeWidth / 2 + this.attributeWidth * counter
+        markup: `<circle r="${this.portWidth / 2}" cx="0" cy="${
+          25 + this.portWidth / 2 + this.portWidth * counter
         }" strokegit ="green" fill="white" />`,
       });
       jointjsEl.addPort({
@@ -195,8 +196,8 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
             // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
           },
         },
-        markup: `<circle r="${this.attributeWidth / 2}" cx="300" cy="${
-          25 + this.attributeWidth / 2 + this.attributeWidth * counter
+        markup: `<circle r="${this.portWidth / 2}" cx="300" cy="${
+          25 + this.portWidth / 2 + this.portWidth * counter
         }" strokegit ="red" fill="white" />`,
       });
       counter++;
