@@ -1,0 +1,1 @@
+[] --> create_date, distance_main, distance_on, distance_pre, em_per_tkm_main, em_per_tkm_on, em_per_tkm_pre, facility_id, id, lane_type, paid_share, region, update_date, vehicle_main, vehicle_on, vehicle_pre, weight
