@@ -1,10 +1,7 @@
-import SqlUtils, {
-  ForeignKeyResult,
-  SchemaQueryRow,
-  TableHead,
-} from "./SqlUtils";
+import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
+import ITableHead from "@/definitions/ITableHead";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -54,21 +51,21 @@ export default class PostgresSqlUtils extends SqlUtils {
     return table_exists.rowCount > 0;
   }
   public async getTableHead(
-    tableschema: string,
-    tablename: string
-  ): Promise<TableHead | { error: string }> {
-    const tableExists = await this.tableExistsInSchema(tableschema, tablename);
+    tablename: string,
+    schemaname: string
+  ): Promise<ITableHead> {
+    const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const client = await this.pool.connect();
       const query_result = await client.query(
-        `SELECT * FROM ${tableschema}.${tablename} LIMIT 10`
+        `SELECT * FROM ${schemaname}.${tablename} LIMIT 10`
       );
       return {
-        data: query_result.rows,
-        columns: query_result.fields.map((v) => v.name),
+        rows: query_result.rows,
+        attributes: query_result.fields.map((v) => v.name),
       };
     } else {
-      return { error: "Table or schema doesn't exist" };
+      throw { error: "Table or schema doesn't exist" };
     }
   }
 

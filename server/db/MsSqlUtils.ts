@@ -1,3 +1,4 @@
+import ITableHead from "@/definitions/ITableHead";
 import sql from "mssql";
 import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
 export default class MsSqlUtils extends SqlUtils {
@@ -37,23 +38,20 @@ export default class MsSqlUtils extends SqlUtils {
     return result.recordset;
   }
   public async getTableHead(
-    schemaname: string,
-    tablename: string
-  ): Promise<
-    | { data: Array<Record<string, any>>; columns: Array<string> }
-    | { error: string }
-  > {
+    tablename: string,
+    schemaname: string
+  ): Promise<ITableHead> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
         `SELECT TOP (10) * FROM [${schemaname}].[${tablename}]`
       );
       return {
-        data: result.recordset,
-        columns: Object.keys(result.recordset.columns),
+        rows: result.recordset,
+        attributes: Object.keys(result.recordset.columns),
       };
     } else {
-      return { error: "Table or schema doesn't exist" };
+      throw { error: "Table or schema doesn't exist" };
     }
   }
 
