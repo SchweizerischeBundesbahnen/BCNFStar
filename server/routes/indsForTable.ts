@@ -11,8 +11,7 @@ export default function getINDsForTableFunction(): RequestHandler {
     try {
       const schemaAndTable: string = req.params.name;
       const expectedOutputPath: string[] =
-        MetanomeINDAlgorithm.outputPath(schemaAndTable);
-
+        MetanomeINDAlgorithm.outputPaths(schemaAndTable);
       let inds: BinderInclusionDependency[] = [];
       for (let i: number = 0; i < expectedOutputPath.length; i++) {
         inds = inds.concat(

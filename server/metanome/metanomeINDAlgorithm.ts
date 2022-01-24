@@ -2,22 +2,17 @@ import { absoluteServerDir } from "../utils/files";
 import { promisify } from "util";
 import { exec } from "child_process";
 import { join } from "path";
-import { sqlUtils } from "../db";
 import MetanomeAlgorithm from "./metanomeAlgorithm";
 import fs from "fs";
 
-export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
-const OUTPUT_SUFFIX = "_inds_binder.json_inds";
-
-export function outputPath(schemaAndTable: string): string {
-  return join(OUTPUT_DIR, schemaAndTable + "-binder.txt");
-}
+const OUTPUT_SUFFIX = "_inds_binder.json";
 
 export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
   constructor(tables: string[]) {
     super(tables);
   }
+
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     console.log("Executing binder for inds on " + this.tables);
@@ -28,7 +23,7 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
     console.log(`Binder execution on ${this.tables} finished`);
     if (stderr) {
       console.error(stderr);
-      throw Error("Metanome execution failed");
+      throw Error("Binder-Algorithm execution failed");
     }
 
     let dict = {};
@@ -49,12 +44,13 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
     return "de.metanome.algorithms.binder.BINDERFile";
   }
 
-  public static outputPath(schemaAndTable: string): string[] {
+  // returns all files, that could contain relevant INDs for the table
+  public static outputPaths(schemaAndTable: string): string[] {
     const files: string[] = fs.readdirSync(OUTPUT_DIR);
     return files
       .filter(
         (file) =>
-          file.endsWith(OUTPUT_SUFFIX) &&
+          file.endsWith("_inds_binder.json_inds") &&
           file.includes(schemaAndTable.replace(".", "_"))
       )
       .map((file) => join(OUTPUT_DIR, file));

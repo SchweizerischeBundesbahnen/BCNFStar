@@ -1,11 +1,4 @@
-import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
-import { table } from "console";
-import e, { Request, Response, RequestHandler } from "express";
-import { access, open, rename } from "fs/promises";
-import { join } from "path";
-import promiseRetry from "promise-retry";
-import { split } from "../utils/databaseUtils";
-import { pathSplit } from "../utils/files";
+import { Request, Response, RequestHandler } from "express";
 import MetanomeINDAlgorithm from "../metanome/metanomeINDAlgorithm";
 
 export default function postRunMetanomeINDAlgorithmFunction(): RequestHandler {
@@ -28,5 +21,5 @@ export default function postRunMetanomeINDAlgorithmFunction(): RequestHandler {
 
 export async function runMetanomeINDAlgorithm(tables: string[]): Promise<void> {
   const algorithm = new MetanomeINDAlgorithm(tables);
-  const metanomeOutputPaths = await algorithm.run();
+  await algorithm.run();
 }
