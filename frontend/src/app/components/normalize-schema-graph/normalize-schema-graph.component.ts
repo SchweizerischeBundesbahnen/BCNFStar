@@ -136,12 +136,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     sourceTable: Table,
     targetTable: Table
   ) {
-    let joinTablesOnFks = (() => {
+    let joinTablesOnFks = () => {
       this.joinFk.emit({
         source: sourceTable,
         target: targetTable,
       });
-    }).bind(this);
+    };
 
     let joinButton = new joint.linkTools.Button({
       markup: [
@@ -213,16 +213,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
             id: this.graphStorage[otherTable.name].jointjsEl.id,
             port:
               fkReferenced.sourceTable.name + '.' + foreignKey.name + '_left',
-          },
-          attrs: {
-            line: {
-              targetMarker: {
-                type: 'none',
-              },
-            },
-          },
-          attributes: {
-            cursor: 'default',
           },
         });
         console.log(link);
