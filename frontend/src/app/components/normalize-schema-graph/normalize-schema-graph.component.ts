@@ -38,7 +38,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.tables.asObservable().subscribe((v) => {
-      console.log('new tables');
+      console.log('new tables. count ' + v.size);
       this.localTables = v;
       this.createDefaultGraph();
     });
@@ -185,7 +185,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
     const sclaedPortRadius =
       (this.portDiameter * this.panzoomTransform.scale) / 2;
-    console.log(sclaedPortRadius);
 
     const cx =
       side == PortSide.Left
