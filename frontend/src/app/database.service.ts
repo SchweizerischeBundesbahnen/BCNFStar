@@ -116,17 +116,25 @@ export class DatabaseService {
     return this.fdResult[table.name];
   }
 
-  postForeignKey(
+  // {"sql" : "ALTER TABLE ADD FOREIGN KEY............. "}
+  getForeignKeySql(
     referencingTable: Table,
     referencedTable: Table,
     schema: string
-  ) {
+  ): Promise<any> {
     // TODO: Tabellen-Objekt sollte auch schema bekommen.... dann kann das hier weg...
     if (referencingTable.name.startsWith('public.')) {
       referencingTable.name = referencingTable.name.substring(7);
     }
     if (referencedTable.name.startsWith('public.')) {
       referencedTable.name = referencedTable.name.substring(7);
+    }
+
+    if (referencingTable.name.startsWith('dbo.')) {
+      referencingTable.name = referencingTable.name.substring(4);
+    }
+    if (referencedTable.name.startsWith('dbo.')) {
+      referencedTable.name = referencedTable.name.substring(4);
     }
 
     const key_columns: string[] = referencingTable
@@ -150,16 +158,20 @@ export class DatabaseService {
       mapping: mapping,
     };
 
-    this.http
-      .post(`http://localhost:80/persist/createForeignKey`, data)
-      .subscribe((result: any) => {
-        console.log(result);
-      });
+    let result: any = this.http
+      .post(`${this.baseUrl}/persist/createForeignKey`, data)
+      .toPromise();
+
+    return result;
   }
 
-  postCreateTable(schema: string, table: Table) {
+  getCreateTableSql(schema: string, table: Table): Promise<any> {
     if (table.name.startsWith('public.')) {
       table.name = table.name.substring(7);
+    }
+
+    if (table.name.startsWith('dbo.')) {
+      table.name = table.name.substring(4);
     }
 
     const [originSchema, originTable]: string[] = table.origin.name.split('.');
@@ -176,11 +188,9 @@ export class DatabaseService {
       }),
       primaryKey: primaryKey,
     };
-
-    this.http
-      .post(`http://localhost:80/persist/createTable`, data)
-      .subscribe((result: any) => {
-        console.log(result);
-      });
+    let result: any = this.http
+      .post(`${this.baseUrl}/persist/createTable`, data)
+      .toPromise();
+    return result;
   }
 }

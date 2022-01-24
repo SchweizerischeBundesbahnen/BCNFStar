@@ -16,6 +16,10 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
+  public sql: PersistSchemaSql = {
+    foreignKeyConstraints: 'foreignKey',
+    databasePreparation: 'databasePreparation',
+  };
 
   constructor(public dataService: DatabaseService) {
     let inputTables = dataService.inputTables!;
@@ -71,21 +75,31 @@ export class NormalizeComponent {
   }
 
   persistSchema(schemaName: string): void {
-    console.log('Creating Tables');
+    console.log('Requesting SQL-Generation');
+
+    console.log('Requesting SQL-Generation (Create Table Statements)');
     this.schema.tables.forEach((table) => {
-      this.dataService.postCreateTable(schemaName, table);
+      this.dataService
+        .getCreateTableSql(schemaName, table)
+        .then((res) => (this.sql.databasePreparation += res.sql));
     });
 
+    console.log('Requesting SQL-Generation (Foreign Keys)');
     this.schema.tables.forEach((referencingTable) => {
-      console.log(referencingTable.referencedTables);
       referencingTable.referencedTables.forEach((referencedTable) => {
-        this.dataService.postForeignKey(
-          referencingTable,
-          referencedTable,
-          schemaName
-        );
+        this.dataService
+          .getForeignKeySql(referencingTable, referencedTable, schemaName)
+          .then((res) => (this.sql.foreignKeyConstraints += res.sql));
       });
     });
-    console.log('Finished!' + schemaName);
+    console.log(this.sql);
+    console.log('Finished! ' + schemaName);
   }
+}
+
+interface PersistSchemaSql {
+  databasePreparation?: string;
+  createTableStatements?: string;
+  primaryKeyConstraints?: string;
+  foreignKeyConstraints?: string;
 }
