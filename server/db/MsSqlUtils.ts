@@ -5,6 +5,7 @@ import { EOL } from "os";
 
 type Attribute = {
   type: string;
+  column_name: string;
 };
 
 export default class MsSqlUtils extends SqlUtils {
@@ -92,8 +93,9 @@ export default class MsSqlUtils extends SqlUtils {
       "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = @schema AND TABLE_NAME = @table"
     );
     const result = await ps.execute({ schema, table });
-    console.log("result.recordSet: ", result.recordset);
-    return attributeNames.every((name) => result.recordset.includes(name));
+    return attributeNames.every((name) =>
+      result.recordset.map((e) => e.COLUMN_NAME).includes(name)
+    );
   }
 
   public async schemaExistsInDatabase(schema: string): Promise<boolean> {
@@ -141,18 +143,27 @@ GO`;
   }
   public async SQL_CREATE_TABLE(
     attributeNames,
+    primaryKey: string[],
     originSchema,
     originTable,
     newSchema,
     newTable
   ): Promise<string> {
     const copy: string[] = [];
-    console.log(attributeNames);
+    const datatypes: Attribute[] = await this.datatypeOf(
+      originSchema,
+      originTable,
+      ""
+    );
+    // console.log("datatypes", datatypes);
     for (let i: number = 0; i < attributeNames.length; i++) {
       copy[i] =
         attributeNames[i] +
         " " +
-        (await this.datatypeOf(originSchema, originTable, attributeNames[i]));
+        datatypes
+          .filter((e) => e.column_name == attributeNames[i])
+          .map((e) => e.type)[0] +
+        (primaryKey.includes(attributeNames[i]) ? " NOT NULL " : " NULL");
     }
     const attributeString: string = copy.join(",");
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) GO`;
@@ -181,14 +192,13 @@ GO`;
     schema: string,
     table: string,
     attribute: string
-  ): Promise<string> {
+  ): Promise<Attribute[]> {
     const ps = new sql.PreparedStatement();
     ps.input("schema", sql.NVarChar);
     ps.input("table", sql.NVarChar);
-    ps.input("attribute", sql.NVarChar);
-
     await ps.prepare(
       `SELECT 
+    [column_name] = c.name,
     [type]         = 
        CASE 
          WHEN tp.[name] IN ('varchar', 'char') THEN tp.[name] + '(' + IIF(c.max_length = -1, 'max', CAST(c.max_length AS VARCHAR(25))) + ')' 
@@ -201,12 +211,11 @@ GO`;
    JOIN sys.schemas s ON t.schema_id = s.schema_id
    JOIN sys.columns c ON t.object_id = c.object_id
    JOIN sys.types tp ON c.user_type_id = tp.user_type_id
-   WHERE s.[name] = @schema AND t.[name] = @table AND c.name = @attribute`
+   WHERE s.[name] = @schema AND t.[name] = @table`
     );
+    const result = await ps.execute({ schema, table });
 
-    const result = await ps.execute({ schema, table, attribute });
-
-    return (result.recordset[0] as Attribute).type;
+    return result.recordset as Attribute[];
   }
 
   public override SQL_INSERT_DATA(

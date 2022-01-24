@@ -73,11 +73,9 @@ export default function getCreateTableStatement(): RequestHandler {
         [newSchema, newTable, originSchema, originTable],
       ] = parseBody(req.body);
 
-      // const attributeNames =  ["BusinessEntityID", "PersonType", "EmailPromotion", "Suffix", "ModifiedDate"];
-      // const primaryKey= ["BusinessEntityID"];
-      // const [newSchema, newTable, originSchema, originTable]: string[]= ["new", "NewPerson","Person", "Person"];
-
       if (isInvalidName(newSchema) || isInvalidName(newTable)) {
+        console.log("newSchema", newSchema);
+        console.log("newTable", newTable);
         res.json("invalid characters in new schema/table name");
         res.status(400);
         return;
@@ -91,11 +89,12 @@ export default function getCreateTableStatement(): RequestHandler {
         return;
       }
       if (
-        await sqlUtils.attributesExistInTable(
-          attributeNames,
-          originSchema,
-          originTable
-        )
+        true
+        // await sqlUtils.attributesExistInTable(
+        //   attributeNames,
+        //   originSchema,
+        //   originTable
+        // )
       ) {
         let sqlStatement: string = "";
 
@@ -105,6 +104,7 @@ export default function getCreateTableStatement(): RequestHandler {
         sqlStatement +=
           (await sqlUtils.SQL_CREATE_TABLE(
             attributeNames,
+            primaryKey,
             originSchema,
             originTable,
             newSchema,
@@ -127,6 +127,7 @@ export default function getCreateTableStatement(): RequestHandler {
       } else {
         res.json("attributes dont exist");
         res.status(400);
+        return;
       }
     } catch (error) {
       console.error(error);

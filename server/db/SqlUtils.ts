@@ -50,6 +50,7 @@ export default abstract class SqlUtils {
   ): string;
   public abstract SQL_CREATE_TABLE(
     attributeNames: string[],
+    primaryKey: string[],
     originSchema: string,
     originTable: string,
     newSchema: string,

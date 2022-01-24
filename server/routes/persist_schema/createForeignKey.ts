@@ -1,5 +1,4 @@
 import { Request, Response, RequestHandler } from "express";
-import { Pool, PoolClient } from "pg";
 import { sqlUtils } from "../../db";
 
 function parseBody(body: any): string[] {
@@ -10,6 +9,11 @@ function parseBody(body: any): string[] {
     body.referencedTable,
     body.constraintName,
   ];
+}
+
+interface IDict {
+  value: string;
+  key: string;
 }
 
 export default function getCreateForeignKey(): RequestHandler {
@@ -23,39 +27,11 @@ export default function getCreateForeignKey(): RequestHandler {
         referencedTable,
         constraintName,
       ]: string[] = parseBody(body);
-      const columnMapping: {} = body.mapping;
-
-      // const referencingSchema: string = "new";
-      // const referencingTable: string = "NewPerson";
-      // const referencedSchema: string = "Person";
-      // const referencedTable: string = "Person";
-      // const columnMapping: {} = {BusinessEntityID : "BusinessEntityID"};
-      // const constraintName = "ABC";
-
-      await new Promise((r) => setTimeout(r, 1000));
-
-      if (
-        !(await sqlUtils.tableExistsInSchema(
-          referencingSchema,
-          referencingTable
-        )) ||
-        !(await sqlUtils.schemaExistsInDatabase(referencingSchema)) ||
-        !(await sqlUtils.tableExistsInSchema(
-          referencedSchema,
-          referencedTable
-        )) ||
-        !(await sqlUtils.schemaExistsInDatabase(referencedSchema))
-      ) {
-        res.json("please type in a schema/table that exists");
-        res.status(400);
-        return;
-      }
-
-      const referencingColumns: string[] = Object.keys(columnMapping);
-      const referencedColumns: string[] = Object.values(columnMapping);
-
-      console.log("referencingColumns", referencingColumns);
-      console.log("referencedColumns", referencedColumns);
+      const columnMapping: IDict[] = body.mapping;
+      const referencingColumns: string[] = columnMapping.map(
+        (elem) => elem.key
+      );
+      const referencedColumns: string[] = columnMapping.map((elem) => elem.key);
 
       const sqlStatement: string = sqlUtils.SQL_FOREIGN_KEY(
         constraintName,

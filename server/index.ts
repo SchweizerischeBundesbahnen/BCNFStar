@@ -42,8 +42,8 @@ app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 app.get("/fks", getFksFunction);
 
-app.get("/persist/createTable", getCreateTableStatement());
-app.get("/persist/createForeignKey", getCreateForeignKey());
+app.post("/persist/createTable", getCreateTableStatement());
+app.post("/persist/createForeignKey", getCreateForeignKey());
 // DB_PASSFILE=C:\.pgpass
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
