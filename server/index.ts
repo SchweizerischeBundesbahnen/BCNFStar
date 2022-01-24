@@ -8,10 +8,13 @@ import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
 import { absoluteServerDir } from "./utils/files";
 import morgan from "morgan";
-import getCreateForeignKey from "./routes/persist_schema/createForeignKey";
+import getCreateForeignKeySQL from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
-import getCreateTableStatement from "./routes/persist_schema/createTable";
+import getCreateTableSQL from "./routes/persist_schema/createTable";
+import getSchemaPreparationSQL from "./routes/persist_schema/prepareSchema";
+import getDataTransferSQL from "./routes/persist_schema/transferData";
+import getAddPrimaryKeySQL from "./routes/persist_schema/createPrimaryKey";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -42,8 +45,12 @@ app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());
 app.get("/fks", getFksFunction);
 
-app.post("/persist/createTable", getCreateTableStatement());
-app.post("/persist/createForeignKey", getCreateForeignKey());
+app.post("/persist/createTable", getCreateTableSQL());
+app.post("/persist/createForeignKey", getCreateForeignKeySQL());
+app.post("/persist/schemaPreparation", getSchemaPreparationSQL());
+app.post("/persist/dataTransfer", getDataTransferSQL());
+app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
+
 // DB_PASSFILE=C:\.pgpass
 // localhost:80/tables/public.customer/fds
 app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
