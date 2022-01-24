@@ -1,6 +1,6 @@
 <div class="container-fluid ml-2 mr-2">
   <div class="row">
-    <div class="col-6">
+    <div class="col-4">
       <div class="sbb-checkbox-group-vertical">
         <sbb-checkbox
           *ngFor="let table of this.tables.keys()"
@@ -20,23 +20,22 @@
         Go
       </button>
     </div>
-    <div class="col-6">
-      {{ hoveredTable.name }}
-      <div *ngFor="let attribute of hoveredTableHead.attributes">
-        {{ attribute }}
-      </div>
-    </div>
-    <sbb-table-wrapper>
-      <table sbb-table [dataSource]="dataSource">
-        <sbb-text-column name="columnOne"></sbb-text-column>
-        <sbb-text-column name="columnTwo"></sbb-text-column>
-        <sbb-text-column name="columnThree"></sbb-text-column>
-        <sbb-text-column name="columnFour"></sbb-text-column>
-        <sbb-text-column name="columnFive"></sbb-text-column>
+    <div class="col-8">
+      <h3>
+        {{ hoveredTable.name }}
+      </h3>
+      <sbb-table-wrapper class="table-wrapper">
+        <table sbb-table [dataSource]="dataSource">
+          <sbb-text-column
+            *ngFor="let column of tableColumns"
+            name="{{ column }}"
+          >
+          </sbb-text-column>
 
-        <tr sbb-header-row *sbbHeaderRowDef="displayedColumns"></tr>
-        <tr sbb-row *sbbRowDef="let row; columns: displayedColumns"></tr>
-      </table>
-    </sbb-table-wrapper>
+          <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
+          <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+        </table>
+      </sbb-table-wrapper>
+    </div>
   </div>
 </div>

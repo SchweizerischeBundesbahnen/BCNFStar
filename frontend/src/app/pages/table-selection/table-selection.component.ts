@@ -1,8 +1,8 @@
 import Table from '@/src/model/schema/Table';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import ITableHead from '@server/definitions/ITableHead';
 import { DatabaseService } from 'src/app/database.service';
-import { SbbTableDataSource } from '@sbb-esta/angular/table';
+import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 
 @Component({
   selector: 'app-table-selection',
@@ -10,40 +10,13 @@ import { SbbTableDataSource } from '@sbb-esta/angular/table';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  tables: Map<Table, Boolean> = new Map();
-  tableHeads: Map<string, ITableHead> = new Map();
-  hoveredTable: Table = new Table();
-  hoveredTableHead: ITableHead = { attributes: [], rows: [] };
-  test: Array<any> = [];
+  @ViewChild(SbbTable) table!: SbbTable<ITableHead>;
+  public tables: Map<Table, Boolean> = new Map();
+  public tableHeads: Map<string, ITableHead> = new Map();
 
-  displayedColumns: string[] = [
-    'columnOne',
-    'columnTwo',
-    'columnThree',
-    'columnFour',
-    'columnFive',
-  ];
-
-  TABLE_EXAMPLE_DATA_SIMPLE = [
-    {
-      columnOne: 'columnOne',
-      columnTwo: 'columnTwo',
-      columnThree: 'columnThree',
-      columnFour: 'columnFour',
-      columnFive: 'columnFive',
-    },
-    {
-      columnOne: 'columnOne',
-      columnTwo: 'columnTwo',
-      columnThree: 'columnThree',
-      columnFour: 'columnFour',
-      columnFive: 'columnFive',
-    },
-  ];
-
-  dataSource: SbbTableDataSource<any> = new SbbTableDataSource(
-    this.TABLE_EXAMPLE_DATA_SIMPLE
-  );
+  public hoveredTable: Table = new Table();
+  public tableColumns: string[] = [];
+  public dataSource: SbbTableDataSource<any> = new SbbTableDataSource<any>([]);
 
   // eslint-disable-next-line no-unused-vars
   constructor(private dataService: DatabaseService) {}
@@ -75,11 +48,16 @@ export class TableSelectionComponent implements OnInit {
   }
 
   public mouseEnter(table: Table) {
-    console.log('enter');
-    console.log(table.name);
     this.hoveredTable = table;
-    this.hoveredTableHead = this.tableHeads.get(table.name)!;
-    // this.test = this.hoveredTableHead.rows;
-    console.log(this.hoveredTableHead);
+    let hoveredTableHead = this.tableHeads.get(table.name);
+
+    if (hoveredTableHead) {
+      this.tableColumns = hoveredTableHead.attributes;
+      this.dataSource.data = hoveredTableHead.rows;
+    } else {
+      this.tableColumns = [];
+      this.dataSource.data = [];
+    }
+    this.table.renderRows();
   }
 }
