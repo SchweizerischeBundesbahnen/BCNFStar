@@ -17,9 +17,9 @@
       <app-normalize-side-bar
         class="normalize-sidebar"
         [table]="this.selectedTable"
-        (splitFd)="onSplitFd($event)"
+        (splitFd)="onClickSplit($event)"
       ></app-normalize-side-bar>
-      <button type="button" sbbButton (click)="this.onAutoNormalize()">
+      <button type="button" sbb-button (click)="this.onAutoNormalize()">
         {{
           this.selectedTable !== undefined
             ? "Auto-Normalize this table"

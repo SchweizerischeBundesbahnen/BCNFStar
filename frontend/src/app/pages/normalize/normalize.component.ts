@@ -6,6 +6,8 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
+import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
 
 @Component({
   selector: 'app-normalize',
@@ -17,13 +19,27 @@ export class NormalizeComponent {
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
 
-  constructor(public dataService: DatabaseService) {
+  constructor(
+    public dataService: DatabaseService,
+    // eslint-disable-next-line no-unused-vars
+    public dialog: SbbDialog
+  ) {
     let inputTables = dataService.inputTables!;
     this.schema = new Schema(...inputTables);
   }
 
   onSelect(table: Table): void {
     this.selectedTable = table;
+  }
+
+  onClickSplit(fd: FunctionalDependency): void {
+    const dialogRef = this.dialog.open(SplitDialogComponent, {
+      data: fd,
+    });
+
+    dialogRef.afterClosed().subscribe((fd) => {
+      if (fd) this.onSplitFd(fd);
+    });
   }
 
   onSplitFd(fd: FunctionalDependency): void {
