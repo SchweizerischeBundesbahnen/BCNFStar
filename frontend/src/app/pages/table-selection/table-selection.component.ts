@@ -1,6 +1,7 @@
 import Table from '@/src/model/schema/Table';
 import { Component, OnInit } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-table-selection',
@@ -8,31 +9,41 @@ import { DatabaseService } from 'src/app/database.service';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  tables: Map<Table, Boolean> = new Map();
+  public tables: Array<Table> = [];
+  public form!: FormGroup;
 
-  // eslint-disable-next-line no-unused-vars
-  constructor(private dataService: DatabaseService) {}
+  constructor(
+    // eslint-disable-next-line no-unused-vars
+    private dataService: DatabaseService,
+    // eslint-disable-next-line no-unused-vars
+    private formBuilder: FormBuilder
+  ) {
+    this.form = this.formBuilder.group({});
+  }
 
   ngOnInit(): void {
-    this.dataService.loadTableCallback$.subscribe((data) =>
-      data.forEach((table) => this.tables.set(table, false))
-    );
+    let rec: Record<string, boolean> = {};
+
+    this.dataService.loadTableCallback$.subscribe((data) => {
+      this.tables = data;
+      this.tables.map((table) => (rec[table.name] = false));
+      this.form = this.formBuilder.group(rec);
+    });
     this.dataService.loadTables();
   }
 
-  public toggleCheckStatus(table: Table) {
-    this.tables.set(table, !this.tables.get(table)!);
-  }
-
   public hasSelectedTables(): boolean {
-    return [...this.tables.values()].some((value) => value);
+    let checked = 0;
+    Object.keys(this.form.controls).forEach((tableName) => {
+      const control = this.form.controls[tableName];
+      if (control.value === true) checked++;
+    });
+    return checked > 0;
   }
 
-  public selectTable() {
+  public selectTables() {
     this.dataService.setInputTables(
-      [...this.tables.entries()]
-        .filter((entry) => entry[1])
-        .map((entry) => entry[0])
+      this.tables.filter((table) => this.form.controls[table.name].value)
     );
   }
 }
