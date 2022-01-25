@@ -50,6 +50,7 @@ export default class Relationship {
         );
       }
     }
+    return cc;
   }
 
   public referencedToReferencingColumnsIn(cc: ColumnCombination) {
@@ -60,6 +61,7 @@ export default class Relationship {
         );
       }
     }
+    return cc;
   }
 
   public toString(): String {

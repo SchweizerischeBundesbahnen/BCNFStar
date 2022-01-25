@@ -128,18 +128,8 @@ export default class Table {
     return this.schema!.fksOf(this);
   }
 
-  /*public indReferencedTables(): Set<Table> {
-    return this.schema!.indsOf(this);
-  }
-
-  public fksForTable(
-    refTable: Table
-  ): Set<Relationship> {
-    return this.schema!.fksBetween(this, refTable);
-  }*/
-
   public fks(): Array<[Relationship, Table]> {
-    console.log(':C');
+    //console.log(':C');
     let fks = new Array<[Relationship, Table]>();
     this.schema!.fksOf(this).forEach((table) => {
       this.schema!.fksBetween(this, table).forEach((relationship) => {

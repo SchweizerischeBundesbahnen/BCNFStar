@@ -131,8 +131,22 @@ export default class Schema {
       sourceTable.projectFds(table);
     });*/
 
-    parent1.projectFds(table);
-    parent2.projectFds(table);
+    let referencing = relationship.appliesTo(parent1, parent2)
+      ? parent1
+      : parent2;
+    let referenced = relationship.appliesTo(parent1, parent2)
+      ? parent2
+      : parent1;
+
+    referencing.fds.forEach((fd) => {
+      table.addFd(
+        relationship.referencingToReferencedColumnsIn(fd.lhs.copy()),
+        relationship.referencingToReferencedColumnsIn(fd.rhs.copy())
+      );
+    });
+    referenced.fds.forEach((fd) => {
+      table.addFd(fd.lhs.copy(), fd.rhs.copy());
+    });
 
     // extension
     let fk = relationship.referenced();
