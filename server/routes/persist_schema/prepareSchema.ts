@@ -2,18 +2,13 @@ import { Request, Response, RequestHandler } from "express";
 import { EOL } from "os";
 import { sqlUtils } from "../../db";
 
-// Catches "SQL-Injection"-Requests
-function isInvalidName(name: string): boolean {
-  return !/^[a-zA-Z\_]+$/.test(name);
-}
-
 export default function getSchemaPreparationSQL(): RequestHandler {
   async function schemaPreparationStatement(
     req: Request,
     res: Response
   ): Promise<void> {
     try {
-      const newSchema: string = req.body.newschema;
+      const newSchema: string = req.body.schema;
       const tables: string[] = req.body.tables;
 
       let sqlStatement: string = "";

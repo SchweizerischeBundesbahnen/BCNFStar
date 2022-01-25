@@ -17,8 +17,11 @@ export class NormalizeComponent {
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
   public sql: PersistSchemaSql = {
-    foreignKeyConstraints: 'foreignKey',
-    databasePreparation: 'databasePreparation',
+    foreignKeyConstraints: 'ForeignKey: ',
+    databasePreparation: 'DatabasePreparation: ',
+    createTableStatements: 'CreateTableStatements: ',
+    dataTransferStatements: 'DataTransferStatements: ',
+    primaryKeyConstraints: 'PrimaryKeyConstraints: ',
   };
 
   constructor(public dataService: DatabaseService) {
@@ -77,11 +80,38 @@ export class NormalizeComponent {
   persistSchema(schemaName: string): void {
     console.log('Requesting SQL-Generation');
 
+    const tables: Table[] = Array.from(this.schema.tables);
+
+    console.log('Requesting SQL-Generation (Prepare Schema Statements)');
+    this.dataService
+      .getSchemaPreparationSql(schemaName, tables)
+      .then((res) => (this.sql.databasePreparation += res.sql));
+
     console.log('Requesting SQL-Generation (Create Table Statements)');
     this.schema.tables.forEach((table) => {
       this.dataService
         .getCreateTableSql(schemaName, table)
-        .then((res) => (this.sql.databasePreparation += res.sql));
+        .then((res) => (this.sql.createTableStatements += res.sql));
+    });
+
+    console.log('Requesting SQL-Generation (Data Transfer)');
+    this.schema.tables.forEach((table) => {
+      this.dataService
+        .getDataTransferSql(
+          schemaName,
+          table.name,
+          schemaName,
+          table.origin.name,
+          Array.from(table.columns.columns)
+        )
+        .then((res) => (this.sql.dataTransferStatements += res.sql));
+    });
+
+    console.log('Requesting SQL-Generation (Primary Keys)');
+    this.schema.tables.forEach((table) => {
+      this.dataService
+        .getPrimaryKeySql(schemaName, table.name, table.pk!.columnNames())
+        .then((res) => (this.sql.primaryKeyConstraints += res.sql));
     });
 
     console.log('Requesting SQL-Generation (Foreign Keys)');
@@ -92,6 +122,7 @@ export class NormalizeComponent {
           .then((res) => (this.sql.foreignKeyConstraints += res.sql));
       });
     });
+
     console.log(this.sql);
     console.log('Finished! ' + schemaName);
   }
@@ -100,6 +131,7 @@ export class NormalizeComponent {
 interface PersistSchemaSql {
   databasePreparation?: string;
   createTableStatements?: string;
+  dataTransferStatements?: string;
   primaryKeyConstraints?: string;
   foreignKeyConstraints?: string;
 }

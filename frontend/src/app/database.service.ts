@@ -7,6 +7,7 @@ import { Observable, shareReplay, map, Subject } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IFk from '@server/definitions/IFk';
 import ColumnCombination from '../model/schema/ColumnCombination';
+import Column from '../model/schema/Column';
 
 @Injectable({
   providedIn: 'root',
@@ -165,15 +166,55 @@ export class DatabaseService {
     return result;
   }
 
+  getSchemaPreparationSql(schemaName: string, tables: Table[]): Promise<any> {
+    const data = {
+      schema: schemaName,
+      tables: tables.map((table) => table.name),
+    };
+    let result: any = this.http
+      .post(`${this.baseUrl}/persist/schemaPreparation`, data)
+      .toPromise();
+    return result;
+  }
+  getDataTransferSql(
+    schema: string,
+    table: string,
+    originSchema: string,
+    originTable: string,
+    attributes: Column[]
+  ): Promise<any> {
+    const data = {
+      originSchema: originSchema,
+      originTable: originTable,
+      newSchema: schema,
+      newTable: table,
+      attribute: attributes.map((str) => {
+        return { name: str.name };
+      }),
+    };
+    let result: any = this.http
+      .post(`${this.baseUrl}/persist/dataTransfer`, data)
+      .toPromise();
+    return result;
+  }
+
+  getPrimaryKeySql(
+    schema: string,
+    table: string,
+    primaryKey: string[]
+  ): Promise<any> {
+    const data = {
+      schema: schema,
+      table: table,
+      primaryKey: primaryKey,
+    };
+    let result: any = this.http
+      .post(`${this.baseUrl}/persist/createPrimaryKey`, data)
+      .toPromise();
+    return result;
+  }
+
   getCreateTableSql(schema: string, table: Table): Promise<any> {
-    if (table.name.startsWith('public.')) {
-      table.name = table.name.substring(7);
-    }
-
-    if (table.name.startsWith('dbo.')) {
-      table.name = table.name.substring(4);
-    }
-
     const [originSchema, originTable]: string[] = table.origin.name.split('.');
     const [newSchema, newTable]: string[] = [schema, table.name];
     const primaryKey: string[] = table.keys()[0].columnNames();
