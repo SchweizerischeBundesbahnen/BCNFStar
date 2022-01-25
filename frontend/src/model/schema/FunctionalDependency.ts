@@ -60,7 +60,7 @@ export default class FunctionalDependency {
   public violatesBCNF(): boolean {
     if (this.isKey()) return false;
     if (this.lhs.cardinality == 0) return false;
-    /*if (
+    if (
       this.table.fks().some((fk) => {
         return (
           !fk[0].referencing().isSubsetOf(this.table.remainingSchema(this)) &&
@@ -68,7 +68,7 @@ export default class FunctionalDependency {
         );
       })
     )
-      return false;*/
+      return false;
     if (
       this.table.pk &&
       !this.table.pk.isSubsetOf(this.table.remainingSchema(this))
