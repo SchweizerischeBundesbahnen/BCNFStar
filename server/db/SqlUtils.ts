@@ -29,5 +29,5 @@ export default abstract class SqlUtils {
   ): Promise<boolean>;
 
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
-  public abstract getJdbcPath(): String;
+  public abstract getJdbcPath(): string;
 }
