@@ -3,13 +3,14 @@
     <div class="col-4">
       <div class="sbb-checkbox-group-vertical">
         <sbb-checkbox
+          class="checkbox"
           *ngFor="let table of this.tables.keys()"
           (change)="toggleCheckStatus(table)"
           (mouseenter)="mouseEnter(table)"
-          >{{ table.name }}</sbb-checkbox
         >
+          {{ table.name }}
+        </sbb-checkbox>
       </div>
-
       <button
         type="button"
         sbb-button
@@ -31,7 +32,6 @@
             name="{{ column }}"
           >
           </sbb-text-column>
-
           <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
           <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
         </table>

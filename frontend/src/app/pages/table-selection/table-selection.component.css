@@ -1,8 +1,25 @@
-.table-wrapper {
-  height: 60vh;
-  min-height: 400px;
+button {
+  margin-top: 10px;
 }
+
 h3 {
   font-weight: bold;
   margin-top: 0px;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+}
+
+.checkbox {
+  overflow: hidden;
+  width: 100%;
+}
+
+.table-wrapper {
+  height: 100vh;
+  width: 100%;
+  min-height: 400px;
+}
+
+tr {
+  white-space: nowrap;
 }
