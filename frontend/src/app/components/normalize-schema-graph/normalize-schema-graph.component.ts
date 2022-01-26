@@ -117,8 +117,17 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           this.updateAllBBoxes();
         },
       },
+      // disable panzoom when clicking on a jointjs element,
+      // so that dragging single elements still works
+      // (false means: enable panzoom, true disable panzoom)
       beforeMouseDown: (evt: MouseEvent) => {
-        evt.target;
+        if (!evt.target) return false;
+        let element: HTMLElement | null = evt.target as HTMLElement;
+        while (element !== null) {
+          if (element.id.startsWith('__jointel')) return true;
+          element = element.parentElement;
+        }
+        return false;
       },
     });
   }
