@@ -33,12 +33,11 @@ export class TableSelectionComponent implements OnInit {
   }
 
   public hasSelectedTables(): boolean {
-    let checked = 0;
-    Object.keys(this.form.controls).forEach((tableName) => {
+    for (let tableName of Object.keys(this.form.controls)) {
       const control = this.form.controls[tableName];
-      if (control.value === true) checked++;
-    });
-    return checked > 0;
+      if (control.value) return true;
+    }
+    return false;
   }
 
   public selectTables() {
