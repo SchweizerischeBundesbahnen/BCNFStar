@@ -49,6 +49,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   public graphStorage: Record<string, GraphStorageItem> = {};
 
   protected graph!: joint.dia.Graph;
+  protected paper!: joint.dia.Paper;
 
   // The graph helps us with creating links, moving elements and rendering them as SVG
   // However, we only create blank elements and put custom Angular components over them
@@ -56,7 +57,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   createDefaultGraph() {
     this.graph = new joint.dia.Graph();
 
-    new joint.dia.Paper({
+    this.paper = new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
       model: this.graph,
       height: null,
@@ -109,24 +110,15 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           return document.querySelector('#paper') as HTMLElement;
         },
         applyTransform: (transform) => {
-          const delta = {
-            x: transform.x - this.panzoomTransform.x,
-            y: transform.y - this.panzoomTransform.y,
-            scale: transform.scale / this.panzoomTransform.scale,
-          };
           this.panzoomTransform = Object.assign({}, transform);
-          for (const el of this.graph.getElements()) {
-            const position = el.position();
-            el.position(position.x + delta.x, position.y + delta.y);
-            el.scale(delta.scale, delta.scale);
-
-            for (const port of el.getPorts()) {
-              port.markup = this.generatePortMarkup(port.args as any);
-            }
-          }
+          this.paper.scale(transform.scale);
+          this.paper.translate(transform.x, transform.y);
 
           this.updateAllBBoxes();
         },
+      },
+      beforeMouseDown: (evt: MouseEvent) => {
+        evt.target;
       },
     });
   }
@@ -227,10 +219,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     const bbox = item.jointjsEl.getBBox();
 
     item.style = {
-      width: bbox.width / this.panzoomTransform.scale + 'px',
-      height: bbox.height / this.panzoomTransform.scale + 'px',
-      left: bbox.x + 'px',
-      top: bbox.y + 'px ',
+      width: bbox.width + 'px',
+      height: bbox.height + 'px',
+      left:
+        bbox.x * this.panzoomTransform.scale + this.panzoomTransform.x + 'px',
+      top:
+        bbox.y * this.panzoomTransform.scale + this.panzoomTransform.y + 'px ',
       transform: `scale(${this.panzoomTransform.scale})`,
       'transform-origin': 'left top',
     };
