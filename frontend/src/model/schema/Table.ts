@@ -126,6 +126,7 @@ export default class Table {
         .copy()
         .union(remaining.columns) // problematic?
         .setMinus(relationship.referencing())
+        .union(relationship.referenced())
     );
     newTable.schema = this.schema;
     newTable.relationships.push(...this.relationships);

@@ -38,6 +38,25 @@ export class NormalizeComponent {
     this.selectedTable = table;
   }
 
+  onJoinFk(event: any): void {
+    let command = new JoinCommand(
+      this.schema,
+      event.target,
+      event.source,
+      event.relationship
+    );
+
+    let self = this;
+    command.onDo = function () {
+      self.selectedTable = undefined;
+    };
+    command.onUndo = function () {
+      self.selectedTable = undefined;
+    };
+    this.commandProcessor.do(command);
+    this.tablesEventEmitter.next(this.schema.tables);
+  }
+
   onJoin(joinRelationship: [Relationship, Table]): void {
     let command = new JoinCommand(
       this.schema,
@@ -54,6 +73,7 @@ export class NormalizeComponent {
       self.selectedTable = undefined;
     };
     this.commandProcessor.do(command);
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onClickSplit(fd: FunctionalDependency): void {

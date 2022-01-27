@@ -1,14 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DatabaseSelectionComponent } from './pages/database-selection/database-selection.component';
 import { TableSelectionComponent } from './pages/table-selection/table-selection.component';
 import { NormalizeComponent } from './pages/normalize/normalize.component';
 import { NormalizeSideBarComponent } from './components/normalize-side-bar/normalize-side-bar.component';
-import { SbbIconModule } from '@sbb-esta/angular-core';
+import { SbbIconModule } from '@sbb-esta/angular/icon';
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
 import { SbbAccordionModule } from '@sbb-esta/angular/accordion';
 import { SbbButtonModule } from '@sbb-esta/angular/button';
