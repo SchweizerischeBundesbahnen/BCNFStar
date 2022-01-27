@@ -31,7 +31,7 @@ export default class Schema {
   }
 
   public fksOf(table: Table): Set<Table> {
-    let fks = this.referencesOf(table, this.fkRelationships);
+    let fks = new Set<Table>();
     this.tables.forEach((otherTable) => {
       let intersect = table.columns.copy().intersect(otherTable.columns);
       if (
@@ -42,6 +42,7 @@ export default class Schema {
         fks.add(otherTable);
     });
     fks.delete(table);
+    this.referencesOf(table, this.fkRelationships).forEach((fk) => fks.add(fk));
     return fks;
   }
 
