@@ -117,11 +117,9 @@ export class DatabaseService {
     return this.fdResult[table.name];
   }
 
-  // {"sql" : "ALTER TABLE ADD FOREIGN KEY............. "}
   getForeignKeySql(
     referencingTable: Table,
-    referencedTable: Table,
-    schema: string
+    referencedTable: Table
   ): Promise<any> {
     // TODO: Tabellen-Objekt sollte auch schema bekommen.... dann kann das hier weg...
     if (referencingTable.name.startsWith('public.')) {
@@ -142,6 +140,7 @@ export class DatabaseService {
       .foreignKeyForReferencedTable(referencedTable)
       .columnNames();
 
+    console.log(key_columns);
     // Da FK nur 40 Zeichen lang sein darf...
     const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
 
@@ -151,9 +150,9 @@ export class DatabaseService {
     }
 
     const data = {
-      referencingSchema: schema,
+      referencingSchema: referencingTable.schemaName,
       referencingTable: referencingTable.name,
-      referencedSchema: schema,
+      referencedSchema: referencedTable.schemaName,
       referencedTable: referencedTable.name,
       constraintName: fk_name,
       mapping: mapping,
@@ -177,17 +176,15 @@ export class DatabaseService {
     return result;
   }
   getDataTransferSql(
-    schema: string,
-    table: string,
-    originSchema: string,
-    originTable: string,
+    table: Table,
+    originTable: Table,
     attributes: Column[]
   ): Promise<any> {
     const data = {
-      originSchema: originSchema,
-      originTable: originTable,
-      newSchema: schema,
-      newTable: table,
+      originSchema: originTable.schemaName,
+      originTable: originTable.name,
+      newSchema: table.schemaName,
+      newTable: table.name,
       attribute: attributes.map((str) => {
         return { name: str.name };
       }),
@@ -214,9 +211,10 @@ export class DatabaseService {
     return result;
   }
 
-  getCreateTableSql(schema: string, table: Table): Promise<any> {
-    const [originSchema, originTable]: string[] = table.origin.name.split('.');
-    const [newSchema, newTable]: string[] = [schema, table.name];
+  getCreateTableSql(table: Table): Promise<any> {
+    const originSchema: string = table.origin.schemaName;
+    const originTable: string = table.origin.name;
+    const [newSchema, newTable]: string[] = [table.schemaName, table.name];
     const primaryKey: string[] = table.keys()[0].columnNames();
 
     const data = {

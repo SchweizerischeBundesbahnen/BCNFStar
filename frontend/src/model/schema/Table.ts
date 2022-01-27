@@ -5,6 +5,7 @@ import ITable from '@server/definitions/ITable';
 
 export default class Table {
   public name = '';
+  public schemaName = '';
   public columns = new ColumnCombination();
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
@@ -24,6 +25,7 @@ export default class Table {
     });
     let table = new Table(columns);
     table.name = iTable.name; //mermaid tablenames must not contain dots
+    table.schemaName = iTable.schemaName;
     return table;
   }
 

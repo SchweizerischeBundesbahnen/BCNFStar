@@ -30,6 +30,7 @@ export default function getCreateTableStatement(): RequestHandler {
         !(await sqlUtils.tableExistsInSchema(originSchema, originTable)) ||
         !(await sqlUtils.schemaExistsInDatabase(originSchema))
       ) {
+        console.log("HERE");
         res.json("OriginSchema/OriginTable does not exists in database.");
         res.status(400);
         return;
@@ -43,7 +44,6 @@ export default function getCreateTableStatement(): RequestHandler {
           newSchema,
           newTable
         )) + EOL;
-
       res.json({ sql: sqlStatement });
       res.status(200);
     } catch (error) {
