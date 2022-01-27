@@ -162,6 +162,12 @@ export default class Schema {
         });
     });
 
-    //TODO remove duplicate fds (lhs = fk subset)
+    //TODO optimise duplicate removal
+    let fds = table.fds;
+    table.setFds();
+    fds.forEach((fd) => {
+      if (!table.fds.some((otherFd) => otherFd.lhs.equals(fd.lhs)))
+        table.fds.push(fd);
+    });
   }
 }
