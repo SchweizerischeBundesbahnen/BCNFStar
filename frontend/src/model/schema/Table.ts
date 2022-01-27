@@ -132,14 +132,15 @@ export default class Table {
     let newTable = new Table(
       generating.columns
         .copy()
-        .union(remaining.columns) // problematic?
+        .union(remaining.columns)
         .setMinus(relationship.referencing())
         .union(relationship.referenced())
     );
     newTable.schema = this.schema;
     newTable.relationships.push(...this.relationships);
     newTable.relationships.push(...otherTable.relationships);
-    newTable.relationships.push(relationship);
+    if (!relationship.referenced().equals(relationship.referencing()))
+      newTable.relationships.push(relationship);
 
     newTable.name = remaining.name;
     newTable.pk = remaining.pk;

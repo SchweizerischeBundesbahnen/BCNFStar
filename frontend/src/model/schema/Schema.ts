@@ -20,10 +20,7 @@ export default class Schema {
       rel.referencing().isSubsetOf(table.columns)
     );
     this.tables.forEach((t) => {
-      if (
-        references.filter((rel) => rel.referenced().isSubsetOf(t.columns))
-          .length > 0
-      ) {
+      if (references.filter((rel) => rel.appliesTo(table, t)).length > 0) {
         referencedTables.add(t);
       }
     });
