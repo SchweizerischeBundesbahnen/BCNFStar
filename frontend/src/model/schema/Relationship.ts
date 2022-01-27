@@ -6,6 +6,22 @@ export default class Relationship {
   private _referencing = new Array<Column>();
   private _referenced = new Array<Column>();
 
+  public static fromTables(
+    referencing: Table,
+    referenced: Table
+  ): Relationship {
+    // TODO optimise
+    let relationship = new Relationship();
+    referencing.columns.columns.forEach((referencingColumn) => {
+      let correspondingCols = [...referenced.columns.columns].filter((column) =>
+        column.equals(referencingColumn)
+      );
+      if (correspondingCols.length > 0)
+        relationship.add(referencingColumn, correspondingCols[0]);
+    });
+    return relationship;
+  }
+
   public add(referencingColumn: Column, referencedColumn: Column) {
     this._referencing.push(referencingColumn);
     this._referenced.push(referencedColumn);
@@ -34,6 +50,7 @@ export default class Relationship {
         );
       }
     }
+    return cc;
   }
 
   public referencedToReferencingColumnsIn(cc: ColumnCombination) {
@@ -44,6 +61,7 @@ export default class Relationship {
         );
       }
     }
+    return cc;
   }
 
   public toString(): String {

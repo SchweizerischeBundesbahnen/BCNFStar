@@ -27,10 +27,10 @@
 #       - name: db-setup
 #         run: |
 #           cat << EOF > .env.local
-#           PGPASSFILE=~/.pgpass
+#           DB_PASSFILE=~/.pgpass
 #           EOF
 #           cat << EOF > ~/.pgpass
-#           $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
+#           $DB_HOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
 #           EOF
 #           chmod 600 ~/.pgpass
 
@@ -39,7 +39,7 @@
 #           sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 80 -j REDIRECT --to-ports 8080
 #         env:
 #           PGPASSWORD: postgres
-#           PGHOST: 127.0.0.1
+#           DB_HOST: 127.0.0.1
 #           PGPORT: 5432
 #           PGDATABASE: _test_
 #           PGUSER: postgres

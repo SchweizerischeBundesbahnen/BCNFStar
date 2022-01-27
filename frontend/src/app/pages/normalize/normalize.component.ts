@@ -9,6 +9,8 @@ import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 import Relationship from '@/src/model/schema/Relationship';
 import { BehaviorSubject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
+import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
 
 @Component({
   selector: 'app-normalize',
@@ -23,7 +25,11 @@ export class NormalizeComponent {
     new Set<Table>()
   );
 
-  constructor(public dataService: DatabaseService) {
+  constructor(
+    public dataService: DatabaseService,
+    // eslint-disable-next-line no-unused-vars
+    public dialog: SbbDialog
+  ) {
     this.schema = dataService.inputSchema!;
     this.tablesEventEmitter.next(this.schema.tables);
   }
@@ -32,8 +38,13 @@ export class NormalizeComponent {
     this.selectedTable = table;
   }
 
-  onJoinFk(tableOb: any): void {
-    let command = new JoinCommand(this.schema, tableOb.source, tableOb.target);
+  onJoin(joinRelationship: [Relationship, Table]): void {
+    let command = new JoinCommand(
+      this.schema,
+      this.selectedTable!,
+      joinRelationship[1],
+      joinRelationship[0]
+    );
 
     let self = this;
     command.onDo = function () {
@@ -43,11 +54,16 @@ export class NormalizeComponent {
       self.selectedTable = undefined;
     };
     this.commandProcessor.do(command);
-    this.tablesEventEmitter.next(this.schema.tables);
   }
 
-  onJoinInd(relationship: Relationship): void {
-    alert('Hier wird später mal Inds gejoint :)' + relationship);
+  onClickSplit(fd: FunctionalDependency): void {
+    const dialogRef = this.dialog.open(SplitDialogComponent, {
+      data: fd,
+    });
+
+    dialogRef.afterClosed().subscribe((fd: FunctionalDependency) => {
+      if (fd) this.onSplitFd(fd);
+    });
   }
 
   onSplitFd(fd: FunctionalDependency): void {

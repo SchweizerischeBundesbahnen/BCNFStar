@@ -25,11 +25,11 @@
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               "src/styles.css",
-              "node_modules/@sbb-esta/angular-business/typography.css",
-              "./node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/jointjs/css/layout.css",
               "node_modules/jointjs/css/themes/material.css",
-              "node_modules/jointjs/css/themes/default.css"
+              "node_modules/jointjs/css/themes/default.css",
+              "node_modules/@sbb-esta/angular/typography.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.min.js",
@@ -100,7 +100,7 @@
             "karmaConfig": "karma.conf.js",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-              "node_modules/@sbb-esta/angular-business/typography.css",
+              "node_modules/@sbb-esta/angular/typography.css",
               "src/styles.css"
             ],
             "scripts": []

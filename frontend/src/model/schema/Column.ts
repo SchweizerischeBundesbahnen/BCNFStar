@@ -21,4 +21,8 @@ export default class Column {
   public copy(): Column {
     return new Column(this.name, this.dataType, this.prio, this.sourceTable);
   }
+
+  public equals(column: Column): boolean {
+    return this.sourceTable == column.sourceTable && this.name == column.name;
+  }
 }

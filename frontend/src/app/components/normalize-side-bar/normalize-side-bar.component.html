@@ -11,9 +11,9 @@
     </sbb-expansion-panel>
 
     <sbb-expansion-panel [expanded]="true">
-      <sbb-expansion-panel-header
-        >Functional Dependencies</sbb-expansion-panel-header
-      >
+      <sbb-expansion-panel-header>
+        Functional Dependencies
+      </sbb-expansion-panel-header>
       <div *ngIf="table.violatingFds().length > 0">
         <sbb-radio-group #fdSelection>
           <sbb-radio-button
@@ -26,7 +26,7 @@
         <br />
         <button
           type="button"
-          sbbButton
+          sbb-button
           [disabled]="!selectedFd()"
           (click)="splitSelectedFd()"
         >
@@ -39,18 +39,16 @@
       <sbb-expansion-panel-header
         >Inclusion Dependencies</sbb-expansion-panel-header
       >
-      <div *ngIf="table.indReferencedRelationships().size > 0">
+      <div *ngIf="table.fks().length > 0">
         <sbb-radio-group #indSelection>
-          <sbb-radio-button
-            *ngFor="let rel of table.indReferencedRelationships()"
-            [value]="rel"
-            >{{ rel.toString() }}</sbb-radio-button
-          >
+          <sbb-radio-button *ngFor="let rel of table.fks()" [value]="rel">{{
+            rel[0].toString()
+          }}</sbb-radio-button>
         </sbb-radio-group>
         <br />
         <button
           type="button"
-          sbbButton
+          sbb-button
           [disabled]="!selectedInd()"
           (click)="joinSelectedInd()"
         >
