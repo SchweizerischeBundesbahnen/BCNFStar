@@ -33,7 +33,12 @@ export default class ColumnCombination {
   }
 
   public sourceTables(): Array<Table> {
-    return [...this.columns].map((column) => column.sourceTable);
+    let sourceTables = new Array<Table>();
+    this.columns.forEach((column) => {
+      if (!sourceTables.includes(column.sourceTable))
+        sourceTables.push(column.sourceTable);
+    });
+    return sourceTables;
   }
 
   public add(...columns: Array<Column>) {
