@@ -1,4 +1,5 @@
 import Column from './Column';
+import Table from './Table';
 
 export default class ColumnCombination {
   columns = new Set<Column>();
@@ -29,6 +30,10 @@ export default class ColumnCombination {
     return new ColumnCombination(
       ...this.inOrder().filter((col, i) => numbers.includes(i))
     );
+  }
+
+  public sourceTables(): Array<Table> {
+    return [...this.columns].map((column) => column.sourceTable);
   }
 
   public add(...columns: Array<Column>) {

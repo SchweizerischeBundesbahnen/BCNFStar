@@ -11,6 +11,7 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public schema?: Schema;
+  public relationships = new Array<Relationship>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -36,6 +37,10 @@ export default class Table {
       table.columns.add(new Column(name, '?', i, table))
     );
     return table;
+  }
+
+  public sourceTables(): Array<Table> {
+    return this.columns.sourceTables();
   }
 
   public get mermaidName(): string {
@@ -75,6 +80,9 @@ export default class Table {
     remaining.schema = this.schema;
     generating.schema = this.schema;
 
+    this.projectRelationships(remaining);
+    this.projectRelationships(generating);
+
     this.projectFds(remaining);
     this.projectFds(generating);
 
@@ -85,6 +93,17 @@ export default class Table {
     generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
 
     return [remaining, generating];
+  }
+
+  public projectRelationships(table: Table): void {
+    let sourceTables = table.sourceTables();
+    this.relationships.forEach((relationship) => {
+      if (
+        sourceTables.includes(relationship.referenced().sourceTables()[0]) &&
+        sourceTables.includes(relationship.referencing().sourceTables()[0])
+      )
+        table.relationships.push(relationship);
+    });
   }
 
   public projectFds(table: Table): void {
@@ -117,6 +136,9 @@ export default class Table {
         .setMinus(relationship.referencing())
     );
     newTable.schema = this.schema;
+    newTable.relationships.push(...this.relationships);
+    newTable.relationships.push(...otherTable.relationships);
+    newTable.relationships.push(relationship);
 
     newTable.name = remaining.name;
     newTable.pk = remaining.pk;
@@ -129,7 +151,6 @@ export default class Table {
   }
 
   public fks(): Array<[Relationship, Table]> {
-    //console.log(':C');
     let fks = new Array<[Relationship, Table]>();
     this.schema!.fksOf(this).forEach((table) => {
       this.schema!.fksBetween(this, table).forEach((relationship) => {
