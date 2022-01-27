@@ -32,7 +32,11 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   @Input() tables!: Subject<Set<Table>>;
   @Input() selectedTable?: Table;
   @Output() selected = new EventEmitter<Table>();
-  @Output() joinFk = new EventEmitter<{ source: Table; target: Table }>();
+  @Output() joinFk = new EventEmitter<{
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }>();
 
   protected localTables: Set<Table> = new Set();
   public paper?: joint.dia.Paper;
@@ -134,12 +138,14 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   private addJoinButton(
     link: joint.shapes.standard.Link,
     sourceTable: Table,
-    targetTable: Table
+    targetTable: Table,
+    relationship: Relationship
   ) {
     let joinTablesOnFks = () => {
       this.joinFk.emit({
         source: sourceTable,
         target: targetTable,
+        relationship: relationship,
       });
     };
 
@@ -182,23 +188,9 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
   generateLinks() {
     for (const table of this.localTables) {
-      for (const otherTable of table.minimalReferencedTables()) {
-        let foreignKey = table
-          .foreignKeyForReferencedTable(otherTable)!
-          .columns.values()
-          .next().value;
-        let fkRelationships: Relationship = table.schema!.fkRelationshipBetween(
-          table,
-          otherTable
-        );
-        let fkReferenced = fkRelationships
-          .referenced()
-          .columns.values()
-          .next().value;
-        let fkReferencing = fkRelationships
-          .referencing()
-          .columns.values()
-          .next().value;
+      for (const fk of table.fks()) {
+        let fkReferenced = fk[0].referenced().columns.values().next().value;
+        let fkReferencing = fk[0].referencing().columns.values().next().value;
         console.log(
           fkReferenced.sourceTable.name,
           fkReferencing.sourceTable.name
@@ -207,18 +199,21 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           source: {
             id: this.graphStorage[table.name].jointjsEl.id,
             port:
-              fkReferencing.sourceTable.name + '.' + foreignKey.name + '_right',
+              fkReferencing.sourceTable.name +
+              '.' +
+              fkReferencing.name +
+              '_right',
           },
           target: {
-            id: this.graphStorage[otherTable.name].jointjsEl.id,
+            id: this.graphStorage[fk[1].name].jointjsEl.id,
             port:
-              fkReferenced.sourceTable.name + '.' + foreignKey.name + '_left',
+              fkReferenced.sourceTable.name + '.' + fkReferenced.name + '_left',
           },
         });
         console.log(link);
-        this.graphStorage[table.name].links[otherTable.name] = link;
+        this.graphStorage[table.name].links[fk[1].name] = link;
         this.graph.addCell(link);
-        this.addJoinButton(link, table, otherTable);
+        this.addJoinButton(link, table, fk[1], fk[0]);
       }
     }
   }
