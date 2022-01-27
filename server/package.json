@@ -21,8 +21,7 @@
     "morgan": "^1.10.0",
     "mssql": "^7.3.0",
     "pg": "^8.7.1",
-    "promise-retry": "^2.0.1",
-    "ts-node": "^10.4.0"
+    "promise-retry": "^2.0.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
