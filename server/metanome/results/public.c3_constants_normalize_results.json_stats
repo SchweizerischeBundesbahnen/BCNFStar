@@ -1,0 +1,1 @@
+{"type":"BasicStatistic","columnCombination":{"columnIdentifiers":[{"tableIdentifier":"c3_constants","columnIdentifier":"str"}]},"statisticMap":{"PrimaryKey":{"type":"BasicStatisticValueString","value":"c3_constants.str"}}}

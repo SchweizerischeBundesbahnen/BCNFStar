@@ -1,0 +1,1 @@
+[] --> aff, category, create_date, method, update_date, user_id
