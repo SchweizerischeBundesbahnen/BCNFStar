@@ -59,6 +59,7 @@ export function exampleSchema(): Schema {
   let tableB = Table.fromColumnNames('B1', 'B2', 'B3', 'B4');
   tableB.name = 'TableB';
   tableB.schema = schema;
+  tableB.pk = tableB.columns.columnsFromNames('B1', 'B2');
   tableB.addFd(
     tableB.columns.columnsFromNames('B1', 'B2'),
     tableB.columns.columnsFromNames('B1', 'B2', 'B3', 'B4')
@@ -79,6 +80,8 @@ export function exampleSchema(): Schema {
     tableB.columns.columnFromName('B2')
   );
   schema.fkRelationships.add(relAB);
+
+  schema.join(tableA, tableB, relAB);
 
   return schema;
 }
