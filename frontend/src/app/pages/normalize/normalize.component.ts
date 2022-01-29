@@ -110,60 +110,60 @@ export class NormalizeComponent {
   persistSchema(schemaName: string): void {
     console.log('Requesting SQL-Generation');
 
-    // this.schema.tables.forEach((table) => (table.schemaName = schemaName));
+    this.schema.tables.forEach((table) => (table.schemaName = schemaName));
 
-    // const tables: Table[] = Array.from(this.schema.tables);
+    const tables: Table[] = Array.from(this.schema.tables);
 
-    // console.log('Requesting SQL-Generation (Prepare Schema Statements)');
-    // this.dataService
-    //   .getSchemaPreparationSql(schemaName, tables)
-    //   .then((res) => (this.sql.databasePreparation += '\n' + res.sql + '\n'));
+    console.log('Requesting SQL-Generation (Prepare Schema Statements)');
+    this.dataService
+      .getSchemaPreparationSql(schemaName, tables)
+      .then((res) => (this.sql.databasePreparation += '\n' + res.sql + '\n'));
 
-    // console.log('Requesting SQL-Generation (Create Table Statements)');
-    // this.schema.tables.forEach((table) => {
-    //   this.dataService
-    //     .getCreateTableSql(table)
-    //     .then(
-    //       (res) => (this.sql.createTableStatements += '\n' + res.sql + '\n')
-    //     );
-    // });
+    console.log('Requesting SQL-Generation (Create Table Statements)');
+    this.schema.tables.forEach((table) => {
+      this.dataService
+        .getCreateTableSql(table)
+        .then(
+          (res) => (this.sql.createTableStatements += '\n' + res.sql + '\n')
+        );
+    });
 
-    // console.log('Requesting SQL-Generation (Data Transfer)');
-    // this.schema.tables.forEach((table) => {
-    //   this.dataService
-    //     .getDataTransferSql(
-    //       table,
-    //       table.origin,
-    //       Array.from(table.columns.columns)
-    //     )
-    //     .then(
-    //       (res) => (this.sql.dataTransferStatements += '\n' + res.sql + '\n')
-    //     );
-    // });
+    console.log('Requesting SQL-Generation (Data Transfer)');
+    this.schema.tables.forEach((table) => {
+      this.dataService
+        .getDataTransferSql(
+          table,
+          table.columns.sourceTable(),
+          Array.from(table.columns.columns)
+        )
+        .then(
+          (res) => (this.sql.dataTransferStatements += '\n' + res.sql + '\n')
+        );
+    });
 
-    // console.log('Requesting SQL-Generation (Primary Keys)');
-    // this.schema.tables.forEach((table) => {
-    //   this.dataService
-    //     .getPrimaryKeySql(
-    //       table.schemaName,
-    //       table.name,
-    //       table.keys()[0].columnNames()
-    //     )
-    //     .then(
-    //       (res) => (this.sql.primaryKeyConstraints += '\n' + res.sql + '\n')
-    //     );
-    // });
+    console.log('Requesting SQL-Generation (Primary Keys)');
+    this.schema.tables.forEach((table) => {
+      this.dataService
+        .getPrimaryKeySql(
+          table.schemaName,
+          table.name,
+          table.keys()[0].columnNames()
+        )
+        .then(
+          (res) => (this.sql.primaryKeyConstraints += '\n' + res.sql + '\n')
+        );
+    });
 
-    // console.log('Requesting SQL-Generation (Foreign Keys)');
-    // this.schema.tables.forEach((referencingTable) => {
-    //   referencingTable.referencedTables.forEach((referencedTable) => {
-    //     this.dataService
-    //       .getForeignKeySql(referencingTable, referencedTable)
-    //       .then(
-    //         (res) => (this.sql.foreignKeyConstraints += '\n' + res.sql + '\n')
-    //       );
-    //   });
-    // });
+    console.log('Requesting SQL-Generation (Foreign Keys)');
+    this.schema.tables.forEach((referencingTable) => {
+      referencingTable.referencedTables().forEach((referencedTable) => {
+        this.dataService
+          .getForeignKeySql(referencingTable, referencedTable)
+          .then(
+            (res) => (this.sql.foreignKeyConstraints += '\n' + res.sql + '\n')
+          );
+      });
+    });
 
     console.log('Finished! ' + schemaName);
   }

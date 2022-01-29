@@ -129,53 +129,48 @@ export class DatabaseService {
     referencingTable: Table,
     referencedTable: Table
   ): Promise<any> {
-    console.log(referencingTable);
+    // TODO: Tabellen-Objekt sollte auch schema bekommen.... dann kann das hier weg...
+    if (referencingTable.name.startsWith('public.')) {
+      referencingTable.name = referencingTable.name.substring(7);
+    }
+    if (referencedTable.name.startsWith('public.')) {
+      referencedTable.name = referencedTable.name.substring(7);
+    }
 
-    console.log(referencedTable);
-    throw Error();
+    if (referencingTable.name.startsWith('dbo.')) {
+      referencingTable.name = referencingTable.name.substring(4);
+    }
+    if (referencedTable.name.startsWith('dbo.')) {
+      referencedTable.name = referencedTable.name.substring(4);
+    }
 
-    // // TODO: Tabellen-Objekt sollte auch schema bekommen.... dann kann das hier weg...
-    // if (referencingTable.name.startsWith('public.')) {
-    //   referencingTable.name = referencingTable.name.substring(7);
-    // }
-    // if (referencedTable.name.startsWith('public.')) {
-    //   referencedTable.name = referencedTable.name.substring(7);
-    // }
+    const key_columns: string[] = referencingTable
+      .foreignKeyForReferencedTable(referencedTable)
+      .columnNames();
 
-    // if (referencingTable.name.startsWith('dbo.')) {
-    //   referencingTable.name = referencingTable.name.substring(4);
-    // }
-    // if (referencedTable.name.startsWith('dbo.')) {
-    //   referencedTable.name = referencedTable.name.substring(4);
-    // }
+    console.log(key_columns);
+    // Da FK nur 40 Zeichen lang sein darf...
+    const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
 
-    // const key_columns: string[] = referencingTable
-    //   .foreignKeyForReferencedTable(referencedTable)
-    //   .columnNames();
+    const mapping: {}[] = [];
+    for (let i = 0; i < key_columns.length; i++) {
+      mapping.push({ key: key_columns[i], value: key_columns[i] });
+    }
 
-    // console.log(key_columns);
-    // // Da FK nur 40 Zeichen lang sein darf...
-    // const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
+    const data = {
+      referencingSchema: referencingTable.schemaName,
+      referencingTable: referencingTable.name,
+      referencedSchema: referencedTable.schemaName,
+      referencedTable: referencedTable.name,
+      constraintName: fk_name,
+      mapping: mapping,
+    };
 
-    // const mapping: {}[] = [];
-    // for (let i = 0; i < key_columns.length; i++) {
-    //   mapping.push({ key: key_columns[i], value: key_columns[i] });
-    // }
+    let result: any = this.http
+      .post(`${this.baseUrl}/persist/createForeignKey`, data)
+      .toPromise();
 
-    // const data = {
-    //   referencingSchema: referencingTable.schemaName,
-    //   referencingTable: referencingTable.name,
-    //   referencedSchema: referencedTable.schemaName,
-    //   referencedTable: referencedTable.name,
-    //   constraintName: fk_name,
-    //   mapping: mapping,
-    // };
-
-    // let result: any = this.http
-    //   .post(`${this.baseUrl}/persist/createForeignKey`, data)
-    //   .toPromise();
-
-    // return result;
+    return result;
   }
 
   getSchemaPreparationSql(schemaName: string, tables: Table[]): Promise<any> {
@@ -225,26 +220,24 @@ export class DatabaseService {
   }
 
   getCreateTableSql(table: Table): Promise<any> {
-    console.log(table);
-    throw Error();
-    // const originSchema: string = table.origin.schemaName;
-    // const originTable: string = table.origin.name;
-    // const [newSchema, newTable]: string[] = [table.schemaName, table.name];
-    // const primaryKey: string[] = table.keys()[0].columnNames();
+    const originSchema: string = table.columns.sourceTable().schemaName;
+    const originTable: string = table.columns.sourceTable().name;
+    const [newSchema, newTable]: string[] = [table.schemaName, table.name];
+    const primaryKey: string[] = table.keys()[0].columnNames();
 
-    // const data = {
-    //   originSchema: originSchema,
-    //   originTable: originTable,
-    //   newSchema: newSchema,
-    //   newTable: newTable,
-    //   attribute: table.columns.columnNames().map((str) => {
-    //     return { name: str };
-    //   }),
-    //   primaryKey: primaryKey,
-    // };
-    // let result: any = this.http
-    //   .post(`${this.baseUrl}/persist/createTable`, data)
-    //   .toPromise();
-    // return result;
+    const data = {
+      originSchema: originSchema,
+      originTable: originTable,
+      newSchema: newSchema,
+      newTable: newTable,
+      attribute: table.columns.columnNames().map((str) => {
+        return { name: str };
+      }),
+      primaryKey: primaryKey,
+    };
+    let result: any = this.http
+      .post(`${this.baseUrl}/persist/createTable`, data)
+      .toPromise();
+    return result;
   }
 }
