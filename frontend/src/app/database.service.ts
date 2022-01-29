@@ -140,9 +140,9 @@ export class DatabaseService {
           )
         )
       );
-      this.getINDsByTables(tables).subscribe((inds) => {
-        this.resolveInds(inds);
-      });
+    });
+    this.getINDsByTables(tables).subscribe((inds) => {
+      this.resolveInds(inds);
     });
     this.resolveIFks(this.fks);
   }

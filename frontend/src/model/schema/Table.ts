@@ -179,14 +179,12 @@ export default class Table {
   }
 
   public inds(): Array<[Relationship, Table]> {
-    console.log('inds start');
     let indArray = new Array<[Relationship, Table]>();
     this.schema!.indsOf(this).forEach((table) => {
       this.schema!.indsBetween(this, table).forEach((relationship) => {
         indArray.push([relationship, table]);
       });
     });
-    console.log('inds end');
     return indArray;
   }
 

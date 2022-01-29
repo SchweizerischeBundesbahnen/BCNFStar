@@ -3,6 +3,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -15,7 +16,7 @@ import Table from 'src/model/schema/Table';
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent {
+export class NormalizeSideBarComponent implements OnChanges {
   @ViewChild('fdSelection', { read: SbbRadioGroup })
   fdSelectionGroup!: SbbRadioGroup;
   @ViewChild('indSelection', { read: SbbRadioGroup })
@@ -27,8 +28,15 @@ export class NormalizeSideBarComponent {
     target: Table;
     relationship: Relationship;
   }>();
+  public fds!: Array<FunctionalDependency>;
+  public inds!: Array<[Relationship, Table]>;
 
   constructor() {}
+
+  ngOnChanges(): void {
+    this.fds = this.table?.violatingFds() || [];
+    this.inds = this.table?.inds() || [];
+  }
 
   selectedFd(): FunctionalDependency | undefined {
     if (!this.fdSelectionGroup) return undefined;
