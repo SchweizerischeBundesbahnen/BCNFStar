@@ -74,3 +74,12 @@
 >
   Persist Schema
 </button>
+
+<button
+  type="button"
+  sbbButton
+  [disabled]="!this.schemaName"
+  (click)="download.emit()"
+>
+  Download SQL
+</button>

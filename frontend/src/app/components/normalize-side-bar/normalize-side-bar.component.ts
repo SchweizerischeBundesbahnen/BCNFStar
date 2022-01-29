@@ -23,6 +23,7 @@ export class NormalizeSideBarComponent {
   @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
   @Output() persistSchema = new EventEmitter<string>();
+  @Output() download = new EventEmitter();
 
   schemaName: string = '';
   @Output() joinInd = new EventEmitter<{

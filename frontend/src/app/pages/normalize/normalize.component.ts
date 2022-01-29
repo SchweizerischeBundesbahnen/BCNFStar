@@ -1,6 +1,7 @@
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import { Component } from '@angular/core';
+import * as saveAs from 'file-saver';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
@@ -19,13 +20,7 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
-  public sql: PersistSchemaSql = {
-    foreignKeyConstraints: 'ForeignKey: ',
-    databasePreparation: 'DatabasePreparation: ',
-    createTableStatements: 'CreateTableStatements: ',
-    dataTransferStatements: 'DataTransferStatements: ',
-    primaryKeyConstraints: 'PrimaryKeyConstraints: ',
-  };
+  public sql: PersistSchemaSql = new PersistSchemaSql();
 
   constructor(
     public dataService: DatabaseService,
@@ -167,12 +162,39 @@ export class NormalizeComponent {
 
     console.log('Finished! ' + schemaName);
   }
+
+  download(): void {
+    console.log('HERE');
+    const file: File = new File([this.sql.to_string()], 'persist_schema.sql', {
+      type: 'text/plain;charset=utf-8',
+    });
+    saveAs(file);
+  }
 }
 
-interface PersistSchemaSql {
-  databasePreparation?: string;
-  createTableStatements?: string;
-  dataTransferStatements?: string;
-  primaryKeyConstraints?: string;
-  foreignKeyConstraints?: string;
+class PersistSchemaSql {
+  public databasePreparation: string = '';
+  public createTableStatements: string = '';
+  public dataTransferStatements: string = '';
+  public primaryKeyConstraints: string = '';
+  public foreignKeyConstraints: string = '';
+  public to_string(): string {
+    return (
+      '/* SCHEMA PREPARATION: */\n' +
+      this.databasePreparation! +
+      '\n' +
+      '/* SCHEMA CREATION: */\n' +
+      this.createTableStatements! +
+      '\n' +
+      '/* DATA TRANSER: */\n' +
+      this.dataTransferStatements! +
+      '\n' +
+      '/* PRIMARY KEYS: */\n' +
+      this.primaryKeyConstraints! +
+      '\n' +
+      '/* FOREIGN KEYS: */\n' +
+      this.foreignKeyConstraints! +
+      '\n'
+    );
+  }
 }

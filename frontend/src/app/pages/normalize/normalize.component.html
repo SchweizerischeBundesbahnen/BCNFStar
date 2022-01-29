@@ -18,6 +18,7 @@
         class="normalize-sidebar"
         [table]="this.selectedTable"
         (persistSchema)="persistSchema($event)"
+        (download)="download()"
         (splitFd)="onClickSplit($event)"
         (joinInd)="onJoin($event)"
       ></app-normalize-side-bar>
