@@ -1,4 +1,4 @@
-import { exampleTable } from './exampleTables';
+import { exampleSchema, exampleTable } from './exampleTables';
 import Schema from './Schema';
 
 describe('Schema', () => {
@@ -27,5 +27,19 @@ describe('Schema', () => {
     expect([...schema.tables].map((table) => table.toString())).toEqual(
       [...schema2.tables].map((table) => table.toString())
     );
+  });
+
+  it('should join columns correctly', () => {
+    let schema = exampleSchema();
+    let tableA = [...schema.tables].filter(
+      (table) => table.name == 'TableA'
+    )[0];
+    let tableB = [...schema.tables].filter(
+      (table) => table.name == 'TableB'
+    )[0];
+    schema.join(tableA, tableB, [...schema.fkRelationships][0]);
+    let expectedColumns = tableA.columns.columnsFromNames('A1', 'A2');
+    expectedColumns.union(tableB.columns.copy());
+    expect([...schema.tables][0].columns).toEqual(expectedColumns);
   });
 });

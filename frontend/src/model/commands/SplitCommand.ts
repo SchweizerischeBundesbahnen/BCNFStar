@@ -7,7 +7,6 @@ export default class SplitCommand extends Command {
   schema: Schema;
   table: Table;
   fd: FunctionalDependency;
-
   children?: Array<Table>;
 
   public constructor(schema: Schema, table: Table, fd: FunctionalDependency) {

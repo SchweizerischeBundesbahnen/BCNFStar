@@ -9,22 +9,24 @@
         </li>
       </ul>
     </sbb-expansion-panel>
+
     <sbb-expansion-panel [expanded]="true">
-      <sbb-expansion-panel-header
-        >Functional Dependencies</sbb-expansion-panel-header
-      >
+      <sbb-expansion-panel-header>
+        Functional Dependencies
+      </sbb-expansion-panel-header>
       <div *ngIf="table.violatingFds().length > 0">
-        <sbb-radio-group>
+        <sbb-radio-group #fdSelection>
           <sbb-radio-button
             *ngFor="let fd of table.violatingFds().slice(0, 10)"
             [value]="fd"
-            >{{ fd.toString() }}</sbb-radio-button
           >
+            {{ fd.toString() }}
+          </sbb-radio-button>
         </sbb-radio-group>
         <br />
         <button
           type="button"
-          sbbButton
+          sbb-button
           [disabled]="!selectedFd()"
           (click)="splitSelectedFd()"
         >
@@ -32,17 +34,37 @@
         </button>
       </div>
     </sbb-expansion-panel>
+
+    <sbb-expansion-panel [expanded]="true">
+      <sbb-expansion-panel-header
+        >Inclusion Dependencies</sbb-expansion-panel-header
+      >
+      <div *ngIf="table.fks().length > 0">
+        <sbb-radio-group #indSelection>
+          <sbb-radio-button *ngFor="let rel of table.fks()" [value]="rel">{{
+            rel[0].toString()
+          }}</sbb-radio-button>
+        </sbb-radio-group>
+        <br />
+        <button
+          type="button"
+          sbb-button
+          [disabled]="!selectedInd()"
+          (click)="joinSelectedInd()"
+        >
+          Join Inclusion Dependency
+        </button>
+      </div>
+    </sbb-expansion-panel>
   </sbb-accordion>
 </div>
 
-<sbb-form-field label="Schema Name">
-  <input
-    type="text"
-    sbbInput
-    placeholder="Schema Name"
-    (input)="onInputChange($event)"
-  />
-</sbb-form-field>
+<input
+  type="text"
+  sbbInput
+  placeholder="Schema Name"
+  (input)="onInputChange($event)"
+/>
 
 <button
   type="button"

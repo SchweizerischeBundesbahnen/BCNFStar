@@ -1,3 +1,4 @@
+import Relationship from '@/src/model/schema/Relationship';
 import {
   Component,
   EventEmitter,
@@ -5,7 +6,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { SbbRadioGroup } from '@sbb-esta/angular-core/radio-button';
+import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 
@@ -15,12 +16,20 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./normalize-side-bar.component.css'],
 })
 export class NormalizeSideBarComponent {
-  @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
+  @ViewChild('fdSelection', { read: SbbRadioGroup })
+  fdSelectionGroup!: SbbRadioGroup;
+  @ViewChild('indSelection', { read: SbbRadioGroup })
+  indSelectionGroup!: SbbRadioGroup;
   @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
   @Output() persistSchema = new EventEmitter<string>();
 
   schemaName: string = '';
+  @Output() joinInd = new EventEmitter<{
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }>();
 
   constructor() {}
 
@@ -35,5 +44,18 @@ export class NormalizeSideBarComponent {
 
   splitSelectedFd(): void {
     this.splitFd.emit(this.selectedFd()!);
+  }
+
+  selectedInd(): [Relationship, Table] | undefined {
+    if (!this.indSelectionGroup) return undefined;
+    return this.indSelectionGroup.value;
+  }
+
+  joinSelectedInd(): void {
+    this.joinInd.emit({
+      source: this.table!,
+      target: this.selectedInd()![1],
+      relationship: this.selectedInd()![0],
+    });
   }
 }
