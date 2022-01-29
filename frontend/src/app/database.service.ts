@@ -10,6 +10,7 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IFk from '@server/definitions/IFk';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import Column from '../model/schema/Column';
+import IInclusionDependency from '@server/definitions/IInclusionDependencies';
 
 @Injectable({
   providedIn: 'root',
@@ -97,6 +98,37 @@ export class DatabaseService {
     });
   }
 
+  private resolveInds(inds: Array<IInclusionDependency>) {
+    let schemaColumns = new Array<Column>();
+    this.inputSchema!.tables.forEach((table) => {
+      schemaColumns.push(...table.columns.columns);
+    });
+    inds.forEach((ind) => {
+      let indRelationship = new Relationship();
+      let numColumns = ind.dependant.columnIdentifiers.length;
+      for (let i = 0; i < numColumns; i++) {
+        let dependantIColumn = ind.dependant.columnIdentifiers[i];
+        let dependantColumn = schemaColumns.filter(
+          (column) =>
+            dependantIColumn.columnIdentifier == column.name &&
+            'public.' + dependantIColumn.schemaIdentifier ==
+              column.sourceTable.name
+        )[0];
+
+        let referencedIColumn = ind.referenced.columnIdentifiers[i];
+        let referencedColumn = schemaColumns.filter(
+          (column) =>
+            referencedIColumn.columnIdentifier == column.name &&
+            'public.' + referencedIColumn.schemaIdentifier ==
+              column.sourceTable.name
+        )[0];
+
+        indRelationship.add(dependantColumn, referencedColumn);
+      }
+      this.inputSchema!.indRelationships.add(indRelationship);
+    });
+  }
+
   public setInputTables(tables: Array<Table>) {
     this.inputSchema = new Schema(...tables);
     this.inputSchema.tables.forEach((inputTable: Table) => {
@@ -108,11 +140,14 @@ export class DatabaseService {
           )
         )
       );
+      this.getINDsByTables(tables).subscribe((inds) => {
+        this.resolveInds(inds);
+      });
     });
     this.resolveIFks(this.fks);
   }
 
-  protected fdResult: Record<string, Observable<IFunctionalDependencies>> = {};
+  private fdResult: Record<string, Observable<IFunctionalDependencies>> = {};
   private getFunctionalDependenciesByTable(
     table: Table
   ): Observable<IFunctionalDependencies> {
@@ -123,5 +158,17 @@ export class DatabaseService {
         )
         .pipe(shareReplay(1));
     return this.fdResult[table.name];
+  }
+
+  private getINDsByTables(
+    tables: Array<Table>
+  ): Observable<Array<IInclusionDependency>> {
+    let tableNamesConcatenation = tables.map((table) => table.name).join();
+    let indResult: Observable<Array<IInclusionDependency>> = this.http
+      .get<Array<IInclusionDependency>>(
+        `${this.baseUrl}/tables/${tableNamesConcatenation}/inds`
+      )
+      .pipe(shareReplay(1));
+    return indResult;
   }
 }

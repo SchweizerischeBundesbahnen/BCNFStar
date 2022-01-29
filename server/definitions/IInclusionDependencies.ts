@@ -4,16 +4,12 @@ export interface IColumnIdentifier {
   schemaIdentifier?: string;
 }
 
-interface IDependant {
-  columnIdentifiers: IColumnIdentifier[];
-}
-
-interface IReferenced {
+interface IColumnCombination {
   columnIdentifiers: IColumnIdentifier[];
 }
 
 export default interface IInclusionDependency {
   type: string;
-  dependant: IDependant;
-  referenced: IReferenced;
+  dependant: IColumnCombination;
+  referenced: IColumnCombination;
 }
