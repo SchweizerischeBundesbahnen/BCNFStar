@@ -55,6 +55,7 @@ export default class Schema {
 
   public indsOf(table: Table): Set<Table> {
     //this.referencesOf(table, this.indRelationships)
+    console.log('IndsOf start');
     let referencedTables = new Set<Table>();
     let references = [...this.indRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
@@ -64,6 +65,7 @@ export default class Schema {
         referencedTables.add(t);
       }
     });
+    console.log('IndsOf end' + referencedTables);
     return referencedTables;
   }
 
@@ -84,11 +86,14 @@ export default class Schema {
   }
 
   public indsBetween(referencing: Table, referenced: Table): Set<Relationship> {
-    return new Set(
+    console.log('indsBetween start');
+    let result = new Set(
       [...this.indRelationships].filter((rel) =>
         rel.appliesTo(referencing, referenced)
       )
     );
+    console.log('indsbetween end');
+    return result;
   }
 
   public add(...tables: Array<Table>) {
