@@ -36,11 +36,18 @@ export default class Relationship {
   }
 
   public appliesTo(referencing: Table, referenced: Table) {
-    return (
-      this.referencing().isSubsetOf(referencing.columns) &&
-      referenced.pk &&
-      this.referenced().equals(referenced.pk)
-    );
+    if (this.referencing().equals(this.referenced())) {
+      return (
+        this.referencing().isSubsetOf(referencing.columns) &&
+        referenced.pk &&
+        this.referenced().equals(referenced.pk!)
+      );
+    } else {
+      return (
+        this.referencing().isSubsetOf(referencing.columns) &&
+        this.referenced().isSubsetOf(referenced.columns)
+      );
+    }
   }
 
   public referencingToReferencedColumnsIn(cc: ColumnCombination) {

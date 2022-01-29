@@ -15,12 +15,14 @@ export default class Schema {
     table: Table,
     relationships: Set<Relationship>
   ): Set<Table> {
+    //can't use this method (see comment below), needs to be refactored
     let referencedTables = new Set<Table>();
     let references = [...relationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
     this.tables.forEach((t) => {
-      if (references.filter((rel) => rel.appliesTo(table, t)).length > 0) {
+      if (t.pk && references.some((rel) => t.pk!.equals(rel.referenced()))) {
+        //different for INDS and FKs
         referencedTables.add(t);
       }
     });
@@ -39,12 +41,30 @@ export default class Schema {
         fks.add(otherTable);
     });
     fks.delete(table);
-    this.referencesOf(table, this.fkRelationships).forEach((fk) => fks.add(fk));
+    //this.referencesOf(table, this.fkRelationships)
+    let references = [...this.fkRelationships].filter((rel) =>
+      rel.referencing().isSubsetOf(table.columns)
+    );
+    this.tables.forEach((t) => {
+      if (t.pk && references.some((rel) => t.pk!.equals(rel.referenced()))) {
+        fks.add(t);
+      }
+    });
     return fks;
   }
 
   public indsOf(table: Table): Set<Table> {
-    return this.referencesOf(table, this.indRelationships);
+    //this.referencesOf(table, this.indRelationships)
+    let referencedTables = new Set<Table>();
+    let references = [...this.indRelationships].filter((rel) =>
+      rel.referencing().isSubsetOf(table.columns)
+    );
+    this.tables.forEach((t) => {
+      if (references.some((rel) => rel.appliesTo(table, t))) {
+        referencedTables.add(t);
+      }
+    });
+    return referencedTables;
   }
 
   public fksBetween(referencing: Table, referenced: Table): Set<Relationship> {
