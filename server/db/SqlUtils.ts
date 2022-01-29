@@ -1,3 +1,4 @@
+import IAttribute from "../definitions/IAttribute";
 export type SchemaQueryRow = {
   table_name: string;
   column_name: string;
@@ -49,13 +50,11 @@ export default abstract class SqlUtils {
     newTable: string
   ): string;
   public abstract SQL_CREATE_TABLE(
-    attributeNames: string[],
+    attributes: IAttribute[],
     primaryKey: string[],
-    originSchema: string,
-    originTable: string,
-    newSchema: string,
-    newTable: string
-  ): Promise<string>;
+    newSchema,
+    newTable
+  ): string;
   public abstract SQL_INSERT_DATA(
     attributeNames: string[],
     originSchema: string,

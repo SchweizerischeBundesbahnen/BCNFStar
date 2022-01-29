@@ -2,6 +2,7 @@ import sql from "mssql";
 import { env } from "process";
 import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
 import { EOL } from "os";
+import IAttribute from "../definitions/IAttribute";
 
 type Attribute = {
   type: string;
@@ -37,10 +38,23 @@ export default class MsSqlUtils extends SqlUtils {
   }
 
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
-    const result: sql.IResult<SchemaQueryRow> =
-      await sql.query(`SELECT table_name, column_name, data_type, table_schema 
-                      FROM information_schema.columns 
-                      WHERE table_schema NOT IN ('information_schema')`);
+    const result: sql.IResult<SchemaQueryRow> = await sql.query(`SELECT 
+      t.name as table_name, 
+      s.name as [schema_name],
+        [column_name] = c.name,
+        [data_type]         = 
+           CASE 
+             WHEN tp.[name] IN ('varchar', 'char') THEN tp.[name] + '(' + IIF(c.max_length = -1, 'max', CAST(c.max_length AS VARCHAR(25))) + ')' 
+             WHEN tp.[name] IN ('nvarchar','nchar') THEN tp.[name] + '(' + IIF(c.max_length = -1, 'max', CAST(c.max_length / 2 AS VARCHAR(25)))+ ')'      
+             WHEN tp.[name] IN ('decimal', 'numeric') THEN tp.[name] + '(' + CAST(c.[precision] AS VARCHAR(25)) + ', ' + CAST(c.[scale] AS VARCHAR(25)) + ')'
+             WHEN tp.[name] IN ('datetime2') THEN tp.[name] + '(' + CAST(c.[scale] AS VARCHAR(25)) + ')'
+             ELSE tp.[name]
+           END
+       FROM sys.tables t 
+       JOIN sys.schemas s ON t.schema_id = s.schema_id
+       JOIN sys.columns c ON t.object_id = c.object_id
+       JOIN sys.types tp ON c.user_type_id = tp.user_type_id
+    `);
 
     return result.recordset;
   }
@@ -141,31 +155,22 @@ GO`;
   public override SQL_DROP_TABLE_IF_EXISTS(newSchema, newTable): string {
     return `DROP TABLE IF EXISTS ${newSchema}.${newTable}; GO`;
   }
-  public async SQL_CREATE_TABLE(
-    attributeNames,
+  public SQL_CREATE_TABLE(
+    attributes: IAttribute[],
     primaryKey: string[],
-    originSchema,
-    originTable,
     newSchema,
     newTable
-  ): Promise<string> {
-    const copy: string[] = [];
-    const datatypes: Attribute[] = await this.datatypeOf(
-      originSchema,
-      originTable,
-      ""
-    );
-    // console.log("datatypes", datatypes);
-    for (let i: number = 0; i < attributeNames.length; i++) {
-      copy[i] =
-        attributeNames[i] +
-        " " +
-        datatypes
-          .filter((e) => e.column_name == attributeNames[i])
-          .map((e) => e.type)[0] +
-        (primaryKey.includes(attributeNames[i]) ? " NOT NULL " : " NULL");
-    }
-    const attributeString: string = copy.join(",");
+  ): string {
+    const attributeString: string = attributes
+      .map(
+        (attribute) =>
+          attribute.name +
+          " " +
+          attribute.dataType +
+          (primaryKey.includes(attribute.name) ? " NOT NULL " : " NULL")
+      )
+      .join(",");
+    console.log(primaryKey);
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) GO`;
   }
 

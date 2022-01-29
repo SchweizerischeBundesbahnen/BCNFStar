@@ -3,6 +3,7 @@ import SqlUtils, {
   SchemaQueryRow,
   TableHead,
 } from "./SqlUtils";
+import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
 export default class PostgresSqlUtils extends SqlUtils {
@@ -128,13 +129,12 @@ export default class PostgresSqlUtils extends SqlUtils {
   public override SQL_DROP_TABLE_IF_EXISTS(newSchema, newTable): string {
     return `DROP TABLE IF EXISTS ${newSchema}.${newTable};`;
   }
-  public async SQL_CREATE_TABLE(
-    attributeNames,
-    originSchema,
-    originTable,
+  public SQL_CREATE_TABLE(
+    attributes: IAttribute[],
+    primaryKey: string[],
     newSchema,
     newTable
-  ): Promise<string> {
+  ): string {
     // return `CREATE TABLE ${newSchema}.${newTable} AS SELECT DISTINCT
     // ${attributeNames.map((a) => '"' + a + '"').join(", ")} FROM ${originSchema}.${originTable};`;
 

@@ -230,8 +230,8 @@ export class DatabaseService {
       originTable: originTable,
       newSchema: newSchema,
       newTable: newTable,
-      attribute: table.columns.columnNames().map((str) => {
-        return { name: str };
+      attributes: Array.from(table.columns.columns).map((column) => {
+        return { name: column.name, dataType: column.dataType };
       }),
       primaryKey: primaryKey,
     };
