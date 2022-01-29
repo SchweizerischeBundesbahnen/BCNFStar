@@ -6,7 +6,6 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
-import Relationship from '@/src/model/schema/Relationship';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
@@ -33,12 +32,12 @@ export class NormalizeComponent {
     this.selectedTable = table;
   }
 
-  onJoin(joinRelationship: [Relationship, Table]): void {
+  onJoin(event: any): void {
     let command = new JoinCommand(
       this.schema,
-      this.selectedTable!,
-      joinRelationship[1],
-      joinRelationship[0]
+      event.target,
+      event.source,
+      event.relationship
     );
 
     let self = this;
