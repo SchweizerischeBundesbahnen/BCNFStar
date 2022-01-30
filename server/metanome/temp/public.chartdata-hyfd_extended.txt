@@ -1,0 +1,1 @@
+[] --> category, emissions, facility_name, timespan_id, user_id

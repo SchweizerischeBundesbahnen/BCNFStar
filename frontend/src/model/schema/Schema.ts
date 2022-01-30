@@ -84,11 +84,12 @@ export default class Schema {
   }
 
   public indsBetween(referencing: Table, referenced: Table): Set<Relationship> {
-    return new Set(
+    let result = new Set(
       [...this.indRelationships].filter((rel) =>
         rel.appliesTo(referencing, referenced)
       )
     );
+    return result;
   }
 
   public add(...tables: Array<Table>) {

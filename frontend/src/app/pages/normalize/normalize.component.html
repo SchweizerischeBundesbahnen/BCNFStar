@@ -1,10 +1,13 @@
 <div class="container-fluid ml-2 mr-2 border">
   <div class="row border">
     <div class="col-8 border">
+      <!-- [selectedTable]="this.selectedTable" -->
+      <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
-        [tables]="this.schema.tables"
+        [tables]="this.tablesEventEmitter"
         [selectedTable]="this.selectedTable"
         (selected)="onSelect($event)"
+        (joinFk)="onJoin($event)"
       ></app-normalize-schema-graph>
     </div>
     <div class="col-4 border">

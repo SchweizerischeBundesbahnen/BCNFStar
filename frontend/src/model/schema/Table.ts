@@ -38,18 +38,10 @@ export default class Table {
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
     names.forEach((name, i) =>
-      table.columns.add(new Column(name, '?', i, table))
+      table.columns.add(new Column(name, 'unkown data type', i, table))
     );
     table.sourceTables.add(table);
     return table;
-  }
-
-  public get mermaidName(): string {
-    return this.name
-      .replace('.', '_')
-      .replace(' ', '')
-      .replace('}', '')
-      .replace('{', '');
   }
 
   public get numColumns(): number {
@@ -189,13 +181,13 @@ export default class Table {
   }
 
   public inds(): Array<[Relationship, Table]> {
-    let inds = new Array<[Relationship, Table]>();
+    let indArray = new Array<[Relationship, Table]>();
     this.schema!.indsOf(this).forEach((table) => {
       this.schema!.indsBetween(this, table).forEach((relationship) => {
-        inds.push([relationship, table]);
+        indArray.push([relationship, table]);
       });
     });
-    return inds;
+    return indArray;
   }
 
   public keys(): Array<ColumnCombination> {
@@ -207,6 +199,30 @@ export default class Table {
       this._keys = keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
     }
     return this._keys;
+  }
+
+  public minimalReferencedTables(): Array<Table> {
+    // Annahme: keine Zyklen in references
+    var result: Set<Table> = new Set(this.referencedTables());
+
+    var visited: Array<Table> = [];
+    visited.push(this);
+
+    var queue: Array<Table> = [];
+    queue.push(...this.referencedTables());
+    while (queue.length > 0) {
+      var current = queue.shift();
+      visited.push(current!);
+      for (const refTable of current!.referencedTables()) {
+        if (result.has(refTable)) {
+          result.delete(refTable);
+        }
+        if (!visited.includes(refTable)) {
+          queue.push(refTable);
+        }
+      }
+    }
+    return [...result];
   }
 
   public violatingFds(): Array<FunctionalDependency> {
@@ -229,22 +245,5 @@ export default class Table {
 
   public foreignKeyForReferencedTable(refTable: Table): ColumnCombination {
     return this.columns.copy().intersect(refTable.columns);
-  }
-
-  public toMermaidString(): string {
-    let result = 'class '.concat(this.mermaidName, '{\n');
-    this.columns.inOrder().forEach((column) => {
-      result = result.concat(column.dataType, ' ', column.name, '\n');
-    });
-    result = result.concat('}');
-    this.referencedTables().forEach((refTable) => {
-      result = result.concat(
-        '\n',
-        this.mermaidName,
-        ' --> ',
-        refTable.mermaidName
-      );
-    });
-    return result;
   }
 }

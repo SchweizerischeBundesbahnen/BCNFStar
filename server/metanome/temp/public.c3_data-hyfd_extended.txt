@@ -1,0 +1,1 @@
+[] --> amount, amount2, ch4_per_unit, co2_per_unit, create_date, emissions_per_unit, facility_id, hfcs_per_unit, id, n2o_per_unit, name, pfcs_per_unit, sc3_emissions_per_unit, sf6_per_unit, type, unit, update_date

@@ -7,6 +7,7 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
+import { BehaviorSubject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
@@ -21,6 +22,9 @@ export class NormalizeComponent {
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
   public sql: PersistSchemaSql = new PersistSchemaSql();
+  public tablesEventEmitter: BehaviorSubject<Set<Table>> = new BehaviorSubject(
+    new Set<Table>()
+  );
 
   constructor(
     public dataService: DatabaseService,
@@ -28,6 +32,7 @@ export class NormalizeComponent {
     public dialog: SbbDialog
   ) {
     this.schema = dataService.inputSchema!;
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onSelect(table: Table): void {
@@ -50,6 +55,7 @@ export class NormalizeComponent {
       self.selectedTable = undefined;
     };
     this.commandProcessor.do(command);
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onClickSplit(fd: FunctionalDependency): void {
@@ -76,6 +82,7 @@ export class NormalizeComponent {
       self.selectedTable = this.table;
     };
     this.commandProcessor.do(command);
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onAutoNormalize(): void {
@@ -92,14 +99,18 @@ export class NormalizeComponent {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
+    console.log('pushing');
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onUndo() {
     this.commandProcessor.undo();
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   onRedo() {
     this.commandProcessor.redo();
+    this.tablesEventEmitter.next(this.schema.tables);
   }
 
   persistSchema(schemaName: string): void {
