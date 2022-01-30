@@ -280,8 +280,10 @@ export class DatabaseService {
     const originSchema: string = table.columns.sourceTable().schemaName;
     const originTable: string = table.columns.sourceTable().name;
     const [newSchema, newTable]: string[] = [table.schemaName, table.name];
-    const primaryKey: string[] = table.keys()[0].columnNames();
-
+    let primaryKey: string[] = [];
+    if (table.pk) {
+      primaryKey = table.pk!.columnNames();
+    }
     const data = {
       originSchema: originSchema,
       originTable: originTable,

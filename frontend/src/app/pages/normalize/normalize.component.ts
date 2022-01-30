@@ -146,15 +146,17 @@ export class NormalizeComponent {
 
     console.log('Requesting SQL-Generation (Primary Keys)');
     this.schema.tables.forEach((table) => {
-      this.dataService
-        .getPrimaryKeySql(
-          table.schemaName,
-          table.name,
-          table.keys()[0].columnNames()
-        )
-        .then(
-          (res) => (this.sql.primaryKeyConstraints += '\n' + res.sql + '\n')
-        );
+      if (table.pk) {
+        this.dataService
+          .getPrimaryKeySql(
+            table.schemaName,
+            table.name,
+            table.pk!.columnNames()
+          )
+          .then(
+            (res) => (this.sql.primaryKeyConstraints += '\n' + res.sql + '\n')
+          );
+      }
     });
 
     console.log('Requesting SQL-Generation (Foreign Keys)');
