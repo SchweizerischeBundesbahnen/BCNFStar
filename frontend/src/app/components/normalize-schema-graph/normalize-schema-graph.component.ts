@@ -177,6 +177,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
               id: this.graphStorage[otherTable.name].jointjsEl.id,
               port: foreignKey.name + '_right',
             },
+            z: -1,
           });
       }
       this.graph.addCells(Object.values(this.graphStorage[table.name].links));
@@ -184,15 +185,9 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   }
 
   generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
-    const sclaedPortRadius =
-      (this.portDiameter * this.panzoomTransform.scale) / 2;
-
-    const cx =
-      side == PortSide.Left
-        ? 0
-        : this.elementWidth * this.panzoomTransform.scale;
-    return `<circle r="${sclaedPortRadius}" cx="${cx}" cy="${
-      25 + sclaedPortRadius + sclaedPortRadius * 2 * counter
+    const cx = side == PortSide.Left ? 0 : this.elementWidth;
+    return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
+      25 + this.portDiameter * (counter + 0.5)
     }" strokegit ="green" fill="white"/>`;
   }
 
