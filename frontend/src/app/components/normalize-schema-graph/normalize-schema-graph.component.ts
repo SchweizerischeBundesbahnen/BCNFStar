@@ -41,14 +41,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   }>();
 
   protected localTables: Set<Table> = new Set();
-
-  ngAfterViewInit(): void {
-    this.tables.asObservable().subscribe((v) => {
-      console.log('new tables. count ' + v.size);
-      this.localTables = v;
-      this.createDefaultGraph();
-    });
-  }
+  protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
   protected portDiameter = 22.5;
 
@@ -57,12 +50,10 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   protected graph!: joint.dia.Graph;
   protected paper!: joint.dia.Paper;
 
-  // The graph helps us with creating links, moving elements and rendering them as SVG
-  // However, we only create blank elements and put custom Angular components over them
-  // Idea is from here: https://resources.jointjs.com/tutorial/html-elements
-  createDefaultGraph() {
-    this.graph = new joint.dia.Graph();
+  protected elementWidth = 300;
 
+  ngAfterViewInit(): void {
+    this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
       model: this.graph,
@@ -73,11 +64,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
       },
     });
 
-    // Order is important, elements need to be there when links are generated
-    this.graphStorage = {};
-    this.generateElements();
-    this.generateLinks();
-
     // move the corresponding HTML overlay whenever a graph element changes position
     this.graph.on('change:position', (element) => {
       if (element.isElement)
@@ -87,6 +73,23 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           }
         }
     });
+
+    this.addPanzoomHandler();
+
+    this.tables.asObservable().subscribe((v) => {
+      console.log('new tables. count ' + v.size);
+      this.localTables = v;
+      this.updateGraph();
+    });
+  }
+
+  updateGraph() {
+    for (const item in this.graphStorage) {
+      this.graphStorage[item].jointjsEl.remove();
+    }
+    this.graphStorage = {};
+    this.generateElements();
+    this.generateLinks();
     joint.layout.DirectedGraph.layout(this.graph, {
       dagre,
       graphlib,
@@ -100,14 +103,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     setTimeout(() => {
       this.updateAllBBoxes();
     }, 10);
-    this.addPanzoomHandler();
   }
 
   // We use the panzoom library becuase pan and zoom detection is difficult and must
   // feel intuitive on a range of devices. We just take the transform and override the
   // default panzoom conotroller to move both the graph elements and the associated Angular
   // components
-  protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
   addPanzoomHandler() {
     panzoom(document.querySelector('#paper svg') as SVGElement, {
       smoothScroll: false,
@@ -138,7 +139,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     });
   }
 
-  protected elementWidth = 300;
   generateElements() {
     for (const table of this.localTables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
