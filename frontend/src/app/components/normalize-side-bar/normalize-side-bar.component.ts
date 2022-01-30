@@ -29,7 +29,7 @@ export class NormalizeSideBarComponent implements OnChanges {
     relationship: Relationship;
   }>();
   public fds!: Array<FunctionalDependency>;
-  public inds!: Array<[Relationship, Table]>;
+  public inds!: Array<{ relationship: Relationship; table: Table }>;
 
   constructor() {}
 
@@ -47,7 +47,7 @@ export class NormalizeSideBarComponent implements OnChanges {
     this.splitFd.emit(this.selectedFd()!);
   }
 
-  selectedInd(): [Relationship, Table] | undefined {
+  selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
   }
@@ -55,8 +55,8 @@ export class NormalizeSideBarComponent implements OnChanges {
   joinSelectedInd(): void {
     this.joinInd.emit({
       source: this.table!,
-      target: this.selectedInd()![1],
-      relationship: this.selectedInd()![0],
+      target: this.selectedInd()!.table,
+      relationship: this.selectedInd()!.relationship,
     });
   }
 }

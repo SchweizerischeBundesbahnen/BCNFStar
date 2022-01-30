@@ -220,8 +220,14 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   generateLinks() {
     for (const table of this.localTables) {
       for (const fk of table.fks()) {
-        let fkReferenced = fk[0].referenced().columns.values().next().value;
-        let fkReferencing = fk[0].referencing().columns.values().next().value;
+        let fkReferenced = fk.relationship
+          .referenced()
+          .columns.values()
+          .next().value;
+        let fkReferencing = fk.relationship
+          .referencing()
+          .columns.values()
+          .next().value;
         console.log(
           fkReferenced.sourceTable.name,
           fkReferencing.sourceTable.name
@@ -236,15 +242,15 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
               '_right',
           },
           target: {
-            id: this.graphStorage[fk[1].name].jointjsEl.id,
+            id: this.graphStorage[fk.table.name].jointjsEl.id,
             port:
               fkReferenced.sourceTable.name + '.' + fkReferenced.name + '_left',
           },
         });
         console.log(link);
-        this.graphStorage[table.name].links[fk[1].name] = link;
+        this.graphStorage[table.name].links[fk.table.name] = link;
         this.graph.addCell(link);
-        this.addJoinButton(link, table, fk[1], fk[0]);
+        this.addJoinButton(link, table, fk.table, fk.relationship);
       }
     }
   }

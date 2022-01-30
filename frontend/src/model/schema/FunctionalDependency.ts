@@ -68,8 +68,12 @@ export default class FunctionalDependency {
     if (
       this.table.fks().some((fk) => {
         return (
-          !fk[0].referencing().isSubsetOf(this.table.remainingSchema(this)) &&
-          !fk[0].referencing().isSubsetOf(this.table.generatingSchema(this))
+          !fk.relationship
+            .referencing()
+            .isSubsetOf(this.table.remainingSchema(this)) &&
+          !fk.relationship
+            .referencing()
+            .isSubsetOf(this.table.generatingSchema(this))
         );
       })
     )

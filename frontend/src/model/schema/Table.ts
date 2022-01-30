@@ -168,21 +168,21 @@ export default class Table {
     return this.schema!.fksOf(this);
   }
 
-  public fks(): Array<[Relationship, Table]> {
-    let fks = new Array<[Relationship, Table]>();
+  public fks(): Array<{ relationship: Relationship; table: Table }> {
+    let fks = new Array<{ relationship: Relationship; table: Table }>();
     this.schema!.fksOf(this).forEach((table) => {
       this.schema!.fksBetween(this, table).forEach((relationship) => {
-        fks.push([relationship, table]);
+        fks.push({ relationship: relationship, table: table });
       });
     });
     return fks;
   }
 
-  public inds(): Array<[Relationship, Table]> {
-    let indArray = new Array<[Relationship, Table]>();
+  public inds(): Array<{ relationship: Relationship; table: Table }> {
+    let indArray = new Array<{ relationship: Relationship; table: Table }>();
     this.schema!.indsOf(this).forEach((table) => {
       this.schema!.indsBetween(this, table).forEach((relationship) => {
-        indArray.push([relationship, table]);
+        indArray.push({ relationship: relationship, table: table });
       });
     });
     return indArray;
