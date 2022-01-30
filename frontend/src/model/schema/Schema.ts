@@ -15,15 +15,14 @@ export default class Schema {
     table: Table,
     relationships: Set<Relationship>
   ): Set<Table> {
+    //can't use this method (see comment below), needs to be refactored
     let referencedTables = new Set<Table>();
     let references = [...relationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
     this.tables.forEach((t) => {
-      if (
-        references.filter((rel) => rel.referenced().isSubsetOf(t.columns))
-          .length > 0
-      ) {
+      if (t.pk && references.some((rel) => t.pk!.equals(rel.referenced()))) {
+        //different for INDS and FKs
         referencedTables.add(t);
       }
     });
@@ -31,7 +30,7 @@ export default class Schema {
   }
 
   public fksOf(table: Table): Set<Table> {
-    let fks = this.referencesOf(table, this.fkRelationships);
+    let fks = new Set<Table>();
     this.tables.forEach((otherTable) => {
       let intersect = table.columns.copy().intersect(otherTable.columns);
       if (
@@ -42,11 +41,30 @@ export default class Schema {
         fks.add(otherTable);
     });
     fks.delete(table);
+    //this.referencesOf(table, this.fkRelationships)
+    let references = [...this.fkRelationships].filter((rel) =>
+      rel.referencing().isSubsetOf(table.columns)
+    );
+    this.tables.forEach((t) => {
+      if (t.pk && references.some((rel) => t.pk!.equals(rel.referenced()))) {
+        fks.add(t);
+      }
+    });
     return fks;
   }
 
   public indsOf(table: Table): Set<Table> {
-    return this.referencesOf(table, this.indRelationships);
+    //this.referencesOf(table, this.indRelationships)
+    let referencedTables = new Set<Table>();
+    let references = [...this.indRelationships].filter((rel) =>
+      rel.referencing().isSubsetOf(table.columns)
+    );
+    this.tables.forEach((t) => {
+      if (references.some((rel) => rel.appliesTo(table, t))) {
+        referencedTables.add(t);
+      }
+    });
+    return referencedTables;
   }
 
   public fksBetween(referencing: Table, referenced: Table): Set<Relationship> {
@@ -66,11 +84,12 @@ export default class Schema {
   }
 
   public indsBetween(referencing: Table, referenced: Table): Set<Relationship> {
-    return new Set(
+    let result = new Set(
       [...this.indRelationships].filter((rel) =>
         rel.appliesTo(referencing, referenced)
       )
     );
+    return result;
   }
 
   public add(...tables: Array<Table>) {
@@ -161,6 +180,12 @@ export default class Schema {
         });
     });
 
-    //TODO remove duplicate fds (lhs = fk subset)
+    //TODO optimise duplicate removal
+    let fds = table.fds;
+    table.setFds();
+    fds.forEach((fd) => {
+      if (!table.fds.some((otherFd) => otherFd.lhs.equals(fd.lhs)))
+        table.fds.push(fd);
+    });
   }
 }

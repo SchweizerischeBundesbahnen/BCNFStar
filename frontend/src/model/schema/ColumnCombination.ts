@@ -32,8 +32,23 @@ export default class ColumnCombination {
     );
   }
 
+  public sourceTable(): Table {
+    let sourceTables = this.sourceTables();
+    if (sourceTables.length > 1)
+      console.log(
+        'Warning: expected only one sourceTable but there are ' +
+          sourceTables.length
+      );
+    return sourceTables[0];
+  }
+
   public sourceTables(): Array<Table> {
-    return [...this.columns].map((column) => column.sourceTable);
+    let sourceTables = new Array<Table>();
+    this.columns.forEach((column) => {
+      if (!sourceTables.includes(column.sourceTable))
+        sourceTables.push(column.sourceTable);
+    });
+    return sourceTables;
   }
 
   public add(...columns: Array<Column>) {

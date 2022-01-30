@@ -12,6 +12,7 @@ export default class Table {
   public fds: Array<FunctionalDependency> = [];
   public schema?: Schema;
   public relationships = new Array<Relationship>();
+  public sourceTables = new Set<Table>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -27,6 +28,7 @@ export default class Table {
         new Column(iAttribute.name, iAttribute.dataType, index, table)
       );
     });
+    table.sourceTables.add(table);
     table.name = iTable.name;
     return table;
   }
@@ -36,11 +38,8 @@ export default class Table {
     names.forEach((name, i) =>
       table.columns.add(new Column(name, 'unkown data type', i, table))
     );
+    table.sourceTables.add(table);
     return table;
-  }
-
-  public sourceTables(): Array<Table> {
-    return this.columns.sourceTables();
   }
 
   public get numColumns(): number {
@@ -88,14 +87,33 @@ export default class Table {
   }
 
   public projectRelationships(table: Table): void {
-    let sourceTables = table.sourceTables();
-    this.relationships.forEach((relationship) => {
-      if (
-        sourceTables.includes(relationship.referenced().sourceTables()[0]) &&
-        sourceTables.includes(relationship.referencing().sourceTables()[0])
-      )
-        table.relationships.push(relationship);
-    });
+    // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
+    let neededSourceTables = new Set(table.columns.sourceTables());
+    let sourceTables = new Set(this.sourceTables);
+    let relationships = new Set(this.relationships);
+
+    let toRemove: Set<Table>;
+    do {
+      toRemove = new Set();
+      sourceTables.forEach((sourceTable) => {
+        let adjacentRelationship = [...relationships].filter(
+          (rel) =>
+            rel.referenced().sourceTable() == sourceTable ||
+            rel.referencing().sourceTable() == sourceTable
+        );
+        if (
+          adjacentRelationship.length == 1 &&
+          !neededSourceTables.has(sourceTable)
+        ) {
+          toRemove.add(sourceTable);
+          relationships.delete(adjacentRelationship[0]);
+        }
+      });
+      toRemove.forEach((table) => sourceTables.delete(table));
+    } while (toRemove.size > 0);
+
+    table.sourceTables = sourceTables;
+    table.relationships = new Array(...relationships);
   }
 
   public projectFds(table: Table): void {
@@ -124,16 +142,24 @@ export default class Table {
     let newTable = new Table(
       generating.columns
         .copy()
-        .union(remaining.columns) // problematic?
+        .union(remaining.columns)
         .setMinus(relationship.referencing())
+        .union(relationship.referenced())
     );
     newTable.schema = this.schema;
     newTable.relationships.push(...this.relationships);
     newTable.relationships.push(...otherTable.relationships);
-    newTable.relationships.push(relationship);
+    if (!relationship.referenced().equals(relationship.referencing()))
+      newTable.relationships.push(relationship);
 
     newTable.name = remaining.name;
     newTable.pk = remaining.pk;
+    this.sourceTables.forEach((sourceTable) =>
+      newTable.sourceTables.add(sourceTable)
+    );
+    otherTable.sourceTables.forEach((sourceTable) =>
+      newTable.sourceTables.add(sourceTable)
+    );
 
     return newTable;
   }
@@ -153,13 +179,13 @@ export default class Table {
   }
 
   public inds(): Array<[Relationship, Table]> {
-    let inds = new Array<[Relationship, Table]>();
+    let indArray = new Array<[Relationship, Table]>();
     this.schema!.indsOf(this).forEach((table) => {
       this.schema!.indsBetween(this, table).forEach((relationship) => {
-        inds.push([relationship, table]);
+        indArray.push([relationship, table]);
       });
     });
-    return inds;
+    return indArray;
   }
 
   public keys(): Array<ColumnCombination> {

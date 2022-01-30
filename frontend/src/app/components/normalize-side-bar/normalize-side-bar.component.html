@@ -14,12 +14,9 @@
       <sbb-expansion-panel-header>
         Functional Dependencies
       </sbb-expansion-panel-header>
-      <div *ngIf="table.violatingFds().length > 0">
+      <div *ngIf="fds.length > 0">
         <sbb-radio-group #fdSelection>
-          <sbb-radio-button
-            *ngFor="let fd of table.violatingFds().slice(0, 10)"
-            [value]="fd"
-          >
+          <sbb-radio-button *ngFor="let fd of fds.slice(0, 10)" [value]="fd">
             {{ fd.toString() }}
           </sbb-radio-button>
         </sbb-radio-group>
@@ -39,22 +36,20 @@
       <sbb-expansion-panel-header
         >Inclusion Dependencies</sbb-expansion-panel-header
       >
-      <div *ngIf="table.fks().length > 0">
-        <sbb-radio-group #indSelection>
-          <sbb-radio-button *ngFor="let rel of table.fks()" [value]="rel">{{
-            rel[0].toString()
-          }}</sbb-radio-button>
-        </sbb-radio-group>
-        <br />
-        <button
-          type="button"
-          sbb-button
-          [disabled]="!selectedInd()"
-          (click)="joinSelectedInd()"
-        >
-          Join Inclusion Dependency
-        </button>
-      </div>
+      <sbb-radio-group #indSelection>
+        <sbb-radio-button *ngFor="let rel of inds.slice(0, 10)" [value]="rel">{{
+          rel[0].toString()
+        }}</sbb-radio-button>
+      </sbb-radio-group>
+      <br />
+      <button
+        type="button"
+        sbb-button
+        [disabled]="!selectedInd()"
+        (click)="joinSelectedInd()"
+      >
+        Join Inclusion Dependency
+      </button>
     </sbb-expansion-panel>
   </sbb-accordion>
 </div>
