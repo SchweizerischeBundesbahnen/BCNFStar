@@ -1,4 +1,5 @@
 import IAttribute from "../definitions/IAttribute";
+import IRelationship from "../definitions/IRelationship";
 export type SchemaQueryRow = {
   table_name: string;
   column_name: string;
@@ -56,9 +57,9 @@ export default abstract class SqlUtils {
     newTable
   ): string;
   public abstract SQL_INSERT_DATA(
-    attributeNames: string[],
-    originSchema: string,
-    originTable: string,
+    attributes: IAttribute[],
+    sourceTables: string[],
+    relationships: IRelationship[],
     newSchema: string,
     newTable: string
   ): string;

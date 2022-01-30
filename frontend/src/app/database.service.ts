@@ -2,6 +2,10 @@ import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
+import {
+  IRequestBodyDataTransferSql,
+  IRequestBodyForeignKeySql,
+} from '@server/definitions/IBackendAPI';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
@@ -11,6 +15,7 @@ import IFk from '@server/definitions/IFk';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependencies';
+import IRelationship from '@server/definitions/IRelationship';
 
 @Injectable({
   providedIn: 'root',
@@ -68,19 +73,19 @@ export class DatabaseService {
 
   private resolveIFks(fks: Array<IFk>) {
     fks.forEach((fk) => {
-      let referencingTable: Table = [...this.inputSchema!.tables].filter(
-        (table: Table) => fk.name == table.name
-      )[0];
       let referencedTable: Table = [...this.inputSchema!.tables].filter(
-        (table: Table) => fk.foreignName == table.name
+        (table: Table) => fk.name == table.schemaAndName()
+      )[0];
+      let referencingTable: Table = [...this.inputSchema!.tables].filter(
+        (table: Table) => fk.foreignName == table.schemaAndName()
       )[0];
 
       if (referencingTable && referencedTable) {
         let fkColumn: Column = referencingTable.columns.columnFromName(
-          fk.column
+          fk.foreignColumn
         );
         let pkColumn: Column = referencedTable.columns.columnFromName(
-          fk.foreignColumn
+          fk.column
         );
 
         if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
@@ -154,51 +159,42 @@ export class DatabaseService {
     if (!this.fdResult[table.name])
       this.fdResult[table.name] = this.http
         .get<IFunctionalDependencies>(
-          `${this.baseUrl}/tables/${table.name}/fds`
+          `${this.baseUrl}/tables/${table.schemaName}.${table.name}/fds`
         )
         .pipe(shareReplay(1));
     return this.fdResult[table.name];
   }
 
   getForeignKeySql(
-    referencingTable: Table,
-    referencedTable: Table
+    referencing: Table,
+    relationship: Relationship,
+    referenced: Table
   ): Promise<any> {
-    // TODO: Tabellen-Objekt sollte auch schema bekommen.... dann kann das hier weg...
-    if (referencingTable.name.startsWith('public.')) {
-      referencingTable.name = referencingTable.name.substring(7);
-    }
-    if (referencedTable.name.startsWith('public.')) {
-      referencedTable.name = referencedTable.name.substring(7);
-    }
-
-    if (referencingTable.name.startsWith('dbo.')) {
-      referencingTable.name = referencingTable.name.substring(4);
-    }
-    if (referencedTable.name.startsWith('dbo.')) {
-      referencedTable.name = referencedTable.name.substring(4);
-    }
-
-    const key_columns: string[] = referencingTable
-      .foreignKeyForReferencedTable(referencedTable)
-      .columnNames();
-
-    console.log(key_columns);
     // Da FK nur 40 Zeichen lang sein darf...
     const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
 
-    const mapping: {}[] = [];
-    for (let i = 0; i < key_columns.length; i++) {
-      mapping.push({ key: key_columns[i], value: key_columns[i] });
-    }
+    const relationship_: IRelationship = {
+      referencing: {
+        name: `${referencing.name}`,
+        schemaName: `${referencing.schemaName!}`,
+        attribute: [],
+      },
+      referenced: {
+        name: `${referenced.name}`,
+        schemaName: `${referenced.schemaName!}`,
+        attribute: [],
+      },
+      columnRelationship: relationship._referencing.map((element, index) => {
+        return {
+          referencingColumn: element.name,
+          referencedColumn: relationship._referenced[index].name,
+        };
+      }),
+    };
 
-    const data = {
-      referencingSchema: referencingTable.schemaName,
-      referencingTable: referencingTable.name,
-      referencedSchema: referencedTable.schemaName,
-      referencedTable: referencedTable.name,
-      constraintName: fk_name,
-      mapping: mapping,
+    const data: IRequestBodyForeignKeySql = {
+      name: fk_name,
+      relationship: relationship_,
     };
 
     let result: any = this.http
@@ -218,20 +214,46 @@ export class DatabaseService {
       .toPromise();
     return result;
   }
-  getDataTransferSql(
-    table: Table,
-    originTable: Table,
-    attributes: Column[]
-  ): Promise<any> {
-    const data = {
-      originSchema: originTable.schemaName,
-      originTable: originTable.name,
-      newSchema: table.schemaName,
+  getDataTransferSql(table: Table, attributes: Column[]): Promise<any> {
+    const relationships: IRelationship[] = table.relationships.map((rel) => {
+      return {
+        referencing: {
+          name: `${rel.referencing().sourceTable().name}`,
+          schemaName: `${rel.referencing().sourceTable().schemaName!}`,
+          attribute: [],
+        },
+        referenced: {
+          name: `${rel.referenced().sourceTable().name}`,
+          schemaName: `${rel.referenced().sourceTable().schemaName!}`,
+          attribute: [],
+        },
+        columnRelationship: rel._referencing.map((element, index) => {
+          return {
+            referencingColumn: element.name,
+            referencedColumn: rel._referenced[index].name,
+          };
+        }),
+      };
+    });
+
+    // console.log('relationships: ', relationships);
+
+    const data: IRequestBodyDataTransferSql = {
+      newSchema: table.schemaName!,
       newTable: table.name,
-      attribute: attributes.map((str) => {
-        return { name: str.name };
+      relationships: relationships,
+      sourceTables: Array.from(table.sourceTables).map(
+        (table) => `${table.schemaName!}.${table.name}`
+      ),
+      attributes: attributes.map((str) => {
+        return {
+          name: str.name,
+          table: str.sourceTable.name,
+          dataType: str.dataType,
+        };
       }),
     };
+    // console.log(data);
     let result: any = this.http
       .post(`${this.baseUrl}/persist/dataTransfer`, data)
       .toPromise();
@@ -278,7 +300,9 @@ export class DatabaseService {
   private getINDsByTables(
     tables: Array<Table>
   ): Observable<Array<IInclusionDependency>> {
-    let tableNamesConcatenation = tables.map((table) => table.name).join();
+    let tableNamesConcatenation = tables
+      .map((table) => table.schemaName + '.' + table.name)
+      .join();
     let indResult: Observable<Array<IInclusionDependency>> = this.http
       .get<Array<IInclusionDependency>>(
         `${this.baseUrl}/tables/${tableNamesConcatenation}/inds`

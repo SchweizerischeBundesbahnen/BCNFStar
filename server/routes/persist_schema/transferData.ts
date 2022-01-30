@@ -1,21 +1,21 @@
+import IAttribute from "@/definitions/IAttribute";
+import IRelationship from "@/definitions/IRelationship";
 import { Request, Response, RequestHandler } from "express";
 import { sqlUtils } from "../../db";
+import { IRequestBodyDataTransferSql } from "@/definitions/IBackendAPI";
 
 export default function getDataTransferSQL(): RequestHandler {
   async function dataTransferSQL(req: Request, res: Response): Promise<void> {
     try {
-      const attributeNames: string[] = req.body.attribute.map((a) => a.name);
-      const newSchema: string = req.body.newSchema;
-      const newTable: string = req.body.newTable;
-      const originSchema: string = req.body.originSchema;
-      const originTable: string = req.body.originTable;
-
+      const body: IRequestBodyDataTransferSql =
+        req.body as IRequestBodyDataTransferSql;
+      console.log(body);
       const sqlStatement: string = sqlUtils.SQL_INSERT_DATA(
-        attributeNames,
-        originSchema,
-        originTable,
-        newSchema,
-        newTable
+        body.attributes,
+        body.sourceTables,
+        body.relationships,
+        body.newSchema,
+        body.newTable
       );
 
       res.json({ sql: sqlStatement });

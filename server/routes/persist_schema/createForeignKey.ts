@@ -1,3 +1,4 @@
+import { IRequestBodyForeignKeySql } from "@/definitions/IBackendAPI";
 import { Request, Response, RequestHandler } from "express";
 import { sqlUtils } from "../../db";
 
@@ -19,28 +20,17 @@ interface IDict {
 export default function getCreateForeignKey(): RequestHandler {
   async function createForeignKey(req: Request, res: Response): Promise<void> {
     try {
-      const body = req.body;
-      const [
-        referencingSchema,
-        referencingTable,
-        referencedSchema,
-        referencedTable,
-        constraintName,
-      ]: string[] = parseBody(body);
-      const columnMapping: IDict[] = body.mapping;
-      const referencingColumns: string[] = columnMapping.map(
-        (elem) => elem.key
-      );
-      const referencedColumns: string[] = columnMapping.map((elem) => elem.key);
+      const body: IRequestBodyForeignKeySql =
+        req.body as IRequestBodyForeignKeySql;
 
       const sqlStatement: string = sqlUtils.SQL_FOREIGN_KEY(
-        constraintName,
-        referencingSchema,
-        referencingTable,
-        referencingColumns,
-        referencedSchema,
-        referencedTable,
-        referencedColumns
+        body.name,
+        body.relationship.referencing.schemaName, // referencing?!
+        body.relationship.referencing.name,
+        body.relationship.columnRelationship.map((c) => c.referencingColumn),
+        body.relationship.referenced.schemaName, // referencing?!
+        body.relationship.referenced.name,
+        body.relationship.columnRelationship.map((c) => c.referencedColumn)
       );
 
       res.json({ sql: sqlStatement });

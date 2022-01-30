@@ -35,6 +35,9 @@ export default class Table {
     return table;
   }
 
+  public schemaAndName(): string {
+    return this.schemaName! + '.' + this.name;
+  }
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
     names.forEach((name, i) =>
@@ -156,6 +159,7 @@ export default class Table {
 
     newTable.name = remaining.name;
     newTable.pk = remaining.pk;
+    console.log('newTable.pk: ', newTable.pk);
     this.sourceTables.forEach((sourceTable) =>
       newTable.sourceTables.add(sourceTable)
     );
@@ -241,9 +245,5 @@ export default class Table {
     let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
-  }
-
-  public foreignKeyForReferencedTable(refTable: Table): ColumnCombination {
-    return this.columns.copy().intersect(refTable.columns);
   }
 }

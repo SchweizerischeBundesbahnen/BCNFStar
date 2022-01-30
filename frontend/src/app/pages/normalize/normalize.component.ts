@@ -136,12 +136,9 @@ export class NormalizeComponent {
 
     console.log('Requesting SQL-Generation (Data Transfer)');
     this.schema.tables.forEach((table) => {
+      console.log('source table: ', table.columns.sourceTable());
       this.dataService
-        .getDataTransferSql(
-          table,
-          table.columns.sourceTable(),
-          Array.from(table.columns.columns)
-        )
+        .getDataTransferSql(table, Array.from(table.columns.columns))
         .then(
           (res) => (this.sql.dataTransferStatements += '\n' + res.sql + '\n')
         );
@@ -161,10 +158,13 @@ export class NormalizeComponent {
     });
 
     console.log('Requesting SQL-Generation (Foreign Keys)');
-    this.schema.tables.forEach((referencingTable) => {
-      referencingTable.referencedTables().forEach((referencedTable) => {
+
+    console.log(this.schema.fkRelationships);
+
+    this.schema.tables.forEach((table) => {
+      table.fks().forEach((elem) => {
         this.dataService
-          .getForeignKeySql(referencingTable, referencedTable)
+          .getForeignKeySql(table, elem[0], elem[1])
           .then(
             (res) => (this.sql.foreignKeyConstraints += '\n' + res.sql + '\n')
           );

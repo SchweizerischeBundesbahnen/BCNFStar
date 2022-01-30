@@ -3,6 +3,8 @@ import { env } from "process";
 import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
 import { EOL } from "os";
 import IAttribute from "../definitions/IAttribute";
+import ITable from "@/definitions/ITable";
+import IRelationship from "@/definitions/IRelationship";
 
 type Attribute = {
   type: string;
@@ -229,16 +231,33 @@ GO`;
   }
 
   public override SQL_INSERT_DATA(
-    attributeNames,
-    originSchema,
-    originTable,
-    newSchema,
-    newTable
+    attributes: IAttribute[],
+    sourceTables: string[],
+    relationships: IRelationship[],
+    newSchema: string,
+    newTable: string
   ): string {
-    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributeNames.join(
-      ", "
-    )} FROM ${originSchema}.${originTable}`;
+    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributes
+      .map((attr) => `${attr.table}.${attr.name}`)
+      .join(", ")} FROM ${sourceTables.join(", ")}
+    ${this.where(relationships)}
+    `;
   }
+
+  private where(relationships: IRelationship[]): string {
+    if (relationships.length == 0) return "";
+    return `WHERE ${relationships
+      .map((relationship) =>
+        relationship.columnRelationship
+          .map(
+            (column) =>
+              `${relationship.referencing.schemaName}.${relationship.referencing.name}.${column.referencingColumn} = ${relationship.referenced.schemaName}.${relationship.referenced.name}.${column.referencedColumn}`
+          )
+          .join(" AND ")
+      )
+      .join(" AND ")}`;
+  }
+
   public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
     return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey.join(
       ", "

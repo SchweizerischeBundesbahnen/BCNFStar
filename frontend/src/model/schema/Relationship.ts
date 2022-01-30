@@ -3,8 +3,8 @@ import ColumnCombination from './ColumnCombination';
 import Table from './Table';
 
 export default class Relationship {
-  private _referencing = new Array<Column>();
-  private _referenced = new Array<Column>();
+  public _referencing = new Array<Column>();
+  public _referenced = new Array<Column>();
 
   public static fromTables(
     referencing: Table,
