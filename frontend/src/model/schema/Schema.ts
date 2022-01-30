@@ -141,15 +141,6 @@ export default class Schema {
     parent2: Table,
     relationship: Relationship
   ) {
-    /*let sourceTables = new Set<Table>();
-    table.columns.columns.forEach((column) => {
-      sourceTables.add(column.sourceTable);
-    });
-
-    sourceTables.forEach((sourceTable) => {
-      sourceTable.projectFds(table);
-    });*/
-
     let referencing = relationship.appliesTo(parent1, parent2)
       ? parent1
       : parent2;
@@ -157,20 +148,25 @@ export default class Schema {
       ? parent2
       : parent1;
 
-    referencing.fds.forEach((fd) => {
-      table.addFd(
-        relationship.referencingToReferencedColumnsIn(fd.lhs.copy()),
-        relationship.referencingToReferencedColumnsIn(fd.rhs.copy())
-      );
-    });
+    // copy parent fds
     referenced.fds.forEach((fd) => {
       table.addFd(fd.lhs.copy(), fd.rhs.copy());
+    });
+    referencing.fds.forEach((fd) => {
+      let newLhs = relationship.referencingToReferencedColumnsIn(fd.lhs.copy());
+      let newRhs = relationship.referencingToReferencedColumnsIn(fd.rhs.copy());
+      if (newLhs.isSubsetOf(relationship.referenced())) {
+        let correspondingFds = table.fds.filter((fd) => fd.lhs.equals(newLhs));
+        if (correspondingFds.length > 0) correspondingFds[0].rhs.union(newRhs);
+        else table.addFd(newLhs, newRhs);
+      } else {
+        table.addFd(newLhs, newRhs);
+      }
     });
 
     // extension
     let fk = relationship.referenced();
     let fkFds = table.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
-
     table.fds.forEach((fd) => {
       let rhsFkPart = fd.rhs.copy().intersect(fk);
       fkFds
@@ -178,14 +174,6 @@ export default class Schema {
         .forEach((fkFd) => {
           fd.rhs.union(fkFd.rhs);
         });
-    });
-
-    //TODO optimise duplicate removal
-    let fds = table.fds;
-    table.setFds();
-    fds.forEach((fd) => {
-      if (!table.fds.some((otherFd) => otherFd.lhs.equals(fd.lhs)))
-        table.fds.push(fd);
     });
   }
 }
