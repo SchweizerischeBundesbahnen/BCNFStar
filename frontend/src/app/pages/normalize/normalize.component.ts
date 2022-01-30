@@ -45,13 +45,13 @@ export class NormalizeComponent {
       event.relationship
     );
 
-    let self = this;
-    command.onDo = function () {
-      self.selectedTable = undefined;
+    command.onDo = () => {
+      this.selectedTable = undefined;
     };
-    command.onUndo = function () {
-      self.selectedTable = undefined;
+    command.onUndo = () => {
+      this.selectedTable = undefined;
     };
+
     this.commandProcessor.do(command);
     this.tablesEventEmitter.next(this.schema.tables);
   }
@@ -68,17 +68,10 @@ export class NormalizeComponent {
 
   onSplitFd(fd: FunctionalDependency): void {
     let command = new SplitCommand(this.schema, this.selectedTable!, fd);
-    // WARNING: To reference the command object from inside the function we need to define
-    // the function via function(){}. If we used arrow functions ()=>{} 'this' would still
-    // refer to this normalize component. We assign self to this, to keep a reference of this
-    // component anyway.
-    let self = this;
-    command.onDo = function () {
-      self.selectedTable = this.children![0];
-    };
-    command.onUndo = function () {
-      self.selectedTable = this.table;
-    };
+
+    command.onDo = () => (this.selectedTable = command.children![0]);
+    command.onUndo = () => (this.selectedTable = command.table);
+
     this.commandProcessor.do(command);
     this.tablesEventEmitter.next(this.schema.tables);
   }
