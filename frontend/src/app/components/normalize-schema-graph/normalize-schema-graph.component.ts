@@ -184,10 +184,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     }
   }
 
+  // if you change this, also change graph-element.component.css > .table-head > height
+  protected graphElementHeaderHeight: number = 25;
   generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
     const cx = side == PortSide.Left ? 0 : this.elementWidth;
     return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
-      25 + this.portDiameter * (counter + 0.5)
+      this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5)
     }" strokegit ="green" fill="white"/>`;
   }
 
