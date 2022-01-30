@@ -38,7 +38,11 @@
       >
       <sbb-radio-group #indSelection>
         <sbb-radio-button *ngFor="let rel of inds.slice(0, 10)" [value]="rel">{{
-          rel.relationship.toString()
+          rel.relationship.referencing().toString() +
+            "->(" +
+            rel.table.name +
+            ") " +
+            rel.relationship.referenced().toString()
         }}</sbb-radio-button>
       </sbb-radio-group>
       <br />
