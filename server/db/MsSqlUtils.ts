@@ -40,7 +40,7 @@ export default class MsSqlUtils extends SqlUtils {
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
     const result: sql.IResult<SchemaQueryRow> = await sql.query(`SELECT 
       t.name as table_name, 
-      s.name as [schema_name],
+      s.name as [table_schema],
         [column_name] = c.name,
         [data_type]         = 
            CASE 
@@ -124,23 +124,28 @@ export default class MsSqlUtils extends SqlUtils {
   }
 
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
-    const result = await sql.query<ForeignKeyResult>(`SELECT
-      tc.table_schema,
-      tc.table_name, 
-      kcu.column_name, 
-      ccu.table_schema AS foreign_table_schema,
-      ccu.table_name AS foreign_table_name,
-      ccu.column_name AS foreign_column_name 
-  FROM 
-      information_schema.table_constraints AS tc 
-      JOIN information_schema.key_column_usage AS kcu
-      ON tc.constraint_name = kcu.constraint_name
-      AND tc.table_schema = kcu.table_schema
-      JOIN information_schema.constraint_column_usage AS ccu
-      ON ccu.constraint_name = tc.constraint_name
-      AND ccu.table_schema = tc.table_schema
-  WHERE tc.constraint_type = 'FOREIGN KEY'
-      AND tc.table_schema NOT IN ('pg_catalog', 'information_schema');`);
+    const result = await sql.query<ForeignKeyResult>(`
+  SELECT 
+    sch.name AS foreign_table_schema,
+    tab1.name AS foreign_table_name,
+    col1.name AS foreign_column_name,
+	sch.name AS table_schema,
+    tab2.name AS table_name,
+    col2.name AS column_name
+FROM sys.foreign_key_columns fkc
+INNER JOIN sys.objects obj
+    ON obj.object_id = fkc.constraint_object_id
+INNER JOIN sys.tables tab1
+    ON tab1.object_id = fkc.parent_object_id
+INNER JOIN sys.schemas sch
+    ON tab1.schema_id = sch.schema_id
+INNER JOIN sys.columns col1
+    ON col1.column_id = parent_column_id AND col1.object_id = tab1.object_id
+INNER JOIN sys.tables tab2
+    ON tab2.object_id = fkc.referenced_object_id
+INNER JOIN sys.columns col2
+    ON col2.column_id = referenced_column_id AND col2.object_id = tab2.object_id
+`);
     console.log(result);
     return result.recordset;
   }
