@@ -184,10 +184,12 @@ export class DatabaseService {
         schemaName: `${referenced.schemaName!}`,
         attribute: [],
       },
-      columnRelationship: relationship._referencing.map((element, index) => {
+      columnRelationship: referenced.pk!.inOrder().map((element) => {
         return {
-          referencingColumn: element.name,
-          referencedColumn: relationship._referenced[index].name,
+          referencingColumn:
+            relationship._referencing[relationship._referenced.indexOf(element)]
+              .name,
+          referencedColumn: element.name,
         };
       }),
     };
