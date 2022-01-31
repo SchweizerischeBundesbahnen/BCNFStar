@@ -29,10 +29,17 @@ export default class Table {
         new Column(iAttribute.name, iAttribute.dataType, index, table)
       );
     });
-    table.sourceTables.add(table);
     table.name = iTable.name; //mermaid tablenames must not contain dots
     table.schemaName = iTable.schemaName;
+    table.sourceTables.add(table.copy());
     return table;
+  }
+
+  public copy(): Table {
+    const copy: Table = new Table(this.columns);
+    copy.name = this.name;
+    copy.schemaName = this.schemaName;
+    return copy;
   }
 
   public schemaAndName(): string {
