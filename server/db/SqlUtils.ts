@@ -56,13 +56,35 @@ export default abstract class SqlUtils {
     newSchema,
     newTable
   ): string;
-  public abstract SQL_INSERT_DATA(
+
+  public SQL_INSERT_DATA(
     attributes: IAttribute[],
     sourceTables: string[],
     relationships: IRelationship[],
     newSchema: string,
     newTable: string
-  ): string;
+  ): string {
+    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributes
+      .map((attr) => `${attr.table}.${attr.name}`)
+      .join(", ")} FROM ${sourceTables.join(", ")}
+    ${this.where(relationships)}
+    `;
+  }
+
+  public where(relationships: IRelationship[]): string {
+    if (relationships.length == 0) return "";
+    return `WHERE ${relationships
+      .map((relationship) =>
+        relationship.columnRelationship
+          .map(
+            (column) =>
+              `${relationship.referencing.schemaName}.${relationship.referencing.name}.${column.referencingColumn} = ${relationship.referenced.schemaName}.${relationship.referenced.name}.${column.referencedColumn}`
+          )
+          .join(" AND ")
+      )
+      .join(" AND ")}`;
+  }
+
   public abstract SQL_ADD_PRIMARY_KEY(
     newSchema: string,
     newTable: string,

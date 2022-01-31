@@ -5,7 +5,6 @@ import SqlUtils, {
 } from "./SqlUtils";
 import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
-import IRelationship from "@/definitions/IRelationship";
 
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
@@ -133,12 +132,16 @@ export default class PostgresSqlUtils extends SqlUtils {
     return result.rows;
   }
 
-  public override SQL_CREATE_SCHEMA(newSchema: string): string {
-    return `CREATE SCHEMA IF NOT EXISTS ${newSchema};`;
+  public override SQL_CREATE_SCHEMA(schema: string): string {
+    return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
   }
-  public override SQL_DROP_TABLE_IF_EXISTS(newSchema, newTable): string {
-    return `DROP TABLE IF EXISTS ${newSchema}.${newTable};`;
+  public override SQL_DROP_TABLE_IF_EXISTS(
+    schema: string,
+    table: string
+  ): string {
+    return `DROP TABLE IF EXISTS ${schema}.${table};`;
   }
+
   public SQL_CREATE_TABLE(
     attributes: IAttribute[],
     primaryKey: string[],
@@ -157,41 +160,14 @@ export default class PostgresSqlUtils extends SqlUtils {
     console.log(primaryKey);
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString})`;
   }
-  public override SQL_INSERT_DATA(
-    attributes: IAttribute[],
-    sourceTables: string[],
-    relationships: IRelationship[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributes
-      .map((attr) => `${attr.table}.${attr.name}`)
-      .join(", ")} FROM ${sourceTables.join(", ")}
-    ${this.where(relationships)}
-    `;
-  }
-
-  public where(relationships: IRelationship[]): string {
-    if (relationships.length == 0) return "";
-    return `WHERE ${relationships
-      .map((relationship) =>
-        relationship.columnRelationship
-          .map(
-            (column) =>
-              `${relationship.referencing.schemaName}.${relationship.referencing.name}.${column.referencingColumn} = ${relationship.referenced.schemaName}.${relationship.referenced.name}.${column.referencedColumn}`
-          )
-          .join(" AND ")
-      )
-      .join(" AND ")}`;
-  }
 
   public override SQL_ADD_PRIMARY_KEY(
     newSchema: string,
     newTable: string,
-    primaryKey
+    primaryKey: string[]
   ): string {
     return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey
-      .map((a) => '"' + a + '"')
+      .map((a) => `"${a}"`)
       .join(", ")});`;
   }
 

@@ -159,14 +159,17 @@ INNER JOIN sys.columns col2
 EXEC('CREATE SCHEMA [${newSchema}]');
 GO`;
   }
-  public override SQL_DROP_TABLE_IF_EXISTS(newSchema, newTable): string {
+  public override SQL_DROP_TABLE_IF_EXISTS(
+    newSchema: string,
+    newTable: string
+  ): string {
     return `DROP TABLE IF EXISTS ${newSchema}.${newTable}; GO`;
   }
   public SQL_CREATE_TABLE(
     attributes: IAttribute[],
     primaryKey: string[],
-    newSchema,
-    newTable
+    newSchema: string,
+    newTable: string
   ): string {
     const attributeString: string = attributes
       .map(
@@ -198,64 +201,6 @@ GO`;
       ", "
     )});
 `;
-  }
-
-  public async datatypeOf(
-    schema: string,
-    table: string,
-    attribute: string
-  ): Promise<Attribute[]> {
-    const ps = new sql.PreparedStatement();
-    ps.input("schema", sql.NVarChar);
-    ps.input("table", sql.NVarChar);
-    await ps.prepare(
-      `SELECT 
-    [column_name] = c.name,
-    [type]         = 
-       CASE 
-         WHEN tp.[name] IN ('varchar', 'char') THEN tp.[name] + '(' + IIF(c.max_length = -1, 'max', CAST(c.max_length AS VARCHAR(25))) + ')' 
-         WHEN tp.[name] IN ('nvarchar','nchar') THEN tp.[name] + '(' + IIF(c.max_length = -1, 'max', CAST(c.max_length / 2 AS VARCHAR(25)))+ ')'      
-         WHEN tp.[name] IN ('decimal', 'numeric') THEN tp.[name] + '(' + CAST(c.[precision] AS VARCHAR(25)) + ', ' + CAST(c.[scale] AS VARCHAR(25)) + ')'
-         WHEN tp.[name] IN ('datetime2') THEN tp.[name] + '(' + CAST(c.[scale] AS VARCHAR(25)) + ')'
-         ELSE tp.[name]
-       END
-   FROM sys.tables t 
-   JOIN sys.schemas s ON t.schema_id = s.schema_id
-   JOIN sys.columns c ON t.object_id = c.object_id
-   JOIN sys.types tp ON c.user_type_id = tp.user_type_id
-   WHERE s.[name] = @schema AND t.[name] = @table`
-    );
-    const result = await ps.execute({ schema, table });
-
-    return result.recordset as Attribute[];
-  }
-
-  public override SQL_INSERT_DATA(
-    attributes: IAttribute[],
-    sourceTables: string[],
-    relationships: IRelationship[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributes
-      .map((attr) => `${attr.table}.${attr.name}`)
-      .join(", ")} FROM ${sourceTables.join(", ")}
-    ${this.where(relationships)}
-    `;
-  }
-
-  private where(relationships: IRelationship[]): string {
-    if (relationships.length == 0) return "";
-    return `WHERE ${relationships
-      .map((relationship) =>
-        relationship.columnRelationship
-          .map(
-            (column) =>
-              `${relationship.referencing.schemaName}.${relationship.referencing.name}.${column.referencingColumn} = ${relationship.referenced.schemaName}.${relationship.referenced.name}.${column.referencedColumn}`
-          )
-          .join(" AND ")
-      )
-      .join(" AND ")}`;
   }
 
   public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
