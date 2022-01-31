@@ -5,6 +5,7 @@ import SqlUtils, {
 } from "./SqlUtils";
 import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
+import IRelationship from "@/definitions/IRelationship";
 
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
@@ -33,9 +34,18 @@ export default class PostgresSqlUtils extends SqlUtils {
     const client = await this.pool.connect();
     const query_result = await client.query<SchemaQueryRow>(
       // the last line excludes system tables
-      `SELECT table_name, column_name, data_type, table_schema 
+      `SELECT table_name, column_name, 
+      case 
+        when domain_name is not null then domain_name
+        when data_type='character varying' THEN 'varchar('||character_maximum_length||')'
+        when data_type='character' THEN 'varchar('||character_maximum_length||')'
+        when data_type='numeric' THEN 'numeric('||numeric_precision||','||numeric_scale||')'
+        else data_type
+      end as data_type, 
+      table_schema 
         FROM information_schema.columns 
-        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')`,
+        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+      `,
       []
     );
     return query_result.rows;
@@ -132,24 +142,54 @@ export default class PostgresSqlUtils extends SqlUtils {
   public SQL_CREATE_TABLE(
     attributes: IAttribute[],
     primaryKey: string[],
-    newSchema,
-    newTable
+    newSchema: string,
+    newTable: string
   ): string {
-    // return `CREATE TABLE ${newSchema}.${newTable} AS SELECT DISTINCT
-    // ${attributeNames.map((a) => '"' + a + '"').join(", ")} FROM ${originSchema}.${originTable};`;
-
-    return "";
+    const attributeString: string = attributes
+      .map(
+        (attribute) =>
+          attribute.name +
+          " " +
+          attribute.dataType +
+          (primaryKey.includes(attribute.name) ? " NOT NULL " : " NULL")
+      )
+      .join(",");
+    console.log(primaryKey);
+    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString})`;
   }
   public override SQL_INSERT_DATA(
-    attributeNames,
-    originSchema,
-    originTable,
-    newSchema,
-    newTable
+    attributes: IAttribute[],
+    sourceTables: string[],
+    relationships: IRelationship[],
+    newSchema: string,
+    newTable: string
   ): string {
-    return "";
+    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributes
+      .map((attr) => `${attr.table}.${attr.name}`)
+      .join(", ")} FROM ${sourceTables.join(", ")}
+    ${this.where(relationships)}
+    `;
   }
-  public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
+
+  public where(relationships: IRelationship[]): string {
+    if (relationships.length == 0) return "";
+    return `WHERE ${relationships
+      .map((relationship) =>
+        relationship.columnRelationship
+          .map(
+            (column) =>
+              `${relationship.referencing.schemaName}.${relationship.referencing.name}.${column.referencingColumn} = ${relationship.referenced.schemaName}.${relationship.referenced.name}.${column.referencedColumn}`
+          )
+          .join(" AND ")
+      )
+      .join(" AND ")}`;
+  }
+
+  public override SQL_ADD_PRIMARY_KEY(
+    newSchema: string,
+    newTable: string,
+    primaryKey
+  ): string {
     return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey
       .map((a) => '"' + a + '"')
       .join(", ")});`;
