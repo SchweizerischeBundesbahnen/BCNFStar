@@ -174,7 +174,6 @@ export class NormalizeComponent {
   }
 
   download(): void {
-    console.log('HERE');
     const file: File = new File([this.sql.to_string()], 'persist_schema.sql', {
       type: 'text/plain;charset=utf-8',
     });
