@@ -1,3 +1,4 @@
+import IRelationship from '@server/definitions/IRelationship';
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
 import Table from './Table';
@@ -74,5 +75,26 @@ export default class Relationship {
 
   public toString(): String {
     return this.referencing().toString() + '->' + this.referenced().toString();
+  }
+
+  public toIRelationship(): IRelationship {
+    return {
+      referencing: {
+        name: `${this.referencing().sourceTable().name}`,
+        schemaName: `${this.referencing().sourceTable().schemaName!}`,
+        attribute: [],
+      },
+      referenced: {
+        name: `${this.referenced().sourceTable().name}`,
+        schemaName: `${this.referenced().sourceTable().schemaName!}`,
+        attribute: [],
+      },
+      columnRelationships: this._referencing.map((element, index) => {
+        return {
+          referencingColumn: element.name,
+          referencedColumn: this._referenced[index].name,
+        };
+      }),
+    };
   }
 }

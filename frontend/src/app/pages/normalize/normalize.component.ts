@@ -114,8 +114,6 @@ export class NormalizeComponent {
   }
 
   persistSchema(schemaName: string): void {
-    console.log('Requesting SQL-Generation');
-
     this.schema.tables.forEach((table) => (table.schemaName = schemaName));
 
     const tables: Table[] = Array.from(this.schema.tables);
@@ -136,7 +134,6 @@ export class NormalizeComponent {
 
     console.log('Requesting SQL-Generation (Data Transfer)');
     this.schema.tables.forEach((table) => {
-      console.log('source table: ', table.columns.sourceTable());
       this.dataService
         .getDataTransferSql(table, Array.from(table.columns.columns))
         .then(

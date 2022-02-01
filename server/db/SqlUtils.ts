@@ -75,7 +75,7 @@ export default abstract class SqlUtils {
     if (relationships.length == 0) return "";
     return `WHERE ${relationships
       .map((relationship) =>
-        relationship.columnRelationship
+        relationship.columnRelationships
           .map(
             (column) =>
               `${relationship.referencing.schemaName}.${relationship.referencing.name}.${column.referencingColumn} = ${relationship.referenced.schemaName}.${relationship.referenced.name}.${column.referencedColumn}`

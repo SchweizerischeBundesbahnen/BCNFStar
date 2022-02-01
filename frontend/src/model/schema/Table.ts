@@ -253,4 +253,14 @@ export default class Table {
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
   }
+
+  public toITable(): ITable {
+    return {
+      name: this.name,
+      schemaName: this.schemaName,
+      attribute: Array.from(this.columns.columns).map((attr) =>
+        attr.toIAttribute()
+      ),
+    };
+  }
 }

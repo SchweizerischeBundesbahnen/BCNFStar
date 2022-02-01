@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import {
+  IRequestBodyCreateTableSql,
   IRequestBodyDataTransferSql,
   IRequestBodyForeignKeySql,
 } from '@server/definitions/IBackendAPI';
@@ -170,21 +171,12 @@ export class DatabaseService {
     relationship: Relationship,
     referenced: Table
   ): Promise<any> {
-    // Da FK nur 40 Zeichen lang sein darf...
     const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
 
     const relationship_: IRelationship = {
-      referencing: {
-        name: `${referencing.name}`,
-        schemaName: `${referencing.schemaName!}`,
-        attribute: [],
-      },
-      referenced: {
-        name: `${referenced.name}`,
-        schemaName: `${referenced.schemaName!}`,
-        attribute: [],
-      },
-      columnRelationship: referenced.pk!.inOrder().map((element) => {
+      referencing: referencing.toITable(),
+      referenced: referenced.toITable(),
+      columnRelationships: referenced.pk!.inOrder().map((element) => {
         return {
           referencingColumn:
             relationship._referencing[relationship._referenced.indexOf(element)]
@@ -216,46 +208,18 @@ export class DatabaseService {
       .toPromise();
     return result;
   }
+
   getDataTransferSql(table: Table, attributes: Column[]): Promise<any> {
-    const relationships: IRelationship[] = table.relationships.map((rel) => {
-      return {
-        referencing: {
-          name: `${rel.referencing().sourceTable().name}`,
-          schemaName: `${rel.referencing().sourceTable().schemaName!}`,
-          attribute: [],
-        },
-        referenced: {
-          name: `${rel.referenced().sourceTable().name}`,
-          schemaName: `${rel.referenced().sourceTable().schemaName!}`,
-          attribute: [],
-        },
-        columnRelationship: rel._referencing.map((element, index) => {
-          return {
-            referencingColumn: element.name,
-            referencedColumn: rel._referenced[index].name,
-          };
-        }),
-      };
-    });
-
-    // console.log('relationships: ', relationships);
-
     const data: IRequestBodyDataTransferSql = {
       newSchema: table.schemaName!,
       newTable: table.name,
-      relationships: relationships,
+      relationships: table.relationships.map((rel) => rel.toIRelationship()),
       sourceTables: Array.from(table.sourceTables).map(
         (table) => `${table.schemaName!}.${table.name}`
       ),
-      attributes: attributes.map((str) => {
-        return {
-          name: str.name,
-          table: str.sourceTable.name,
-          dataType: str.dataType,
-        };
-      }),
+      attributes: attributes.map((attr) => attr.toIAttribute()),
     };
-    // console.log(data);
+
     let result: any = this.http
       .post(`${this.baseUrl}/persist/dataTransfer`, data)
       .toPromise();
@@ -279,16 +243,12 @@ export class DatabaseService {
   }
 
   getCreateTableSql(table: Table): Promise<any> {
-    const originSchema: string = table.columns.sourceTable().schemaName;
-    const originTable: string = table.columns.sourceTable().name;
     const [newSchema, newTable]: string[] = [table.schemaName, table.name];
     let primaryKey: string[] = [];
     if (table.pk) {
       primaryKey = table.pk!.columnNames();
     }
-    const data = {
-      originSchema: originSchema,
-      originTable: originTable,
+    const data: IRequestBodyCreateTableSql = {
       newSchema: newSchema,
       newTable: newTable,
       attributes: Array.from(table.columns.columns).map((column) => {

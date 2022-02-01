@@ -9,6 +9,13 @@ export interface IRequestBodyDataTransferSql {
   relationships: IRelationship[];
 }
 
+export interface IRequestBodyCreateTableSql {
+  newSchema: string;
+  newTable: string;
+  attributes: IAttribute[];
+  primaryKey: string[];
+}
+
 export interface IRequestBodyForeignKeySql {
   name: string;
   relationship: IRelationship;

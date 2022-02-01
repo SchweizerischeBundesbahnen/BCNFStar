@@ -27,10 +27,10 @@ export default function getCreateForeignKey(): RequestHandler {
         body.name,
         body.relationship.referencing.schemaName, // referencing?!
         body.relationship.referencing.name,
-        body.relationship.columnRelationship.map((c) => c.referencingColumn),
+        body.relationship.columnRelationships.map((c) => c.referencingColumn),
         body.relationship.referenced.schemaName, // referencing?!
         body.relationship.referenced.name,
-        body.relationship.columnRelationship.map((c) => c.referencedColumn)
+        body.relationship.columnRelationships.map((c) => c.referencedColumn)
       );
 
       res.json({ sql: sqlStatement });

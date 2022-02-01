@@ -2,24 +2,21 @@ import { Request, Response, RequestHandler } from "express";
 import { EOL } from "os";
 import { sqlUtils } from "../../db";
 import IAttribute from "../../definitions/IAttribute";
-
-function parseBody(body: any): string[][] {
-  const primaryKey: string[] = body.primaryKey;
-  const newSchema: string = body.newSchema;
-  const newTable: string = body.newTable;
-
-  return [primaryKey, [newSchema, newTable]];
-}
+import { IRequestBodyCreateTableSql } from "@/definitions/IBackendAPI";
 
 export default function getCreateTableStatement(): RequestHandler {
   async function createTable(req: Request, res: Response): Promise<void> {
     try {
-      const [primaryKey, [newSchema, newTable]] = parseBody(req.body);
+      const body: IRequestBodyCreateTableSql =
+        req.body as IRequestBodyCreateTableSql;
 
-      const attributes: IAttribute[] = req.body.attributes as IAttribute[];
       const sqlStatement: string =
-        sqlUtils.SQL_CREATE_TABLE(attributes, primaryKey, newSchema, newTable) +
-        EOL;
+        sqlUtils.SQL_CREATE_TABLE(
+          body.attributes,
+          body.primaryKey,
+          body.newSchema,
+          body.newTable
+        ) + EOL;
       res.json({ sql: sqlStatement });
       res.status(200);
     } catch (error) {
