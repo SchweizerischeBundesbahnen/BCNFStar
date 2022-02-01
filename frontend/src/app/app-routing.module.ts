@@ -7,7 +7,7 @@ import { NormalizeComponent } from './pages/normalize/normalize.component';
 const routes: Routes = [
   { path: '', component: DatabaseSelectionComponent },
   { path: 'table-selection', component: TableSelectionComponent },
-  { path: 'normalize/:table_name', component: NormalizeComponent },
+  { path: 'normalize', component: NormalizeComponent },
   { path: '**', redirectTo: '/database-selection' },
 ];
 

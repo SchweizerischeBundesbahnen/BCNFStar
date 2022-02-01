@@ -1,6 +1,6 @@
+import Table from '@/src/model/schema/Table';
 import { Component, OnInit } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
-import ITable from '@server/definitions/ITable';
 
 @Component({
   selector: 'app-table-selection',
@@ -8,16 +8,31 @@ import ITable from '@server/definitions/ITable';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
+  tables: Map<Table, Boolean> = new Map();
+
   // eslint-disable-next-line no-unused-vars
   constructor(private dataService: DatabaseService) {}
 
   ngOnInit(): void {
-    this.dataService.getTableNames().subscribe((data) => (this.tables = data));
+    this.dataService.loadTableCallback$.subscribe((data) =>
+      data.forEach((table) => this.tables.set(table, false))
+    );
+    this.dataService.loadTables();
   }
 
-  public selectTable(table: ITable) {
-    this.dataService.setInputTable(table);
+  public toggleCheckStatus(table: Table) {
+    this.tables.set(table, !this.tables.get(table)!);
   }
 
-  tables: ITable[] = [];
+  public hasSelectedTables(): boolean {
+    return [...this.tables.values()].some((value) => value);
+  }
+
+  public selectTable() {
+    this.dataService.setInputTables(
+      [...this.tables.entries()]
+        .filter((entry) => entry[1])
+        .map((entry) => entry[0])
+    );
+  }
 }

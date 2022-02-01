@@ -1,20 +1,22 @@
-//import { assert } from 'console';
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 
 export default class Table {
-  name: string = '';
-  columns: ColumnCombination = new ColumnCombination();
-  pk?: ColumnCombination;
-  fds: FunctionalDependency[] = [];
-  children: Table[] = new Array(2);
-  referencedTables: Table[] = [];
-  referencingTables: Table[] = [];
+  public name = '';
+  public columns = new ColumnCombination();
+  public pk?: ColumnCombination = undefined;
+  public fds: Array<FunctionalDependency> = [];
+  public referencedTables = new Set<Table>();
+  public referencingTables = new Set<Table>();
+  public readonly origin: Table;
+  private _violatingFds?: Array<FunctionalDependency>;
+  private _keys?: Array<ColumnCombination>;
 
-  public constructor(columns?: ColumnCombination) {
+  public constructor(columns?: ColumnCombination, origin?: Table) {
     if (columns) this.columns = columns;
+    this.origin = origin ? origin : this;
   }
 
   public static fromITable(iTable: ITable): Table {
@@ -27,7 +29,7 @@ export default class Table {
     return table;
   }
 
-  public static fromColumnNames(...names: string[]) {
+  public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
     names.forEach((name, i) => table.columns.add(new Column(name, '?', i)));
     return table;
@@ -45,29 +47,13 @@ export default class Table {
     return this.columns.cardinality;
   }
 
-  public get hasChildren(): boolean {
-    return !!this.children[0];
-  }
-
-  public setFds(...fds: FunctionalDependency[]) {
+  public setFds(...fds: Array<FunctionalDependency>) {
     this.fds = fds;
-    this.extendFds();
     this.fds = fds.filter((fd) => !fd.isFullyTrivial());
   }
 
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.fds.push(new FunctionalDependency(this, lhs, rhs));
-  }
-
-  public allResultingTables(): Table[] {
-    if (!this.hasChildren) return [this];
-    return this.children[0]
-      .allResultingTables()
-      .concat(this.children[1].allResultingTables());
-  }
-
-  public extendFds() {
-    this.fds.forEach((fd) => fd.extend());
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
@@ -78,21 +64,25 @@ export default class Table {
     return fd.rhs.copy();
   }
 
-  public split(fd: FunctionalDependency): Table[] {
-    //assert(this.fds.includes(fd));
-    this.children[0] = this.constructProjection(this.remainingSchema(fd));
-    this.children[1] = this.constructProjection(this.generatingSchema(fd));
-    this.children[0].pk = this.pk;
-    this.children[1].pk = fd.lhs.copy();
-    this.children[0].referencedTables.push(this.children[1]);
-    this.children[1].referencingTables.push(this.children[0]);
-    this.children[0].name = this.name;
-    this.children[1].name = fd.lhs.columnNames().join('_').substring(0, 50);
-    return this.children;
+  public split(fd: FunctionalDependency): Array<Table> {
+    let remaining: Table = this.constructProjection(this.remainingSchema(fd));
+    let generating: Table = this.constructProjection(this.generatingSchema(fd));
+
+    remaining.pk = this.pk;
+    generating.pk = fd.lhs.copy();
+
+    remaining.name = this.name;
+    generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
+
+    remaining.referencedTables.add(generating);
+    generating.referencingTables.add(remaining);
+
+    return [remaining, generating];
   }
 
   public constructProjection(cc: ColumnCombination): Table {
-    const table: Table = new Table(cc);
+    const table: Table = new Table(cc, this.origin);
+
     this.fds.forEach((fd) => {
       if (fd.lhs.isSubsetOf(cc)) {
         fd = new FunctionalDependency(
@@ -105,49 +95,95 @@ export default class Table {
         }
       }
     });
+
     this.referencedTables.forEach((refTable) => {
       if (this.foreignKeyForReferencedTable(refTable).isSubsetOf(cc)) {
-        table.referencedTables.push(refTable);
-        refTable.referencingTables.push(table);
+        table.referencedTables.add(refTable);
+        refTable.referencingTables.add(table);
       }
     });
+
     this.referencingTables.forEach((refTable) => {
       if (refTable.foreignKeyForReferencedTable(this).isSubsetOf(cc)) {
-        table.referencingTables.push(refTable);
-        refTable.referencedTables.push(table);
+        table.referencingTables.add(refTable);
+        refTable.referencedTables.add(table);
       }
     });
+
     return table;
   }
 
+  public join(otherTable: Table): Table {
+    let newTable = this.origin.constructProjection(
+      this.columns.copy().union(otherTable.columns)
+    );
+
+    this.referencedTables.forEach((refTable) =>
+      newTable.referencedTables.add(refTable)
+    );
+    otherTable.referencedTables.forEach((refTable) =>
+      newTable.referencedTables.add(refTable)
+    );
+
+    this.referencingTables.forEach((refTable) =>
+      newTable.referencingTables.add(refTable)
+    );
+    otherTable.referencingTables.forEach((refTable) =>
+      newTable.referencingTables.add(refTable)
+    );
+
+    let remaining: Table;
+    let generating: Table;
+    if (this.referencedTables.has(otherTable)) {
+      remaining = this;
+      generating = otherTable;
+    } else {
+      remaining = otherTable;
+      generating = this;
+    }
+
+    newTable.referencedTables.delete(generating);
+    newTable.referencingTables.delete(remaining);
+
+    newTable.name = remaining.name;
+    newTable.pk = remaining.pk;
+
+    return newTable;
+  }
+
   public foreignKeyForReferencedTable(refTable: Table): ColumnCombination {
-    //assert(this.referencedTables.includes(refTable));
     return this.columns.copy().intersect(refTable.columns);
   }
 
-  public keys(): ColumnCombination[] {
-    let keys: Array<ColumnCombination> = this.fds
-      .filter((fd) => fd.isKey())
-      .map((fd) => fd.lhs);
-    if (keys.length == 0) keys.push(this.columns.copy());
-    return keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
+  public keys(): Array<ColumnCombination> {
+    if (!this._keys) {
+      let keys: Array<ColumnCombination> = this.fds
+        .filter((fd) => fd.isKey())
+        .map((fd) => fd.lhs);
+      if (keys.length == 0) keys.push(this.columns.copy());
+      this._keys = keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
+    }
+    return this._keys;
   }
 
-  public foreignKeys(): ColumnCombination[] {
-    return this.referencedTables.map((table) =>
-      this.foreignKeyForReferencedTable(table)
+  public foreignKeys(): Array<ColumnCombination> {
+    let foreignKeys: Array<ColumnCombination> = [];
+    this.referencedTables.forEach((table) =>
+      foreignKeys.push(this.foreignKeyForReferencedTable(table))
     );
+    return foreignKeys;
   }
 
-  public violatingFds(): FunctionalDependency[] {
-    return this.fds
-      .filter((fd) => fd.violatesBCNF())
-      .sort((fd1, fd2) => {
-        let comparison = fd1.lhs.cardinality - fd2.lhs.cardinality;
-        if (comparison == 0)
-          comparison = fd2.rhs.cardinality - fd1.rhs.cardinality;
-        return comparison;
-      });
+  public violatingFds(): Array<FunctionalDependency> {
+    if (!this._violatingFds) {
+      this._violatingFds = this.fds
+        .filter((fd) => fd.violatesBCNF())
+        .sort((fd1, fd2) => {
+          return fd2.fdScore() - fd1.fdScore();
+        })
+        .slice(0, 100);
+    }
+    return this._violatingFds;
   }
 
   public toString(): string {
@@ -163,14 +199,12 @@ export default class Table {
     });
     result = result.concat('}');
     this.referencedTables.forEach((refTable) => {
-      if (!refTable.hasChildren) {
-        result = result.concat(
-          '\n',
-          this.mermaidName,
-          ' --> ',
-          refTable.mermaidName
-        );
-      }
+      result = result.concat(
+        '\n',
+        this.mermaidName,
+        ' --> ',
+        refTable.mermaidName
+      );
     });
     return result;
   }

@@ -5,7 +5,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { SbbRadioGroup } from '@sbb-esta/angular-core/radio-button';
+import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 
@@ -16,10 +16,9 @@ import Table from 'src/model/schema/Table';
 })
 export class NormalizeSideBarComponent {
   @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
-  @Input() table!: Table;
+  @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
-  // @Input() functionalDependencies!: string[];
   constructor() {}
 
   selectedFd(): FunctionalDependency | undefined {
