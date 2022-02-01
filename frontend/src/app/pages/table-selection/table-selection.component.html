@@ -1,8 +1,8 @@
-<div class="sbb-checkbox-group-vertical" [formGroup]="form">
+<div class="sbb-checkbox-group-vertical">
   <sbb-checkbox
-    *ngFor="let formControl of form.controls | keyvalue"
-    [formControlName]="formControl.key"
-    >{{ formControl.key }}</sbb-checkbox
+    *ngFor="let table of this.tables.keys()"
+    (change)="toggleCheckStatus(table)"
+    >{{ table.name }}</sbb-checkbox
   >
 </div>
 
@@ -10,7 +10,7 @@
   type="button"
   sbb-button
   [disabled]="!hasSelectedTables()"
-  (click)="selectTables()"
+  (click)="selectTable()"
   [routerLink]="['/normalize']"
 >
   Go

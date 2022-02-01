@@ -7,16 +7,42 @@ import { sqlUtils } from "../db";
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
-export default abstract class MetanomeAlgorithm {
+export function outputPath(schemaAndTable: string): string {
+  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
+}
+
+export default class MetanomeAlgorithm {
   public memory = "12g";
-  protected classpath_separator = process.platform === "win32" ? ";" : ":";
-  protected tables: string[];
+  private tables: string[];
   constructor(tables: string[]) {
     this.tables = tables;
   }
-  abstract run(): Promise<{}>;
+  async run(): Promise<{}> {
+    const asyncExec = promisify(exec);
+    for (const table of this.tables) {
+      console.log("Executing metanome on " + table);
+      const { stderr, stdout } = await asyncExec(this.command(table), {
+        cwd: "metanome/",
+      });
+      console.log(`Metanome execution on ${table} finished`);
+      // console.log(stdout);
+      if (stderr) {
+        console.error(stderr);
+        throw Error("Metanome execution failed");
+      }
+    }
 
-  protected classpath(): string {
+    let dict = {};
+    this.tables
+      .map((schemaAndTable) => schemaAndTable.split(".")[1])
+      .forEach(
+        (table) =>
+          (dict[table] = join(OUTPUT_DIR, table + "-hyfd_extended.txt"))
+      );
+    return dict;
+  }
+
+  private classpath(): string {
     const classpath_separator = process.platform === "win32" ? ";" : ":";
     return [
       METANOME_CLI_JAR_PATH,
@@ -24,10 +50,13 @@ export default abstract class MetanomeAlgorithm {
       this.algoJarPath(),
     ].join(classpath_separator);
   }
-  // location of the algorithm JAR relative to the package.json directory
-  protected abstract algoJarPath(): string;
 
-  protected dbPassPath(): string {
+  // location of the algorithm JAR relative to the package.json directory
+  private algoJarPath(): string {
+    return "Normalize-1.2-SNAPSHOT.jar";
+  }
+
+  private pgpassPath(): string {
     if (process.env.DB_PASSFILE == undefined) {
       throw new Error("missing DB_PASSFILE in env.local");
     }
@@ -35,7 +64,14 @@ export default abstract class MetanomeAlgorithm {
   }
 
   // location in the JAR where the algorithm is located
-  protected abstract algoClass(): string;
-
-  protected abstract command(tables: string[]): string;
+  private algoClass(): string {
+    return "de.metanome.algorithms.normalize.Normi";
+  }
+  private command(table: string): string {
+    return `java -Xmx${
+      this.memory
+    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.pgpassPath()} --db-type ${
+      process.env.DB_TYPE
+    } --table-key "INPUT_GENERATOR" --tables ${table} --output file:${table}_normalize_results.json --algorithm-config isHumanInTheLoop:false`;
+  }
 }

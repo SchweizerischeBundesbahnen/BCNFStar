@@ -1,8 +1,8 @@
 import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
 import { Request, Response, RequestHandler } from "express";
 import { readFile } from "fs/promises";
-import MetanomeFDAlgorithm from "../metanome/metanomeFDAlgorithm";
-import { runMetanomeFDAlgorithm } from "./runMetanomeFD";
+import { outputPath } from "../metanome/metanomeAlgorithm";
+import { runMetanomeFDAlgorithm } from "./runMetanome";
 
 export default function getFDsFromTableNameFunction(): RequestHandler {
   async function getFDsFromTableName(
@@ -11,7 +11,7 @@ export default function getFDsFromTableNameFunction(): RequestHandler {
   ): Promise<void> {
     try {
       const schemaAndTable = req.params.name;
-      const expectedOutputPath = MetanomeFDAlgorithm.outputPath(schemaAndTable);
+      const expectedOutputPath = outputPath(schemaAndTable);
       try {
         await sendFDs(schemaAndTable, expectedOutputPath);
       } catch (err) {
