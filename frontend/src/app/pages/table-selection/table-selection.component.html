@@ -2,7 +2,7 @@
   <sbb-checkbox
     *ngFor="let table of this.tables.keys()"
     (change)="toggleCheckStatus(table)"
-    >{{ table.name }}</sbb-checkbox
+    >{{ table.schemaAndName() }}</sbb-checkbox
   >
 </div>
 
