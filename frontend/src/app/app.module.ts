@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -44,6 +45,7 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
     ReactiveFormsModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    NgxSliderModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
