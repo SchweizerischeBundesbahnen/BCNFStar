@@ -25,7 +25,8 @@
     "prepare": "husky install",
     "lint": "run-s lint:*",
     "lint:frontend": "cd frontend && npm run lint",
-    "lint:prettier": "prettier --write ."
+    "lint:prettier": "prettier --write .",
+    "postcheckout": "sh npm-install-githook.sh"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.9.12",
