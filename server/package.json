@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "node dist",
+    "start": "ts-node index",
     "dev": "ts-node-dev index",
     "start:coverage": "nyc ts-node index",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "true #noop - build is not required"
   },
   "author": "",
   "license": "MIT",

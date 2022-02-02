@@ -36,6 +36,7 @@ jobs:
 
           createdb _test_
           pg_restore -d _test_ cypress/postgres_1MB_testdata_denormalized.sql
+          # route port 8080 to 80 to be able to run on port 80 without sudo
           sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 80 -j REDIRECT --to-ports 8080
 
         env:
@@ -48,7 +49,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           build: npm run build
-          start: node server/dist
+          start: npm run start:coverage
           wait-on: "http://localhost:80"
           browser: chrome
         env:
