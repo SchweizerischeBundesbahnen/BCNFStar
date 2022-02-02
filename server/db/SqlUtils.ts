@@ -20,8 +20,13 @@ export default abstract class SqlUtils {
   public abstract getSchema(): Promise<Array<SchemaQueryRow>>;
   public abstract getTableHead(
     tablename: string,
-    schemaname: string
+    schemaname: string,
+    limit: number
   ): Promise<ITableHead>;
+  public abstract getTableRowCount(
+    table: string,
+    schema: string
+  ): Promise<number>;
 
   public abstract tableExistsInSchema(
     schema: string,

@@ -45,12 +45,13 @@ export default class MsSqlUtils extends SqlUtils {
   }
   public async getTableHead(
     tablename: string,
-    schemaname: string
+    schemaname: string,
+    limit: number
   ): Promise<ITableHead> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
-        `SELECT TOP (10) * FROM [${schemaname}].[${tablename}]`
+        `SELECT TOP (${limit}) * FROM [${schemaname}].[${tablename}]`
       );
       return {
         rows: result.recordset,
@@ -58,6 +59,23 @@ export default class MsSqlUtils extends SqlUtils {
       };
     } else {
       throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  public async getTableRowCount(
+    table: string,
+    schema: string
+  ): Promise<number> {
+    const tableExists = await this.tableExistsInSchema(schema, table);
+    if (tableExists) {
+      const query_result = await sql.query(
+        `SELECT COUNT(*) FROM ${schema}.${table}`
+      );
+      return query_result.output[0].count;
+    } else {
+      throw {
+        error: "Table or schema does not exist in database",
+      };
     }
   }
 

@@ -90,13 +90,24 @@ export class DatabaseService {
     });
   }
 
-  public loadTableHeads(): Observable<Record<string, ITableHead>> {
+  public loadTableHeads(limit: number): Observable<Record<string, ITableHead>> {
     let tableHeads;
     tableHeads = this.http
-      .get<Record<string, ITableHead>>(`http://localhost:80/tables/heads`)
+      .get<Record<string, ITableHead>>(
+        `${this.baseUrl}/tables/heads?limit=${limit}`
+      )
       // required for caching
       .pipe(shareReplay(1));
     return tableHeads;
+  }
+
+  public loadTableRowCounts(): Observable<Record<string, number>> {
+    let tableRowCounts;
+    tableRowCounts = this.http
+      .get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
+      // required for caching
+      .pipe(shareReplay(1));
+    return tableRowCounts;
   }
 
   public setInputTables(tables: Array<Table>) {

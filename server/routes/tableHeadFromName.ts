@@ -1,5 +1,4 @@
 import { sqlUtils } from "../db";
-import ITableHead from "@/definitions/ITableHead";
 import { Request, Response, RequestHandler } from "express";
 
 export default function getTableHeadFromNameFunction(): RequestHandler {
@@ -14,10 +13,11 @@ export default function getTableHeadFromNameFunction(): RequestHandler {
           .json({ error: "Must specify table_name and schema_name" });
         return;
       }
-
+      const limit = 10;
       const query_result = await sqlUtils.getTableHead(
         req.query.table_name as string,
-        req.query.schema_name as string
+        req.query.schema_name as string,
+        limit
       );
       res.json(query_result);
     } catch (error) {

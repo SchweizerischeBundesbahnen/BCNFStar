@@ -1,10 +1,15 @@
 import ITableHead from "@/definitions/ITableHead";
-import { Request, Response, RequestHandler, query } from "express";
+import { Request, Response, RequestHandler } from "express";
 import { sqlUtils } from "../db";
 
 export default function getTableHeadFunction(): RequestHandler {
   async function getTableHead(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.query.limit) {
+        res.status(400).json({ error: "Must specify limit" });
+        return;
+      }
+      const limit = +req.query.limit;
       const query_result_tables = await sqlUtils.getSchema();
       let temp_table_heads: Record<string, Promise<ITableHead>> = {};
 
@@ -13,7 +18,8 @@ export default function getTableHeadFunction(): RequestHandler {
         if (!temp_table_heads[complete_name]) {
           temp_table_heads[complete_name] = sqlUtils.getTableHead(
             row.table_name,
-            row.table_schema
+            row.table_schema,
+            limit
           );
         }
       }

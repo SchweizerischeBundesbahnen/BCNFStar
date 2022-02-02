@@ -55,12 +55,13 @@ export default class PostgresSqlUtils extends SqlUtils {
 
   public async getTableHead(
     tablename: string,
-    schemaname: string
+    schemaname: string,
+    limit: number
   ): Promise<ITableHead> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} LIMIT 10`
+        `SELECT * FROM ${schemaname}.${tablename} LIMIT ${limit}`
       );
       return {
         rows: query_result.rows,
@@ -68,6 +69,23 @@ export default class PostgresSqlUtils extends SqlUtils {
       };
     } else {
       throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  public async getTableRowCount(
+    table: string,
+    schema: string
+  ): Promise<number> {
+    const tableExists = await this.tableExistsInSchema(schema, table);
+    if (tableExists) {
+      const query_result = await this.pool.query(
+        `SELECT COUNT(*) FROM ${schema}.${table}`
+      );
+      return query_result.rows[0].count;
+    } else {
+      throw {
+        error: "Table or schema does not exist in database",
+      };
     }
   }
 

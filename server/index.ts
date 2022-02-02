@@ -3,6 +3,7 @@ import expressStaticGzip from "express-static-gzip";
 import { join } from "path";
 // import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
+import getTableRowCountsFunction from "./routes/rowCounts";
 import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanome";
@@ -38,6 +39,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 app.get("/tables", getTablesFunction());
+app.get("/tables/rows", getTableRowCountsFunction());
 app.get("/tables/head", getTableHeadFromNameFunction());
 app.get("/tables/heads", getTableHeadFunction());
 app.get("/tables/:name/fds", getFDsFromTableNameFunction());

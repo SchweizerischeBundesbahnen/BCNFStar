@@ -13,6 +13,8 @@ export class TableSelectionComponent implements OnInit {
   @ViewChild(SbbTable) table!: SbbTable<ITableHead>;
   public tables: Map<Table, Boolean> = new Map();
   public tableHeads: Map<string, ITableHead> = new Map();
+  public tableRowCounts: Map<string, number> = new Map();
+  public headLimit: number = 20;
 
   public hoveredTable: Table = new Table();
   public tableColumns: string[] = [];
@@ -27,8 +29,13 @@ export class TableSelectionComponent implements OnInit {
     );
     this.dataService.loadTables();
     this.dataService
-      .loadTableHeads()
+      .loadTableHeads(this.headLimit)
       .subscribe((data) => (this.tableHeads = new Map(Object.entries(data))));
+    this.dataService
+      .loadTableRowCounts()
+      .subscribe(
+        (data) => (this.tableRowCounts = new Map(Object.entries(data)))
+      );
   }
 
   public toggleCheckStatus(table: Table) {

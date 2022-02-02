@@ -23,7 +23,29 @@
     </div>
     <div class="col-8">
       <h3>
-        {{ hoveredTable.name }}
+        <ng-container
+          [ngSwitch]="
+            tableRowCounts.get(hoveredTable.name)! >= headLimit
+              ? 1
+              : tableRowCounts.get(hoveredTable.name)! > 0 &&
+                tableRowCounts.get(hoveredTable.name)! < headLimit
+              ? 2
+              : -1
+          "
+        >
+          <ng-container *ngSwitchCase="1">
+            {{ hoveredTable.name }} {{ headLimit }} von
+            {{ tableRowCounts.get(hoveredTable.name) }}
+          </ng-container>
+          <ng-container *ngSwitchCase="2">
+            {{ hoveredTable.name }}
+            {{ tableRowCounts.get(hoveredTable.name)! }} von
+            {{ tableRowCounts.get(hoveredTable.name) }}
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            {{ hoveredTable.name }}
+          </ng-container>
+        </ng-container>
       </h3>
       <sbb-table-wrapper class="table-wrapper">
         <table sbb-table [dataSource]="dataSource">
