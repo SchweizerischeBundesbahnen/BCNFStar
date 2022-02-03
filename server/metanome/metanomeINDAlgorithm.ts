@@ -3,6 +3,7 @@ import { promisify } from "util";
 import { exec } from "child_process";
 import { join } from "path";
 import MetanomeAlgorithm from "./metanomeAlgorithm";
+import { metanomeQueue, queueEvents } from "./queue";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 const OUTPUT_SUFFIX = "_inds_binder.json";
@@ -16,15 +17,12 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     console.log("Executing binder for inds on " + this.tables);
-    console.log(this.command(this.tables));
-    const { stderr, stdout } = await asyncExec(this.command(this.tables), {
-      cwd: "metanome/",
-    });
+    let jobId = await metanomeQueue.add(
+      `get fds for ${this.tables}`,
+      this.command(this.tables)
+    );
+    await jobId.waitUntilFinished(queueEvents);
     console.log(`Binder execution on ${this.tables} finished`);
-    if (stderr) {
-      console.error(stderr);
-      throw Error("Binder-Algorithm execution failed");
-    }
 
     let dict = {};
     dict[this.tables.join("_")] = join(
