@@ -26,9 +26,6 @@ jobs:
       # and run all Cypress tests
       - name: db-setup
         run: |
-          cat << EOF > .env.local
-          PGPASSFILE=~/.pgpass
-          EOF
           cat << EOF > ~/.pgpass
           $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
           EOF
@@ -36,8 +33,6 @@ jobs:
 
           createdb _test_
           pg_restore -d _test_ cypress/postgres_1MB_testdata_denormalized.sql
-          # route port 8080 to 80 to be able to run on port 80 without sudo
-          sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 80 -j REDIRECT --to-ports 8080
 
         env:
           PGPASSWORD: postgres
@@ -53,9 +48,10 @@ jobs:
           wait-on: "http://localhost:80"
           browser: chrome
         env:
-           CYPRESS_FRONTEND_BASEURL: "http://localhost:80"
-           CYPRESS_BACKEND_BASEURL: "http://localhost:80"
+           CYPRESS_FRONTEND_BASEURL: "http://localhost:8080"
+           CYPRESS_BACKEND_BASEURL: "http://localhost:8080"
            DB_TYPE: postgres
+           DB_PASSFILE: ~/.pgpass
            PORT: 8080
       - name: Upload screenshots
         uses: actions/upload-artifact@v2.2.4
