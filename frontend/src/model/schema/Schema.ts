@@ -11,26 +11,9 @@ export default class Schema {
     this.add(...tables);
   }
 
-  private referencesOf(
-    table: Table,
-    relationships: Set<Relationship>
-  ): Set<Table> {
-    //can't use this method (see comment below), needs to be refactored
-    let referencedTables = new Set<Table>();
-    let references = [...relationships].filter((rel) =>
-      rel.referencing().isSubsetOf(table.columns)
-    );
-    this.tables.forEach((t) => {
-      if (t.pk && references.some((rel) => t.pk!.equals(rel.referenced()))) {
-        //different for INDS and FKs
-        referencedTables.add(t);
-      }
-    });
-    return referencedTables;
-  }
-
   public fksOf(table: Table): Set<Table> {
     let fks = new Set<Table>();
+    // intersects
     this.tables.forEach((otherTable) => {
       let intersect = table.columns.copy().intersect(otherTable.columns);
       if (
@@ -41,7 +24,7 @@ export default class Schema {
         fks.add(otherTable);
     });
     fks.delete(table);
-    //this.referencesOf(table, this.fkRelationships)
+    // fkRelationships
     let references = [...this.fkRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
@@ -54,17 +37,16 @@ export default class Schema {
   }
 
   public indsOf(table: Table): Set<Table> {
-    //this.referencesOf(table, this.indRelationships)
-    let referencedTables = new Set<Table>();
+    let inds = new Set<Table>();
     let references = [...this.indRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
     this.tables.forEach((t) => {
       if (references.some((rel) => rel.appliesTo(table, t))) {
-        referencedTables.add(t);
+        inds.add(t);
       }
     });
-    return referencedTables;
+    return inds;
   }
 
   public fksBetween(referencing: Table, referenced: Table): Set<Relationship> {
