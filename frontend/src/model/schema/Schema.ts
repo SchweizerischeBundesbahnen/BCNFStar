@@ -6,6 +6,7 @@ export default class Schema {
   public readonly tables = new Set<Table>();
   public readonly fkRelationships = new Set<Relationship>();
   public readonly indRelationships = new Set<Relationship>();
+  public readonly formerIndRelationship = new Set<Relationship>();
 
   public constructor(...tables: Array<Table>) {
     this.add(...tables);
