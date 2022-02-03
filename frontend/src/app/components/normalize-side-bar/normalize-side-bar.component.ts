@@ -23,7 +23,7 @@ export class NormalizeSideBarComponent implements OnChanges {
   indSelectionGroup!: SbbRadioGroup;
   @Input() table?: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() joinInd = new EventEmitter<{
+  @Output() indToFk = new EventEmitter<{
     source: Table;
     target: Table;
     relationship: Relationship;
@@ -35,7 +35,7 @@ export class NormalizeSideBarComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.fds = this.table?.violatingFds() || [];
-    this.inds = this.table?.inds() || [];
+    this.inds = this.table?.inds().filter((x) => x.table != this.table) || [];
   }
 
   selectedFd(): FunctionalDependency | undefined {
@@ -52,8 +52,8 @@ export class NormalizeSideBarComponent implements OnChanges {
     return this.indSelectionGroup.value;
   }
 
-  joinSelectedInd(): void {
-    this.joinInd.emit({
+  transformIndToFk(): void {
+    this.indToFk.emit({
       source: this.table!,
       target: this.selectedInd()!.table,
       relationship: this.selectedInd()!.relationship,

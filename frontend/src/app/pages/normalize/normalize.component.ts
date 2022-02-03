@@ -10,6 +10,7 @@ import { BehaviorSubject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 
 @Component({
   selector: 'app-normalize',
@@ -71,6 +72,18 @@ export class NormalizeComponent {
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
+
+    this.commandProcessor.do(command);
+    this.tablesEventEmitter.next(this.schema.tables);
+  }
+
+  onIndToFk(event: any): void {
+    let command = new IndToFkCommand(
+      this.schema,
+      event.relationship,
+      event.source,
+      event.target
+    );
 
     this.commandProcessor.do(command);
     this.tablesEventEmitter.next(this.schema.tables);

@@ -21,7 +21,7 @@
         class="normalize-sidebar"
         [table]="this.selectedTable"
         (splitFd)="onClickSplit($event)"
-        (joinInd)="onJoin($event)"
+        (indToFk)="onIndToFk($event)"
       ></app-normalize-side-bar>
       <button type="button" sbb-button (click)="this.onAutoNormalize()">
         {{
