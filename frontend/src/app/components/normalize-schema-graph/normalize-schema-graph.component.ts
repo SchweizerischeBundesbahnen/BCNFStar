@@ -70,8 +70,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
     this.addPanzoomHandler();
 
-    this.tables.asObservable().subscribe((v) => {
-      console.log('new tables. count ' + v.size);
+    this.tables.subscribe((v) => {
       this.localTables = v;
       this.updateGraph();
     });

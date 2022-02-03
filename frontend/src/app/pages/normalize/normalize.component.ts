@@ -19,7 +19,7 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
-  public tablesEventEmitter: BehaviorSubject<Set<Table>> = new BehaviorSubject(
+  public tablesObservable: BehaviorSubject<Set<Table>> = new BehaviorSubject(
     new Set<Table>()
   );
 
@@ -30,7 +30,11 @@ export class NormalizeComponent {
   ) {
     let inputTables = dataService.inputTables!;
     this.schema = new Schema(...inputTables);
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
+  }
+
+  protected schemaChanged() {
+    this.tablesObservable.next(this.schema.tables);
   }
 
   onSelect(table: Table): void {
@@ -56,7 +60,7 @@ export class NormalizeComponent {
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
     this.commandProcessor.do(command);
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 
   onAutoNormalize(): void {
@@ -73,17 +77,16 @@ export class NormalizeComponent {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
-    console.log('pushing');
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 
   onUndo() {
     this.commandProcessor.undo();
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 
   onRedo() {
     this.commandProcessor.redo();
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 }
