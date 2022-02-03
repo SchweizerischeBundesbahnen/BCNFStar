@@ -6,7 +6,9 @@ import { absoluteServerDir } from "../utils/files";
 
 const queueName = "metanome";
 
-export const metanomeQueue = new Queue(queueName, { connection: {} });
+export const metanomeQueue = new Queue(queueName, {
+  connection: process.env.REDIS_URL,
+});
 
 export const queueEvents = new QueueEvents(queueName, { connection: {} });
 
