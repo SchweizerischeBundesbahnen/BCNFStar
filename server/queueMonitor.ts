@@ -10,6 +10,6 @@ export default function createQueueMonitor(app: Express) {
     queues: [new BullMQAdapter(metanomeQueue)],
     serverAdapter: serverAdapter,
   });
-  serverAdapter.setBasePath("/admin/queues");
-  app.use("/admin/queues", serverAdapter.getRouter());
+  serverAdapter.setBasePath("/queue");
+  app.use("/queue", serverAdapter.getRouter());
 }

@@ -16,13 +16,19 @@ const worker = new Worker<string, void, string>(
   queueName,
   async (job) => {
     const asyncExec = promisify(exec);
-    let result = await asyncExec(job.data, {
+    let { stderr, stdout } = await asyncExec(job.data, {
       cwd: absoluteServerDir + "/metanome",
     });
-    job.log(JSON.stringify(result));
-    if (result.stderr) {
-      console.error(result.stderr);
+    if (stderr) {
+      job.log("Stderr");
+      job.log(stderr);
+      job.log("Stdout:");
+      job.log(stdout);
+      console.error(stderr);
       throw Error("Metanome execution failed");
+    } else {
+      job.log("Stderr: <empty>, Stdout:");
+      job.log(stdout);
     }
   },
   { connection: {} }

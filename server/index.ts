@@ -35,7 +35,12 @@ const corsOptions: CorsOptions = {
 };
 
 const app = express();
-app.use(morgan("dev"));
+app.use(
+  morgan("dev", {
+    // omit queue/api calls from log, since they appear very frequent
+    skip: (req, res) => req.originalUrl.includes("/queue/api"),
+  })
+);
 app.use(express.json());
 app.use(cors(corsOptions));
 createQueueMonitor(app);
