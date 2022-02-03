@@ -2,9 +2,9 @@ import { absoluteServerDir } from "../utils/files";
 import { promisify } from "util";
 import { exec } from "child_process";
 import { join } from "path";
-import { sqlUtils } from "../db";
 import MetanomeAlgorithm from "./metanomeAlgorithm";
 import { assert } from "console";
+import { metanomeQueue, queueEvents } from "./queue";
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
@@ -18,17 +18,15 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
     super(tables);
   }
   async run(): Promise<{}> {
-    const asyncExec = promisify(exec);
+    // const asyncExec = promisify(exec);
     for (const table of this.tables) {
       console.log("Executing metanome on " + table);
-      const { stderr, stdout } = await asyncExec(this.command([table]), {
-        cwd: "metanome/",
-      });
+      let jobId = await metanomeQueue.add(
+        `get fds for ${table}`,
+        this.command([table])
+      );
+      await jobId.waitUntilFinished(queueEvents);
       console.log(`Metanome execution on ${table} finished`);
-      if (stderr) {
-        console.error(stderr);
-        throw Error("Metanome execution failed");
-      }
     }
 
     let dict = {};

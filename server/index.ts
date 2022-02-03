@@ -13,6 +13,7 @@ import morgan from "morgan";
 // import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
+import createQueueMonitor from "./queueMonitor";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -37,6 +38,7 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors(corsOptions));
+createQueueMonitor(app);
 
 app.get("/tables", getTablesFunction());
 app.get("/tables/head", getTableHeadFromNameFunction());
