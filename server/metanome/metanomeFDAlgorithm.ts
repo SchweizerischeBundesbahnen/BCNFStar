@@ -21,12 +21,13 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
     // const asyncExec = promisify(exec);
     for (const table of this.tables) {
       console.log("Executing metanome on " + table);
-      let jobId = await metanomeQueue.add(
+      let job = await metanomeQueue.add(
         `get fds for ${table}`,
         this.command([table])
       );
-      await jobId.waitUntilFinished(queueEvents);
+      await job.waitUntilFinished(queueEvents);
       console.log(`Metanome execution on ${table} finished`);
+      if (job.isFailed()) return {};
     }
 
     let dict = {};

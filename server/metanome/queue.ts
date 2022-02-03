@@ -5,14 +5,16 @@ import { promisify } from "util";
 import { absoluteServerDir } from "../utils/files";
 
 const queueName = "metanome";
+const connection = {
+  host: process.env.REDIS_HOST || "localhost",
+  port: process.env.REDIS_PORT || 6379,
+};
 
-export const metanomeQueue = new Queue(queueName, {
-  connection: process.env.REDIS_URL,
-});
+export const metanomeQueue = new Queue(queueName, { connection });
 
-export const queueEvents = new QueueEvents(queueName, { connection: {} });
-
-const worker = new Worker<string, void, string>(
+export const queueEvents = new QueueEvents(queueName, { connection });
+// types: <type of job.data, type of returnValue>
+const worker = new Worker<string, void>(
   queueName,
   async (job) => {
     const asyncExec = promisify(exec);
@@ -31,7 +33,7 @@ const worker = new Worker<string, void, string>(
       job.log(stdout);
     }
   },
-  { connection: {} }
+  { connection }
 );
 
 worker.on("error", (err) => {

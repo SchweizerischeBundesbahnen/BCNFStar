@@ -17,12 +17,13 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     console.log("Executing binder for inds on " + this.tables);
-    let jobId = await metanomeQueue.add(
+    let job = await metanomeQueue.add(
       `get fds for ${this.tables}`,
       this.command(this.tables)
     );
-    await jobId.waitUntilFinished(queueEvents);
+    await job.waitUntilFinished(queueEvents);
     console.log(`Binder execution on ${this.tables} finished`);
+    if (job.isFailed()) return {};
 
     let dict = {};
     dict[this.tables.join("_")] = join(
