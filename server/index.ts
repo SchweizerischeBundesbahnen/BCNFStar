@@ -38,12 +38,12 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors(corsOptions));
 
-app.get("/tables", getTablesFunction());
-app.get("/tables/head", getTableHeadFromNameFunction());
-app.get("/tables/:name/fds", getFDsFromTableNameFunction());
+app.get("/tables", getTablesFunction);
+app.get("/tables/head", getTableHeadFromNameFunction);
+app.get("/tables/:name/fds", getFDsFromTableNameFunction);
 app.get("/fks", getFksFunction);
 
-app.get("/tables/:tableNames/inds", getINDsForTablesFunction());
+app.get("/tables/:tableNames/inds", getINDsForTablesFunction);
 
 // app.post("/persist/createTable", postCreateTable(pool));
 // app.post("/persist/createForeignKey", postCreateForeignKey(pool));
