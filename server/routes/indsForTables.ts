@@ -10,7 +10,7 @@ import { runMetanomeINDAlgorithm } from "./runMetanomeIND";
 export default function getINDsForTablesFunction(): RequestHandler {
   async function getINDsForTables(req: Request, res: Response): Promise<void> {
     try {
-      const tables: string[] = req.params.tableNames.split(",");
+      const tables: string[] = req.params.tableNames.split(",").sort();
       const expectedOutputPath: string =
         MetanomeINDAlgorithm.outputPath(tables);
       try {
