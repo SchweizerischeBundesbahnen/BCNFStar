@@ -26,9 +26,19 @@
             "styles": [
               "src/styles.css",
               "node_modules/@sbb-esta/angular/typography.css",
-              "./node_modules/bootstrap/dist/css/bootstrap.css"
+              "./node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/jointjs/css/layout.css",
+              "node_modules/jointjs/css/themes/material.css",
+              "node_modules/jointjs/css/themes/default.css"
             ],
-            "scripts": ["node_modules/bootstrap/dist/js/bootstrap.min.js"]
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.min.js",
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/lodash/index.js",
+              "node_modules/backbone/backbone.js",
+              "node_modules/jointjs/dist/joint.js"
+            ],
+            "allowedCommonJsDependencies": ["panzoom", "graphlib", "dagre"]
           },
           "configurations": {
             "production": {
