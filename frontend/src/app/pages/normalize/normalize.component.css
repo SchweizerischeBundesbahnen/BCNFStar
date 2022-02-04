@@ -7,3 +7,7 @@
 .col-4 {
   height: 90vh;
 }
+
+.row > * {
+  padding: 0;
+}
