@@ -36,24 +36,30 @@
       <sbb-expansion-panel-header
         >Inclusion Dependencies</sbb-expansion-panel-header
       >
-      <sbb-radio-group #indSelection>
-        <sbb-radio-button *ngFor="let rel of inds.slice(0, 10)" [value]="rel">{{
-          rel.relationship.referencing().toString() +
-            "->(" +
-            rel.table.name +
-            ") " +
-            rel.relationship.referenced().toString()
-        }}</sbb-radio-button>
-      </sbb-radio-group>
-      <br />
-      <button
-        type="button"
-        sbb-button
-        [disabled]="!selectedInd()"
-        (click)="transformIndToFk()"
-      >
-        Create Foreign Key
-      </button>
+      <div *ngIf="localInds.length > 0">
+        <sbb-radio-group #indSelection>
+          <sbb-radio-button
+            *ngFor="let rel of localInds.slice(0, 10)"
+            [value]="rel"
+            >{{
+              rel.relationship.referencing().toString() +
+                "->(" +
+                rel.table.name +
+                ") " +
+                rel.relationship.referenced().toString()
+            }}</sbb-radio-button
+          >
+        </sbb-radio-group>
+        <br />
+        <button
+          type="button"
+          sbb-button
+          [disabled]="!selectedInd()"
+          (click)="transformIndToFk()"
+        >
+          Create Foreign Key
+        </button>
+      </div>
     </sbb-expansion-panel>
   </sbb-accordion>
 </div>

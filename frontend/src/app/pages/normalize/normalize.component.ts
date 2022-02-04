@@ -11,6 +11,7 @@ import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
+import { IndService } from '../../ind.service';
 
 @Component({
   selector: 'app-normalize',
@@ -26,7 +27,8 @@ export class NormalizeComponent {
   );
 
   constructor(
-    public dataService: DatabaseService,
+    dataService: DatabaseService,
+    private indService: IndService,
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog
   ) {
@@ -79,6 +81,7 @@ export class NormalizeComponent {
 
   onIndToFk(event: any): void {
     let command = new IndToFkCommand(
+      this.indService,
       this.schema,
       event.relationship,
       event.source,
