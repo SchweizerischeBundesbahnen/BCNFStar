@@ -11,24 +11,24 @@ const OUTPUT_SUFFIX = "_inds_binder.json";
 export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
   constructor(tables: string[]) {
     super(tables);
-    this.tables = this.tables.sort();
+    this.schemaAndTables = this.schemaAndTables.sort();
   }
 
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
-    console.log("Executing binder for inds on " + this.tables);
+    console.log("Executing binder for inds on " + this.schemaAndTables);
     let job = await metanomeQueue.add(
-      `get fds for ${this.tables}`,
-      this.command(this.tables)
+      `get fds for ${this.schemaAndTables}`,
+      this.command(this.schemaAndTables)
     );
     await job.waitUntilFinished(queueEvents);
-    console.log(`Binder execution on ${this.tables} finished`);
+    console.log(`Binder execution on ${this.schemaAndTables} finished`);
     if (job.isFailed()) return {};
 
     let dict = {};
-    dict[this.tables.join("_")] = join(
+    dict[this.schemaAndTables.join("_")] = join(
       OUTPUT_DIR,
-      MetanomeINDAlgorithm.outputFileName(this.tables)
+      MetanomeINDAlgorithm.outputFileName(this.schemaAndTables)
     );
     return dict;
   }
