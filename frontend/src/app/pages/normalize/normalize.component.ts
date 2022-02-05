@@ -20,7 +20,7 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
-  public tablesEventEmitter: BehaviorSubject<Set<Table>> = new BehaviorSubject(
+  public tablesObservable: BehaviorSubject<Set<Table>> = new BehaviorSubject(
     new Set<Table>()
   );
 
@@ -29,8 +29,13 @@ export class NormalizeComponent {
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog
   ) {
-    this.schema = dataService.inputSchema!;
-    this.tablesEventEmitter.next(this.schema.tables);
+    let inputSchema = dataService.inputSchema!;
+    this.schema = new Schema(...inputSchema.tables);
+    this.schemaChanged();
+  }
+
+  protected schemaChanged() {
+    this.tablesObservable.next(this.schema.tables);
   }
 
   onSelect(table: Table): void {
@@ -53,7 +58,7 @@ export class NormalizeComponent {
     };
 
     this.commandProcessor.do(command);
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.tablesObservable.next(this.schema.tables);
   }
 
   onClickSplit(fd: FunctionalDependency): void {
@@ -73,7 +78,7 @@ export class NormalizeComponent {
     command.onUndo = () => (this.selectedTable = command.table);
 
     this.commandProcessor.do(command);
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 
   onAutoNormalize(): void {
@@ -90,17 +95,16 @@ export class NormalizeComponent {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
-    console.log('pushing');
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 
   onUndo() {
     this.commandProcessor.undo();
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 
   onRedo() {
     this.commandProcessor.redo();
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged();
   }
 }

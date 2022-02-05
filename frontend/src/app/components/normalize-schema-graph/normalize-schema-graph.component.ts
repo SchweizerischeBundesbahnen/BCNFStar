@@ -76,8 +76,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
     this.addPanzoomHandler();
 
-    this.tables.asObservable().subscribe((v) => {
-      console.log('new tables. count ' + v.size);
+    this.tables.subscribe((v) => {
       this.localTables = v;
       this.updateGraph();
     });
@@ -218,7 +217,9 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   }
 
   generateLinks() {
+    console.log(this.localTables);
     for (const table of this.localTables) {
+      console.log(table.fks());
       for (const fk of table.fks()) {
         let fkReferenced = fk.relationship
           .referenced()
@@ -246,6 +247,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
             port:
               fkReferenced.sourceTable.name + '.' + fkReferenced.name + '_left',
           },
+          z: -1,
         });
         console.log(link);
         this.graphStorage[table.name].links[fk.table.name] = link;
@@ -255,16 +257,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     }
   }
 
+  // if you change this, also change graph-element.component.css > .table-head > height
+  protected graphElementHeaderHeight: number = 25;
   generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
-    const sclaedPortRadius =
-      (this.portDiameter * this.panzoomTransform.scale) / 2;
-
-    const cx =
-      side == PortSide.Left
-        ? 0
-        : this.elementWidth * this.panzoomTransform.scale;
-    return `<circle r="${sclaedPortRadius}" cx="${cx}" cy="${
-      25 + sclaedPortRadius + sclaedPortRadius * 2 * counter
+    const cx = side == PortSide.Left ? 0 : this.elementWidth;
+    return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
+      this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5)
     }" strokegit ="green" fill="white"/>`;
   }
 
