@@ -6,6 +6,7 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
+import { BehaviorSubject } from 'rxjs';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
 
@@ -18,6 +19,9 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
+  public tablesObservable: BehaviorSubject<Set<Table>> = new BehaviorSubject(
+    new Set<Table>()
+  );
 
   constructor(
     public dataService: DatabaseService,
@@ -26,6 +30,11 @@ export class NormalizeComponent {
   ) {
     let inputTables = dataService.inputTables!;
     this.schema = new Schema(...inputTables);
+    this.schemaChanged();
+  }
+
+  protected schemaChanged() {
+    this.tablesObservable.next(this.schema.tables);
   }
 
   onClickSplit(fd: FunctionalDependency): void {
@@ -40,22 +49,14 @@ export class NormalizeComponent {
 
   onSplitFd(fd: FunctionalDependency): void {
     let command = new SplitCommand(this.schema, this.selectedTable!, fd);
-    // TODO: proper change detection: currently schema graph is only updated due to
-    // selectedTable being changed. It should already be updated, because of the changes
-    // happening in the schema tables.
 
-    // WARNING: To reference the command object from inside the function we need to define
-    // the function via function(){}. If we used arrow functions ()=>{} 'this' would still
-    // refer to this normalize component. We assign self to this, to keep a reference of this
-    // component anyway.
-    let self = this;
-    command.onDo = function () {
-      self.selectedTable = this.children![0];
-    };
-    command.onUndo = function () {
-      self.selectedTable = this.table;
-    };
+    // WARNING: When using arrow functions like here, `this` refers to
+    // the context where the function is defined, instead of the function
+    // object itself like when using function(){}
+    command.onDo = () => (this.selectedTable = command.children![0]);
+    command.onUndo = () => (this.selectedTable = command.table);
     this.commandProcessor.do(command);
+    this.schemaChanged();
   }
 
   onAutoNormalize(): void {
@@ -72,13 +73,16 @@ export class NormalizeComponent {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
+    this.schemaChanged();
   }
 
   onUndo() {
     this.commandProcessor.undo();
+    this.schemaChanged();
   }
 
   onRedo() {
     this.commandProcessor.redo();
+    this.schemaChanged();
   }
 }
