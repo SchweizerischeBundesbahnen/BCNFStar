@@ -29,8 +29,7 @@ export class NormalizeComponent {
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog
   ) {
-    let inputSchema = dataService.inputSchema!;
-    this.schema = new Schema(...inputSchema.tables);
+    this.schema = dataService.inputSchema!;
     this.schemaChanged();
   }
 
