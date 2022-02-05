@@ -217,9 +217,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   }
 
   generateLinks() {
-    console.log(this.localTables);
     for (const table of this.localTables) {
-      console.log(table.fks());
       for (const fk of table.fks()) {
         let fkReferenced = fk.relationship
           .referenced()
@@ -229,10 +227,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           .referencing()
           .columns.values()
           .next().value;
-        console.log(
-          fkReferenced.sourceTable.name,
-          fkReferencing.sourceTable.name
-        );
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage[table.name].jointjsEl.id,
@@ -249,7 +243,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           },
           z: -1,
         });
-        console.log(link);
         this.graphStorage[table.name].links[fk.table.name] = link;
         this.graph.addCell(link);
         this.addJoinButton(link, table, fk.table, fk.relationship);
@@ -271,15 +264,15 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     for (let column of table.columns.inOrder()) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_right', // generated if `id` value is not present
-        group: 'ports-right',
+        id: column.sourceTable.name + '.' + column.name + '_left', // generated if `id` value is not present
+        group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
       args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_left', // generated if `id` value is not present
-        group: 'ports-left',
+        id: column.sourceTable.name + '.' + column.name + '_right', // generated if `id` value is not present
+        group: 'ports-right',
         args,
         markup: this.generatePortMarkup(args),
       });

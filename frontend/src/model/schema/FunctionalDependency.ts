@@ -26,8 +26,6 @@ export default class FunctionalDependency {
     const [lhsString, rhsString] = metanomeString
       .split('-->')
       .map((elem) => elem.trim());
-    // console.log("lhs: ", lhsString);
-    // console.log("rhs: ", rhsString);
     let rhs: ColumnCombination = table.columns.columnsFromNames(
       ...rhsString.split(',').map((elem) => elem.trim())
     );
