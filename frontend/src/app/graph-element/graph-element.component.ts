@@ -14,7 +14,6 @@ export class GraphElementComponent {
   constructor() {}
 
   select() {
-    console.log('selecting');
     this.selected.emit(this.table);
   }
 }

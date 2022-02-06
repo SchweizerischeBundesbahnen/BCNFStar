@@ -76,8 +76,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
     this.addPanzoomHandler();
 
-    this.tables.asObservable().subscribe((v) => {
-      console.log('new tables. count ' + v.size);
+    this.tables.subscribe((v) => {
       this.localTables = v;
       this.updateGraph();
     });
@@ -228,10 +227,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           .referencing()
           .columns.values()
           .next().value;
-        console.log(
-          fkReferenced.sourceTable.name,
-          fkReferencing.sourceTable.name
-        );
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage[table.name].jointjsEl.id,
@@ -246,8 +241,8 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
             port:
               fkReferenced.sourceTable.name + '.' + fkReferenced.name + '_left',
           },
+          z: -1,
         });
-        console.log(link);
         this.graphStorage[table.name].links[fk.table.name] = link;
         this.graph.addCell(link);
         this.addJoinButton(link, table, fk.table, fk.relationship);
@@ -255,16 +250,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     }
   }
 
+  // if you change this, also change graph-element.component.css > .table-head > height
+  protected graphElementHeaderHeight: number = 25;
   generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
-    const sclaedPortRadius =
-      (this.portDiameter * this.panzoomTransform.scale) / 2;
-
-    const cx =
-      side == PortSide.Left
-        ? 0
-        : this.elementWidth * this.panzoomTransform.scale;
-    return `<circle r="${sclaedPortRadius}" cx="${cx}" cy="${
-      25 + sclaedPortRadius + sclaedPortRadius * 2 * counter
+    const cx = side == PortSide.Left ? 0 : this.elementWidth;
+    return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
+      this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5)
     }" strokegit ="green" fill="white"/>`;
   }
 
@@ -273,15 +264,15 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     for (let column of table.columns.inOrder()) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_right', // generated if `id` value is not present
-        group: 'ports-right',
+        id: column.sourceTable.name + '.' + column.name + '_left', // generated if `id` value is not present
+        group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
       args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_left', // generated if `id` value is not present
-        group: 'ports-left',
+        id: column.sourceTable.name + '.' + column.name + '_right', // generated if `id` value is not present
+        group: 'ports-right',
         args,
         markup: this.generatePortMarkup(args),
       });

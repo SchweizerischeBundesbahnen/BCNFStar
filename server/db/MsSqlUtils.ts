@@ -90,7 +90,6 @@ export default class MsSqlUtils extends SqlUtils {
       AND ccu.table_schema = tc.table_schema
   WHERE tc.constraint_type = 'FOREIGN KEY'
       AND tc.table_schema NOT IN ('pg_catalog', 'information_schema');`);
-    console.log(result);
     return result.recordset;
   }
   public getJdbcPath(): String {
