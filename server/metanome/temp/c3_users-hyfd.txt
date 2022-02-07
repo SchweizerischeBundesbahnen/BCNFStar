@@ -1,1 +1,0 @@
-[] --> company_name, create_date, equity_share, fac_name, financial_control, id, is_demo, operational_control, owner_id, password, salt, update_date, username

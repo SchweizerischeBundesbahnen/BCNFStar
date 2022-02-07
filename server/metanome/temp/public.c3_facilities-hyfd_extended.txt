@@ -1,1 +1,0 @@
-[] --> address, bd_per_week, create_date, equity_share, export_harbor, export_harbor_distance, financial_control, id, import_harbor, import_harbor_distance, lat, lng, lost_bd_per_year, name, operational_control, region, sc3_type, timespan_id, update_date, user_id
