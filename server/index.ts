@@ -38,19 +38,19 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors(corsOptions));
 
-app.get("/tables", getTablesFunction());
-app.get("/tables/head", getTableHeadFromNameFunction());
-app.get("/tables/:name/fds", getFDsFromTableNameFunction());
+app.get("/tables", getTablesFunction);
+app.get("/tables/head", getTableHeadFromNameFunction);
+app.get("/tables/:name/fds", getFDsFromTableNameFunction);
 app.get("/fks", getFksFunction);
 
-app.get("/tables/:tableNames/inds", getINDsForTablesFunction());
+app.get("/tables/:tableNames/inds", getINDsForTablesFunction);
 
 // app.post("/persist/createTable", postCreateTable(pool));
 // app.post("/persist/createForeignKey", postCreateForeignKey(pool));
 // DB_PASSFILE=C:\.pgpass
 // localhost:80/tables/public.customer/fds
-app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction());
-app.post("/tables/inds/run", postRunMetanomeINDAlgorithmFunction());
+app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction);
+app.post("/tables/inds/run", postRunMetanomeINDAlgorithmFunction);
 
 app.use(
   expressStaticGzip(
