@@ -1,6 +1,1 @@
-{
-  "env": {
-    "serverUrl": "http://localhost",
-    "angularDevServerUrl": "http://localhost:4200"
-  }
-}
+{}
