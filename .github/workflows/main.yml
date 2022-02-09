@@ -32,7 +32,7 @@ jobs:
           chmod 600 ~/.pgpass
 
           createdb $PGDATABASE
-          pg_restore cypress/postgres_1MB_testdata_denormalized.sql
+          pg_restore -d $PGDATABASE cypress/postgres_1MB_testdata_denormalized.sql
 
           # change postgres auth method
           sudo sed -i 's/scram-sha-256/md5/g' /etc/postgresql/14/main/pg_hba.conf
