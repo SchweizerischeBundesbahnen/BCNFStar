@@ -36,7 +36,7 @@ jobs:
 
           # change postgres auth method
           sudo sed -i 's/scram-sha-256/md5/g' /etc/postgresql/14/main/pg_hba.conf
-          psql -c 'ALTER ROLE $PGUSER WITH PASSWORD $PGPASSWORD;'
+          psql -c "ALTER ROLE $PGUSER WITH PASSWORD $PGPASSWORD;"
 
         env:
           PGPASSWORD: postgres
