@@ -29,7 +29,7 @@ jobs:
           cat << EOF > ~/.pgpass
           $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
           EOF
-          sudo find / -name pg_hba.conf 2> /dev/null   
+          echo < /etc/postgresql/14/main/pg_hba.conf
           chmod 600 ~/.pgpass
 
           createdb _test_
