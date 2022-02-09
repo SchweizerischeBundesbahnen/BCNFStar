@@ -9,8 +9,9 @@
     "start": "cd server && npm run start",
     "dev": "run-p dev:*",
     "install": "run-p install:*",
-    "test:dev": "CYPRESS_FRONTEND_BASEURL=http://localhost:4200 run-p dev:* cypress:open",
-    "test:prod": "CYPRESS_FRONTEND_BASEURL=http://localhost run-p start cypress:open",
+    "test:dev": "CYPRESS_FRONTEND_BASEURL=http://localhost:4200 CYPRESS_BACKEND_BASEURL=http://localhost:80 run-p dev:* cypress:open",
+    "test:prod": "CYPRESS_FRONTEND_BASEURL=http://localhost:80 CYPRESS_BACKEND_BASEURL=http://localhost:80 run-p start:coverage cypress:open",
+    "start:coverage": "nyc npm run start",
     "prebuild": "npm run generateTypeGuards",
     "install:server": "cd server && npm install",
     "install:frontend": "cd frontend && npm install",
@@ -24,15 +25,18 @@
     "prepare": "husky install",
     "lint": "run-s lint:*",
     "lint:frontend": "cd frontend && npm run lint",
-    "lint:prettier": "prettier --write ."
+    "lint:prettier": "prettier --write .",
+    "postcheckout": "sh npm-install-githook.sh"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.9.12",
     "@cypress/schema-tools": "^4.7.9",
     "cypress": "^9.1.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.1.2",
     "npm-run-all": "^4.1.5",
+    "nyc": "^15.1.0",
     "prettier": "^2.4.1",
     "pretty-quick": "^3.1.2"
   },
