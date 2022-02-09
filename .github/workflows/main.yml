@@ -33,8 +33,8 @@ jobs:
 
           createdb $PGDATABASE
           pg_restore -d $PGDATABASE cypress/postgres_1MB_testdata_denormalized.sql
-          sudo cat /etc/postgresql/14/main/postgresql.conf
           # change postgres auth method
+          sudo echo "password_encryption = md5" >> /etc/postgresql/14/main/postgresql.conf
           sudo sed -i 's/scram-sha-256/md5/g' /etc/postgresql/14/main/pg_hba.conf
           psql -c "ALTER ROLE $PGUSER WITH PASSWORD '$PGPASSWORD';"
 
