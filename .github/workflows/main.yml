@@ -29,8 +29,6 @@ jobs:
       # and run all Cypress tests
       - name: db-setup
         run: |
-          redis-cli KEYS '*'  
-          false
           cat << EOF > ~/.pgpass
           $PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD
           EOF
