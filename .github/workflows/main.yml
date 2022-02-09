@@ -10,7 +10,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres
+        image: postgres/13.5
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
@@ -34,9 +34,9 @@ jobs:
           createdb $PGDATABASE
           pg_restore -d $PGDATABASE cypress/postgres_1MB_testdata_denormalized.sql
           # change postgres auth method
-          sudo echo "password_encryption = md5" >> /etc/postgresql/14/main/postgresql.conf
-          sudo sed -i 's/scram-sha-256/md5/g' /etc/postgresql/14/main/pg_hba.conf
-          psql -c "ALTER ROLE $PGUSER WITH PASSWORD '$PGPASSWORD';"
+          #sudo echo "password_encryption = md5" >> /etc/postgresql/14/main/postgresql.conf
+          #sudo sed -i 's/scram-sha-256/md5/g' /etc/postgresql/14/main/pg_hba.conf
+          #psql -c "ALTER ROLE $PGUSER WITH PASSWORD '$PGPASSWORD';"
 
         env:
           PGPASSWORD: postgres
