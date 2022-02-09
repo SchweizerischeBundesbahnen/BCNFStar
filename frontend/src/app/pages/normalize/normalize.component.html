@@ -1,8 +1,10 @@
-<div class="container-fluid ml-2 mr-2 border">
+<div class="container-fluid border">
   <div class="row border">
     <div class="col-8 border">
+      <!-- [selectedTable]="this.selectedTable" -->
+      <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
-        [tables]="this.schema.tables"
+        [tables]="this.tablesObservable"
         [selectedTable]="this.selectedTable"
         (selected)="onSelect($event)"
       ></app-normalize-schema-graph>
@@ -14,11 +16,6 @@
         (undo)="onUndo()"
         (redo)="onRedo()"
       ></app-normalize-undo-redo>
-      <app-normalize-side-bar
-        class="normalize-sidebar"
-        [table]="this.selectedTable"
-        (splitFd)="onClickSplit($event)"
-      ></app-normalize-side-bar>
       <button type="button" sbb-button (click)="this.onAutoNormalize()">
         {{
           this.selectedTable !== undefined
@@ -26,6 +23,11 @@
             : "Auto-Normalize all tables"
         }}
       </button>
+      <app-normalize-side-bar
+        class="normalize-sidebar"
+        [table]="this.selectedTable"
+        (splitFd)="onClickSplit($event)"
+      ></app-normalize-side-bar>
     </div>
   </div>
 </div>

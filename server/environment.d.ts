@@ -14,6 +14,9 @@ declare global {
       REDIS_HOST?: string;
       REDIS_PORT?: string;
     }
+    interface Global {
+      __coverage__?: any;
+    }
   }
 }
 

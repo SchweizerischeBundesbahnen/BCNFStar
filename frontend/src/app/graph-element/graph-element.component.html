@@ -1,0 +1,28 @@
+<div class="container px-0" [ngStyle]="bbox">
+  <div class="table-head ellipses">
+    <span class="table-head-title" (click)="select()">
+      {{ table.name }}
+    </span>
+  </div>
+  <div
+    *ngFor="let column of table.columns.inOrder()"
+    class="row justify-content-between table-body"
+  >
+    <div
+      [ngClass]="{
+        pk: table.pk && table.pk.includes(column),
+        fk: table.hasForeignKeyWith(column)
+      }"
+      class="col-6 ellipses"
+    >
+      {{ column.name }}
+    </div>
+    <div class="col-6 text-end ellipses">{{ column.dataType }}</div>
+  </div>
+  <div class="row">
+    <sbb-icon
+      class="text-end"
+      svgIcon="kom:arrows-left-right-down-up-medium"
+    ></sbb-icon>
+  </div>
+</div>

@@ -1,9 +1,4 @@
-import { Request, Response, RequestHandler } from "express";
-import { access, open, rename } from "fs/promises";
-import { join } from "path";
-import promiseRetry from "promise-retry";
-import { split } from "../utils/databaseUtils";
-import { pathSplit } from "../utils/files";
+import { Request, Response } from "express";
 import MetanomeFDAlgorithm from "../metanome/metanomeFDAlgorithm";
 
 export default async function runMetanomeFD(
