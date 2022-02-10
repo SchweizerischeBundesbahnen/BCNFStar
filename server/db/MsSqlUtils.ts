@@ -69,9 +69,9 @@ export default class MsSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
       const query_result = await sql.query(
-        `SELECT COUNT(*) FROM ${schema}.${table}`
+        `SELECT COUNT(*) as count FROM ${schema}.${table}`
       );
-      return query_result.output[0].count;
+      return query_result.recordset[0].count;
     } else {
       throw {
         error: "Table or schema does not exist in database",
