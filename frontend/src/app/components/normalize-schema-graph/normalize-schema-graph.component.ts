@@ -9,7 +9,7 @@ import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
-import panzoom, { Transform } from 'panzoom';
+import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Subject } from 'rxjs';
 
 type GraphStorageItem = {
@@ -98,38 +98,42 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     }, 10);
   }
 
+  protected panzoomHandler?: PanZoom;
   // We use the panzoom library becuase pan and zoom detection is difficult and must
   // feel intuitive on a range of devices. We just take the transform and override the
   // default panzoom conotroller to move both the graph elements and the associated Angular
   // components
   addPanzoomHandler() {
-    panzoom(document.querySelector('#paper svg') as SVGElement, {
-      smoothScroll: false,
-      controller: {
-        getOwner() {
-          return document.querySelector('#paper') as HTMLElement;
-        },
-        applyTransform: (transform) => {
-          this.panzoomTransform = Object.assign({}, transform);
-          this.paper.scale(transform.scale);
-          this.paper.translate(transform.x, transform.y);
+    this.panzoomHandler = panzoom(
+      document.querySelector('#paper svg') as SVGElement,
+      {
+        smoothScroll: false,
+        controller: {
+          getOwner() {
+            return document.querySelector('#paper') as HTMLElement;
+          },
+          applyTransform: (transform) => {
+            this.panzoomTransform = Object.assign({}, transform);
+            this.paper.scale(transform.scale);
+            this.paper.translate(transform.x, transform.y);
 
-          this.updateAllBBoxes();
+            this.updateAllBBoxes();
+          },
         },
-      },
-      // disable panzoom when clicking on a jointjs element,
-      // so that dragging single elements still works
-      // (false means: enable panzoom, true disable panzoom)
-      beforeMouseDown: (evt: MouseEvent) => {
-        if (!evt.target) return false;
-        let element: HTMLElement | null = evt.target as HTMLElement;
-        while (element !== null) {
-          if (element.id.startsWith('__jointel')) return true;
-          element = element.parentElement;
-        }
-        return false;
-      },
-    });
+        // disable panzoom when clicking on a jointjs element,
+        // so that dragging single elements still works
+        // (false means: enable panzoom, true disable panzoom)
+        beforeMouseDown: (evt: MouseEvent) => {
+          if (!evt.target) return false;
+          let element: HTMLElement | null = evt.target as HTMLElement;
+          while (element !== null) {
+            if (element.id.startsWith('__jointel')) return true;
+            element = element.parentElement;
+          }
+          return false;
+        },
+      }
+    );
   }
 
   generateElements() {
@@ -211,6 +215,11 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
       });
       counter++;
     }
+  }
+
+  resetView() {
+    this.panzoomHandler?.moveTo(0, 0);
+    this.panzoomHandler?.zoomAbs(0, 0, 1);
   }
 
   updateAllBBoxes() {
