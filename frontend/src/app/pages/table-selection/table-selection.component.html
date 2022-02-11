@@ -34,8 +34,8 @@
           "
         >
           <ng-container *ngSwitchCase="1">
-            {{ hoveredTable.name }} {{ headLimit }} von
-            {{ tableRowCounts.get(hoveredTable.name) }}
+            Displaying {{ hoveredTable.name }} {{ headLimit }} of
+            {{ tableRowCounts.get(hoveredTable.name) }} rows
           </ng-container>
           <ng-container *ngSwitchCase="2">
             {{ hoveredTable.name }}
