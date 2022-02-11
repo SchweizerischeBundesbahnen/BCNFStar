@@ -1,12 +1,6 @@
 <div class="container-fluid ml-2 mr-2">
   <div class="row">
     <div class="col-4">
-      <ngx-slider
-        [(value)]="headLimit"
-        [options]="sliderOptions"
-        (valueChange)="reloadTableHeads()"
-      >
-      </ngx-slider>
       <div class="sbb-checkbox-group-vertical">
         <sbb-checkbox
           class="checkbox"
@@ -33,7 +27,7 @@
           [ngSwitch]="
             tableRowCounts.get(hoveredTable.name)! >= headLimit
               ? 1
-              : tableRowCounts.get(hoveredTable.name)! > 0 &&
+              : tableRowCounts.get(hoveredTable.name)! >= 0 &&
                 tableRowCounts.get(hoveredTable.name)! < headLimit
               ? 2
               : -1
@@ -52,6 +46,12 @@
             {{ hoveredTable.name }}
           </ng-container>
         </ng-container>
+        <ngx-slider
+          [(value)]="headLimit"
+          [options]="sliderOptions"
+          (valueChange)="reloadTableHeads()"
+        >
+        </ngx-slider>
       </h3>
       <sbb-table-wrapper class="table-wrapper">
         <table sbb-table [dataSource]="dataSource">

@@ -45,12 +45,6 @@ export class TableSelectionComponent implements OnInit {
       );
   }
 
-  public reloadTableHeads() {
-    this.dataService
-      .loadTableHeads(this.headLimit)
-      .subscribe((data) => (this.tableHeads = new Map(Object.entries(data))));
-  }
-
   public toggleCheckStatus(table: Table) {
     this.tables.set(table, !this.tables.get(table)!);
   }
@@ -67,10 +61,8 @@ export class TableSelectionComponent implements OnInit {
     );
   }
 
-  public mouseEnter(table: Table) {
-    this.hoveredTable = table;
+  private getDataSourceAndRenderTable(table: Table) {
     let hoveredTableHead = this.tableHeads.get(table.name);
-
     if (hoveredTableHead) {
       this.tableColumns = hoveredTableHead.attributes;
       this.dataSource.data = hoveredTableHead.rows;
@@ -79,5 +71,17 @@ export class TableSelectionComponent implements OnInit {
       this.dataSource.data = [];
     }
     this.table.renderRows();
+  }
+
+  public reloadTableHeads() {
+    this.dataService.loadTableHeads(this.headLimit).subscribe((data) => {
+      this.tableHeads = new Map(Object.entries(data));
+      this.getDataSourceAndRenderTable(this.hoveredTable);
+    });
+  }
+
+  public mouseEnter(table: Table) {
+    this.hoveredTable = table;
+    this.getDataSourceAndRenderTable(table);
   }
 }
