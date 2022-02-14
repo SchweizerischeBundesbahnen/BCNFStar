@@ -158,8 +158,6 @@ export class NormalizeComponent {
 
     console.log('Requesting SQL-Generation (Foreign Keys)');
 
-    console.log(this.schema.fkRelationships);
-
     this.schema.tables.forEach((table) => {
       table.fks().forEach((elem) => {
         this.dataService

@@ -179,8 +179,11 @@ export class DatabaseService {
       columnRelationships: referenced.pk!.inOrder().map((element) => {
         return {
           referencingColumn:
-            relationship._referencing[relationship._referenced.indexOf(element)]
-              .name,
+            relationship._referencing[
+              relationship._referenced.indexOf(
+                relationship._referenced.filter((c) => c.equals(element))[0]
+              )
+            ].name,
           referencedColumn: element.name,
         };
       }),
