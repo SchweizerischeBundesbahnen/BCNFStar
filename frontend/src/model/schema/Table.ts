@@ -11,7 +11,7 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public schema?: Schema;
-  public relationships = new Array<Relationship>();
+  public relationships = new Set<Relationship>();
   public sourceTables = new Set<Table>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
@@ -113,7 +113,7 @@ export default class Table {
     } while (toRemove.size > 0);
 
     table.sourceTables = sourceTables;
-    table.relationships = new Array(...relationships);
+    table.relationships = relationships;
   }
 
   public projectFds(table: Table): void {
@@ -147,10 +147,10 @@ export default class Table {
         .union(relationship.referenced())
     );
     newTable.schema = this.schema;
-    newTable.relationships.push(...this.relationships);
-    newTable.relationships.push(...otherTable.relationships);
+    this.relationships.forEach((rel) => newTable.relationships.add(rel));
+    otherTable.relationships.forEach((rel) => newTable.relationships.add(rel));
     if (!relationship.referenced().equals(relationship.referencing()))
-      newTable.relationships.push(relationship);
+      newTable.relationships.add(relationship);
 
     newTable.name = remaining.name;
     newTable.pk = remaining.pk;
