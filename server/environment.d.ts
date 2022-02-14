@@ -12,6 +12,9 @@ declare global {
       DB_PASSWORD?: string;
       DB_TYPE?: string;
     }
+    interface Global {
+      __coverage__?: any;
+    }
   }
 }
 

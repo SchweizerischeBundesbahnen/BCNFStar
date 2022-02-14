@@ -1,6 +1,6 @@
 import { sqlUtils } from "../db";
 import IFk from "@/definitions/IFk";
-import { Request, Response, RequestHandler } from "express";
+import { Request, Response } from "express";
 
 export default async function getFks(
   req: Request,

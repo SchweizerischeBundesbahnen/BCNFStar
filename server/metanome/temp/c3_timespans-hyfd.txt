@@ -1,1 +1,0 @@
-[] --> create_date, description, timespan_id, update_date, user_id
