@@ -37,10 +37,6 @@ export class NormalizeComponent {
     this.tablesObservable.next(this.schema.tables);
   }
 
-  onSelect(table: Table): void {
-    this.selectedTable = table;
-  }
-
   onClickSplit(fd: FunctionalDependency): void {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
       data: fd,

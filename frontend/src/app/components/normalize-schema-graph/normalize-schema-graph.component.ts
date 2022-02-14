@@ -31,8 +31,8 @@ enum PortSide {
 })
 export class NormalizeSchemaGraphComponent implements AfterViewInit {
   @Input() tables!: Subject<Set<Table>>;
-  @Input() selectedTable?: Table;
-  @Output() selected = new EventEmitter<Table>();
+  @Input() selection?: Table;
+  @Output() selectionChange = new EventEmitter<Table>();
 
   protected localTables: Set<Table> = new Set();
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
