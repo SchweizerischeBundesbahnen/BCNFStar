@@ -38,10 +38,6 @@ export class NormalizeComponent {
     this.tablesObservable.next(this.schema.tables);
   }
 
-  onSelect(table: Table): void {
-    this.selectedTable = table;
-  }
-
   onJoin(event: {
     source: Table;
     target: Table;

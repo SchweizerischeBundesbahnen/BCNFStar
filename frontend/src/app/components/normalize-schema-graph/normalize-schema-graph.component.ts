@@ -32,8 +32,8 @@ enum PortSide {
 })
 export class NormalizeSchemaGraphComponent implements AfterViewInit {
   @Input() tables!: Subject<Set<Table>>;
-  @Input() selectedTable?: Table;
-  @Output() selected = new EventEmitter<Table>();
+  @Input() selection?: Table;
+  @Output() selectionChange = new EventEmitter<Table>();
   @Output() joinFk = new EventEmitter<{
     source: Table;
     target: Table;

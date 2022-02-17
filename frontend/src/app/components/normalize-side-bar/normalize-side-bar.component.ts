@@ -21,7 +21,7 @@ export class NormalizeSideBarComponent implements OnChanges {
   fdSelectionGroup!: SbbRadioGroup;
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
-  @Input() table?: Table;
+  @Input() table!: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
   @Output() joinInd = new EventEmitter<{
     source: Table;
