@@ -65,7 +65,7 @@ export default class Table {
 
   public split(fd: FunctionalDependency): Array<Table> {
     let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
-    fd.lhs.columns.forEach((column) => remaining.columns.add(column.copy()));
+    fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
 
     remaining.schema = this.schema;

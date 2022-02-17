@@ -99,7 +99,7 @@ export class DatabaseService {
   private resolveInds(inds: Array<IInclusionDependency>) {
     let schemaColumns = new Array<Column>();
     this.inputSchema!.tables.forEach((table) => {
-      schemaColumns.push(...table.columns.columns);
+      schemaColumns.push(...table.columns.asSet());
     });
     inds.forEach((ind) => {
       let indRelationship = new Relationship();

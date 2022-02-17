@@ -12,10 +12,10 @@ export default class Relationship {
   ): Relationship {
     // TODO optimise
     let relationship = new Relationship();
-    referencing.columns.columns.forEach((referencingColumn) => {
-      let correspondingCols = [...referenced.columns.columns].filter((column) =>
-        column.equals(referencingColumn)
-      );
+    referencing.columns.asSet().forEach((referencingColumn) => {
+      let correspondingCols = referenced.columns
+        .asArray()
+        .filter((column) => column.equals(referencingColumn));
       if (correspondingCols.length > 0)
         relationship.add(referencingColumn, correspondingCols[0]);
     });

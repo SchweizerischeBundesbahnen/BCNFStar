@@ -155,7 +155,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
       });
       jointjsEl.resize(
         this.elementWidth,
-        60 + this.portDiameter * table.columns.columns.size
+        60 + this.portDiameter * table.columns.cardinality
       );
       this.graphStorage[table.name] = {
         // alternative to HtmlElement: joint.shapes.html.Element
@@ -223,14 +223,8 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   generateLinks() {
     for (const table of this.localTables) {
       for (const fk of table.fks()) {
-        let fkReferenced = fk.relationship
-          .referenced()
-          .columns.values()
-          .next().value;
-        let fkReferencing = fk.relationship
-          .referencing()
-          .columns.values()
-          .next().value;
+        let fkReferenced = fk.relationship.referenced().asArray()[0];
+        let fkReferencing = fk.relationship.referencing().asArray()[0];
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage[table.name].jointjsEl.id,
