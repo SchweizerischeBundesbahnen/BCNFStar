@@ -51,25 +51,15 @@ export default class Relationship {
   }
 
   public referencingToReferencedColumnsIn(cc: ColumnCombination) {
+    let newCC = cc.copy();
     for (let i = 0; i < this._referencing.length; i++) {
-      if (cc.includes(this._referencing[i])) {
-        cc.setMinus(new ColumnCombination(this._referencing[i])).union(
-          new ColumnCombination(this._referenced[i])
-        );
+      if (newCC.includes(this._referencing[i])) {
+        newCC
+          .setMinus(new ColumnCombination(this._referencing[i]))
+          .union(new ColumnCombination(this._referenced[i]));
       }
     }
-    return cc;
-  }
-
-  public referencedToReferencingColumnsIn(cc: ColumnCombination) {
-    for (let i = 0; i < this._referenced.length; i++) {
-      if (cc.includes(this._referenced[i])) {
-        cc.setMinus(new ColumnCombination(this._referenced[i])).union(
-          new ColumnCombination(this._referencing[i])
-        );
-      }
-    }
-    return cc;
+    return newCC;
   }
 
   public toString(): String {

@@ -135,11 +135,11 @@ export default class Schema {
       table.addFd(fd.lhs.copy(), fd.rhs.copy());
     });
     referencing.fds.forEach((fd) => {
-      let newLhs = relationship.referencingToReferencedColumnsIn(fd.lhs.copy());
-      let newRhs = relationship.referencingToReferencedColumnsIn(fd.rhs.copy());
+      let newLhs = relationship.referencingToReferencedColumnsIn(fd.lhs);
+      let newRhs = relationship.referencingToReferencedColumnsIn(fd.rhs);
       if (newLhs.isSubsetOf(relationship.referenced())) {
-        let correspondingFds = table.fds.filter((fd) => fd.lhs.equals(newLhs));
-        if (correspondingFds.length > 0) correspondingFds[0].rhs.union(newRhs);
+        let correspondingFd = table.fds.find((fd) => fd.lhs.equals(newLhs));
+        if (correspondingFd) correspondingFd.rhs.union(newRhs);
         else table.addFd(newLhs, newRhs);
       } else {
         table.addFd(newLhs, newRhs);
