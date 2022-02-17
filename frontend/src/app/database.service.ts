@@ -70,9 +70,8 @@ export class DatabaseService {
     fks.forEach((fk) => {
       let referencingTable: Table = [...this.inputSchema!.tables].find(
         (table: Table) => fk.name == table.name);
-      let referencedTable: Table = [...this.inputSchema!.tables].filter(
-        (table: Table) => fk.foreignName == table.name
-      )[0];
+      let referencedTable: Table = [...this.inputSchema!.tables].find(
+        (table: Table) => fk.foreignName == table.name);
 
       if (referencingTable && referencedTable) {
         let fkColumn: Column = referencingTable.columns.columnFromName(
