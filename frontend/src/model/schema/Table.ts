@@ -36,7 +36,7 @@ export default class Table {
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
     names.forEach((name, i) =>
-      table.columns.add(new Column(name, 'unkown data type', i, table))
+      table.columns.add(new Column(name, 'unknown data type', i, table))
     );
     table.sourceTables.add(table);
     return table;
