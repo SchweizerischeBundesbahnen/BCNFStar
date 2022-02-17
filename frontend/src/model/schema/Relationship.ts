@@ -3,6 +3,8 @@ import ColumnCombination from './ColumnCombination';
 import Table from './Table';
 
 export default class Relationship {
+  // these arrays are linked, the column in _referencing has the same index as the
+  // corresponding column in _referenced
   private _referencing = new Array<Column>();
   private _referenced = new Array<Column>();
 
