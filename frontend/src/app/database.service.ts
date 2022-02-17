@@ -68,10 +68,12 @@ export class DatabaseService {
 
   private resolveIFks(fks: Array<IFk>) {
     fks.forEach((fk) => {
-      let referencingTable: Table = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.name == table.name);
-      let referencedTable: Table = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.foreignName == table.name);
+      let referencingTable = [...this.inputSchema!.tables].find(
+        (table: Table) => fk.name == table.name
+      );
+      let referencedTable = [...this.inputSchema!.tables].find(
+        (table: Table) => fk.foreignName == table.name
+      );
 
       if (referencingTable && referencedTable) {
         let fkColumn: Column = referencingTable.columns.columnFromName(
@@ -84,8 +86,10 @@ export class DatabaseService {
         if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
         referencedTable.pk.add(pkColumn);
 
-        let relationship = this.inputSchema!.fkRelationships.find((rel) => 
-           rel.appliesTo(referencingTable, referencedTable))) || new Relationship();
+        let relationship =
+          [...this.inputSchema!.fkRelationships].find((rel) =>
+            rel.appliesTo(referencingTable!, referencedTable!)
+          ) || new Relationship();
         relationship.add(fkColumn, pkColumn);
         this.inputSchema!.fkRelationships.add(relationship);
       }
