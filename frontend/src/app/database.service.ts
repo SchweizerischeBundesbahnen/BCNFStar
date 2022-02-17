@@ -84,12 +84,8 @@ export class DatabaseService {
         if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
         referencedTable.pk.add(pkColumn);
 
-        let relationship = new Relationship();
-        this.inputSchema!.fkRelationships.forEach((rel) => {
-          if (rel.appliesTo(referencingTable, referencedTable)) {
-            relationship = rel;
-          }
-        });
+        let relationship = this.inputSchema!.fkRelationships.find((rel) => 
+           rel.appliesTo(referencingTable, referencedTable))) || new Relationship();
         relationship.add(fkColumn, pkColumn);
         this.inputSchema!.fkRelationships.add(relationship);
       }
