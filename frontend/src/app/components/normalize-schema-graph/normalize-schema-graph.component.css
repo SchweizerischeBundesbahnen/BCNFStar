@@ -18,3 +18,7 @@
   position: relative;
   height: 90vh;
 }
+
+.tool-remove {
+  display: none;
+}

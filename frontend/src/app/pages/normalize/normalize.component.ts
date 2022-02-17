@@ -7,8 +7,10 @@ import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 import { BehaviorSubject } from 'rxjs';
+import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import Relationship from '@/src/model/schema/Relationship';
 
 @Component({
   selector: 'app-normalize',
@@ -28,12 +30,34 @@ export class NormalizeComponent {
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog
   ) {
-    let inputTables = dataService.inputTables!;
-    this.schema = new Schema(...inputTables);
+    this.schema = dataService.inputSchema!;
     this.schemaChanged();
   }
 
   protected schemaChanged() {
+    this.tablesObservable.next(this.schema.tables);
+  }
+
+  onJoin(event: {
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }): void {
+    let command = new JoinCommand(
+      this.schema,
+      event.target,
+      event.source,
+      event.relationship
+    );
+
+    command.onDo = () => {
+      this.selectedTable = undefined;
+    };
+    command.onUndo = () => {
+      this.selectedTable = undefined;
+    };
+
+    this.commandProcessor.do(command);
     this.tablesObservable.next(this.schema.tables);
   }
 
@@ -42,7 +66,7 @@ export class NormalizeComponent {
       data: fd,
     });
 
-    dialogRef.afterClosed().subscribe((fd) => {
+    dialogRef.afterClosed().subscribe((fd: FunctionalDependency) => {
       if (fd) this.onSplitFd(fd);
     });
   }
@@ -50,11 +74,9 @@ export class NormalizeComponent {
   onSplitFd(fd: FunctionalDependency): void {
     let command = new SplitCommand(this.schema, this.selectedTable!, fd);
 
-    // WARNING: When using arrow functions like here, `this` refers to
-    // the context where the function is defined, instead of the function
-    // object itself like when using function(){}
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
+
     this.commandProcessor.do(command);
     this.schemaChanged();
   }
