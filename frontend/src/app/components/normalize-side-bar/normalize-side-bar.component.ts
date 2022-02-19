@@ -1,9 +1,9 @@
 import Relationship from '@/src/model/schema/Relationship';
+import Schema from '@/src/model/schema/Schema';
 import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -16,27 +16,21 @@ import Table from 'src/model/schema/Table';
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent implements OnChanges {
+export class NormalizeSideBarComponent {
   @ViewChild('fdSelection', { read: SbbRadioGroup })
   fdSelectionGroup!: SbbRadioGroup;
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
   @Input() table!: Table;
+  @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
   @Output() joinInd = new EventEmitter<{
     source: Table;
     target: Table;
     relationship: Relationship;
   }>();
-  public fds!: Array<FunctionalDependency>;
-  public inds!: Array<{ relationship: Relationship; table: Table }>;
 
   constructor() {}
-
-  ngOnChanges(): void {
-    this.fds = this.table?.violatingFds() || [];
-    this.inds = this.table?.inds() || [];
-  }
 
   selectedFd(): FunctionalDependency | undefined {
     if (!this.fdSelectionGroup) return undefined;

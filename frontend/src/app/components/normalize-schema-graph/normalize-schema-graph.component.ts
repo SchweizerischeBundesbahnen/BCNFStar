@@ -12,6 +12,7 @@ import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Subject } from 'rxjs';
 import Relationship from '@/src/model/schema/Relationship';
+import Schema from '@/src/model/schema/Schema';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -32,6 +33,7 @@ enum PortSide {
 })
 export class NormalizeSchemaGraphComponent implements AfterViewInit {
   @Input() tables!: Subject<Set<Table>>;
+  @Input() schema!: Schema;
   @Input() selection?: Table;
   @Output() selectionChange = new EventEmitter<Table>();
   @Output() joinFk = new EventEmitter<{
@@ -222,7 +224,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
   generateLinks() {
     for (const table of this.localTables) {
-      for (const fk of table.fks()) {
+      for (const fk of this.schema.fksOf(table)) {
         let fkReferenced = fk.relationship.referenced().asArray()[0];
         let fkReferencing = fk.relationship.referencing().asArray()[0];
         let link = new joint.shapes.standard.Link({

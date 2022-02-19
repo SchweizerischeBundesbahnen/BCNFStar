@@ -91,7 +91,7 @@ export class DatabaseService {
             rel.appliesTo(referencingTable!, referencedTable!)
           ) || new Relationship();
         relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.fkRelationships.add(relationship);
+        this.inputSchema!.addFkRelationship(relationship);
       }
     });
   }
@@ -123,14 +123,13 @@ export class DatabaseService {
 
         indRelationship.add(dependantColumn, referencedColumn);
       }
-      this.inputSchema!.indRelationships.add(indRelationship);
+      this.inputSchema!.addIndRelationship(indRelationship);
     });
   }
 
   public setInputTables(tables: Array<Table>) {
     this.inputSchema = new Schema(...tables);
     this.inputSchema.tables.forEach((inputTable: Table) => {
-      inputTable.schema = this.inputSchema;
       this.getFunctionalDependenciesByTable(inputTable).subscribe((fd) =>
         inputTable.setFds(
           ...fd.functionalDependencies.map((fds) =>

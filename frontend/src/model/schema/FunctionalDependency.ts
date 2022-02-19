@@ -63,7 +63,7 @@ export default class FunctionalDependency {
       !this.table.pk.isSubsetOf(this.table.remainingSchema(this))
     )
       return false;
-    if (
+    /*if (
       this.table.fks().some((fk) => {
         return (
           !fk.relationship
@@ -76,6 +76,7 @@ export default class FunctionalDependency {
       })
     )
       return false;
+    */
     return true;
   }
 
