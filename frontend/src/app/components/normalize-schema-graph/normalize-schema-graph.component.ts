@@ -10,7 +10,7 @@ import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
-import { Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
 
@@ -32,9 +32,9 @@ enum PortSide {
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
 export class NormalizeSchemaGraphComponent implements AfterViewInit {
-  @Input() tables!: Subject<Set<Table>>;
   @Input() schema!: Schema;
   @Input() selection?: Table;
+  @Input() schemaChanged!: Observable<void>;
   @Output() selectionChange = new EventEmitter<Table>();
   @Output() joinFk = new EventEmitter<{
     source: Table;
@@ -42,7 +42,6 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     relationship: Relationship;
   }>();
 
-  protected localTables: Set<Table> = new Set();
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
   protected portDiameter = 22.5;
@@ -78,10 +77,10 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
     this.addPanzoomHandler();
 
-    this.tables.subscribe((v) => {
-      this.localTables = v;
+    this.schemaChanged.subscribe(() => {
       this.updateGraph();
     });
+    this.updateGraph();
   }
 
   updateGraph() {
@@ -145,7 +144,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   }
 
   generateElements() {
-    for (const table of this.localTables) {
+    for (const table of this.schema.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
         attrs: { root: { id: '__jointel__' + table.name } },
       });
@@ -223,7 +222,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   }
 
   generateLinks() {
-    for (const table of this.localTables) {
+    for (const table of this.schema.tables) {
       for (const fk of this.schema.fksOf(table)) {
         let fkReferenced = fk.relationship.referenced().asArray()[0];
         let fkReferencing = fk.relationship.referencing().asArray()[0];
