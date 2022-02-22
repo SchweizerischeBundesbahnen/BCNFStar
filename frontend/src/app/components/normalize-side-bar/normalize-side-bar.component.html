@@ -14,10 +14,12 @@
       <sbb-expansion-panel-header>
         Functional Dependencies
       </sbb-expansion-panel-header>
-      <div *ngIf="this.table.violatingFds().length > 0">
+      <div *ngIf="this.schema.splittableFdsOf(table).length > 0">
         <sbb-radio-group #fdSelection>
           <sbb-radio-button
-            *ngFor="let fd of this.table.violatingFds().slice(0, 10)"
+            *ngFor="
+              let fd of this.schema.splittableFdsOf(this.table).slice(0, 10)
+            "
             [value]="fd"
           >
             {{ fd.toString() }}

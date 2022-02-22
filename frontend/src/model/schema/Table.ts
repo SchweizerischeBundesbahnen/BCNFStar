@@ -3,6 +3,7 @@ import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
+import FdScore from './methodObjects/FdScore';
 
 export default class Table {
   public name = '';
@@ -17,15 +18,15 @@ export default class Table {
   /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
-  public fks!: Set<{ relationship: Relationship; table: Table }>;
+  public _fks!: Set<{ relationship: Relationship; table: Table }>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
-  public inds!: Set<{ relationship: Relationship; table: Table }>;
+  public _inds!: Set<{ relationship: Relationship; table: Table }>;
   /**
    * This variable tracks if the cached results fks and inds are still valid
    */
-  public relationshipsValid = true;
+  public _relationshipsValid = true;
 
   public constructor(columns?: ColumnCombination) {
     if (columns) this.columns = columns;
@@ -63,7 +64,7 @@ export default class Table {
   }
 
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
-    this.fds.push(new FunctionalDependency(this, lhs, rhs));
+    this.fds.push(new FunctionalDependency(lhs, rhs));
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
@@ -128,7 +129,6 @@ export default class Table {
     this.fds.forEach((fd) => {
       if (fd.lhs.isSubsetOf(table.columns)) {
         fd = new FunctionalDependency(
-          table,
           fd.lhs.copy(),
           fd.rhs.copy().intersect(table.columns)
         );
@@ -176,10 +176,24 @@ export default class Table {
 
     return newTable;
   }
+
+  public isKey(fd: FunctionalDependency): boolean {
+    // assume fd is fully extended
+    // TODO what about null values
+    return fd.rhs.equals(this.columns);
+  }
+
+  public isBCNFViolating(fd: FunctionalDependency): boolean {
+    if (this.isKey(fd)) return false;
+    if (fd.lhs.cardinality == 0) return false;
+    if (this.pk && !this.pk.isSubsetOf(this.remainingSchema(fd))) return false;
+    return true;
+  }
+
   public keys(): Array<ColumnCombination> {
     if (!this._keys) {
       let keys: Array<ColumnCombination> = this.fds
-        .filter((fd) => fd.isKey())
+        .filter((fd) => this.isKey(fd))
         .map((fd) => fd.lhs);
       if (keys.length == 0) keys.push(this.columns.copy());
       this._keys = keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
@@ -190,9 +204,11 @@ export default class Table {
   public violatingFds(): Array<FunctionalDependency> {
     if (!this._violatingFds) {
       this._violatingFds = this.fds
-        .filter((fd) => fd.violatesBCNF())
+        .filter((fd) => this.isBCNFViolating(fd))
         .sort((fd1, fd2) => {
-          return fd2.fdScore() - fd1.fdScore();
+          let score1 = new FdScore(this, fd1).get();
+          let score2 = new FdScore(this, fd2).get();
+          return score2 - score1;
         })
         .slice(0, 100);
     }

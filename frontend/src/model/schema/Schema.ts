@@ -60,27 +60,27 @@ export default class Schema {
   }
 
   private set relationshipsValid(valid: boolean) {
-    this.tables.forEach((table) => (table.relationshipsValid = valid));
+    this.tables.forEach((table) => (table._relationshipsValid = valid));
   }
 
   public fksOf(
     table: Table
   ): Set<{ relationship: Relationship; table: Table }> {
-    if (!table.relationshipsValid) {
-      table.fks = this.calculateFksOf(table);
-      table.inds = this.calculateIndsOf(table);
-    }
-    return table.fks;
+    if (!table._relationshipsValid) this.updateRelationshipsOf(table);
+    return table._fks;
   }
 
   public indsOf(
     table: Table
   ): Set<{ relationship: Relationship; table: Table }> {
-    if (!table.relationshipsValid) {
-      table.fks = this.calculateFksOf(table);
-      table.inds = this.calculateIndsOf(table);
-    }
-    return table.inds;
+    if (!table._relationshipsValid) this.updateRelationshipsOf(table);
+    return table._inds;
+  }
+
+  private updateRelationshipsOf(table: Table): void {
+    table._fks = this.calculateFksOf(table);
+    table._inds = this.calculateIndsOf(table);
+    table._relationshipsValid = true;
   }
 
   private calculateFksOf(
@@ -132,6 +132,21 @@ export default class Schema {
     return inds;
   }
 
+  public splittableFdsOf(table: Table): Array<FunctionalDependency> {
+    console.log(table);
+    return table.violatingFds().filter((fd) => this.isFdSplittable(fd, table));
+  }
+
+  private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
+    return [...this.fksOf(table)].every((fk) => {
+      let fkColumns = fk.relationship.referencing();
+      return (
+        fkColumns.isSubsetOf(table.remainingSchema(fd)) ||
+        fkColumns.isSubsetOf(table.generatingSchema(fd))
+      );
+    });
+  }
+
   public split(table: Table, fd: FunctionalDependency) {
     let tables = table.split(fd);
     this.add(...tables);
@@ -144,22 +159,14 @@ export default class Schema {
     let resultingTables = new Array<Table>();
     while (queue.length > 0) {
       let current = queue.shift()!;
-      if (current.violatingFds().length > 0) {
-        let children = this.split(current, current.violatingFds()[0]);
+      if (this.splittableFdsOf(current).length > 0) {
+        let children = this.split(current, this.splittableFdsOf(current)[0]);
         queue.push(...children);
       } else {
         resultingTables.push(current);
       }
     }
     return resultingTables;
-  }
-
-  public relationshipsChanged() {
-    for (let table of this.tables) {
-      table.fks = this.calculateFksOf(table);
-      table.inds = this.calculateIndsOf(table);
-    }
-    this.relationshipsValid = true;
   }
 
   public join(table1: Table, table2: Table, relationship: Relationship) {
