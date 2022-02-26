@@ -9,6 +9,7 @@ describe("The /tables route", () => {
       .its("content-type")
       .should("include", "application/json");
   });
+
   it("Should return tables", () => {
     cy.request("get", Cypress.env("BACKEND_BASEURL") + "/tables").should(
       (result) => {
