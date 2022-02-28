@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, isDevMode } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'bcnfstar';
+  public isDevMode = isDevMode();
+  public queueUrl: string = isDevMode()
+    ? 'http://localhost:80/queue'
+    : '/queue';
 }

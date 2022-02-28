@@ -92,7 +92,10 @@ export default class MsSqlUtils extends SqlUtils {
       AND tc.table_schema NOT IN ('pg_catalog', 'information_schema');`);
     return result.recordset;
   }
-  public getJdbcPath(): String {
+  public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
+  }
+  public getDbmsName(): string {
+    return "mssql";
   }
 }

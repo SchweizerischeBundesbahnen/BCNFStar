@@ -10,9 +10,9 @@ export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 export default abstract class MetanomeAlgorithm {
   public memory = "12g";
   protected classpath_separator = process.platform === "win32" ? ";" : ":";
-  protected tables: string[];
+  protected schemaAndTables: string[];
   constructor(tables: string[]) {
-    this.tables = tables;
+    this.schemaAndTables = tables;
   }
   abstract run(): Promise<{}>;
 

@@ -92,7 +92,10 @@ export default class PostgresSqlUtils extends SqlUtils {
             AND tc.table_schema NOT IN ('pg_catalog', 'information_schema')`);
     return result.rows;
   }
-  public getJdbcPath(): String {
+  public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
+  }
+  public getDbmsName(): string {
+    return "postgres";
   }
 }
