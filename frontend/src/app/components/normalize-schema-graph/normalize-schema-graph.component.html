@@ -1,8 +1,9 @@
 <div id="graph">
   <div id="paper" #paper></div>
+  <button sbb-button (click)="resetView()" id="reset-btn">Reset view</button>
   <app-graph-element
     *ngFor="let item of graphStorage | keyvalue"
-    (selected)="selected.emit($event)"
+    (selected)="selectionChange.emit($event)"
     [table]="item.value.table"
     [bbox]="item.value.style"
   ></app-graph-element>

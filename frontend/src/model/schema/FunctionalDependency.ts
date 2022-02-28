@@ -26,8 +26,6 @@ export default class FunctionalDependency {
     const [lhsString, rhsString] = metanomeString
       .split('-->')
       .map((elem) => elem.trim());
-    // console.log("lhs: ", lhsString);
-    // console.log("rhs: ", rhsString);
     let rhs: ColumnCombination = table.columns.columnsFromNames(
       ...rhsString.split(',').map((elem) => elem.trim())
     );
@@ -61,17 +59,21 @@ export default class FunctionalDependency {
     if (this.isKey()) return false;
     if (this.lhs.cardinality == 0) return false;
     if (
-      this.table.foreignKeys().some((fk) => {
-        return (
-          !fk.isSubsetOf(this.table.remainingSchema(this)) &&
-          !fk.isSubsetOf(this.table.generatingSchema(this))
-        );
-      })
+      this.table.pk &&
+      !this.table.pk.isSubsetOf(this.table.remainingSchema(this))
     )
       return false;
     if (
-      this.table.pk &&
-      !this.table.pk.isSubsetOf(this.table.remainingSchema(this))
+      this.table.fks().some((fk) => {
+        return (
+          !fk.relationship
+            .referencing()
+            .isSubsetOf(this.table.remainingSchema(this)) &&
+          !fk.relationship
+            .referencing()
+            .isSubsetOf(this.table.generatingSchema(this))
+        );
+      })
     )
       return false;
     return true;

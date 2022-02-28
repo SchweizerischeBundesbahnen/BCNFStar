@@ -22,7 +22,8 @@ export class SplitDialogComponent {
     fd.rhs
       .copy()
       .setMinus(fd.lhs)
-      .columns.forEach((column) => {
+      .asSet()
+      .forEach((column) => {
         this.selectedColumns.set(column, true);
         this.columns.push(column);
       });

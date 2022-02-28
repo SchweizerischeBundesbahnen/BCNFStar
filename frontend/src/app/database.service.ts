@@ -3,16 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import Table from '../model/schema/Table';
+import Schema from '../model/schema/Schema';
+import Relationship from '../model/schema/Relationship';
 import { Observable, shareReplay, map, Subject } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
 import ColumnCombination from '../model/schema/ColumnCombination';
+import Column from '../model/schema/Column';
+import IInclusionDependency from '@server/definitions/IInclusionDependencies';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatabaseService {
-  public inputTables?: Array<Table>;
+  public inputSchema?: Schema;
   private loadTableCallback = new Subject<Array<Table>>(); // Source
   loadTableCallback$ = this.loadTableCallback.asObservable(); // Stream
   // when using the angular dev server, you need to access another adress
@@ -31,7 +35,6 @@ export class DatabaseService {
       tables.push(...data);
       this.getIFks().subscribe((data) => {
         this.fks = data;
-        // this.resolveIFks(data, tables);
         this.loadTableCallback.next(tables);
       });
     });
@@ -63,35 +66,71 @@ export class DatabaseService {
     return fks;
   }
 
-  private resolveIFks(fks: Array<IForeignKey>, tables: Array<Table>) {
+  private resolveIFks(fks: Array<IForeignKey>) {
     fks.forEach((fk) => {
-      let referencing_table: Table = tables.filter(
-        (table) => fk.name == table.name
-      )[0];
-      let referenced_table: Table = tables.filter(
-        (table) => fk.foreignName == table.name
-      )[0];
+      let referencingTable = [...this.inputSchema!.tables].find(
+        (table: Table) => fk.name == table.name
+      );
+      let referencedTable = [...this.inputSchema!.tables].find(
+        (table: Table) => fk.foreignName == table.name
+      );
 
-      if (referencing_table && referenced_table) {
-        referencing_table.referencedTables.add(referenced_table);
-        referenced_table.referencingTables.add(referencing_table);
+      if (referencingTable && referencedTable) {
+        let fkColumn: Column = referencingTable.columns.columnFromName(
+          fk.column
+        );
+        let pkColumn: Column = referencedTable.columns.columnFromName(
+          fk.foreignColumn
+        );
 
-        let fk_column: ColumnCombination =
-          referencing_table.columns.columnsFromNames(fk.column);
-        let pk_column: ColumnCombination =
-          referenced_table.columns.columnsFromNames(fk.foreignColumn);
+        if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
+        referencedTable.pk.add(pkColumn);
 
-        referencing_table.columns.setMinus(fk_column).union(pk_column);
-
-        if (!referenced_table.pk) referenced_table.pk = new ColumnCombination();
-        referenced_table.pk.union(pk_column);
+        let relationship =
+          [...this.inputSchema!.fkRelationships].find((rel) =>
+            rel.appliesTo(referencingTable!, referencedTable!)
+          ) || new Relationship();
+        relationship.add(fkColumn, pkColumn);
+        this.inputSchema!.fkRelationships.add(relationship);
       }
     });
   }
 
+  private resolveInds(inds: Array<IInclusionDependency>) {
+    let schemaColumns = new Array<Column>();
+    this.inputSchema!.tables.forEach((table) => {
+      schemaColumns.push(...table.columns.asSet());
+    });
+    inds.forEach((ind) => {
+      let indRelationship = new Relationship();
+      let numColumns = ind.dependant.columnIdentifiers.length;
+      for (let i = 0; i < numColumns; i++) {
+        let dependantIColumn = ind.dependant.columnIdentifiers[i];
+        let dependantColumn = schemaColumns.filter(
+          (column) =>
+            dependantIColumn.columnIdentifier == column.name &&
+            'public.' + dependantIColumn.schemaIdentifier ==
+              column.sourceTable.name
+        )[0];
+
+        let referencedIColumn = ind.referenced.columnIdentifiers[i];
+        let referencedColumn = schemaColumns.filter(
+          (column) =>
+            referencedIColumn.columnIdentifier == column.name &&
+            'public.' + referencedIColumn.schemaIdentifier ==
+              column.sourceTable.name
+        )[0];
+
+        indRelationship.add(dependantColumn, referencedColumn);
+      }
+      this.inputSchema!.indRelationships.add(indRelationship);
+    });
+  }
+
   public setInputTables(tables: Array<Table>) {
-    this.inputTables = tables;
-    this.inputTables.forEach((inputTable) => {
+    this.inputSchema = new Schema(...tables);
+    this.inputSchema.tables.forEach((inputTable: Table) => {
+      inputTable.schema = this.inputSchema;
       this.getFunctionalDependenciesByTable(inputTable).subscribe((fd) =>
         inputTable.setFds(
           ...fd.functionalDependencies.map((fds) =>
@@ -100,10 +139,13 @@ export class DatabaseService {
         )
       );
     });
-    this.resolveIFks(this.fks, this.inputTables);
+    this.getINDsByTables(tables).subscribe((inds) => {
+      this.resolveInds(inds);
+    });
+    this.resolveIFks(this.fks);
   }
 
-  protected fdResult: Record<string, Observable<IFunctionalDependencies>> = {};
+  private fdResult: Record<string, Observable<IFunctionalDependencies>> = {};
   private getFunctionalDependenciesByTable(
     table: Table
   ): Observable<IFunctionalDependencies> {
@@ -114,5 +156,17 @@ export class DatabaseService {
         )
         .pipe(shareReplay(1));
     return this.fdResult[table.name];
+  }
+
+  private getINDsByTables(
+    tables: Array<Table>
+  ): Observable<Array<IInclusionDependency>> {
+    let tableNamesConcatenation = tables.map((table) => table.name).join();
+    let indResult: Observable<Array<IInclusionDependency>> = this.http
+      .get<Array<IInclusionDependency>>(
+        `${this.baseUrl}/tables/${tableNamesConcatenation}/inds`
+      )
+      .pipe(shareReplay(1));
+    return indResult;
   }
 }

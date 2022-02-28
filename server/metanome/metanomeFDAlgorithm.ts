@@ -72,13 +72,13 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
     assert(schemaAndTables.length == 1);
     return `java -Xmx${
       this.memory
-    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.dbPassPath()} --db-type ${
+    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
       process.env.DB_TYPE
-    } --table-key "INPUT_GENERATOR" --tables ${
+    } --table-key "INPUT_GENERATOR" --tables "${
       schemaAndTables[0]
-    } --output file:${
+    }" --output file:"${
       schemaAndTables[0]
-    }_normalize_results.json --algorithm-config isHumanInTheLoop:false
+    }_normalize_results.json" --algorithm-config isHumanInTheLoop:false
       ${this.renameCommand(schemaAndTables[0])}`;
   }
 }

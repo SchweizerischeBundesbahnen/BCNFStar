@@ -59,11 +59,11 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
   protected command(tables: string[]): string {
     return `java -Xmx${
       this.memory
-    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm ${this.algoClass()} --db-connection ${this.dbPassPath()} --db-type ${
+    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
       process.env.DB_TYPE
-    } --table-key "INPUT_FILES" --header  --tables ${tables.join(
+    }" --table-key "INPUT_FILES" --header  --tables "${tables.join(
       ","
-    )} --output file:${MetanomeINDAlgorithm.outputFileName(tables)}`.replace(
+    )}" --output "file:${MetanomeINDAlgorithm.outputFileName(tables)}"`.replace(
       /(\r\n|\n|\r)/gm,
       ""
     );
