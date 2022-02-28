@@ -5,7 +5,7 @@ import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies
 import Table from '../model/schema/Table';
 import { Observable, shareReplay, map, Subject } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
-import IFk from '@server/definitions/IFk';
+import IForeignKey from '@server/definitions/IForeignKey';
 import ColumnCombination from '../model/schema/ColumnCombination';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class DatabaseService {
   // at http://localhost:80. In production mode, the serving server is assumed
   // to be the BCNFStar express server (found in backend/index.ts)
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
-  private fks: Array<IFk> = [];
+  private fks: Array<IForeignKey> = [];
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
@@ -54,16 +54,16 @@ export class DatabaseService {
     return tableResult;
   }
 
-  private getIFks(): Observable<Array<IFk>> {
+  private getIFks(): Observable<Array<IForeignKey>> {
     let fks;
     fks = this.http
-      .get<IFk[]>(`${this.baseUrl}/fks`)
+      .get<IForeignKey[]>(`${this.baseUrl}/fks`)
       // required for caching
       .pipe(shareReplay(1));
     return fks;
   }
 
-  private resolveIFks(fks: Array<IFk>, tables: Array<Table>) {
+  private resolveIFks(fks: Array<IForeignKey>, tables: Array<Table>) {
     fks.forEach((fk) => {
       let referencing_table: Table = tables.filter(
         (table) => fk.name == table.name
