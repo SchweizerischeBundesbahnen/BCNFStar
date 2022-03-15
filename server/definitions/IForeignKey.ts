@@ -1,4 +1,4 @@
-export default interface IFk {
+export default interface IForeignKey {
   name: string;
   column: string;
   foreignName: string;

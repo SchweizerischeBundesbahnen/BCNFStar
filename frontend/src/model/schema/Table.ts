@@ -36,7 +36,7 @@ export default class Table {
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
     names.forEach((name, i) =>
-      table.columns.add(new Column(name, 'unkown data type', i, table))
+      table.columns.add(new Column(name, 'unknown data type', i, table))
     );
     table.sourceTables.add(table);
     return table;
@@ -65,7 +65,7 @@ export default class Table {
 
   public split(fd: FunctionalDependency): Array<Table> {
     let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
-    fd.lhs.columns.forEach((column) => remaining.columns.add(column.copy()));
+    fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
 
     remaining.schema = this.schema;

@@ -12,6 +12,7 @@ import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { IndService } from '../../ind.service';
+import Relationship from '@/src/model/schema/Relationship';
 
 @Component({
   selector: 'app-normalize',
@@ -40,11 +41,11 @@ export class NormalizeComponent {
     this.tablesObservable.next(this.schema.tables);
   }
 
-  onSelect(table: Table): void {
-    this.selectedTable = table;
-  }
-
-  onJoin(event: any): void {
+  onJoin(event: {
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }): void {
     let command = new JoinCommand(
       this.schema,
       event.target,
