@@ -5,7 +5,7 @@ import { NormalizeComponent } from './pages/normalize/normalize.component';
 
 const routes: Routes = [
   { path: '', component: TableSelectionComponent },
-  { path: 'normalize', component: NormalizeComponent },
+  { path: 'edit-schema', component: NormalizeComponent },
   { path: '**', redirectTo: '' },
 ];
 
