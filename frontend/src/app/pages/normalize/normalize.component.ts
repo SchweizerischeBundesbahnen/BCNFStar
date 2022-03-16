@@ -11,6 +11,7 @@ import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
 import Relationship from '@/src/model/schema/Relationship';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-normalize',
@@ -28,9 +29,11 @@ export class NormalizeComponent {
   constructor(
     public dataService: DatabaseService,
     // eslint-disable-next-line no-unused-vars
-    public dialog: SbbDialog
+    public dialog: SbbDialog,
+    public router: Router
   ) {
     this.schema = dataService.inputSchema!;
+    if (!this.schema) router.navigate(['']);
     this.schemaChanged();
   }
 
