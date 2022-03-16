@@ -30,25 +30,19 @@ export default class IndToFkCommand extends Command {
 
   protected override _do(): void {
     this.formerPk = this.referenced.pk;
-    this.schema.indRelationships.delete(this.relationship);
     this.schema.fkRelationships.add(this.relationship);
-    this.schema.formerIndRelationship.add(this.relationship);
     this.referenced.pk = this.relationship.referenced();
     this.indService.changeInd(this.referencing.inds());
   }
 
   protected override _undo(): void {
     this.schema.fkRelationships.delete(this.relationship);
-    this.schema.indRelationships.add(this.relationship);
-    this.schema.formerIndRelationship.delete(this.relationship);
     this.referenced.pk = this.formerPk;
     this.indService.changeInd(this.referencing.inds());
   }
 
   protected override _redo(): void {
-    this.schema.indRelationships.delete(this.relationship);
     this.schema.fkRelationships.add(this.relationship);
-    this.schema.formerIndRelationship.add(this.relationship);
     this.referenced.pk = this.relationship.referenced();
     this.indService.changeInd(this.referencing.inds());
   }

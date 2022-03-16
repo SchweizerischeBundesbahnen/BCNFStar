@@ -43,8 +43,7 @@ export class NormalizeSideBarComponent implements OnChanges, OnInit {
 
   ngOnChanges(): void {
     this.fds = this.table?.violatingFds() || [];
-    this.localInds =
-      this.table?.inds().filter((x) => x.table != this.table) || [];
+    this.localInds = this.table?.inds().filter((x) => x.table != this.table);
   }
 
   selectedFd(): FunctionalDependency | undefined {
