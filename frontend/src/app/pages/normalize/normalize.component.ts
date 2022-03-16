@@ -13,6 +13,7 @@ import { SplitDialogComponent } from '../../components/split-dialog/split-dialog
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { IndService } from '../../ind.service';
 import Relationship from '@/src/model/schema/Relationship';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-normalize',
@@ -31,9 +32,11 @@ export class NormalizeComponent {
     dataService: DatabaseService,
     private indService: IndService,
     // eslint-disable-next-line no-unused-vars
-    public dialog: SbbDialog
+    public dialog: SbbDialog,
+    public router: Router
   ) {
     this.schema = dataService.inputSchema!;
+    if (!this.schema) router.navigate(['']);
     this.schemaChanged();
   }
 
