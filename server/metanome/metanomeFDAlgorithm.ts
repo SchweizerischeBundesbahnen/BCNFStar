@@ -74,7 +74,7 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
       this.memory
     } -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
       process.env.DB_TYPE
-    } --table-key "INPUT_GENERATOR" --tables "${
+    }" --table-key "INPUT_GENERATOR" --tables "${
       schemaAndTables[0]
     }" --output file:"${
       schemaAndTables[0]
