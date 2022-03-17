@@ -1,7 +1,7 @@
 import Table from '@/src/model/schema/Table';
 import { Component, OnInit } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-table-selection',
@@ -10,39 +10,34 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class TableSelectionComponent implements OnInit {
   public tables: Array<Table> = [];
-  public form!: FormGroup;
+  public selectedTables = new Map<Table, Boolean>();
+  public isLoading = false;
 
   constructor(
     // eslint-disable-next-line no-unused-vars
     private dataService: DatabaseService,
-    // eslint-disable-next-line no-unused-vars
-    private formBuilder: FormBuilder
+    private router: Router
   ) {
-    this.form = this.formBuilder.group({});
+    this.router = router;
   }
 
-  ngOnInit(): void {
-    let rec: Record<string, boolean> = {};
-
-    this.dataService.loadTableCallback$.subscribe((data) => {
-      this.tables = data;
-      this.tables.map((table) => (rec[table.name] = false));
-      this.form = this.formBuilder.group(rec);
-    });
-    this.dataService.loadTables();
+  async ngOnInit(): Promise<void> {
+    this.tables = await this.dataService.loadTables();
+    this.tables.forEach((table) => this.selectedTables.set(table, false));
   }
 
   public hasSelectedTables(): boolean {
-    for (let tableName of Object.keys(this.form.controls)) {
-      const control = this.form.controls[tableName];
-      if (control.value) return true;
-    }
-    return false;
+    return [...this.selectedTables.values()].some((bool) => bool);
   }
 
   public selectTables() {
-    this.dataService.setInputTables(
-      this.tables.filter((table) => this.form.controls[table.name].value)
+    const tables = this.tables.filter((table) =>
+      this.selectedTables.get(table)
     );
+    this.isLoading = true;
+    this.dataService.setInputTables(tables).then(() => {
+      this.isLoading = false;
+      this.router.navigate(['/edit-schema']);
+    });
   }
 }
