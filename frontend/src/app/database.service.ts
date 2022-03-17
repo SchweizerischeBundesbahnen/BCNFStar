@@ -19,10 +19,13 @@ export class DatabaseService {
   public inputSchema?: Schema;
   private loadTableCallback = new Subject<Array<Table>>(); // Source
   loadTableCallback$ = this.loadTableCallback.asObservable(); // Stream
-  // when using the angular dev server, you need to access another adress
-  // for the BCNFStar express server. It is assumed that this server is
-  // at http://localhost:80. In production mode, the serving server is assumed
-  // to be the BCNFStar express server (found in backend/index.ts)
+  /**
+   * when using the angular dev server, you need to access another adress
+   * for the BCNFStar express server. It is assumed that this server is
+   * at http://localhost:80. In production mode, the serving server is assumed
+   * to be the BCNFStar express server (found in backend/index.ts
+   *
+   **/
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   private fks: Array<IForeignKey> = [];
 
