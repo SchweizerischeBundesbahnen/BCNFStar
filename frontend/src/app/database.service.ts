@@ -110,16 +110,21 @@ export class DatabaseService {
   }
 
   public async setInputTables(tables: Array<Table>) {
+    const indPromise = this.getINDs(tables);
+    const fdResults = await Promise.all(tables.map((v) => this.getFDs(v)));
+
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
       table.schema = this.inputSchema;
-      const iFDs = await this.getFDs(table);
+      const iFDs = fdResults.find(
+        (v) => v.tableName == table.name
+      ) as IFunctionalDependencies;
       const fds = iFDs.functionalDependencies.map((fds) =>
         FunctionalDependency.fromString(table, fds)
       );
       table.setFds(...fds);
     }
-    this.resolveInds(await this.getINDs(tables));
+    this.resolveInds(await indPromise);
     this.resolveIFks(this.iFks);
   }
 
