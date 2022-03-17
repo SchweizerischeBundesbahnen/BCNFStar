@@ -4,38 +4,46 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
 import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
+import { IndService } from '../../ind.service';
 
 @Component({
   selector: 'app-normalize-side-bar',
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent implements OnChanges {
+export class NormalizeSideBarComponent implements OnChanges, OnInit {
   @ViewChild('fdSelection', { read: SbbRadioGroup })
   fdSelectionGroup!: SbbRadioGroup;
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
   @Input() table!: Table;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() joinInd = new EventEmitter<{
+  @Output() indToFk = new EventEmitter<{
     source: Table;
     target: Table;
     relationship: Relationship;
   }>();
   public fds!: Array<FunctionalDependency>;
-  public inds!: Array<{ relationship: Relationship; table: Table }>;
+  public localInds!: Array<{ relationship: Relationship; table: Table }>;
 
-  constructor() {}
+  constructor(public indService: IndService) {}
+
+  ngOnInit(): void {
+    this.indService.currentInds.subscribe((inds) => {
+      this.localInds = inds.filter((x) => x.table != this.table);
+    });
+  }
 
   ngOnChanges(): void {
     this.fds = this.table?.violatingFds() || [];
-    this.inds = this.table?.inds() || [];
+    this.localInds = this.table?.inds().filter((x) => x.table != this.table);
   }
 
   selectedFd(): FunctionalDependency | undefined {
@@ -52,8 +60,8 @@ export class NormalizeSideBarComponent implements OnChanges {
     return this.indSelectionGroup.value;
   }
 
-  joinSelectedInd(): void {
-    this.joinInd.emit({
+  transformIndToFk(): void {
+    this.indToFk.emit({
       source: this.table!,
       target: this.selectedInd()!.table,
       relationship: this.selectedInd()!.relationship,

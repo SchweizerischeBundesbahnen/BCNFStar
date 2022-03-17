@@ -37,8 +37,10 @@ export default class Schema {
   }
 
   public indsOf(table: Table): Set<Table> {
+    let onlyIndRelationships = new Set(this.indRelationships);
+    this.fkRelationships.forEach((rel) => onlyIndRelationships.delete(rel));
     let inds = new Set<Table>();
-    let references = [...this.indRelationships].filter((rel) =>
+    let references = [...onlyIndRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
     this.tables.forEach((t) => {
@@ -66,8 +68,10 @@ export default class Schema {
   }
 
   public indsBetween(referencing: Table, referenced: Table): Set<Relationship> {
+    let onlyIndRelationships = new Set(this.indRelationships);
+    this.fkRelationships.forEach((rel) => onlyIndRelationships.delete(rel));
     let result = new Set(
-      [...this.indRelationships].filter((rel) =>
+      [...onlyIndRelationships].filter((rel) =>
         rel.appliesTo(referencing, referenced)
       )
     );

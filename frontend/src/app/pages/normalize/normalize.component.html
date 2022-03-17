@@ -27,7 +27,7 @@
         *ngIf="this.selectedTable"
         [table]="this.selectedTable"
         (splitFd)="onClickSplit($event)"
-        (joinInd)="onJoin($event)"
+        (indToFk)="onIndToFk($event)"
       ></app-normalize-side-bar>
     </div>
   </div>
