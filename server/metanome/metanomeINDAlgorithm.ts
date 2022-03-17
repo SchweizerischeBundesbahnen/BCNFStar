@@ -17,7 +17,7 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
     let job = await metanomeQueue.add(
-      `get fds for ${this.schemaAndTables}`,
+      `get inds for ${this.schemaAndTables}`,
       this.command(this.schemaAndTables)
     );
     await job.waitUntilFinished(queueEvents);
