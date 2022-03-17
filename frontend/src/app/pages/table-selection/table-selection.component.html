@@ -35,4 +35,14 @@
   Go
 </button>
 
-<div *ngIf="isLoading">Lädt...</div>
+<!-- <div *ngIf="isLoading">lol</div> -->
+<div *ngIf="isLoading" class="loading-box">
+  <sbb-loading
+    mode="medium"
+    aria-valuetext="Loading, please wait"
+  ></sbb-loading>
+  Functional Dependencies and Inclusion Dependencies are currently being
+  searched. <br />
+  Progress can be monitored
+  <a [href]="queueUrl" target="_blank">here</a>
+</div>

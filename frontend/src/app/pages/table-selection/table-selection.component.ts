@@ -13,13 +13,10 @@ export class TableSelectionComponent implements OnInit {
   public selectedTables = new Map<Table, Boolean>();
   public schemaToName: Record<string, Table[]> = {};
   public isLoading = false;
-
-  constructor(
-    // eslint-disable-next-line no-unused-vars
-    private dataService: DatabaseService,
-    private router: Router
-  ) {
+  public queueUrl: string;
+  constructor(private dataService: DatabaseService, private router: Router) {
     this.router = router;
+    this.queueUrl = dataService.baseUrl + '/queue';
   }
 
   async ngOnInit(): Promise<void> {

@@ -1,3 +1,7 @@
 .table-checkbox {
     display: block;
 }
+
+.loading-box {
+    text-align: center;
+}
