@@ -3,6 +3,7 @@ import { promisify } from "util";
 import { exec } from "child_process";
 import { join } from "path";
 import MetanomeAlgorithm from "./metanomeAlgorithm";
+import { metanomeQueue, queueEvents } from "./queue";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 const OUTPUT_SUFFIX = "_inds_binder.json";
@@ -10,26 +11,22 @@ const OUTPUT_SUFFIX = "_inds_binder.json";
 export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
   constructor(tables: string[]) {
     super(tables);
-    this.tables = this.tables.sort();
+    this.schemaAndTables = this.schemaAndTables.sort();
   }
 
   async run(): Promise<{}> {
     const asyncExec = promisify(exec);
-    console.log("Executing binder for inds on " + this.tables);
-    console.log(this.command(this.tables));
-    const { stderr, stdout } = await asyncExec(this.command(this.tables), {
-      cwd: "metanome/",
-    });
-    console.log(`Binder execution on ${this.tables} finished`);
-    if (stderr) {
-      console.error(stderr);
-      throw Error("Binder-Algorithm execution failed");
-    }
+    let job = await metanomeQueue.add(
+      `get inds for ${this.schemaAndTables}`,
+      this.command(this.schemaAndTables)
+    );
+    await job.waitUntilFinished(queueEvents);
+    if (job.isFailed()) return {};
 
     let dict = {};
-    dict[this.tables.join("_")] = join(
+    dict[this.schemaAndTables.join("_")] = join(
       OUTPUT_DIR,
-      MetanomeINDAlgorithm.outputFileName(this.tables)
+      MetanomeINDAlgorithm.outputFileName(this.schemaAndTables)
     );
     return dict;
   }

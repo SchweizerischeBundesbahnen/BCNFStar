@@ -42,6 +42,11 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
+  public deleteFkRelationship(fkRelationship: Relationship) {
+    this._fkRelationships.delete(fkRelationship);
+    this.relationshipsValid = false;
+  }
+
   /**
    * Returns a copy of the set of inclusion dependency relationships
    */
@@ -119,10 +124,13 @@ export default class Schema {
     table: Table
   ): Set<{ relationship: Relationship; table: Table }> {
     let inds = new Set<{ relationship: Relationship; table: Table }>();
-    let possibleIndRelationships = [...this.indRelationships].filter((rel) =>
+    let onlyIndRelationships = new Set(this.indRelationships);
+    this.fkRelationships.forEach((rel) => onlyIndRelationships.delete(rel));
+    let possibleIndRelationships = [...onlyIndRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
     for (let otherTable of this.tables) {
+      if (otherTable == table) continue;
       possibleIndRelationships
         .filter((rel) => rel.appliesTo(table, otherTable))
         .forEach((rel) => {

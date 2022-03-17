@@ -7,7 +7,6 @@ export default async function runMetanomeIND(
 ): Promise<void> {
   try {
     const tables: string[] = req.body.tables;
-    console.log(tables);
     await runMetanomeINDAlgorithm(tables);
     res.status(200).json({ message: "success!" });
   } catch (error) {

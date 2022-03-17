@@ -12,6 +12,7 @@ import morgan from "morgan";
 // import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
+import createQueueMonitor from "./queueMonitor";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -26,15 +27,21 @@ const corsOptions: CorsOptions = {
 };
 
 const app = express();
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms")
-);
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(
+  morgan(
+    "dev",
+    // omit queue/api calls from log, since they appear very frequent
+    { skip: (req, res) => req.originalUrl.includes("/queue/api") }
+  )
+);
 if (global.__coverage__) {
   console.log("enabling code coverage reporting");
   require("@cypress/code-coverage/middleware/express")(app);
 }
+
+createQueueMonitor(app);
 
 app.get("/tables", getTablesFunction);
 app.get("/tables/head", getTableHeadFromNameFunction);

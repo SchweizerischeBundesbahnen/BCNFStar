@@ -2,7 +2,6 @@ import IFunctionalDependencies from "@/definitions/IFunctionalDependencies";
 import { Request, Response } from "express";
 import { readFile } from "fs/promises";
 import MetanomeFDAlgorithm from "../metanome/metanomeFDAlgorithm";
-import { runMetanomeFDAlgorithm } from "./runMetanomeFD";
 
 export default async function getFDsFromTableName(
   req: Request,
@@ -16,7 +15,7 @@ export default async function getFDsFromTableName(
     } catch (err) {
       // means file not found
       if (err.code === "ENOENT") {
-        await runMetanomeFDAlgorithm(schemaAndTable);
+        await new MetanomeFDAlgorithm([schemaAndTable]).run();
         await sendFDs(schemaAndTable, expectedOutputPath);
       } else {
         throw err;
@@ -29,7 +28,7 @@ export default async function getFDsFromTableName(
   }
 
   async function sendFDs(schemaAndTable: string, expectedOutputPath: string) {
-    const fds = {
+    const fds: IFunctionalDependencies = {
       tableName: schemaAndTable,
       functionalDependencies: await readFDsFromFile(expectedOutputPath),
     };

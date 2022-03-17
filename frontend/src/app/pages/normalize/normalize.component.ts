@@ -10,7 +10,10 @@ import { Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
+import { IndService } from '../../ind.service';
 import Relationship from '@/src/model/schema/Relationship';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-normalize',
@@ -24,11 +27,15 @@ export class NormalizeComponent {
   public schemaChanged: Subject<void> = new Subject();
 
   constructor(
-    public dataService: DatabaseService,
+    dataService: DatabaseService,
+    private indService: IndService,
     // eslint-disable-next-line no-unused-vars
-    public dialog: SbbDialog
+    public dialog: SbbDialog,
+    public router: Router
   ) {
     this.schema = dataService.inputSchema!;
+    if (!this.schema) router.navigate(['']);
+    // this.schemaChanged.next();
   }
 
   onJoin(event: {
@@ -69,6 +76,18 @@ export class NormalizeComponent {
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  onIndToFk(event: any): void {
+    let command = new IndToFkCommand(
+      this.schema,
+      event.relationship,
+      event.source,
+      event.target
+    );
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();

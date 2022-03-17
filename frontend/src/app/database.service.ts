@@ -7,7 +7,7 @@ import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
 import { Observable, shareReplay, map, Subject } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
-import IFk from '@server/definitions/IFk';
+import IForeignKey from '@server/definitions/IForeignKey';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependencies';
@@ -24,7 +24,7 @@ export class DatabaseService {
   // at http://localhost:80. In production mode, the serving server is assumed
   // to be the BCNFStar express server (found in backend/index.ts)
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
-  private fks: Array<IFk> = [];
+  private fks: Array<IForeignKey> = [];
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
@@ -57,16 +57,16 @@ export class DatabaseService {
     return tableResult;
   }
 
-  private getIFks(): Observable<Array<IFk>> {
+  private getIFks(): Observable<Array<IForeignKey>> {
     let fks;
     fks = this.http
-      .get<IFk[]>(`${this.baseUrl}/fks`)
+      .get<IForeignKey[]>(`${this.baseUrl}/fks`)
       // required for caching
       .pipe(shareReplay(1));
     return fks;
   }
 
-  private resolveIFks(fks: Array<IFk>) {
+  private resolveIFks(fks: Array<IForeignKey>) {
     fks.forEach((fk) => {
       let referencingTable = [...this.inputSchema!.tables].find(
         (table: Table) => fk.name == table.name

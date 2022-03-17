@@ -24,13 +24,11 @@ export class NormalizeSideBarComponent {
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() joinInd = new EventEmitter<{
+  @Output() indToFk = new EventEmitter<{
     source: Table;
     target: Table;
     relationship: Relationship;
   }>();
-
-  constructor() {}
 
   selectedFd(): FunctionalDependency | undefined {
     if (!this.fdSelectionGroup) return undefined;
@@ -46,8 +44,8 @@ export class NormalizeSideBarComponent {
     return this.indSelectionGroup.value;
   }
 
-  joinSelectedInd(): void {
-    this.joinInd.emit({
+  transformIndToFk(): void {
+    this.indToFk.emit({
       source: this.table!,
       target: this.selectedInd()!.table,
       relationship: this.selectedInd()!.relationship,

@@ -31,7 +31,7 @@ export default abstract class SqlUtils {
     schema: string,
     table: string
   ): Promise<boolean>;
-
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
-  public abstract getJdbcPath(): String;
+  public abstract getJdbcPath(): string;
+  public abstract getDbmsName(): string;
 }

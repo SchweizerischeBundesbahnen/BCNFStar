@@ -12,7 +12,7 @@ export default async function getINDsForTables(
   res: Response
 ): Promise<void> {
   try {
-    const tables: string[] = req.params.tableNames.split(",");
+    const tables: string[] = req.params.tableNames.split(",").sort();
     const expectedOutputPath: string = MetanomeINDAlgorithm.outputPath(tables);
     try {
       await sendINDs(expectedOutputPath);
