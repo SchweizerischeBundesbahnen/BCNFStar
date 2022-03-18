@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 export class TableSelectionComponent implements OnInit {
   public tables: Array<Table> = [];
   public selectedTables = new Map<Table, Boolean>();
-  public schemaToName: Record<string, Table[]> = {};
+  public tablesInSchema: Record<string, Table[]> = {};
   public isLoading = false;
   public queueUrl: string;
   constructor(private dataService: DatabaseService, private router: Router) {
@@ -23,10 +23,9 @@ export class TableSelectionComponent implements OnInit {
     this.tables = await this.dataService.loadTables();
     for (const table of this.tables) {
       this.selectedTables.set(table, false);
-      // don't use .split, since name might also contain additional dots
       const schema = table.name.split('.')[0];
-      if (!this.schemaToName[schema]) this.schemaToName[schema] = [];
-      this.schemaToName[schema].push(table);
+      if (!this.tablesInSchema[schema]) this.tablesInSchema[schema] = [];
+      this.tablesInSchema[schema].push(table);
     }
   }
 
@@ -36,23 +35,23 @@ export class TableSelectionComponent implements OnInit {
 
   public clickSelectAll(schema: string) {
     if (this.areAllSelectedIn(schema)) {
-      this.schemaToName[schema].forEach((table) =>
+      this.tablesInSchema[schema].forEach((table) =>
         this.selectedTables.set(table, false)
       );
     } else
-      this.schemaToName[schema].forEach((table) =>
+      this.tablesInSchema[schema].forEach((table) =>
         this.selectedTables.set(table, true)
       );
   }
 
   public areAllSelectedIn(schema: string) {
-    return this.schemaToName[schema].every((table) =>
+    return this.tablesInSchema[schema].every((table) =>
       this.selectedTables.get(table)
     );
   }
 
   public areZeroSelectedIn(schema: string) {
-    return !this.schemaToName[schema].some((table) =>
+    return !this.tablesInSchema[schema].some((table) =>
       this.selectedTables.get(table)
     );
   }
