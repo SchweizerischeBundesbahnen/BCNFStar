@@ -78,7 +78,7 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
       schemaAndTables[0]
     }" --output file:"${
       schemaAndTables[0]
-    }_normalize_results.json" --algorithm-config isHumanInTheLoop:false & ${this.renameCommand(
+    }_normalize_results.json" --algorithm-config isHumanInTheLoop:false && ${this.renameCommand(
       schemaAndTables[0]
     )}`;
   }
