@@ -4,7 +4,7 @@ import MetanomeAlgorithm from "./metanomeAlgorithm";
 import { assert } from "console";
 import { metanomeQueue, queueEvents } from "./queue";
 
-import { split } from "../utils/databaseUtils";
+import { splitTableString } from "../utils/databaseUtils";
 import { sqlUtils } from "../db";
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
@@ -31,7 +31,7 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
 
     let dict = {};
     this.schemaAndTables
-      .map((schemaAndTable) => split(schemaAndTable)[1])
+      .map((schemaAndTable) => splitTableString(schemaAndTable)[1])
       .forEach(
         (table) =>
           (dict[table] = join(OUTPUT_DIR, table + "-hyfd_extended.txt"))
@@ -45,7 +45,7 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
   }
 
   protected static originalOutputPath(schemaAndTable: string): string {
-    const [, table] = split(schemaAndTable);
+    const [, table] = splitTableString(schemaAndTable);
 
     return join(OUTPUT_DIR, table + "-hyfd_extended.txt");
   }
