@@ -21,6 +21,8 @@
               .splittableFdClustersOf(this.table)
               .slice(0, 10)
           "
+          (mouseenter)="this.selectColumns.emit(cluster.columns)"
+          (mouseleave)="this.selectColumns.emit()"
         >
           <sbb-expansion-panel-header>
             {{ cluster.columns }}

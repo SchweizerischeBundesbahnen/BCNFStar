@@ -5,7 +5,8 @@
       <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
         [schema]="this.schema"
-        [(selection)]="this.selectedTable"
+        [(selectedTable)]="this.selectedTable"
+        [selectedColumns]="this.selectedColumns"
         [schemaChanged]="this.schemaChanged.asObservable()"
         (joinFk)="onJoin($event)"
       ></app-normalize-schema-graph>
@@ -30,6 +31,7 @@
         [schema]="this.schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
+        (selectColumns)="onSelectColumns($event)"
       ></app-normalize-side-bar>
     </div>
   </div>

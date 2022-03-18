@@ -1,5 +1,6 @@
 import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import {
   Component,
   EventEmitter,
@@ -27,6 +28,7 @@ export class NormalizeSideBarComponent {
     target: Table;
     relationship: Relationship;
   }>();
+  @Output() selectColumns = new EventEmitter<ColumnCombination>();
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
