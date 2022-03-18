@@ -1,3 +1,4 @@
+import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import Relationship from './Relationship';
 import Table from './Table';
@@ -140,8 +141,24 @@ export default class Schema {
     return inds;
   }
 
+  public splittableFdClustersOf(
+    table: Table
+  ): Map<ColumnCombination, Set<FunctionalDependency>> {
+    let clusters = new Map<ColumnCombination, Set<FunctionalDependency>>();
+    for (let fd of this.splittableFdsOf(table)) {
+      if (![...clusters.keys()].find((key) => key.equals(fd.rhs)))
+        clusters.set(fd.rhs.copy(), new Set());
+      for (let [key, value] of clusters.entries()) {
+        if (key.equals(fd.rhs)) {
+          value.add(fd);
+          break;
+        }
+      }
+    }
+    return clusters;
+  }
+
   public splittableFdsOf(table: Table): Array<FunctionalDependency> {
-    console.log(table);
     return table.violatingFds().filter((fd) => this.isFdSplittable(fd, table));
   }
 
