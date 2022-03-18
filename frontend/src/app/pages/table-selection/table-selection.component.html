@@ -1,17 +1,21 @@
-<div class="sbb-checkbox-group-vertical" [formGroup]="form">
+<div class="sbb-checkbox-group-vertical">
   <sbb-checkbox
-    *ngFor="let formControl of form.controls | keyvalue"
-    [formControlName]="formControl.key"
-    >{{ formControl.key }}</sbb-checkbox
+    *ngFor="let table of tables"
+    [ngModel]="selectedTables.get(table)"
+    (ngModelChange)="selectedTables.set(table, $event)"
+    [disabled]="isLoading"
   >
+    {{ table.name }}
+  </sbb-checkbox>
 </div>
 
 <button
   type="button"
   sbb-button
-  [disabled]="!hasSelectedTables()"
+  [disabled]="!hasSelectedTables() || isLoading"
   (click)="selectTables()"
-  [routerLink]="['/edit-schema']"
 >
   Go
 </button>
+
+<div *ngIf="isLoading">Lädt...</div>
