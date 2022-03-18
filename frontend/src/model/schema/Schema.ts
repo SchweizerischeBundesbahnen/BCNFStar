@@ -143,14 +143,25 @@ export default class Schema {
 
   public splittableFdClustersOf(
     table: Table
-  ): Map<ColumnCombination, Set<FunctionalDependency>> {
-    let clusters = new Map<ColumnCombination, Set<FunctionalDependency>>();
+  ): Set<{ columns: ColumnCombination; fds: Set<FunctionalDependency> }> {
+    if (!table._splittableFdClusters)
+      table._splittableFdClusters = this.calculateSplittableFdClustersOf(table);
+    return table._splittableFdClusters;
+  }
+
+  public calculateSplittableFdClustersOf(
+    table: Table
+  ): Set<{ columns: ColumnCombination; fds: Set<FunctionalDependency> }> {
+    let clusters = new Set<{
+      columns: ColumnCombination;
+      fds: Set<FunctionalDependency>;
+    }>();
     for (let fd of this.splittableFdsOf(table)) {
-      if (![...clusters.keys()].find((key) => key.equals(fd.rhs)))
-        clusters.set(fd.rhs.copy(), new Set());
-      for (let [key, value] of clusters.entries()) {
-        if (key.equals(fd.rhs)) {
-          value.add(fd);
+      if (![...clusters].find((cluster) => cluster.columns.equals(fd.rhs)))
+        clusters.add({ columns: fd.rhs.copy(), fds: new Set() });
+      for (let cluster of clusters) {
+        if (cluster.columns.equals(fd.rhs)) {
+          cluster.fds.add(fd);
           break;
         }
       }

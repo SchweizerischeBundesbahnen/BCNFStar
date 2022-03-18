@@ -17,8 +17,6 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./normalize-side-bar.component.css'],
 })
 export class NormalizeSideBarComponent {
-  @ViewChild('fdSelection', { read: SbbRadioGroup })
-  fdSelectionGroup!: SbbRadioGroup;
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
   @Input() table!: Table;
@@ -29,15 +27,6 @@ export class NormalizeSideBarComponent {
     target: Table;
     relationship: Relationship;
   }>();
-
-  selectedFd(): FunctionalDependency | undefined {
-    if (!this.fdSelectionGroup) return undefined;
-    return this.fdSelectionGroup.value;
-  }
-
-  splitSelectedFd(): void {
-    this.splitFd.emit(this.selectedFd()!);
-  }
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;

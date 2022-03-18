@@ -14,27 +14,23 @@
       <sbb-expansion-panel-header>
         Functional Dependencies
       </sbb-expansion-panel-header>
-      <div *ngIf="this.schema.splittableFdsOf(table).length > 0">
-        <sbb-radio-group #fdSelection>
-          <sbb-radio-button
-            *ngFor="
-              let fd of this.schema.splittableFdsOf(this.table).slice(0, 10)
-            "
-            [value]="fd"
-          >
-            {{ fd.toString() }}
-          </sbb-radio-button>
-        </sbb-radio-group>
-        <br />
-        <button
-          type="button"
-          sbb-button
-          [disabled]="!selectedFd()"
-          (click)="splitSelectedFd()"
+      <sbb-accordion>
+        <sbb-expansion-panel
+          *ngFor="let cluster of this.schema.splittableFdClustersOf(this.table)"
         >
-          Split Functional Dependency
-        </button>
-      </div>
+          <sbb-expansion-panel-header>
+            {{ cluster.columns }}
+          </sbb-expansion-panel-header>
+          <button
+            *ngFor="let fd of cluster.fds"
+            type="button"
+            sbb-button
+            (click)="this.splitFd.emit(fd)"
+          >
+            {{ fd.lhs }}
+          </button>
+        </sbb-expansion-panel>
+      </sbb-accordion>
     </sbb-expansion-panel>
 
     <sbb-expansion-panel [expanded]="true">
