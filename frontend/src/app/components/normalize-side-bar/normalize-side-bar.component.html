@@ -16,15 +16,22 @@
       </sbb-expansion-panel-header>
       <sbb-accordion>
         <sbb-expansion-panel
-          *ngFor="let cluster of this.schema.splittableFdClustersOf(this.table)"
+          *ngFor="
+            let cluster of this.schema
+              .splittableFdClustersOf(this.table)
+              .slice(0, 10)
+          "
         >
           <sbb-expansion-panel-header>
             {{ cluster.columns }}
           </sbb-expansion-panel-header>
+          Keys:
+          <br />
           <button
             *ngFor="let fd of cluster.fds"
             type="button"
             sbb-button
+            style="margin: 3px"
             (click)="this.splitFd.emit(fd)"
           >
             {{ fd.lhs }}

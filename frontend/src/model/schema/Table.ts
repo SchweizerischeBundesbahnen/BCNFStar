@@ -18,9 +18,9 @@ export default class Table {
   /**
    * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
    */
-  public _splittableFdClusters!: Set<{
+  public _splittableFdClusters!: Array<{
     columns: ColumnCombination;
-    fds: Set<FunctionalDependency>;
+    fds: Array<FunctionalDependency>;
   }>;
   /**
   /**
