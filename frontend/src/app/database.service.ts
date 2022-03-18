@@ -128,23 +128,15 @@ export class DatabaseService {
     this.resolveIFks(this.iFks);
   }
 
-  private fdResult: Record<string, Promise<IFunctionalDependencies>> = {};
-  private getFDs(
-    table: Table,
-    forceReload: boolean = false
-  ): Promise<IFunctionalDependencies> {
-    if (!this.fdResult[table.name] || forceReload)
-      this.fdResult[table.name] = firstValueFrom(
-        this.http.get<IFunctionalDependencies>(
-          `${this.baseUrl}/tables/${table.name}/fds`
-        )
-      );
-    return this.fdResult[table.name];
+  private getFDs(table: Table): Promise<IFunctionalDependencies> {
+    return firstValueFrom(
+      this.http.get<IFunctionalDependencies>(
+        `${this.baseUrl}/tables/${table.name}/fds`
+      )
+    );
   }
 
-  private async getINDs(
-    tables: Array<Table>
-  ): Promise<Array<IInclusionDependency>> {
+  private getINDs(tables: Array<Table>): Promise<Array<IInclusionDependency>> {
     let tableNamesConcatenation = tables.map((table) => table.name).join(',');
     return firstValueFrom(
       this.http.get<Array<IInclusionDependency>>(
