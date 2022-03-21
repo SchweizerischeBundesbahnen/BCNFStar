@@ -4,18 +4,19 @@ describe("The normalize page", () => {
   beforeEach(() => {
     cy.visitFrontend();
 
-    cy.contains("Default Connection").click();
+    cy.contains("public").click();
 
-    cy.contains("public.nation_region_denormalized").click();
-    cy.contains("public.denormalized_data").click();
-    cy.contains("public.customer_orders_lineitem_denormalized").click();
-    cy.contains("public.part_partsupp_supplier_denormalized").click();
+    cy.contains("nation_region_denormalized").click();
+    // cy.contains("denormalized_data").click();
+    // cy.contains("customer_orders_lineitem_denormalized").click();
+    cy.contains("part_partsupp_supplier_denormalized").click();
 
     cy.contains("Go").click();
+    cy.wait(2000);
   });
 
   it("should be rendered", () => {
-    cy.url().should("contain", "/normalize");
+    cy.url().should("contain", "/edit-schema");
   });
 
   it("should display undo/redo buttons", () => {
@@ -36,19 +37,16 @@ describe("The normalize page", () => {
   });
 
   it("should render all tables", () => {
-    cy.get("app-graph-element").should("have.length", 4);
+    cy.get("app-graph-element").should("have.length", 2);
+    cy.get("app-graph-element").should("contain", "nation_region_denormalized");
+    // cy.get("app-graph-element").should("contain", "denormalized_data");
+    // cy.get("app-graph-element").should(
+    //   "contain",
+    //   "customer_orders_lineitem_denormalized"
+    // );
     cy.get("app-graph-element").should(
       "contain",
-      "public.nation_region_denormalized"
-    );
-    cy.get("app-graph-element").should("contain", "public.denormalized_data");
-    cy.get("app-graph-element").should(
-      "contain",
-      "public.customer_orders_lineitem_denormalized"
-    );
-    cy.get("app-graph-element").should(
-      "contain",
-      "public.part_partsupp_supplier_denormalized"
+      "part_partsupp_supplier_denormalized"
     );
   });
 });

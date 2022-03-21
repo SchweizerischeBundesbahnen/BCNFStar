@@ -3,25 +3,25 @@
 describe("The table selection page", () => {
   beforeEach(() => {
     cy.visitFrontend();
-    cy.contains("Default Connection").click();
+    cy.contains("public").click();
   });
 
   it("should be rendered", () => {
-    cy.url().should("contain", "/table-selection");
+    cy.url().should("contain", Cypress.env("FRONTEND_BASEURL"));
   });
 
   it("should display all tables of the database", () => {
-    cy.contains("public.nation_region_denormalized");
-    cy.contains("public.denormalized_data");
-    cy.contains("public.customer_orders_lineitem_denormalized");
-    cy.contains("public.part_partsupp_supplier_denormalized");
+    cy.contains("nation_region_denormalized");
+    cy.contains("denormalized_data");
+    cy.contains("customer_orders_lineitem_denormalized");
+    cy.contains("part_partsupp_supplier_denormalized");
   });
 
   it("should display all checkboxes unchecked by default", () => {
-    cy.contains("public.nation_region_denormalized");
-    cy.contains("public.denormalized_data");
-    cy.contains("public.customer_orders_lineitem_denormalized");
-    cy.contains("public.part_partsupp_supplier_denormalized");
+    cy.contains("nation_region_denormalized");
+    cy.contains("denormalized_data");
+    cy.contains("customer_orders_lineitem_denormalized");
+    cy.contains("part_partsupp_supplier_denormalized");
   });
 
   it("should have a Go button", () => {
@@ -29,9 +29,9 @@ describe("The table selection page", () => {
   });
 
   it("should render normalize page when clicking on Go button", () => {
-    cy.contains("public.customer_orders_lineitem_denormalized").click();
-    cy.contains("public.part_partsupp_supplier_denormalized").click();
+    cy.contains("customer_orders_lineitem_denormalized").click();
+    cy.contains("part_partsupp_supplier_denormalized").click();
     cy.contains("Go").click();
-    cy.url().should("contain", "/normalize");
+    cy.url().should("contain", "/edit-schema");
   });
 });
