@@ -308,7 +308,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     };
   }
 
-  selectedColumnsFor(table: Table): ColumnCombination? {
+  selectedColumnsFor(table: Table): ColumnCombination | undefined {
     return table == this.selectedTable ? this.selectedColumns : undefined;
   }
 }

@@ -157,14 +157,14 @@ export default class Schema {
       fds: Array<FunctionalDependency>;
     }>();
     for (let fd of this.splittableFdsOf(table)) {
-      if (![...clusters].find((cluster) => cluster.columns.equals(fd.rhs)))
-        clusters.push({ columns: fd.rhs.copy(), fds: new Array() });
-      for (let cluster of clusters) {
-        if (cluster.columns.equals(fd.rhs)) {
-          cluster.fds.push(fd);
-          break;
-        }
+      let cluster = [...clusters].find((cluster) =>
+        cluster.columns.equals(fd.rhs)
+      );
+      if (!cluster) {
+        cluster = { columns: fd.rhs.copy(), fds: new Array() };
+        clusters.push(cluster);
       }
+      cluster.fds.push(fd);
     }
     return clusters;
   }
