@@ -12,7 +12,7 @@
 
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header>
-        Functional Dependencies
+        Contained Subtables
       </sbb-expansion-panel-header>
       <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
         <sbb-expansion-panel
@@ -42,7 +42,7 @@
 
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header
-        >Inclusion Dependencies</sbb-expansion-panel-header
+        >Possible Foreign Keys</sbb-expansion-panel-header
       >
       <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).size > 0">
         <sbb-radio-button
