@@ -141,7 +141,6 @@ export default class Schema {
   }
 
   public splittableFdsOf(table: Table): Array<FunctionalDependency> {
-    console.log(table);
     return table.violatingFds().filter((fd) => this.isFdSplittable(fd, table));
   }
 
