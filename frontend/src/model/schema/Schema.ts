@@ -157,8 +157,8 @@ export default class Schema {
       fds: Array<FunctionalDependency>;
     }>();
     for (let fd of this.splittableFdsOf(table)) {
-      let cluster = [...clusters].find((cluster) =>
-        cluster.columns.equals(fd.rhs)
+      let cluster = [...clusters].find((c) =>
+        c.columns.equals(fd.rhs)
       );
       if (!cluster) {
         cluster = { columns: fd.rhs.copy(), fds: new Array() };
