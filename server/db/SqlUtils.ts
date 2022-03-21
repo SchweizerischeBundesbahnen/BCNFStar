@@ -36,14 +36,9 @@ export default abstract class SqlUtils {
 
   public abstract schemaExistsInDatabase(schema: string): Promise<boolean>;
 
-  public abstract attributesExistInTable(
-    attributeNames: string[],
-    schema: string,
-    table: string
-  ): Promise<boolean>;
-
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
-  public abstract getJdbcPath(): String;
+  public abstract getJdbcPath(): string;
+  public abstract getDbmsName(): string;
 
   public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
   public abstract SQL_DROP_TABLE_IF_EXISTS(
@@ -99,7 +94,4 @@ export default abstract class SqlUtils {
     referencedTable: string,
     referencedColumns: string[]
   ): string;
-  public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
-  public abstract getJdbcPath(): string;
-  public abstract getDbmsName(): string;
 }

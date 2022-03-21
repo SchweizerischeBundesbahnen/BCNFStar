@@ -6,6 +6,7 @@ import Table from './Table';
 export const exampleITable: Array<ITable> = [
   {
     name: 'Example Table',
+    schemaName: 'public',
     attribute: [
       { dataType: 'int', name: 'CD_ID' },
       { dataType: 'varchar', name: 'Albumtitel' },

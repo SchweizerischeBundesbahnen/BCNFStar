@@ -24,6 +24,30 @@
             : "Auto-Normalize all tables"
         }}
       </button>
+      <input
+        type="text"
+        sbbInput
+        placeholder="Schema Name"
+        (input)="onInputChange($event)"
+      />
+
+      <button
+        type="button"
+        sbb-button
+        [disabled]="!this.schemaName"
+        (click)="persistSchema(this.schemaName)"
+      >
+        Persist Schema
+      </button>
+
+      <button
+        type="button"
+        sbb-button
+        [disabled]="!this.schemaName"
+        (click)="download()"
+      >
+        Download SQL
+      </button>
       <div>{{ sql.databasePreparation }}</div>
       <div>{{ sql.createTableStatements }}</div>
       <div>{{ sql.primaryKeyConstraints }}</div>

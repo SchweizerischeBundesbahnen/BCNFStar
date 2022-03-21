@@ -23,9 +23,9 @@ export class TableSelectionComponent implements OnInit {
     this.tables = await this.dataService.loadTables();
     for (const table of this.tables) {
       this.selectedTables.set(table, false);
-      const schema = table.name.split('.')[0];
-      if (!this.tablesInSchema[schema]) this.tablesInSchema[schema] = [];
-      this.tablesInSchema[schema].push(table);
+      if (!this.tablesInSchema[table.schemaName])
+        this.tablesInSchema[table.schemaName] = [];
+      this.tablesInSchema[table.schemaName].push(table);
     }
   }
 

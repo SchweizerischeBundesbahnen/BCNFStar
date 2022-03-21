@@ -24,8 +24,6 @@ export class NormalizeSideBarComponent {
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() persistSchema = new EventEmitter<string>();
-  @Output() download = new EventEmitter();
 
   schemaName: string = '';
   @Output() indToFk = new EventEmitter<{

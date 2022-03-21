@@ -64,28 +64,3 @@
     </sbb-expansion-panel>
   </sbb-accordion>
 </div>
-
-<input
-  type="text"
-  sbbInput
-  placeholder="Schema Name"
-  (input)="onInputChange($event)"
-/>
-
-<button
-  type="button"
-  sbb-button
-  [disabled]="!this.schemaName"
-  (click)="persistSchema.emit(this.schemaName)"
->
-  Persist Schema
-</button>
-
-<button
-  type="button"
-  sbb-button
-  [disabled]="!this.schemaName"
-  (click)="download.emit()"
->
-  Download SQL
-</button>

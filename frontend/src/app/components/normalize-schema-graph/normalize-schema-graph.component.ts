@@ -146,7 +146,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   generateElements() {
     for (const table of this.schema.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
-        attrs: { root: { id: '__jointel__' + table.name } },
+        attrs: { root: { id: '__jointel__' + table.schemaAndName() } },
       });
       jointjsEl.attr({
         body: {
@@ -158,7 +158,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
         this.elementWidth,
         60 + this.portDiameter * table.columns.cardinality
       );
-      this.graphStorage[table.name] = {
+      this.graphStorage[table.schemaAndName()] = {
         // alternative to HtmlElement: joint.shapes.html.Element
         jointjsEl,
         style: {},
@@ -228,21 +228,26 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
         let fkReferencing = fk.relationship.referencing().asArray()[0];
         let link = new joint.shapes.standard.Link({
           source: {
-            id: this.graphStorage[table.name].jointjsEl.id,
+            id: this.graphStorage[table.schemaAndName()].jointjsEl.id,
             port:
-              fkReferencing.sourceTable.name +
+              fkReferencing.sourceTable.schemaAndName() +
               '.' +
               fkReferencing.name +
               '_right',
           },
           target: {
-            id: this.graphStorage[fk.table.name].jointjsEl.id,
+            id: this.graphStorage[fk.table.schemaAndName()].jointjsEl.id,
             port:
-              fkReferenced.sourceTable.name + '.' + fkReferenced.name + '_left',
+              fkReferenced.sourceTable.schemaAndName() +
+              '.' +
+              fkReferenced.name +
+              '_left',
           },
           z: -1,
         });
-        this.graphStorage[table.name].links[fk.table.name] = link;
+        this.graphStorage[table.schemaAndName()].links[
+          fk.table.schemaAndName()
+        ] = link;
         this.graph.addCell(link);
         this.addJoinButton(link, table, fk.table, fk.relationship);
       }
@@ -263,14 +268,14 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     for (let column of table.columns.inOrder()) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_left', // generated if `id` value is not present
+        id: column.sourceTable.schemaAndName() + '.' + column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
       args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_right', // generated if `id` value is not present
+        id: column.sourceTable.schemaAndName() + '.' + column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
         args,
         markup: this.generatePortMarkup(args),
