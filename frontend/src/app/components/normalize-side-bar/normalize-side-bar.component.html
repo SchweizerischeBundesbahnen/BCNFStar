@@ -43,7 +43,7 @@
       >
       <sbb-radio-group #indSelection>
         <sbb-radio-button
-          *ngFor="let rel of this.schema.indsOf(this.table)"
+          *ngFor="let rel of schema.indsOf(table)"
           [value]="rel"
           >{{
             rel.relationship.referencing().toString() +
