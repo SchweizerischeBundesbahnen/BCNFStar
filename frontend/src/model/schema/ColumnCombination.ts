@@ -103,7 +103,9 @@ export default class ColumnCombination {
   }
 
   public inOrder(): Array<Column> {
-    return this.asArray().sort((col1, col2) => col1.prio - col2.prio);
+    return this.asArray().sort(
+      (col1, col2) => col1.ordinalPosition - col2.ordinalPosition
+    );
   }
 
   public columnNames(): Array<string> {
