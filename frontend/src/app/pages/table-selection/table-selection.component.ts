@@ -11,23 +11,49 @@ import { Router } from '@angular/router';
 export class TableSelectionComponent implements OnInit {
   public tables: Array<Table> = [];
   public selectedTables = new Map<Table, Boolean>();
+  public tablesInSchema: Record<string, Table[]> = {};
   public isLoading = false;
-
-  constructor(
-    // eslint-disable-next-line no-unused-vars
-    private dataService: DatabaseService,
-    private router: Router
-  ) {
+  public queueUrl: string;
+  constructor(private dataService: DatabaseService, private router: Router) {
     this.router = router;
+    this.queueUrl = dataService.baseUrl + '/queue';
   }
 
   async ngOnInit(): Promise<void> {
     this.tables = await this.dataService.loadTables();
-    this.tables.forEach((table) => this.selectedTables.set(table, false));
+    for (const table of this.tables) {
+      this.selectedTables.set(table, false);
+      const schema = table.name.split('.')[0];
+      if (!this.tablesInSchema[schema]) this.tablesInSchema[schema] = [];
+      this.tablesInSchema[schema].push(table);
+    }
   }
 
   public hasSelectedTables(): boolean {
     return [...this.selectedTables.values()].some((bool) => bool);
+  }
+
+  public clickSelectAll(schema: string) {
+    if (this.areAllSelectedIn(schema)) {
+      this.tablesInSchema[schema].forEach((table) =>
+        this.selectedTables.set(table, false)
+      );
+    } else
+      this.tablesInSchema[schema].forEach((table) =>
+        this.selectedTables.set(table, true)
+      );
+  }
+
+  public areAllSelectedIn(schema: string) {
+    return this.tablesInSchema[schema].every((table) =>
+      this.selectedTables.get(table)
+    );
+  }
+
+  public areZeroSelectedIn(schema: string) {
+    return !this.tablesInSchema[schema].some((table) =>
+      this.selectedTables.get(table)
+    );
   }
 
   public selectTables() {

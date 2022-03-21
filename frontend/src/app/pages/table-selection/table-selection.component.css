@@ -1,0 +1,17 @@
+.table-checkbox {
+    display: block;
+}
+
+.loading-box {
+    text-align: center;
+}
+
+.container {
+    margin-left: 0.5vw;
+}
+sbb-checkbox {
+    padding-bottom: 5px;
+}
+button {
+    margin-top: 0.5vw;
+}
