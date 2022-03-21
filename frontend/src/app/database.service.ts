@@ -58,12 +58,10 @@ export class DatabaseService {
       );
 
       if (referencingTable && referencedTable) {
-        let fkColumn: Column = referencingTable.columns.columnFromName(
-          fk.column
-        );
-        let pkColumn: Column = referencedTable.columns.columnFromName(
+        let fkColumn = referencingTable.columns.columnFromName(fk.column)!;
+        let pkColumn = referencedTable.columns.columnFromName(
           fk.foreignColumn
-        );
+        )!;
 
         if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
         referencedTable.pk.add(pkColumn);
@@ -73,7 +71,7 @@ export class DatabaseService {
             rel.appliesTo(referencingTable!, referencedTable!)
           ) || new Relationship();
         relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.fkRelationships.add(relationship);
+        this.inputSchema!.addFkRelationship(relationship);
       }
     });
   }
@@ -105,7 +103,7 @@ export class DatabaseService {
 
         indRelationship.add(dependantColumn, referencedColumn);
       }
-      this.inputSchema!.indRelationships.add(indRelationship);
+      this.inputSchema!.addIndRelationship(indRelationship);
     });
   }
 
@@ -115,7 +113,6 @@ export class DatabaseService {
 
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
-      table.schema = this.inputSchema;
       const iFDs = fdResults.find(
         (v) => v.tableName == table.name
       ) as IFunctionalDependencies;
