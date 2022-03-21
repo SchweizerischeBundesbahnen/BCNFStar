@@ -58,8 +58,6 @@
         *ngIf="this.selectedTable"
         [table]="this.selectedTable"
         [schema]="this.schema"
-        (persistSchema)="persistSchema($event)"
-        (download)="download()"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
       ></app-normalize-side-bar>
