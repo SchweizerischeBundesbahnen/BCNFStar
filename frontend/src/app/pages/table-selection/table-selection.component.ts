@@ -4,8 +4,6 @@ import ITableHead from '@server/definitions/ITableHead';
 import { DatabaseService } from 'src/app/database.service';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 
-import { Options } from '@angular-slider/ngx-slider';
-
 @Component({
   selector: 'app-table-selection',
   templateUrl: './table-selection.component.html',
@@ -16,12 +14,7 @@ export class TableSelectionComponent implements OnInit {
   public tables: Map<Table, Boolean> = new Map();
   public tableHeads: Map<string, ITableHead> = new Map();
   public tableRowCounts: Map<string, number> = new Map();
-  public headLimit: number = 20;
-
-  public sliderOptions: Options = {
-    floor: 10,
-    ceil: 200,
-  };
+  public headLimit: number = 100;
 
   public hoveredTable: Table = new Table();
   public tableColumns: string[] = [];
@@ -71,13 +64,6 @@ export class TableSelectionComponent implements OnInit {
       this.dataSource.data = [];
     }
     this.table.renderRows();
-  }
-
-  public reloadTableHeads() {
-    this.dataService.loadTableHeads(this.headLimit).subscribe((data) => {
-      this.tableHeads = new Map(Object.entries(data));
-      this.getDataSourceAndRenderTable(this.hoveredTable);
-    });
   }
 
   public mouseEnter(table: Table) {
