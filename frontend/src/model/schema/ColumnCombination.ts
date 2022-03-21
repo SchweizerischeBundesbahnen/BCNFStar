@@ -107,7 +107,9 @@ export default class ColumnCombination {
   }
 
   public columnNames(): Array<string> {
-    return this.inOrder().map((col) => col.name);
+    return this.asArray()
+      .sort((col1, col2) => (col1.name < col2.name ? 1 : -1))
+      .map((col) => col.name);
   }
 
   public toString(): string {
