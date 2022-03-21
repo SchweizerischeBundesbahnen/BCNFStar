@@ -38,7 +38,6 @@ export class SplitDialogComponent {
       .filter(([, included]) => included)
       .map(([column]) => column);
     let new_fd = new FunctionalDependency(
-      this.fd.table,
       this.fd.lhs,
       new ColumnCombination(...new_rhs)
     );
