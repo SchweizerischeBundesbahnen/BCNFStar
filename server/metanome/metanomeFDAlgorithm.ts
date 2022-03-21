@@ -65,7 +65,7 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
     const command = process.platform == "win32" ? "move /y" : "mv -f";
     const originPath = MetanomeFDAlgorithm.originalOutputPath(schemaAndTable);
     const resultPath = MetanomeFDAlgorithm.outputPath(schemaAndTable);
-    return `${command} ${originPath} ${resultPath}`;
+    return `${command} "${originPath}" "${resultPath}"`;
   }
 
   protected override command(schemaAndTables: string[]): string {
