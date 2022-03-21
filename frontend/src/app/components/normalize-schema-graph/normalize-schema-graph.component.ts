@@ -1,9 +1,9 @@
 import {
   Component,
-  AfterViewInit,
   Input,
   Output,
   EventEmitter,
+  AfterContentInit,
 } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
@@ -32,7 +32,7 @@ enum PortSide {
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements AfterViewInit {
+export class NormalizeSchemaGraphComponent implements AfterContentInit {
   @Input() schema!: Schema;
   @Input() selectedTable?: Table;
   @Input() selectedColumns?: ColumnCombination;
@@ -55,7 +55,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
 
   protected elementWidth = 300;
 
-  ngAfterViewInit(): void {
+  ngAfterContentInit(): void {
     this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
