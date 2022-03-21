@@ -12,9 +12,10 @@ describe("The normalize side bar", () => {
     // cy.contains("part_partsupp_supplier_denormalized").click();
 
     cy.contains("Go").click();
-    cy.wait(2000);
 
-    cy.get("span").contains("nation_region_denormalized").click();
+    cy.contains("public.nation_region_denormalized", {
+      timeout: 60000,
+    }).click();
   });
   it("should be rendered", () => {
     cy.get("app-normalize-side-bar");

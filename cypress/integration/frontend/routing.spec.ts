@@ -7,18 +7,21 @@ describe("The app routing", () => {
   });
 
   it("should be render normalize component", () => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL"));
+    cy.visitFrontend();
     cy.contains("public").click();
     cy.contains("customer_orders_lineitem_denormalized").click();
     cy.contains("Go").click();
     cy.url().should(
       "contain",
-      Cypress.env("FRONTEND_BASEURL") + "/edit-schema"
+      Cypress.env("FRONTEND_BASEURL") + "/edit-schema",
+      { timeout: 60000 }
     );
   });
 
   it("should be render database component when calling missing url", () => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/wrong/path");
+    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/wrong/path", {
+      failOnStatusCode: false,
+    });
     cy.url().should("contain", Cypress.env("FRONTEND_BASEURL"));
   });
 });

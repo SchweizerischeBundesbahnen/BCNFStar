@@ -31,7 +31,7 @@ describe("The table selection page", () => {
   it("should render normalize page when clicking on Go button", () => {
     cy.contains("customer_orders_lineitem_denormalized").click();
     cy.contains("part_partsupp_supplier_denormalized").click();
-    cy.contains("Go").click();
+    cy.contains("Go", { timeout: 60000 }).click();
     cy.url().should("contain", "/edit-schema");
   });
 });

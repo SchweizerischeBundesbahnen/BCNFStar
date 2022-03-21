@@ -12,7 +12,7 @@ describe("The normalize page", () => {
     cy.contains("part_partsupp_supplier_denormalized").click();
 
     cy.contains("Go").click();
-    cy.wait(2000);
+    cy.contains("Undo", { timeout: 60000 });
   });
 
   it("should be rendered", () => {
