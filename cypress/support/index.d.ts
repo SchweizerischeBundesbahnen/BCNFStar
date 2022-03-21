@@ -8,5 +8,11 @@ declare namespace Cypress {
      * @example cy.dataCy('greeting')
      */
     dataCy(value: string): Chainable<Element>;
+    /**
+     * Visits the BCNFStar frontend page
+     * Takes regular cy.visit options, but overrides the header's Accept Encoding setting
+     * to allow gzipped requests
+     */
+    visitFrontend(options?: Partial<Cypress.VisitOptions>): Chainable<Element>;
   }
 }

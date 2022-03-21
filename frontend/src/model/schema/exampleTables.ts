@@ -1,4 +1,6 @@
 import ITable from '@server/definitions/ITable';
+import Relationship from './Relationship';
+import Schema from './Schema';
 import Table from './Table';
 
 export const exampleITable: Array<ITable> = [
@@ -39,4 +41,47 @@ export function exampleTable(): Table {
   );
   table.addFd(table.columns.columnsFromIds(2), table.columns.columnsFromIds(3));
   return table;
+}
+export function exampleSchema(): Schema {
+  let schema = new Schema();
+
+  let tableA = Table.fromColumnNames('A1', 'A2', 'A3', 'A4');
+  tableA.name = 'TableA';
+  tableA.schema = schema;
+  tableA.addFd(
+    tableA.columns.columnsFromNames('A2'),
+    tableA.columns.columnsFromNames('A3', 'A4')
+  );
+  tableA.addFd(
+    tableA.columns.columnsFromNames('A1'),
+    tableA.columns.columnsFromNames('A3')
+  );
+  let tableB = Table.fromColumnNames('B1', 'B2', 'B3', 'B4');
+  tableB.name = 'TableB';
+  tableB.schema = schema;
+  tableB.pk = tableB.columns.columnsFromNames('B1', 'B2');
+  tableB.addFd(
+    tableB.columns.columnsFromNames('B1', 'B2'),
+    tableB.columns.columnsFromNames('B1', 'B2', 'B3', 'B4')
+  );
+  tableB.addFd(
+    tableB.columns.columnsFromNames('B1'),
+    tableB.columns.columnsFromNames('B4')
+  );
+  schema.add(tableA, tableB);
+
+  let relAB = new Relationship();
+  relAB.add(
+    tableA.columns.columnFromName('A3'),
+    tableB.columns.columnFromName('B1')
+  );
+  relAB.add(
+    tableA.columns.columnFromName('A4'),
+    tableB.columns.columnFromName('B2')
+  );
+  schema.addFkRelationship(relAB);
+
+  schema.join(tableA, tableB, relAB);
+
+  return schema;
 }

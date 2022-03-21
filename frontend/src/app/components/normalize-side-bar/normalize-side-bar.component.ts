@@ -1,3 +1,5 @@
+import Relationship from '@/src/model/schema/Relationship';
+import Schema from '@/src/model/schema/Schema';
 import {
   Component,
   EventEmitter,
@@ -15,11 +17,18 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./normalize-side-bar.component.css'],
 })
 export class NormalizeSideBarComponent {
-  @ViewChild(SbbRadioGroup) fdSelectionGroup!: SbbRadioGroup;
-  @Input() table?: Table;
+  @ViewChild('fdSelection', { read: SbbRadioGroup })
+  fdSelectionGroup!: SbbRadioGroup;
+  @ViewChild('indSelection', { read: SbbRadioGroup })
+  indSelectionGroup!: SbbRadioGroup;
+  @Input() table!: Table;
+  @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-
-  constructor() {}
+  @Output() indToFk = new EventEmitter<{
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }>();
 
   selectedFd(): FunctionalDependency | undefined {
     if (!this.fdSelectionGroup) return undefined;
@@ -28,5 +37,18 @@ export class NormalizeSideBarComponent {
 
   splitSelectedFd(): void {
     this.splitFd.emit(this.selectedFd()!);
+  }
+
+  selectedInd(): { relationship: Relationship; table: Table } | undefined {
+    if (!this.indSelectionGroup) return undefined;
+    return this.indSelectionGroup.value;
+  }
+
+  transformIndToFk(): void {
+    this.indToFk.emit({
+      source: this.table!,
+      target: this.selectedInd()!.table,
+      relationship: this.selectedInd()!.relationship,
+    });
   }
 }

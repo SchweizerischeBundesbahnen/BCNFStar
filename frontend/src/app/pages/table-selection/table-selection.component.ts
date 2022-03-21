@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import ITableHead from '@server/definitions/ITableHead';
 import { DatabaseService } from 'src/app/database.service';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-table-selection',
@@ -11,7 +12,7 @@ import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 })
 export class TableSelectionComponent implements OnInit {
   @ViewChild(SbbTable) table!: SbbTable<ITableHead>;
-  public tables: Map<Table, Boolean> = new Map();
+  // public tables: Map<Table, Boolean> = new Map();
   public tableHeads: Map<string, ITableHead> = new Map();
   public tableRowCounts: Map<string, number> = new Map();
   public headLimit: number = 100;
@@ -20,38 +21,66 @@ export class TableSelectionComponent implements OnInit {
   public tableColumns: string[] = [];
   public dataSource: SbbTableDataSource<any> = new SbbTableDataSource<any>([]);
 
-  // eslint-disable-next-line no-unused-vars
-  constructor(private dataService: DatabaseService) {}
-
-  ngOnInit(): void {
-    this.dataService.loadTableCallback$.subscribe((data) =>
-      data.forEach((table) => this.tables.set(table, false))
-    );
-    this.dataService.loadTables();
-    this.dataService
-      .loadTableHeads(this.headLimit)
-      .subscribe((data) => (this.tableHeads = new Map(Object.entries(data))));
-    this.dataService
-      .loadTableRowCounts()
-      .subscribe(
-        (data) => (this.tableRowCounts = new Map(Object.entries(data)))
-      );
+  public tables: Array<Table> = [];
+  public selectedTables = new Map<Table, Boolean>();
+  public tablesInSchema: Record<string, Table[]> = {};
+  public isLoading = false;
+  public queueUrl: string;
+  constructor(private dataService: DatabaseService, private router: Router) {
+    this.router = router;
+    this.queueUrl = dataService.baseUrl + '/queue';
   }
 
-  public toggleCheckStatus(table: Table) {
-    this.tables.set(table, !this.tables.get(table)!);
+  async ngOnInit(): Promise<void> {
+    this.tables = await this.dataService.loadTables();
+    for (const table of this.tables) {
+      this.selectedTables.set(table, false);
+      const schema = table.name.split('.')[0];
+      if (!this.tablesInSchema[schema]) this.tablesInSchema[schema] = [];
+      this.tablesInSchema[schema].push(table);
+    }
+    const tableHeads = await this.dataService.loadTableHeads(this.headLimit);
+    this.tableHeads = new Map(Object.entries(tableHeads));
+    const rowCounts = await this.dataService.loadTableRowCounts();
+    this.tableRowCounts = new Map(Object.entries(rowCounts));
   }
 
   public hasSelectedTables(): boolean {
-    return [...this.tables.values()].some((value) => value);
+    return [...this.selectedTables.values()].some((bool) => bool);
   }
 
-  public selectTable() {
-    this.dataService.setInputTables(
-      [...this.tables.entries()]
-        .filter((entry) => entry[1])
-        .map((entry) => entry[0])
+  public clickSelectAll(schema: string) {
+    if (this.areAllSelectedIn(schema)) {
+      this.tablesInSchema[schema].forEach((table) =>
+        this.selectedTables.set(table, false)
+      );
+    } else
+      this.tablesInSchema[schema].forEach((table) =>
+        this.selectedTables.set(table, true)
+      );
+  }
+
+  public areAllSelectedIn(schema: string) {
+    return this.tablesInSchema[schema].every((table) =>
+      this.selectedTables.get(table)
     );
+  }
+
+  public areZeroSelectedIn(schema: string) {
+    return !this.tablesInSchema[schema].some((table) =>
+      this.selectedTables.get(table)
+    );
+  }
+
+  public selectTables() {
+    const tables = this.tables.filter((table) =>
+      this.selectedTables.get(table)
+    );
+    this.isLoading = true;
+    this.dataService.setInputTables(tables).then(() => {
+      this.isLoading = false;
+      this.router.navigate(['/edit-schema']);
+    });
   }
 
   private getDataSourceAndRenderTable(table: Table) {

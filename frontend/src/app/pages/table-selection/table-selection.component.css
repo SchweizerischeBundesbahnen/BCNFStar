@@ -1,5 +1,14 @@
 button {
-  margin-top: 10px;
+  margin-top: 0.5vw;
+}
+
+.checkbox {
+  overflow: hidden;
+  width: 100%;
+}
+
+.container {
+  margin-left: 0.5vw;
 }
 
 h3 {
@@ -9,9 +18,16 @@ h3 {
   text-overflow: ellipsis; 
 }
 
-.checkbox {
-  overflow: hidden;
-  width: 100%;
+.loading-box {
+  text-align: center;
+}
+
+sbb-checkbox {
+  padding-bottom: 5px;
+}
+
+.table-checkbox {
+  display: block;
 }
 
 .table-wrapper {

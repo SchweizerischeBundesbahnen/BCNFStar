@@ -122,4 +122,7 @@ export default class MsSqlUtils extends SqlUtils {
   public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }
+  public getDbmsName(): string {
+    return "mssql";
+  }
 }

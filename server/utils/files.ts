@@ -11,3 +11,13 @@ export function pathSplit(path: string): string[] {
   const result = parse(path);
   return [result["dir"], result["base"]];
 }
+
+export function getStaticDir() {
+  return join(
+    absoluteServerDir,
+    "..",
+    "frontend",
+    "dist",
+    global.__coverage__ ? "bcnfstar-coverage" : "bcnfstar"
+  );
+}

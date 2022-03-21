@@ -112,4 +112,7 @@ export default class PostgresSqlUtils extends SqlUtils {
   public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
   }
+  public getDbmsName(): string {
+    return "postgres";
+  }
 }

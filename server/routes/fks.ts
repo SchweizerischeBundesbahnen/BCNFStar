@@ -1,6 +1,6 @@
 import { sqlUtils } from "../db";
-import IFk from "@/definitions/IFk";
-import { Request, Response, RequestHandler } from "express";
+import IForeignKey from "@/definitions/IForeignKey";
+import { Request, Response } from "express";
 
 export default async function getFks(
   req: Request,
@@ -9,7 +9,7 @@ export default async function getFks(
   try {
     const query_result = await sqlUtils.getForeignKeys();
 
-    let fks: Array<IFk> = [];
+    let fks: Array<IForeignKey> = [];
     for (const row of query_result) {
       fks.push({
         name: `${row.table_schema}.${row.table_name}`,
