@@ -14,15 +14,13 @@
       <sbb-expansion-panel-header>
         Functional Dependencies
       </sbb-expansion-panel-header>
-      <sbb-accordion>
+      <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
         <sbb-expansion-panel
           *ngFor="
-            let cluster of this.schema
-              .splittableFdClustersOf(this.table)
-              .slice(0, 10)
+            let cluster of schema.splittableFdClustersOf(table).slice(0, 10)
           "
-          (mouseenter)="this.selectColumns.emit(cluster.columns)"
-          (mouseleave)="this.selectColumns.emit()"
+          (mouseenter)="selectColumns.emit(cluster.columns)"
+          (mouseleave)="selectColumns.emit()"
         >
           <sbb-expansion-panel-header>
             {{ cluster.columns }}
@@ -34,7 +32,7 @@
             type="button"
             sbb-button
             style="margin: 3px"
-            (click)="this.splitFd.emit(fd)"
+            (click)="splitFd.emit(fd)"
           >
             {{ fd.lhs }}
           </button>
@@ -46,9 +44,9 @@
       <sbb-expansion-panel-header
         >Inclusion Dependencies</sbb-expansion-panel-header
       >
-      <sbb-radio-group #indSelection>
+      <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).size > 0">
         <sbb-radio-button
-          *ngFor="let rel of this.schema.indsOf(this.table)"
+          *ngFor="let rel of schema.indsOf(table)"
           [value]="rel"
           >{{
             rel.relationship.referencing().toString() +

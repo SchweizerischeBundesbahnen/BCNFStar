@@ -1,17 +1,51 @@
-<div class="sbb-checkbox-group-vertical" [formGroup]="form">
-  <sbb-checkbox
-    *ngFor="let formControl of form.controls | keyvalue"
-    [formControlName]="formControl.key"
-    >{{ formControl.key }}</sbb-checkbox
+<div class="container">
+  <div class="sbb-checkbox-group-vertical">
+    <sbb-accordion multi="true">
+      <sbb-expansion-panel *ngFor="let item of tablesInSchema | keyvalue">
+        <!-- item.key = schema name, item.value = list of associated table objects -->
+        <sbb-expansion-panel-header>{{ item.key }}</sbb-expansion-panel-header>
+        <sbb-checkbox
+          (change)="clickSelectAll(item.key)"
+          [disabled]="isLoading"
+          [checked]="areAllSelectedIn(item.key)"
+          [indeterminate]="
+            !areAllSelectedIn(item.key) && !areZeroSelectedIn(item.key)
+          "
+        >
+          All
+        </sbb-checkbox>
+        <sbb-checkbox
+          *ngFor="let table of item.value"
+          [ngModel]="selectedTables.get(table)"
+          (ngModelChange)="selectedTables.set(table, $event)"
+          [disabled]="isLoading"
+          class="table-checkbox"
+        >
+          <!-- hide schema and dot from name -->
+          {{ table.name.substring(item.key.length + 1) }}
+        </sbb-checkbox>
+      </sbb-expansion-panel>
+    </sbb-accordion>
+  </div>
+
+  <button
+    type="button"
+    sbb-button
+    [disabled]="!hasSelectedTables() || isLoading"
+    (click)="selectTables()"
   >
+    Go
+  </button>
 </div>
 
-<button
-  type="button"
-  sbb-button
-  [disabled]="!hasSelectedTables()"
-  (click)="selectTables()"
-  [routerLink]="['/edit-schema']"
->
-  Go
-</button>
+<!-- <div *ngIf="isLoading">lol</div> -->
+<div *ngIf="isLoading" class="loading-box">
+  <sbb-loading
+    mode="medium"
+    aria-valuetext="Loading, please wait"
+  ></sbb-loading>
+  Functional Dependencies and Inclusion Dependencies are currently being
+  searched. <br />
+  Progress can be monitored
+  <a [href]="queueUrl" target="_blank">here</a>
+</div>

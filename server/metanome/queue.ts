@@ -1,4 +1,5 @@
-import { Queue, QueueEvents } from "bullmq";
+// if UnrecoverableError is not found, make sure to run npm install
+import { Queue, QueueEvents, UnrecoverableError } from "bullmq";
 import { Worker } from "bullmq";
 import { exec } from "child_process";
 import { absoluteServerDir } from "../utils/files";
@@ -24,12 +25,14 @@ const worker = new Worker<string, void>(
       process.stderr.on("data", (chunk) => job.log(chunk));
       process.on("error", (err) => {
         job.log(`An error ocurred while executing metanome: ${err}`);
-        reject(err);
+        reject(new UnrecoverableError(err.message));
       });
       process.on("close", (code) => {
         if (code) {
           job.log(`Error: Command exited with exit code ${code}`);
-          reject(new Error(`Command exited with exit code ${code}`));
+          reject(
+            new UnrecoverableError(`Command exited with exit code ${code}`)
+          );
         } else resolve();
       });
     });

@@ -6,8 +6,9 @@ describe("The tables page", () => {
   });
   it("should be able to navigate to the normalize page", () => {
     // contains asserts that a element with the content exists and selects it
-    cy.contains("public.nation_region_denormalized").click();
+    cy.contains("public").click();
+    cy.contains("nation_region_denormalized").click();
     cy.contains("Go").click();
-    cy.url().should("contain", "/edit-schema");
+    cy.url({ timeout: 30 * 1000 }).should("contain", "/edit-schema");
   });
 });
