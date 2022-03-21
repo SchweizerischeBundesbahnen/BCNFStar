@@ -26,10 +26,8 @@ export default class ColumnCombination {
     );
   }
 
-  public columnFromName(names: string) {
-    return this.asArray().filter((column: Column) =>
-      names.includes(column.name)
-    )[0];
+  public columnFromName(name: string) {
+    return this.asArray().find((column: Column) => name.includes(column.name));
   }
 
   public columnsFromIds(...numbers: Array<number>) {

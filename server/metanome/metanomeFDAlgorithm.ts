@@ -62,7 +62,7 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
   protected renameCommand(schemaAndTable: string) {
     // mssql already outputs the hyfd results with schema
     if (sqlUtils.getDbmsName() === "mssql") return "";
-    const command = process.platform == "win32" ? "move \\y" : "mv -f";
+    const command = process.platform == "win32" ? "move /y" : "mv -f";
     const originPath = MetanomeFDAlgorithm.originalOutputPath(schemaAndTable);
     const resultPath = MetanomeFDAlgorithm.outputPath(schemaAndTable);
     return `${command} ${originPath} ${resultPath}`;
@@ -78,7 +78,8 @@ export default class MetanomeFDAlgorithm extends MetanomeAlgorithm {
       schemaAndTables[0]
     }" --output file:"${
       schemaAndTables[0]
-    }_normalize_results.json" --algorithm-config isHumanInTheLoop:false
-      ${this.renameCommand(schemaAndTables[0])}`;
+    }_normalize_results.json" --algorithm-config isHumanInTheLoop:false && ${this.renameCommand(
+      schemaAndTables[0]
+    )}`;
   }
 }
