@@ -7,10 +7,13 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
+import Relationship from '@/src/model/schema/Relationship';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-normalize',
@@ -22,24 +25,26 @@ export class NormalizeComponent {
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
   public sql: PersistSchemaSql = new PersistSchemaSql();
-  public tablesEventEmitter: BehaviorSubject<Set<Table>> = new BehaviorSubject(
-    new Set<Table>()
-  );
+  public schemaChanged: Subject<void> = new Subject();
+  private dataService: DatabaseService;
 
   constructor(
-    public dataService: DatabaseService,
+    dataService: DatabaseService,
     // eslint-disable-next-line no-unused-vars
-    public dialog: SbbDialog
+    public dialog: SbbDialog,
+    public router: Router
   ) {
     this.schema = dataService.inputSchema!;
-    this.tablesEventEmitter.next(this.schema.tables);
+    if (!this.schema) router.navigate(['']);
+    this.dataService = dataService;
+    // this.schemaChanged.next();
   }
 
-  onSelect(table: Table): void {
-    this.selectedTable = table;
-  }
-
-  onJoin(event: any): void {
+  onJoin(event: {
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }): void {
     let command = new JoinCommand(
       this.schema,
       event.target,
@@ -47,15 +52,15 @@ export class NormalizeComponent {
       event.relationship
     );
 
-    let self = this;
-    command.onDo = function () {
-      self.selectedTable = undefined;
+    command.onDo = () => {
+      this.selectedTable = undefined;
     };
-    command.onUndo = function () {
-      self.selectedTable = undefined;
+    command.onUndo = () => {
+      this.selectedTable = undefined;
     };
+
     this.commandProcessor.do(command);
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged.next();
   }
 
   onClickSplit(fd: FunctionalDependency): void {
@@ -70,19 +75,24 @@ export class NormalizeComponent {
 
   onSplitFd(fd: FunctionalDependency): void {
     let command = new SplitCommand(this.schema, this.selectedTable!, fd);
-    // WARNING: To reference the command object from inside the function we need to define
-    // the function via function(){}. If we used arrow functions ()=>{} 'this' would still
-    // refer to this normalize component. We assign self to this, to keep a reference of this
-    // component anyway.
-    let self = this;
-    command.onDo = function () {
-      self.selectedTable = this.children![0];
-    };
-    command.onUndo = function () {
-      self.selectedTable = this.table;
-    };
+
+    command.onDo = () => (this.selectedTable = command.children![0]);
+    command.onUndo = () => (this.selectedTable = command.table);
+
     this.commandProcessor.do(command);
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged.next();
+  }
+
+  onIndToFk(event: any): void {
+    let command = new IndToFkCommand(
+      this.schema,
+      event.relationship,
+      event.source,
+      event.target
+    );
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
   }
 
   onAutoNormalize(): void {
@@ -99,18 +109,17 @@ export class NormalizeComponent {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
-    console.log('pushing');
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged.next();
   }
 
   onUndo() {
     this.commandProcessor.undo();
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged.next();
   }
 
   onRedo() {
     this.commandProcessor.redo();
-    this.tablesEventEmitter.next(this.schema.tables);
+    this.schemaChanged.next();
   }
 
   persistSchema(schemaName: string): void {
@@ -135,7 +144,7 @@ export class NormalizeComponent {
     console.log('Requesting SQL-Generation (Data Transfer)');
     this.schema.tables.forEach((table) => {
       this.dataService
-        .getDataTransferSql(table, Array.from(table.columns.columns))
+        .getDataTransferSql(table, table.columns.asArray())
         .then(
           (res) => (this.sql.dataTransferStatements += '\n' + res.sql + '\n')
         );
@@ -159,9 +168,9 @@ export class NormalizeComponent {
     console.log('Requesting SQL-Generation (Foreign Keys)');
 
     this.schema.tables.forEach((table) => {
-      table.fks().forEach((elem) => {
+      this.schema.fksOf(table).forEach((elem) => {
         this.dataService
-          .getForeignKeySql(table, elem[0], elem[1])
+          .getForeignKeySql(table, elem.relationship, elem.table)
           .then(
             (res) => (this.sql.foreignKeyConstraints += '\n' + res.sql + '\n')
           );

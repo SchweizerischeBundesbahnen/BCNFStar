@@ -1,12 +1,12 @@
-<div class="container-fluid ml-2 mr-2 border">
+<div class="container-fluid border">
   <div class="row border">
     <div class="col-8 border">
       <!-- [selectedTable]="this.selectedTable" -->
       <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
-        [tables]="this.tablesEventEmitter"
-        [selectedTable]="this.selectedTable"
-        (selected)="onSelect($event)"
+        [schema]="this.schema"
+        [(selection)]="this.selectedTable"
+        [schemaChanged]="this.schemaChanged.asObservable()"
         (joinFk)="onJoin($event)"
       ></app-normalize-schema-graph>
     </div>
@@ -17,14 +17,6 @@
         (undo)="onUndo()"
         (redo)="onRedo()"
       ></app-normalize-undo-redo>
-      <app-normalize-side-bar
-        class="normalize-sidebar"
-        [table]="this.selectedTable"
-        (persistSchema)="persistSchema($event)"
-        (download)="download()"
-        (splitFd)="onClickSplit($event)"
-        (joinInd)="onJoin($event)"
-      ></app-normalize-side-bar>
       <button type="button" sbb-button (click)="this.onAutoNormalize()">
         {{
           this.selectedTable !== undefined
@@ -37,6 +29,16 @@
       <div>{{ sql.primaryKeyConstraints }}</div>
       <div>{{ sql.foreignKeyConstraints }}</div>
       <div>{{ sql.dataTransferStatements }}</div>
+      <app-normalize-side-bar
+        class="normalize-sidebar"
+        *ngIf="this.selectedTable"
+        [table]="this.selectedTable"
+        [schema]="this.schema"
+        (persistSchema)="persistSchema($event)"
+        (download)="download()"
+        (splitFd)="onClickSplit($event)"
+        (indToFk)="onIndToFk($event)"
+      ></app-normalize-side-bar>
     </div>
   </div>
 </div>

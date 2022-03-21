@@ -10,9 +10,9 @@ import {
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
-import { Observable, shareReplay, map, Subject } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
-import IFk from '@server/definitions/IFk';
+import IForeignKey from '@server/definitions/IForeignKey';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependencies';
@@ -23,83 +23,61 @@ import IRelationship from '@server/definitions/IRelationship';
 })
 export class DatabaseService {
   public inputSchema?: Schema;
-  private loadTableCallback = new Subject<Array<Table>>(); // Source
-  loadTableCallback$ = this.loadTableCallback.asObservable(); // Stream
-  // when using the angular dev server, you need to access another adress
-  // for the BCNFStar express server. It is assumed that this server is
-  // at http://localhost:80. In production mode, the serving server is assumed
-  // to be the BCNFStar express server (found in backend/index.ts)
+  /**
+   * when using the angular dev server, you need to access another adress
+   * for the BCNFStar express server. It is assumed that this server is
+   * at http://localhost:80. In production mode, the serving server is assumed
+   * to be the BCNFStar express server (found in backend/index.ts)
+   **/
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
-  private fks: Array<IFk> = [];
+  private iFks: Array<IForeignKey> = [];
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
 
-  public loadTables(): Array<Table> {
-    let tables: Array<Table> = [];
-    this.getTables().subscribe((data) => {
-      tables.push(...data);
-      this.getIFks().subscribe((data) => {
-        this.fks = data;
-        this.loadTableCallback.next(tables);
-      });
-    });
+  public async loadTables(): Promise<Array<Table>> {
+    this.iFks = await this.getIFks();
+    return this.getTables();
+  }
+
+  private async getTables(): Promise<Array<Table>> {
+    const iTables = await firstValueFrom(
+      this.http.get<Array<ITable>>(this.baseUrl + '/tables')
+    );
+    const tables = iTables.map((iTable) => Table.fromITable(iTable));
     return tables;
   }
 
-  private getTables(): Observable<Array<Table>> {
-    let tableResult;
-    if (!tableResult) {
-      tableResult = this.http
-        .get<ITable[]>(`${this.baseUrl}/tables`)
-        // required for caching
-        .pipe(shareReplay(1))
-        .pipe(
-          map((iTables: Array<ITable>) =>
-            iTables.map((iTable) => Table.fromITable(iTable))
-          )
-        );
-    }
-    return tableResult;
+  private getIFks(): Promise<Array<IForeignKey>> {
+    return firstValueFrom(
+      this.http.get<Array<IForeignKey>>(this.baseUrl + '/fks')
+    );
   }
 
-  private getIFks(): Observable<Array<IFk>> {
-    let fks;
-    fks = this.http
-      .get<IFk[]>(`${this.baseUrl}/fks`)
-      // required for caching
-      .pipe(shareReplay(1));
-    return fks;
-  }
-
-  private resolveIFks(fks: Array<IFk>) {
+  private resolveIFks(fks: Array<IForeignKey>) {
     fks.forEach((fk) => {
-      let referencedTable: Table = [...this.inputSchema!.tables].filter(
+      let referencingTable = [...this.inputSchema!.tables].find(
         (table: Table) => fk.name == table.schemaAndName()
-      )[0];
-      let referencingTable: Table = [...this.inputSchema!.tables].filter(
+      );
+      let referencedTable = [...this.inputSchema!.tables].find(
         (table: Table) => fk.foreignName == table.schemaAndName()
-      )[0];
+      );
 
       if (referencingTable && referencedTable) {
-        let fkColumn: Column = referencingTable.columns.columnFromName(
+        let fkColumn = referencingTable.columns.columnFromName(fk.column)!;
+        let pkColumn = referencedTable.columns.columnFromName(
           fk.foreignColumn
-        );
-        let pkColumn: Column = referencedTable.columns.columnFromName(
-          fk.column
-        );
+        )!;
 
         if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
         referencedTable.pk.add(pkColumn);
 
-        let relationship = new Relationship();
-        this.inputSchema!.fkRelationships.forEach((rel) => {
-          if (rel.appliesTo(referencingTable, referencedTable)) {
-            relationship = rel;
-          }
-        });
+        let relationship =
+          [...this.inputSchema!.fkRelationships].find((rel) =>
+            rel.appliesTo(referencingTable!, referencedTable!)
+          ) || new Relationship();
         relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.fkRelationships.add(relationship);
+        this.inputSchema!.addFkRelationship(relationship);
       }
     });
   }
@@ -107,63 +85,71 @@ export class DatabaseService {
   private resolveInds(inds: Array<IInclusionDependency>) {
     let schemaColumns = new Array<Column>();
     this.inputSchema!.tables.forEach((table) => {
-      schemaColumns.push(...table.columns.columns);
+      schemaColumns.push(...table.columns.asSet());
     });
     inds.forEach((ind) => {
       let indRelationship = new Relationship();
       let numColumns = ind.dependant.columnIdentifiers.length;
       for (let i = 0; i < numColumns; i++) {
         let dependantIColumn = ind.dependant.columnIdentifiers[i];
-        let dependantColumn = schemaColumns.filter(
+        let dependantColumn = schemaColumns.find(
           (column) =>
             dependantIColumn.columnIdentifier == column.name &&
-            'public.' + dependantIColumn.schemaIdentifier ==
-              column.sourceTable.name
-        )[0];
+            dependantIColumn.schemaIdentifier ==
+              column.sourceTable.schemaName &&
+            dependantIColumn.tableIdentifier == column.sourceTable.name
+        )!;
 
         let referencedIColumn = ind.referenced.columnIdentifiers[i];
-        let referencedColumn = schemaColumns.filter(
+        let referencedColumn = schemaColumns.find(
           (column) =>
             referencedIColumn.columnIdentifier == column.name &&
-            'public.' + referencedIColumn.schemaIdentifier ==
-              column.sourceTable.name
-        )[0];
+            dependantIColumn.schemaIdentifier ==
+              column.sourceTable.schemaName &&
+            dependantIColumn.tableIdentifier == column.sourceTable.name
+        )!;
 
         indRelationship.add(dependantColumn, referencedColumn);
       }
-      this.inputSchema!.indRelationships.add(indRelationship);
+      this.inputSchema!.addIndRelationship(indRelationship);
     });
   }
 
-  public setInputTables(tables: Array<Table>) {
+  public async setInputTables(tables: Array<Table>) {
+    const indPromise = this.getINDs(tables);
+    const fdResults = await Promise.all(tables.map((v) => this.getFDs(v)));
+
     this.inputSchema = new Schema(...tables);
-    this.inputSchema.tables.forEach((inputTable: Table) => {
-      inputTable.schema = this.inputSchema;
-      this.getFunctionalDependenciesByTable(inputTable).subscribe((fd) =>
-        inputTable.setFds(
-          ...fd.functionalDependencies.map((fds) =>
-            FunctionalDependency.fromString(inputTable, fds)
-          )
-        )
+    for (const table of tables) {
+      const iFDs = fdResults.find(
+        (v) => v.tableName == table.schemaAndName()
+      ) as IFunctionalDependencies;
+      const fds = iFDs.functionalDependencies.map((fds) =>
+        FunctionalDependency.fromString(table, fds)
       );
-    });
-    this.getINDsByTables(tables).subscribe((inds) => {
-      this.resolveInds(inds);
-    });
-    this.resolveIFks(this.fks);
+      table.setFds(...fds);
+    }
+    this.resolveInds(await indPromise);
+    this.resolveIFks(this.iFks);
   }
 
-  private fdResult: Record<string, Observable<IFunctionalDependencies>> = {};
-  private getFunctionalDependenciesByTable(
-    table: Table
-  ): Observable<IFunctionalDependencies> {
-    if (!this.fdResult[table.name])
-      this.fdResult[table.name] = this.http
-        .get<IFunctionalDependencies>(
-          `${this.baseUrl}/tables/${table.schemaName}.${table.name}/fds`
-        )
-        .pipe(shareReplay(1));
-    return this.fdResult[table.name];
+  private getFDs(table: Table): Promise<IFunctionalDependencies> {
+    return firstValueFrom(
+      this.http.get<IFunctionalDependencies>(
+        `${this.baseUrl}/tables/${table.schemaAndName()}/fds`
+      )
+    );
+  }
+
+  private getINDs(tables: Array<Table>): Promise<Array<IInclusionDependency>> {
+    let tableNamesConcatenation = tables
+      .map((table) => table.schemaAndName())
+      .join(',');
+    return firstValueFrom(
+      this.http.get<Array<IInclusionDependency>>(
+        `${this.baseUrl}/tables/${tableNamesConcatenation}/inds`
+      )
+    );
   }
 
   getForeignKeySql(
@@ -212,20 +198,28 @@ export class DatabaseService {
     return result;
   }
 
-  getDataTransferSql(table: Table, attributes: Column[]): Promise<any> {
+  getDataTransferSql(
+    table: Table,
+    attributes: Column[]
+  ): Promise<{ sql: string }> {
     const data: IRequestBodyDataTransferSql = {
       newSchema: table.schemaName!,
       newTable: table.name,
-      relationships: table.relationships.map((rel) => rel.toIRelationship()),
+      relationships: [...table.relationships].map((rel) =>
+        rel.toIRelationship()
+      ),
       sourceTables: Array.from(table.sourceTables).map(
-        (table) => `${table.schemaName!}.${table.name}`
+        (table) => `${table.schemaAndName()}`
       ),
       attributes: attributes.map((attr) => attr.toIAttribute()),
     };
 
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/dataTransfer`, data)
-      .toPromise();
+    let result = firstValueFrom(
+      this.http.post<{ sql: string }>(
+        `${this.baseUrl}/persist/dataTransfer`,
+        data
+      )
+    );
     return result;
   }
 
@@ -254,7 +248,7 @@ export class DatabaseService {
     const data: IRequestBodyCreateTableSql = {
       newSchema: newSchema,
       newTable: newTable,
-      attributes: Array.from(table.columns.columns).map((column) => {
+      attributes: table.columns.asArray().map((column) => {
         return { name: column.name, dataType: column.dataType };
       }),
       primaryKey: primaryKey,
@@ -263,18 +257,5 @@ export class DatabaseService {
       .post(`${this.baseUrl}/persist/createTable`, data)
       .toPromise();
     return result;
-  }
-  private getINDsByTables(
-    tables: Array<Table>
-  ): Observable<Array<IInclusionDependency>> {
-    let tableNamesConcatenation = tables
-      .map((table) => table.schemaName + '.' + table.name)
-      .join();
-    let indResult: Observable<Array<IInclusionDependency>> = this.http
-      .get<Array<IInclusionDependency>>(
-        `${this.baseUrl}/tables/${tableNamesConcatenation}/inds`
-      )
-      .pipe(shareReplay(1));
-    return indResult;
   }
 }

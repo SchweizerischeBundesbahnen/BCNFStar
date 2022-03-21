@@ -99,4 +99,7 @@ export default abstract class SqlUtils {
     referencedTable: string,
     referencedColumns: string[]
   ): string;
+  public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
+  public abstract getJdbcPath(): string;
+  public abstract getDbmsName(): string;
 }

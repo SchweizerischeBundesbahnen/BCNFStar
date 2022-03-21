@@ -25,13 +25,16 @@ export default class PostgresSqlUtils extends SqlUtils {
     };
   }
 
+  // ATTENTION: use a client obtained by const client = this.pool.connect to execute multiple
+  // statements in a single transaction, and then make sure to call client.release() in any case
+  // or the server will not be able to handle any further requests!
+  // if you don't need transactions, just do this.pool.query, which does the connecting and releasing for you
   protected pool: Pool;
   init(): void {
     this.pool = new Pool(this.config);
   }
   public async getSchema(): Promise<SchemaQueryRow[]> {
-    const client = await this.pool.connect();
-    const query_result = await client.query<SchemaQueryRow>(
+    const query_result = await this.pool.query<SchemaQueryRow>(
       // the last line excludes system tables
       `SELECT table_name, column_name, 
       case 
@@ -54,42 +57,13 @@ export default class PostgresSqlUtils extends SqlUtils {
     schema: string,
     table: string
   ): Promise<boolean> {
-    const client = await this.pool.connect();
     const queryConfig: QueryConfig = {
       text: "SELECT 1 FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2",
       name: "table-exists-postgres",
       values: [schema, table],
     };
-    const table_exists = await client.query(queryConfig);
+    const table_exists = await this.pool.query(queryConfig);
     return table_exists.rowCount > 0;
-  }
-
-  public async attributesExistInTable(
-    attributeNames: string[],
-    originSchema: string,
-    originTable: string
-  ): Promise<boolean> {
-    const client = await this.pool.connect();
-    const query_result = await client.query<{
-      column_name: string;
-    }>(
-      `SELECT column_name 
-          FROM information_schema.columns
-          WHERE table_schema = $1 AND table_name = $2;`,
-      [originSchema, originTable]
-    );
-    const originTableColumns = query_result.rows.map((row) => row.column_name);
-    return attributeNames.every((name) => originTableColumns.includes(name));
-  }
-
-  public async schemaExistsInDatabase(schema: string): Promise<boolean> {
-    const client = await this.pool.connect();
-    return client
-      .query(
-        `SELECT 1 FROM information_schema.schemata WHERE schema_name = $1`,
-        [schema]
-      )
-      .then((queryResult) => queryResult.rowCount > 0);
   }
 
   public async getTableHead(
@@ -98,8 +72,7 @@ export default class PostgresSqlUtils extends SqlUtils {
   ): Promise<TableHead | { error: string }> {
     const tableExists = await this.tableExistsInSchema(tableschema, tablename);
     if (tableExists) {
-      const client = await this.pool.connect();
-      const query_result = await client.query(
+      const query_result = await this.pool.query(
         `SELECT * FROM ${tableschema}.${tablename} LIMIT 10`
       );
       return {
@@ -189,7 +162,10 @@ export default class PostgresSqlUtils extends SqlUtils {
 `;
   }
 
-  public getJdbcPath(): String {
+  public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
+  }
+  public getDbmsName(): string {
+    return "postgres";
   }
 }

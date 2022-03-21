@@ -1,6 +1,5 @@
 #graph {
   position: relative;
-  border: 1px solid gray;
   display: inline-block;
   background: transparent;
   overflow: hidden;
@@ -8,9 +7,16 @@
   height: 100%;
 }
 
+#reset-btn {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  right: 0;
+}
+
 #paper {
-    position: relative;
-    height: 90vh;
+  position: relative;
+  height: 90vh;
 }
 
 .tool-remove {

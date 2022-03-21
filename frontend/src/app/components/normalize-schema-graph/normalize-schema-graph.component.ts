@@ -1,18 +1,18 @@
 import {
   Component,
-  AfterViewInit,
   Input,
   Output,
   EventEmitter,
+  AfterContentInit,
 } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
-// import panzoom, { PanZoom, Transform } from 'panzoom';
-import { Transform } from 'panzoom';
-import { Subject } from 'rxjs';
+import panzoom, { PanZoom, Transform } from 'panzoom';
+import { Observable } from 'rxjs';
 import Relationship from '@/src/model/schema/Relationship';
+import Schema from '@/src/model/schema/Schema';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -21,45 +21,40 @@ type GraphStorageItem = {
   links: Record<string, joint.dia.Link>;
 };
 
-const jointJsPrefix = '__jointel__';
+enum PortSide {
+  Left,
+  Right,
+}
 
 @Component({
   selector: 'app-normalize-schema-graph',
   templateUrl: './normalize-schema-graph.component.html',
   styleUrls: ['./normalize-schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements AfterViewInit {
-  @Input() tables!: Subject<Set<Table>>;
-  @Input() selectedTable?: Table;
-  @Output() selected = new EventEmitter<Table>();
+export class NormalizeSchemaGraphComponent implements AfterContentInit {
+  @Input() schema!: Schema;
+  @Input() selection?: Table;
+  @Input() schemaChanged!: Observable<void>;
+  @Output() selectionChange = new EventEmitter<Table>();
   @Output() joinFk = new EventEmitter<{
     source: Table;
     target: Table;
     relationship: Relationship;
   }>();
 
-  protected localTables: Set<Table> = new Set();
-  public paper?: joint.dia.Paper;
+  protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
-  ngAfterViewInit(): void {
-    this.tables.asObservable().subscribe((v) => {
-      console.log('new tables');
-      this.localTables = v;
-      this.createDefaultGraph();
-    });
-  }
-
-  private panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
-
-  protected attributeWidth = 22.5;
+  protected portDiameter = 22.5;
 
   public graphStorage: Record<string, GraphStorageItem> = {};
 
   protected graph!: joint.dia.Graph;
+  protected paper!: joint.dia.Paper;
 
-  createDefaultGraph() {
+  protected elementWidth = 300;
+
+  ngAfterContentInit(): void {
     this.graph = new joint.dia.Graph();
-
     this.paper = new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
       model: this.graph,
@@ -69,6 +64,7 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
         color: 'rgba(200, 200, 200, 0.3)',
       },
     });
+
     // move the corresponding HTML overlay whenever a graph element changes position
     this.graph.on('change:position', (element) => {
       if (element.isElement)
@@ -78,6 +74,19 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
           }
         }
     });
+
+    this.addPanzoomHandler();
+
+    this.schemaChanged.subscribe(() => {
+      this.updateGraph();
+    });
+    this.updateGraph();
+  }
+
+  updateGraph() {
+    for (const item in this.graphStorage) {
+      this.graphStorage[item].jointjsEl.remove();
+    }
     this.graphStorage = {};
     this.generateElements();
     this.generateLinks();
@@ -86,31 +95,58 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
       graphlib,
       nodeSep: 40,
       // prevent left ports from being cut off
-      marginX: this.attributeWidth / 2,
+      marginX: this.portDiameter / 2,
       edgeSep: 80,
       rankDir: 'LR',
     });
 
-    // setTimeout(() => {
-    //   const panzoomHandler = panzoom(
-    //     document.querySelector('#paper svg') as SVGElement,
-    //     { smoothScroll: false,
-    //     pinchSpeed:0,
-    //   zoomSpeed: 0 }
-    //   );
-    //   // move all HTML overlays whenever the user zoomed or panned
-    //   panzoomHandler.on('transform', (e: PanZoom) => {
-    //     this.panzoomTransform = e.getTransform();
-    //     this.updateAllBBoxes();
-    //   });
-    //   this.updateAllBBoxes();
-    // }, 10);
+    setTimeout(() => {
+      this.updateAllBBoxes();
+    }, 10);
+  }
+
+  protected panzoomHandler?: PanZoom;
+  // We use the panzoom library becuase pan and zoom detection is difficult and must
+  // feel intuitive on a range of devices. We just take the transform and override the
+  // default panzoom conotroller to move both the graph elements and the associated Angular
+  // components
+  addPanzoomHandler() {
+    this.panzoomHandler = panzoom(
+      document.querySelector('#paper svg') as SVGElement,
+      {
+        smoothScroll: false,
+        controller: {
+          getOwner() {
+            return document.querySelector('#paper') as HTMLElement;
+          },
+          applyTransform: (transform) => {
+            this.panzoomTransform = Object.assign({}, transform);
+            this.paper.scale(transform.scale);
+            this.paper.translate(transform.x, transform.y);
+
+            this.updateAllBBoxes();
+          },
+        },
+        // disable panzoom when clicking on a jointjs element,
+        // so that dragging single elements still works
+        // (false means: enable panzoom, true disable panzoom)
+        beforeMouseDown: (evt: MouseEvent) => {
+          if (!evt.target) return false;
+          let element: HTMLElement | null = evt.target as HTMLElement;
+          while (element !== null) {
+            if (element.id.startsWith('__jointel')) return true;
+            element = element.parentElement;
+          }
+          return false;
+        },
+      }
+    );
   }
 
   generateElements() {
-    for (const table of this.localTables) {
+    for (const table of this.schema.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
-        attrs: { root: { id: jointJsPrefix + table.name } },
+        attrs: { root: { id: '__jointel__' + table.name } },
       });
       jointjsEl.attr({
         body: {
@@ -119,10 +155,9 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
         '.': { magnet: true },
       });
       jointjsEl.resize(
-        300,
-        60 + this.attributeWidth * table.columns.columns.size
+        this.elementWidth,
+        60 + this.portDiameter * table.columns.cardinality
       );
-      jointjsEl.position(50, 10);
       this.graphStorage[table.name] = {
         // alternative to HtmlElement: joint.shapes.html.Element
         jointjsEl,
@@ -187,14 +222,10 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
   }
 
   generateLinks() {
-    for (const table of this.localTables) {
-      for (const fk of table.fks()) {
-        let fkReferenced = fk[0].referenced().columns.values().next().value;
-        let fkReferencing = fk[0].referencing().columns.values().next().value;
-        console.log(
-          fkReferenced.sourceTable.name,
-          fkReferencing.sourceTable.name
-        );
+    for (const table of this.schema.tables) {
+      for (const fk of this.schema.fksOf(table)) {
+        let fkReferenced = fk.relationship.referenced().asArray()[0];
+        let fkReferencing = fk.relationship.referencing().asArray()[0];
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage[table.name].jointjsEl.id,
@@ -205,52 +236,52 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
               '_right',
           },
           target: {
-            id: this.graphStorage[fk[1].name].jointjsEl.id,
+            id: this.graphStorage[fk.table.name].jointjsEl.id,
             port:
               fkReferenced.sourceTable.name + '.' + fkReferenced.name + '_left',
           },
+          z: -1,
         });
-        console.log(link);
-        this.graphStorage[table.name].links[fk[1].name] = link;
+        this.graphStorage[table.name].links[fk.table.name] = link;
         this.graph.addCell(link);
-        this.addJoinButton(link, table, fk[1], fk[0]);
+        this.addJoinButton(link, table, fk.table, fk.relationship);
       }
     }
+  }
+
+  // if you change this, also change graph-element.component.css > .table-head > height
+  protected graphElementHeaderHeight: number = 25;
+  generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
+    const cx = side == PortSide.Left ? 0 : this.elementWidth;
+    return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
+      this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5)
+    }" strokegit ="green" fill="white"/>`;
   }
 
   generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
     for (let column of table.columns.inOrder()) {
+      let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
         id: column.sourceTable.name + '.' + column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
-        args: {}, // extra arguments for the port layout function, see `layout.Port` section
-        label: {
-          position: {
-            name: 'left',
-            // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
-          },
-        },
-        markup: `<circle r="${this.attributeWidth / 2}" cx="0" cy="${
-          25 + this.attributeWidth / 2 + this.attributeWidth * counter
-        }" strokegit ="green" fill="white" />`,
+        args,
+        markup: this.generatePortMarkup(args),
       });
+      args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
         id: column.sourceTable.name + '.' + column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
-        args: {}, // extra arguments for the port layout function, see `layout.Port` section
-        label: {
-          position: {
-            name: 'right',
-            // args: { y: 60 + 22.5 * i } // extra arguments for the label layout function, see `layout.PortLabel` section
-          },
-        },
-        markup: `<circle r="${this.attributeWidth / 2}" cx="300" cy="${
-          25 + this.attributeWidth / 2 + this.attributeWidth * counter
-        }" strokegit ="red" fill="white" />`,
+        args,
+        markup: this.generatePortMarkup(args),
       });
       counter++;
     }
+  }
+
+  resetView() {
+    this.panzoomHandler?.moveTo(0, 0);
+    this.panzoomHandler?.zoomAbs(0, 0, 1);
   }
 
   updateAllBBoxes() {
@@ -264,10 +295,12 @@ export class NormalizeSchemaGraphComponent implements AfterViewInit {
     const bbox = item.jointjsEl.getBBox();
 
     item.style = {
-      width: bbox.width / this.panzoomTransform.scale + 'px',
-      height: bbox.height / this.panzoomTransform.scale + 'px',
-      left: bbox.x + 'px',
-      top: bbox.y + 'px ',
+      width: bbox.width + 'px',
+      height: bbox.height + 'px',
+      left:
+        bbox.x * this.panzoomTransform.scale + this.panzoomTransform.x + 'px',
+      top:
+        bbox.y * this.panzoomTransform.scale + this.panzoomTransform.y + 'px ',
       transform: `scale(${this.panzoomTransform.scale})`,
       'transform-origin': 'left top',
     };

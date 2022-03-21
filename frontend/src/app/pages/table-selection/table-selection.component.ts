@@ -1,6 +1,7 @@
 import Table from '@/src/model/schema/Table';
 import { Component, OnInit } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-table-selection',
@@ -8,31 +9,61 @@ import { DatabaseService } from 'src/app/database.service';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  tables: Map<Table, Boolean> = new Map();
-
-  // eslint-disable-next-line no-unused-vars
-  constructor(private dataService: DatabaseService) {}
-
-  ngOnInit(): void {
-    this.dataService.loadTableCallback$.subscribe((data) =>
-      data.forEach((table) => this.tables.set(table, false))
-    );
-    this.dataService.loadTables();
+  public tables: Array<Table> = [];
+  public selectedTables = new Map<Table, Boolean>();
+  public tablesInSchema: Record<string, Table[]> = {};
+  public isLoading = false;
+  public queueUrl: string;
+  constructor(private dataService: DatabaseService, private router: Router) {
+    this.router = router;
+    this.queueUrl = dataService.baseUrl + '/queue';
   }
 
-  public toggleCheckStatus(table: Table) {
-    this.tables.set(table, !this.tables.get(table)!);
+  async ngOnInit(): Promise<void> {
+    this.tables = await this.dataService.loadTables();
+    for (const table of this.tables) {
+      this.selectedTables.set(table, false);
+      const schema = table.name.split('.')[0];
+      if (!this.tablesInSchema[schema]) this.tablesInSchema[schema] = [];
+      this.tablesInSchema[schema].push(table);
+    }
   }
 
   public hasSelectedTables(): boolean {
-    return [...this.tables.values()].some((value) => value);
+    return [...this.selectedTables.values()].some((bool) => bool);
   }
 
-  public selectTable() {
-    this.dataService.setInputTables(
-      [...this.tables.entries()]
-        .filter((entry) => entry[1])
-        .map((entry) => entry[0])
+  public clickSelectAll(schema: string) {
+    if (this.areAllSelectedIn(schema)) {
+      this.tablesInSchema[schema].forEach((table) =>
+        this.selectedTables.set(table, false)
+      );
+    } else
+      this.tablesInSchema[schema].forEach((table) =>
+        this.selectedTables.set(table, true)
+      );
+  }
+
+  public areAllSelectedIn(schema: string) {
+    return this.tablesInSchema[schema].every((table) =>
+      this.selectedTables.get(table)
     );
+  }
+
+  public areZeroSelectedIn(schema: string) {
+    return !this.tablesInSchema[schema].some((table) =>
+      this.selectedTables.get(table)
+    );
+  }
+
+  public selectTables() {
+    const tables = this.tables.filter((table) =>
+      this.selectedTables.get(table)
+    );
+    this.isLoading = true;
+    this.dataService.setInputTables(tables).then(() => {
+      this.isLoading = false;
+      this.router.navigate(['/edit-schema']);
+    });
   }
 }

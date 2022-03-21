@@ -1,4 +1,4 @@
-<div *ngIf="this.table">
+<div>
   <h3>{{ table.name }}</h3>
   <sbb-accordion [multi]="true">
     <sbb-expansion-panel [expanded]="true">
@@ -14,9 +14,12 @@
       <sbb-expansion-panel-header>
         Functional Dependencies
       </sbb-expansion-panel-header>
-      <div *ngIf="fds.length > 0">
+      <div *ngIf="schema.splittableFdsOf(table).length > 0">
         <sbb-radio-group #fdSelection>
-          <sbb-radio-button *ngFor="let fd of fds.slice(0, 10)" [value]="fd">
+          <sbb-radio-button
+            *ngFor="let fd of schema.splittableFdsOf(table).slice(0, 10)"
+            [value]="fd"
+          >
             {{ fd.toString() }}
           </sbb-radio-button>
         </sbb-radio-group>
@@ -36,19 +39,27 @@
       <sbb-expansion-panel-header
         >Inclusion Dependencies</sbb-expansion-panel-header
       >
-      <sbb-radio-group #indSelection>
-        <sbb-radio-button *ngFor="let rel of inds.slice(0, 10)" [value]="rel">{{
-          rel[0].toString()
-        }}</sbb-radio-button>
+      <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).size > 0">
+        <sbb-radio-button
+          *ngFor="let rel of schema.indsOf(table)"
+          [value]="rel"
+          >{{
+            rel.relationship.referencing().toString() +
+              "->(" +
+              rel.table.name +
+              ") " +
+              rel.relationship.referenced().toString()
+          }}</sbb-radio-button
+        >
       </sbb-radio-group>
       <br />
       <button
         type="button"
         sbb-button
         [disabled]="!selectedInd()"
-        (click)="joinSelectedInd()"
+        (click)="transformIndToFk()"
       >
-        Join Inclusion Dependency
+        Create Foreign Key
       </button>
     </sbb-expansion-panel>
   </sbb-accordion>

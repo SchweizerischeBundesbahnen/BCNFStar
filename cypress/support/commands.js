@@ -23,3 +23,17 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("visitFrontend", { prevSubject: false }, (options) => {
+  let finalOptions;
+  if (options && options.headers) {
+    finalOptions = options;
+    options.headers["Accept-Encoding"] = "gzip, deflat, br";
+  } else
+    finalOptions = Object.assign({}, options, {
+      headers: {
+        "Accept-Encoding": "gzip, deflate, br",
+      },
+    });
+  return cy.visit(Cypress.env("FRONTEND_BASEURL"), finalOptions);
+});

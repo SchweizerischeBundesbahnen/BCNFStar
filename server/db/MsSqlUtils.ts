@@ -1,16 +1,11 @@
 import sql from "mssql";
-import { env } from "process";
 import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
-import { EOL } from "os";
 import IAttribute from "../definitions/IAttribute";
-import ITable from "@/definitions/ITable";
-import IRelationship from "@/definitions/IRelationship";
 
-type Attribute = {
-  type: string;
-  column_name: string;
-};
-
+// WARNING: make sure to always unprepare a PreparedStatement after everything's done
+// (or failed*), otherwise it will eternally use one of the connections from the pool and
+// prevent new queries
+// * this means: use try-finally
 export default class MsSqlUtils extends SqlUtils {
   private config: sql.config;
   public connection: sql.ConnectionPool;
@@ -86,32 +81,19 @@ export default class MsSqlUtils extends SqlUtils {
     table: string
   ): Promise<boolean> {
     const ps = new sql.PreparedStatement();
-    ps.input("schema", sql.NVarChar);
-    ps.input("table", sql.NVarChar);
 
-    await ps.prepare(
-      "SELECT 1 FROM information_schema.tables WHERE table_schema = @schema AND table_name = @table"
-    );
-    const result = await ps.execute({ schema, table });
-    return result.recordset.length > 0;
-  }
+    try {
+      ps.input("schema", sql.NVarChar);
+      ps.input("table", sql.NVarChar);
 
-  public async attributesExistInTable(
-    attributeNames: string[],
-    schema: string,
-    table: string
-  ): Promise<boolean> {
-    const ps = new sql.PreparedStatement();
-    ps.input("table", sql.NVarChar);
-    ps.input("schema", sql.NVarChar);
-
-    await ps.prepare(
-      "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = @schema AND TABLE_NAME = @table"
-    );
-    const result = await ps.execute({ schema, table });
-    return attributeNames.every((name) =>
-      result.recordset.map((e) => e.COLUMN_NAME).includes(name)
-    );
+      await ps.prepare(
+        "SELECT 1 FROM information_schema.tables WHERE table_schema = @schema AND table_name = @table"
+      );
+      const result = await ps.execute({ schema, table });
+      return result.recordset.length > 0;
+    } finally {
+      ps.unprepare();
+    }
   }
 
   public async schemaExistsInDatabase(schema: string): Promise<boolean> {
@@ -148,7 +130,6 @@ INNER JOIN sys.tables tab2
 INNER JOIN sys.columns col2
     ON col2.column_id = referenced_column_id AND col2.object_id = tab2.object_id
 `);
-    console.log(result);
     return result.recordset;
   }
 
@@ -209,7 +190,10 @@ GO`;
     )});`;
   }
 
-  public getJdbcPath(): String {
+  public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
+  }
+  public getDbmsName(): string {
+    return "mssql";
   }
 }
