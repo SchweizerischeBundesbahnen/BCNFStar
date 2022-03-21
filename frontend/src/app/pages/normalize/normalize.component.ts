@@ -6,11 +6,13 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import Relationship from '@/src/model/schema/Relationship';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-normalize',
@@ -21,21 +23,17 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
-  public tablesObservable: BehaviorSubject<Set<Table>> = new BehaviorSubject(
-    new Set<Table>()
-  );
+  public schemaChanged: Subject<void> = new Subject();
 
   constructor(
-    public dataService: DatabaseService,
+    dataService: DatabaseService,
     // eslint-disable-next-line no-unused-vars
-    public dialog: SbbDialog
+    public dialog: SbbDialog,
+    public router: Router
   ) {
     this.schema = dataService.inputSchema!;
-    this.schemaChanged();
-  }
-
-  protected schemaChanged() {
-    this.tablesObservable.next(this.schema.tables);
+    if (!this.schema) router.navigate(['']);
+    // this.schemaChanged.next();
   }
 
   onJoin(event: {
@@ -58,7 +56,7 @@ export class NormalizeComponent {
     };
 
     this.commandProcessor.do(command);
-    this.tablesObservable.next(this.schema.tables);
+    this.schemaChanged.next();
   }
 
   onClickSplit(fd: FunctionalDependency): void {
@@ -78,7 +76,19 @@ export class NormalizeComponent {
     command.onUndo = () => (this.selectedTable = command.table);
 
     this.commandProcessor.do(command);
-    this.schemaChanged();
+    this.schemaChanged.next();
+  }
+
+  onIndToFk(event: any): void {
+    let command = new IndToFkCommand(
+      this.schema,
+      event.relationship,
+      event.source,
+      event.target
+    );
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
   }
 
   onAutoNormalize(): void {
@@ -95,16 +105,16 @@ export class NormalizeComponent {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
-    this.schemaChanged();
+    this.schemaChanged.next();
   }
 
   onUndo() {
     this.commandProcessor.undo();
-    this.schemaChanged();
+    this.schemaChanged.next();
   }
 
   onRedo() {
     this.commandProcessor.redo();
-    this.schemaChanged();
+    this.schemaChanged.next();
   }
 }

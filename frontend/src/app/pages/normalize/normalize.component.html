@@ -4,8 +4,9 @@
       <!-- [selectedTable]="this.selectedTable" -->
       <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
-        [tables]="this.tablesObservable"
+        [schema]="this.schema"
         [(selection)]="this.selectedTable"
+        [schemaChanged]="this.schemaChanged.asObservable()"
         (joinFk)="onJoin($event)"
       ></app-normalize-schema-graph>
     </div>
@@ -26,8 +27,9 @@
       <app-normalize-side-bar
         *ngIf="this.selectedTable"
         [table]="this.selectedTable"
+        [schema]="this.schema"
         (splitFd)="onClickSplit($event)"
-        (joinInd)="onJoin($event)"
+        (indToFk)="onIndToFk($event)"
       ></app-normalize-side-bar>
     </div>
   </div>

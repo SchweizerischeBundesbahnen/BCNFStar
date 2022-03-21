@@ -1,20 +1,32 @@
 import Column from './Column';
-import Schema from './Schema';
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
+import FdScore from './methodObjects/FdScore';
 
 export default class Table {
   public name = '';
   public columns = new ColumnCombination();
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
-  public schema?: Schema;
   public relationships = new Set<Relationship>();
   public sourceTables = new Set<Table>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
+
+  /**
+   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   */
+  public _fks!: Set<{ relationship: Relationship; table: Table }>;
+  /**
+   * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
+   */
+  public _inds!: Set<{ relationship: Relationship; table: Table }>;
+  /**
+   * This variable tracks if the cached results fks and inds are still valid
+   */
+  public _relationshipsValid = true;
 
   public constructor(columns?: ColumnCombination) {
     if (columns) this.columns = columns;
@@ -52,7 +64,7 @@ export default class Table {
   }
 
   public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
-    this.fds.push(new FunctionalDependency(this, lhs, rhs));
+    this.fds.push(new FunctionalDependency(lhs, rhs));
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
@@ -67,9 +79,6 @@ export default class Table {
     let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
     fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
-
-    remaining.schema = this.schema;
-    generating.schema = this.schema;
 
     this.projectRelationships(remaining);
     this.projectRelationships(generating);
@@ -120,7 +129,6 @@ export default class Table {
     this.fds.forEach((fd) => {
       if (fd.lhs.isSubsetOf(table.columns)) {
         fd = new FunctionalDependency(
-          table,
           fd.lhs.copy(),
           fd.rhs.copy().intersect(table.columns)
         );
@@ -139,6 +147,7 @@ export default class Table {
       ? otherTable
       : this;
 
+    // columns
     let newTable = new Table(
       generating.columns
         .copy()
@@ -146,14 +155,18 @@ export default class Table {
         .setMinus(relationship.referencing())
         .union(relationship.referenced())
     );
-    newTable.schema = this.schema;
+
+    // relationships
     this.relationships.forEach((rel) => newTable.relationships.add(rel));
     otherTable.relationships.forEach((rel) => newTable.relationships.add(rel));
     if (!relationship.referenced().equals(relationship.referencing()))
       newTable.relationships.add(relationship);
 
+    // name, pk
     newTable.name = remaining.name;
     newTable.pk = remaining.pk;
+
+    // source tables
     this.sourceTables.forEach((sourceTable) =>
       newTable.sourceTables.add(sourceTable)
     );
@@ -164,34 +177,23 @@ export default class Table {
     return newTable;
   }
 
-  public referencedTables(): Set<Table> {
-    return this.schema!.fksOf(this);
+  public isKey(fd: FunctionalDependency): boolean {
+    // assume fd is fully extended
+    // TODO what about null values
+    return fd.rhs.equals(this.columns);
   }
 
-  public fks(): Array<{ relationship: Relationship; table: Table }> {
-    let fks = new Array<{ relationship: Relationship; table: Table }>();
-    this.schema!.fksOf(this).forEach((table) => {
-      this.schema!.fksBetween(this, table).forEach((relationship) => {
-        fks.push({ relationship: relationship, table: table });
-      });
-    });
-    return fks;
-  }
-
-  public inds(): Array<{ relationship: Relationship; table: Table }> {
-    let indArray = new Array<{ relationship: Relationship; table: Table }>();
-    this.schema!.indsOf(this).forEach((table) => {
-      this.schema!.indsBetween(this, table).forEach((relationship) => {
-        indArray.push({ relationship: relationship, table: table });
-      });
-    });
-    return indArray;
+  public isBCNFViolating(fd: FunctionalDependency): boolean {
+    if (this.isKey(fd)) return false;
+    if (fd.lhs.cardinality == 0) return false;
+    if (this.pk && !this.pk.isSubsetOf(this.remainingSchema(fd))) return false;
+    return true;
   }
 
   public keys(): Array<ColumnCombination> {
     if (!this._keys) {
       let keys: Array<ColumnCombination> = this.fds
-        .filter((fd) => fd.isKey())
+        .filter((fd) => this.isKey(fd))
         .map((fd) => fd.lhs);
       if (keys.length == 0) keys.push(this.columns.copy());
       this._keys = keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
@@ -199,36 +201,14 @@ export default class Table {
     return this._keys;
   }
 
-  public minimalReferencedTables(): Array<Table> {
-    // Annahme: keine Zyklen in references
-    var result: Set<Table> = new Set(this.referencedTables());
-
-    var visited: Array<Table> = [];
-    visited.push(this);
-
-    var queue: Array<Table> = [];
-    queue.push(...this.referencedTables());
-    while (queue.length > 0) {
-      var current = queue.shift();
-      visited.push(current!);
-      for (const refTable of current!.referencedTables()) {
-        if (result.has(refTable)) {
-          result.delete(refTable);
-        }
-        if (!visited.includes(refTable)) {
-          queue.push(refTable);
-        }
-      }
-    }
-    return [...result];
-  }
-
   public violatingFds(): Array<FunctionalDependency> {
     if (!this._violatingFds) {
       this._violatingFds = this.fds
-        .filter((fd) => fd.violatesBCNF())
+        .filter((fd) => this.isBCNFViolating(fd))
         .sort((fd1, fd2) => {
-          return fd2.fdScore() - fd1.fdScore();
+          let score1 = new FdScore(this, fd1).get();
+          let score2 = new FdScore(this, fd2).get();
+          return score2 - score1;
         })
         .slice(0, 100);
     }
