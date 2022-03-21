@@ -18,7 +18,7 @@
         <sbb-radio-group #fdSelection>
           <sbb-radio-button
             *ngFor="
-              let fd of this.schema.splittableFdsOf(this.table).slice(0, 10)
+              let fd of schema.splittableFdsOf(table).slice(0, 10)
             "
             [value]="fd"
           >
@@ -43,7 +43,7 @@
       >
       <sbb-radio-group #indSelection>
         <sbb-radio-button
-          *ngFor="let rel of this.schema.indsOf(this.table)"
+          *ngFor="let rel of schema.indsOf(table)"
           [value]="rel"
           >{{
             rel.relationship.referencing().toString() +
