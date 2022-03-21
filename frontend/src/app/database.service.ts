@@ -88,20 +88,20 @@ export class DatabaseService {
       let numColumns = ind.dependant.columnIdentifiers.length;
       for (let i = 0; i < numColumns; i++) {
         let dependantIColumn = ind.dependant.columnIdentifiers[i];
-        let dependantColumn = schemaColumns.filter(
+        let dependantColumn = schemaColumns.find(
           (column) =>
             dependantIColumn.columnIdentifier == column.name &&
-            'public.' + dependantIColumn.schemaIdentifier ==
+            `${dependantIColumn.schemaIdentifier}.${dependantIColumn.tableIdentifier}` ==
               column.sourceTable.name
-        )[0];
+        )!;
 
         let referencedIColumn = ind.referenced.columnIdentifiers[i];
-        let referencedColumn = schemaColumns.filter(
+        let referencedColumn = schemaColumns.find(
           (column) =>
             referencedIColumn.columnIdentifier == column.name &&
-            'public.' + referencedIColumn.schemaIdentifier ==
+            `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}` ==
               column.sourceTable.name
-        )[0];
+        )!;
 
         indRelationship.add(dependantColumn, referencedColumn);
       }
