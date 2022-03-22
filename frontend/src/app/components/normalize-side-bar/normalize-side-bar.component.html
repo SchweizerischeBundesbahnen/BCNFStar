@@ -16,9 +16,7 @@
       </sbb-expansion-panel-header>
       <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
         <sbb-expansion-panel
-          *ngFor="
-            let cluster of schema.splittableFdClustersOf(table).slice(0, 10)
-          "
+          *ngFor="let cluster of schema.splittableFdClustersOf(table)"
           (mouseenter)="selectColumns.emit(cluster.columns)"
           (mouseleave)="selectColumns.emit()"
         >

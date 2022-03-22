@@ -63,7 +63,9 @@ export default class MetanomeINDAlgorithm extends MetanomeAlgorithm {
       process.env.DB_TYPE
     }" --table-key "INPUT_FILES" --header  --tables "${tables.join(
       ","
-    )}" --output "file:${MetanomeINDAlgorithm.outputFileName(tables)}"`.replace(
+    )}" --output "file:${MetanomeINDAlgorithm.outputFileName(
+      tables
+    )}" --algorithm-config DETECT_NARY:true,MAX_NARY_LEVEL:2`.replace(
       /(\r\n|\n|\r)/gm,
       ""
     );
