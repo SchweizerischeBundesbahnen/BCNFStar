@@ -5,11 +5,11 @@ describe("The app", () => {
     cy.visitFrontend();
   });
 
-  it("should be render title", () => {
+  it("renders the title", () => {
     cy.title().should("eq", "BCNFStar");
   });
 
-  it("should be render heading", () => {
+  it("renders the heading", () => {
     cy.get("h1").contains("BCNFStar");
   });
 });

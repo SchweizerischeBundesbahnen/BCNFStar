@@ -17,26 +17,26 @@ describe("The normalize side bar", () => {
       timeout: 60000,
     }).click();
   });
-  it("should be rendered", () => {
+  it("renders", () => {
     cy.get("app-normalize-side-bar");
   });
 
-  it("should display auto normalize this table button", () => {
+  it("displays the 'auto normalize this table' button", () => {
     cy.get("button").contains("Auto-normalize this table");
   });
 
-  it("should display table name", () => {
+  it("displays the table name", () => {
     cy.contains("nation_region_denormalized");
   });
 
-  it("should display keys", () => {
+  it("displays keys", () => {
     cy.get("sbb-expansion-panel").contains("Keys");
     cy.get("sbb-expansion-panel").contains("_name");
     cy.get("sbb-expansion-panel").contains("n_nationkey");
     cy.get("sbb-expansion-panel").contains("n_comment");
   });
 
-  it("should display Functional Dependencies", () => {
+  it("displays Functional Dependencies", () => {
     cy.get("sbb-expansion-panel").contains("Functional Dependencies");
     cy.get("sbb-expansion-panel").contains(
       "r_regionkey -> n_regionkey, r_name, r_comment"
@@ -52,7 +52,7 @@ describe("The normalize side bar", () => {
     );
   });
 
-  it("should display Inclusion Dependencies", () => {
+  it("displays Inclusion Dependencies", () => {
     cy.get("sbb-expansion-panel").contains("Inclusion Dependencies");
     cy.get("sbb-expansion-panel").contains(
       "r_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
@@ -62,11 +62,11 @@ describe("The normalize side bar", () => {
     );
   });
 
-  it("should display splitting button", () => {
+  it("displays the splitting button", () => {
     cy.get("button").contains("Split Functional Dependency");
   });
 
-  it("should display joining button", () => {
+  it("displays the joining button", () => {
     cy.get("button").contains("Create Foreign Key");
   });
 });

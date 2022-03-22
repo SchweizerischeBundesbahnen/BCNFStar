@@ -15,28 +15,28 @@ describe("The normalize page", () => {
     cy.contains("Undo", { timeout: 60000 });
   });
 
-  it("should be rendered", () => {
+  it("renders", () => {
     cy.url().should("contain", "/edit-schema");
   });
 
-  it("should display undo/redo buttons", () => {
+  it("displays the undo/redo buttons", () => {
     cy.get("button").contains("Undo");
     cy.get("button").contains("Redo");
   });
 
-  it("should display reset view button", () => {
+  it("displays the reset view button", () => {
     cy.get("button").contains("Reset view");
   });
 
-  it("should display auto normalize all tables buttons", () => {
+  it("displays the 'auto normalize all tables' button", () => {
     cy.get("button").contains("Auto-normalize all tables");
   });
 
-  it("should have normalize schema graph", () => {
+  it("has the normalize schema graph", () => {
     cy.get("app-normalize-schema-graph");
   });
 
-  it("should render all tables", () => {
+  it("renders all tables", () => {
     cy.get("app-graph-element").should("have.length", 2);
     cy.get("app-graph-element").should("contain", "nation_region_denormalized");
     // cy.get("app-graph-element").should("contain", "denormalized_data");

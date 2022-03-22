@@ -1,12 +1,12 @@
 /// <reference types="cypress" />
 
 describe("The app routing", () => {
-  it("should be render table selection component", () => {
+  it("renders the table selection component", () => {
     cy.visitFrontend();
     cy.url().should("contain", Cypress.env("FRONTEND_BASEURL"));
   });
 
-  it("should be render normalize component", () => {
+  it("renders the normalize component", () => {
     cy.visitFrontend();
     cy.contains("public").click();
     cy.contains("customer_orders_lineitem_denormalized").click();
@@ -18,7 +18,7 @@ describe("The app routing", () => {
     );
   });
 
-  it("should be render database component when calling missing url", () => {
+  it("renders the table selection component when calling missing url", () => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/wrong/path", {
       failOnStatusCode: false,
     });
