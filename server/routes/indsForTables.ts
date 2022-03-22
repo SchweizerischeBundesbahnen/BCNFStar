@@ -53,6 +53,9 @@ export default async function getINDsForTables(
 
 async function readINDsFromFile(path: string): Promise<IInclusionDependency[]> {
   const result = await readFile(path, "utf8");
+  if (result == "") {
+    return [];
+  }
   return result
     .trim()
     .split(/\r?\n/)

@@ -3,23 +3,28 @@ import Table from './Table';
 export default class Column {
   name: string;
   dataType: string;
-  prio: number;
+  ordinalPosition: number;
   sourceTable: Table;
 
   public constructor(
     name: string,
     dataType: string,
-    prio: number,
+    ordinalPosition: number,
     sourceTable: Table
   ) {
     this.name = name;
     this.dataType = dataType;
-    this.prio = prio;
+    this.ordinalPosition = ordinalPosition;
     this.sourceTable = sourceTable;
   }
 
   public copy(): Column {
-    return new Column(this.name, this.dataType, this.prio, this.sourceTable);
+    return new Column(
+      this.name,
+      this.dataType,
+      this.ordinalPosition,
+      this.sourceTable
+    );
   }
 
   public equals(column: Column): boolean {

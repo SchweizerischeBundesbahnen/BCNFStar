@@ -34,7 +34,8 @@ export default class PostgresSqlUtils extends SqlUtils {
       // the last line excludes system tables
       `SELECT table_name, column_name, data_type, table_schema 
         FROM information_schema.columns 
-        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')`,
+        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+        ORDER BY ordinal_position`,
       []
     );
     return query_result.rows;

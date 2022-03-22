@@ -69,7 +69,7 @@ export default class FdScore {
   public numAttributesBetween(attributes: ColumnCombination): number {
     let firstColumn = attributes.inOrder()[0];
     let lastColumn = attributes.inOrder()[attributes.cardinality - 1];
-    let range = lastColumn.prio - firstColumn.prio + 1;
+    let range = lastColumn.ordinalPosition - firstColumn.ordinalPosition + 1;
     return range - attributes.cardinality;
   }
 
