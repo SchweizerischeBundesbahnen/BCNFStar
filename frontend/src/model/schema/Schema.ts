@@ -124,6 +124,7 @@ export default class Schema {
     table: Table
   ): Set<{ relationship: Relationship; table: Table }> {
     let inds = new Set<{ relationship: Relationship; table: Table }>();
+    console.log('inds: ', inds);
     let onlyIndRelationships = new Set(this.indRelationships);
     this.fkRelationships.forEach((rel) => onlyIndRelationships.delete(rel));
     let possibleIndRelationships = [...onlyIndRelationships].filter((rel) =>

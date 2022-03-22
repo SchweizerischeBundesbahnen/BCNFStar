@@ -46,6 +46,7 @@ export default async function getINDsForTables(
         splitTableIdentifier(column, tablesWithSchema)
       );
     });
+    console.log("inds", inds);
     res.json(inds);
     res.status(200);
   }

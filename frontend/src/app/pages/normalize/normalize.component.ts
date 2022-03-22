@@ -24,6 +24,7 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
+  public schemaName: string = '';
   public sql: PersistSchemaSql = new PersistSchemaSql();
   public schemaChanged: Subject<void> = new Subject();
   private dataService: DatabaseService;
@@ -35,6 +36,7 @@ export class NormalizeComponent {
     public router: Router
   ) {
     this.schema = dataService.inputSchema!;
+    console.log('schema:', this.schema);
     if (!this.schema) router.navigate(['']);
     this.dataService = dataService;
     // this.schemaChanged.next();
