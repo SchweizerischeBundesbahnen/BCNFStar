@@ -14,6 +14,7 @@ import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
 import { SbbDialogModule } from '@sbb-esta/angular/dialog';
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
+import { SbbTableModule } from '@sbb-esta/angular/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './graph-element/graph-element.component';
@@ -41,6 +42,7 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
     SbbIconModule,
     SbbCheckboxModule,
     SbbDialogModule,
+    SbbTableModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

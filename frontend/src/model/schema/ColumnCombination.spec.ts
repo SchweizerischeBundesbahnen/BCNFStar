@@ -60,9 +60,9 @@ describe('ColumnCombination', () => {
     let priorPrio: number;
     cc1.inOrder().forEach((column, index) => {
       if (index != 0) {
-        expect(column.prio).toBeGreaterThanOrEqual(priorPrio);
+        expect(column.ordinalPosition).toBeGreaterThanOrEqual(priorPrio);
       }
-      priorPrio = column.prio;
+      priorPrio = column.ordinalPosition;
     });
   });
 });
