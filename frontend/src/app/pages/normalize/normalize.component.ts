@@ -36,7 +36,6 @@ export class NormalizeComponent {
     public router: Router
   ) {
     this.schema = dataService.inputSchema!;
-    console.log('schema:', this.schema);
     if (!this.schema) router.navigate(['']);
     this.dataService = dataService;
     // this.schemaChanged.next();
@@ -122,6 +121,11 @@ export class NormalizeComponent {
   onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
+  }
+
+  onInputChange(value: Event): void {
+    this.schemaName = (value.target! as HTMLInputElement).value;
+    console.log(this.schemaName);
   }
 
   persistSchema(schemaName: string): void {

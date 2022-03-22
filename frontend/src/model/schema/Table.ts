@@ -102,8 +102,9 @@ export default class Table {
     generating.pk = fd.lhs.copy();
 
     remaining.name = this.name;
+    remaining.schemaName = this.schemaName;
     generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
-
+    generating.schemaName = this.schemaName;
     return [remaining, generating];
   }
 

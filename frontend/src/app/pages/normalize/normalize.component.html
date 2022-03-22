@@ -24,7 +24,12 @@
             : "Auto-Normalize all tables"
         }}
       </button>
-      <input type="text" sbbInput placeholder="Schema Name" />
+      <input
+        type="text"
+        sbbInput
+        placeholder="Schema Name"
+        (input)="onInputChange($event)"
+      />
 
       <button
         type="button"
