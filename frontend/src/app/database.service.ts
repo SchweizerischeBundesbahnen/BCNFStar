@@ -180,10 +180,9 @@ export class DatabaseService {
       relationship: relationship_,
     };
 
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/createForeignKey`, data)
-      .toPromise();
-
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/createForeignKey`, data)
+    );
     return result;
   }
 
@@ -192,9 +191,9 @@ export class DatabaseService {
       schema: schemaName,
       tables: tables.map((table) => table.name),
     };
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/schemaPreparation`, data)
-      .toPromise();
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/schemaPreparation`, data)
+    );
     return result;
   }
 
@@ -233,9 +232,9 @@ export class DatabaseService {
       table: table,
       primaryKey: primaryKey,
     };
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/createPrimaryKey`, data)
-      .toPromise();
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/createPrimaryKey`, data)
+    );
     return result;
   }
 
@@ -253,9 +252,9 @@ export class DatabaseService {
       }),
       primaryKey: primaryKey,
     };
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/createTable`, data)
-      .toPromise();
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/createTable`, data)
+    );
     return result;
   }
 }
