@@ -31,7 +31,7 @@ describe("The normalize side bar", () => {
 
   it("displays keys", () => {
     cy.get("sbb-expansion-panel").contains("Keys");
-    cy.get("sbb-expansion-panel").contains("_name");
+    cy.get("sbb-expansion-panel").contains("n_name");
     cy.get("sbb-expansion-panel").contains("n_nationkey");
     cy.get("sbb-expansion-panel").contains("n_comment");
   });
