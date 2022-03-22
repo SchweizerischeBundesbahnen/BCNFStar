@@ -1,10 +1,7 @@
-import SqlUtils, {
-  ForeignKeyResult,
-  SchemaQueryRow,
-  TableHead,
-} from "./SqlUtils";
+import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
+import ITableHead from "@/definitions/ITableHead";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -37,7 +34,8 @@ export default class PostgresSqlUtils extends SqlUtils {
       // the last line excludes system tables
       `SELECT table_name, column_name, data_type, table_schema 
         FROM information_schema.columns 
-        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')`,
+        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+        ORDER BY ordinal_position`,
       []
     );
     return query_result.rows;
@@ -57,20 +55,38 @@ export default class PostgresSqlUtils extends SqlUtils {
   }
 
   public async getTableHead(
-    tableschema: string,
-    tablename: string
-  ): Promise<TableHead | { error: string }> {
-    const tableExists = await this.tableExistsInSchema(tableschema, tablename);
+    tablename: string,
+    schemaname: string,
+    limit: number
+  ): Promise<ITableHead> {
+    const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${tableschema}.${tablename} LIMIT 10`
+        `SELECT * FROM ${schemaname}.${tablename} LIMIT ${limit}`
       );
       return {
-        data: query_result.rows,
-        columns: query_result.fields.map((v) => v.name),
+        rows: query_result.rows,
+        attributes: query_result.fields.map((v) => v.name),
       };
     } else {
-      return { error: "Table or schema doesn't exist" };
+      throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  public async getTableRowCount(
+    table: string,
+    schema: string
+  ): Promise<number> {
+    const tableExists = await this.tableExistsInSchema(schema, table);
+    if (tableExists) {
+      const query_result = await this.pool.query(
+        `SELECT COUNT(*) FROM ${schema}.${table}`
+      );
+      return query_result.rows[0].count;
+    } else {
+      throw {
+        error: "Table or schema does not exist in database",
+      };
     }
   }
 

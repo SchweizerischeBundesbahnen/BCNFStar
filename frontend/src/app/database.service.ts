@@ -1,6 +1,7 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
+import ITableHead from '@server/definitions/ITableHead';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
@@ -32,6 +33,26 @@ export class DatabaseService {
   public async loadTables(): Promise<Array<Table>> {
     this.iFks = await this.getIFks();
     return this.getTables();
+  }
+
+  public async loadTableHeads(
+    limit: number
+  ): Promise<Record<string, ITableHead>> {
+    let tableHeads;
+    tableHeads = await firstValueFrom(
+      this.http.get<Record<string, ITableHead>>(
+        `${this.baseUrl}/tables/heads?limit=${limit}`
+      )
+    );
+    return tableHeads;
+  }
+
+  public async loadTableRowCounts(): Promise<Record<string, number>> {
+    let tableRowCounts;
+    tableRowCounts = await firstValueFrom(
+      this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
+    );
+    return tableRowCounts;
   }
 
   private async getTables(): Promise<Array<Table>> {
