@@ -104,9 +104,9 @@ export class DatabaseService {
         let referencedColumn = schemaColumns.find(
           (column) =>
             referencedIColumn.columnIdentifier == column.name &&
-            dependantIColumn.schemaIdentifier ==
+            referencedIColumn.schemaIdentifier ==
               column.sourceTable.schemaName &&
-            dependantIColumn.tableIdentifier == column.sourceTable.name
+            referencedIColumn.tableIdentifier == column.sourceTable.name
         )!;
 
         indRelationship.add(dependantColumn, referencedColumn);
