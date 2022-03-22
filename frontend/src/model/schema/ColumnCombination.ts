@@ -103,15 +103,16 @@ export default class ColumnCombination {
   }
 
   public inOrder(): Array<Column> {
-    return this.asArray().sort(
-      (col1, col2) => col1.ordinalPosition - col2.ordinalPosition
-    );
+    return this.asArray().sort((col1, col2) => {
+      if (col1.ordinalPosition == col2.ordinalPosition) {
+        if (col1.name < col2.name) return 1;
+        else return -1;
+      } else return col1.ordinalPosition - col2.ordinalPosition;
+    });
   }
 
   public columnNames(): Array<string> {
-    return this.asArray()
-      .sort((col1, col2) => (col1.name < col2.name ? 1 : -1))
-      .map((col) => col.name);
+    return this.inOrder().map((col) => col.name);
   }
 
   public toString(): string {

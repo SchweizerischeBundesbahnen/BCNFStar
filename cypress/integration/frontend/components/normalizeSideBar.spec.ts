@@ -39,13 +39,13 @@ describe("The normalize side bar", () => {
   it("should display Functional Dependencies", () => {
     cy.get("sbb-expansion-panel").contains("Functional Dependencies");
     cy.get("sbb-expansion-panel").contains(
-      "r_regionkey -> r_name, r_comment, n_regionkey"
+      "r_regionkey -> n_regionkey, r_name, r_comment"
     );
     cy.get("sbb-expansion-panel").contains(
-      "r_comment -> r_regionkey, r_name, n_regionkey"
+      "r_comment -> n_regionkey, r_regionkey, r_name"
     );
     cy.get("sbb-expansion-panel").contains(
-      "r_name -> r_regionkey, r_comment, n_regionkey"
+      "r_name -> n_regionkey, r_regionkey, r_comment"
     );
     cy.get("sbb-expansion-panel").contains(
       "n_regionkey -> r_regionkey, r_name, r_comment"
