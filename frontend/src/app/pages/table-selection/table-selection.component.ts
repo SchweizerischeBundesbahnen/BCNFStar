@@ -84,7 +84,7 @@ export class TableSelectionComponent implements OnInit {
   }
 
   private getDataSourceAndRenderTable(table: Table) {
-    let hoveredTableHead = this.tableHeads.get(table.name);
+    let hoveredTableHead = this.tableHeads.get(table.schemaAndName());
     if (hoveredTableHead) {
       this.tableColumns = hoveredTableHead.attributes;
       this.dataSource.data = hoveredTableHead.rows;
