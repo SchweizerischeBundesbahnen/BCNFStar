@@ -1,5 +1,6 @@
 import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
+import IndScore from './methodObjects/IndScore';
 import Relationship from './Relationship';
 import Table from './Table';
 
@@ -78,7 +79,7 @@ export default class Schema {
 
   public indsOf(
     table: Table
-  ): Set<{ relationship: Relationship; table: Table }> {
+  ): Array<{ relationship: Relationship; table: Table }> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._inds;
   }
@@ -123,8 +124,8 @@ export default class Schema {
 
   private calculateIndsOf(
     table: Table
-  ): Set<{ relationship: Relationship; table: Table }> {
-    let inds = new Set<{ relationship: Relationship; table: Table }>();
+  ): Array<{ relationship: Relationship; table: Table }> {
+    let inds = new Array<{ relationship: Relationship; table: Table }>();
     let onlyIndRelationships = new Set(this.indRelationships);
     this.fkRelationships.forEach((rel) => onlyIndRelationships.delete(rel));
     let possibleIndRelationships = [...onlyIndRelationships].filter((rel) =>
@@ -135,9 +136,14 @@ export default class Schema {
       possibleIndRelationships
         .filter((rel) => rel.appliesTo(table, otherTable))
         .forEach((rel) => {
-          inds.add({ relationship: rel, table: otherTable });
+          inds.push({ relationship: rel, table: otherTable });
         });
     }
+    inds.sort((ind1, ind2) => {
+      let score1 = new IndScore(ind1.relationship).get();
+      let score2 = new IndScore(ind2.relationship).get();
+      return score2 - score1;
+    });
     return inds;
   }
 

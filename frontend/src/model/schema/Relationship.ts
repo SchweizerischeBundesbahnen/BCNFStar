@@ -8,6 +8,11 @@ export default class Relationship {
   private _referencing = new Array<Column>();
   private _referenced = new Array<Column>();
 
+  /**
+   * cached result of the score calculation. Should not be accessed directly
+   */
+  public _score?: number;
+
   public static fromTables(
     referencing: Table,
     referenced: Table
