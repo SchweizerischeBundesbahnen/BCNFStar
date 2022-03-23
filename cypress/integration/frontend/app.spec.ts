@@ -10,6 +10,6 @@ describe("The app", () => {
   });
 
   it("renders the heading", () => {
-    cy.get("h1").contains("BCNFStar");
+    cy.get(".sbb-header-lean-label").contains("BCNFStar");
   });
 });
