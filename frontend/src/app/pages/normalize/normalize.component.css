@@ -15,3 +15,7 @@
 .row > * {
   padding: 0;
 }
+
+.undo-redo {
+  margin-top: calc(-0.8333333333rem * var(--sbb-scaling-factor));
+}

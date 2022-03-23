@@ -13,6 +13,7 @@ import { SplitDialogComponent } from '../../components/split-dialog/split-dialog
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import Relationship from '@/src/model/schema/Relationship';
 import { Router } from '@angular/router';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 
 @Component({
   selector: 'app-normalize',
@@ -23,6 +24,7 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
+  public selectedColumns?: ColumnCombination;
   public schemaChanged: Subject<void> = new Subject();
 
   constructor(
@@ -34,6 +36,10 @@ export class NormalizeComponent {
     this.schema = dataService.inputSchema!;
     if (!this.schema) router.navigate(['']);
     // this.schemaChanged.next();
+  }
+
+  onSelectColumns(columns: ColumnCombination) {
+    this.selectedColumns = columns;
   }
 
   onJoin(event: {

@@ -1,0 +1,6 @@
+button {
+    margin-top: 0;
+}
+:root {
+    --sbb-button-icon-top-margin: 0;
+}
