@@ -18,6 +18,9 @@ export default class IndScore {
     return (this.keyIdScore() + this.matchingScore()) / 2;
   }
 
+  /**
+   * Fraction of columns whose name contains "key" or "id"
+   */
   public keyIdScore(): number {
     let sum = 0;
     for (let cc of [
@@ -35,6 +38,10 @@ export default class IndScore {
     return sum / (this.relationship.referenced().cardinality * 2);
   }
 
+  /**
+   * Minimal distances of each referenced-column to the referencing-columns
+   * standardized to (0,1)
+   */
   public matchingScore(): number {
     let sum = 0;
     this.relationship
@@ -53,6 +60,11 @@ export default class IndScore {
     return sum / this.relationship.referenced().cardinality;
   }
 
+  /**
+   * Distance of two strings
+   * Code taken from https://www.30secondsofcode.org/js/s/levenshtein-distance
+   * Scaled to (0,1)
+   */
   private levenshteinDistance(string1: string, string2: string): number {
     if (!string1.length) return string2.length;
     if (!string2.length) return string1.length;
