@@ -12,7 +12,7 @@ describe("The normalize page", () => {
     cy.contains("part_partsupp_supplier_denormalized").click();
 
     cy.contains("Go").click();
-    cy.contains("Undo", { timeout: 60000 });
+    cy.get("button#undo", { timeout: 60000 });
   });
 
   it("renders", () => {
@@ -20,8 +20,8 @@ describe("The normalize page", () => {
   });
 
   it("displays the undo/redo buttons", () => {
-    cy.get("button").contains("Undo");
-    cy.get("button").contains("Redo");
+    cy.get("button#undo");
+    cy.get("button#redo");
   });
 
   it("displays the reset view button", () => {

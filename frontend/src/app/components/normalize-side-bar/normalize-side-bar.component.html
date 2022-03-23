@@ -1,5 +1,5 @@
 <div>
-  <h3>{{ table.name }}</h3>
+  <h2>{{ table.name }}</h2>
   <sbb-accordion [multi]="true">
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
@@ -16,9 +16,7 @@
       </sbb-expansion-panel-header>
       <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
         <sbb-expansion-panel
-          *ngFor="
-            let cluster of schema.splittableFdClustersOf(table).slice(0, 10)
-          "
+          *ngFor="let cluster of schema.splittableFdClustersOf(table)"
           (mouseenter)="selectColumns.emit(cluster.columns)"
           (mouseleave)="selectColumns.emit()"
         >
