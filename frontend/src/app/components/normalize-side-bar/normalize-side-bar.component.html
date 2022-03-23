@@ -42,7 +42,7 @@
       <sbb-expansion-panel-header
         >Possible Foreign Keys</sbb-expansion-panel-header
       >
-      <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).size > 0">
+      <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).length > 0">
         <sbb-radio-button
           *ngFor="let rel of schema.indsOf(table)"
           [value]="rel"
