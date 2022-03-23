@@ -37,33 +37,24 @@ describe("The normalize side bar", () => {
   });
 
   it("displays Functional Dependencies", () => {
-    cy.get("sbb-expansion-panel").contains("Functional Dependencies");
-    cy.get("sbb-expansion-panel").contains(
-      "r_regionkey -> n_regionkey, r_name, r_comment"
-    );
-    cy.get("sbb-expansion-panel").contains(
-      "r_comment -> n_regionkey, r_regionkey, r_name"
-    );
-    cy.get("sbb-expansion-panel").contains(
-      "r_name -> n_regionkey, r_regionkey, r_comment"
-    );
-    cy.get("sbb-expansion-panel").contains(
-      "n_regionkey -> r_regionkey, r_name, r_comment"
-    );
+    cy.get("sbb-expansion-panel").contains("Contained Subtables");
+    cy.get("sbb-expansion-panel-header")
+      .contains("n_regionkey, r_regionkey, r_name, r_comment")
+      .click();
+    cy.get(".sbb-expansion-panel-body button").contains("r_regionkey");
+    cy.get(".sbb-expansion-panel-body button").contains("r_comment");
+    cy.get(".sbb-expansion-panel-body button").contains("r_name");
+    cy.get(".sbb-expansion-panel-body button").contains("n_regionkey");
   });
 
   it("displays Inclusion Dependencies", () => {
-    cy.get("sbb-expansion-panel").contains("Inclusion Dependencies");
-    cy.get("sbb-expansion-panel").contains(
+    cy.get("sbb-expansion-panel").contains("Possible Foreign Keys");
+    cy.get("sbb-expansion-panel-header").contains(
       "r_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
     );
     cy.get("sbb-expansion-panel").contains(
       "n_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
     );
-  });
-
-  it("displays the splitting button", () => {
-    cy.get("button").contains("Split Functional Dependency");
   });
 
   it("displays the joining button", () => {
