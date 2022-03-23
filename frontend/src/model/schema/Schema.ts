@@ -156,10 +156,15 @@ export default class Schema {
       columns: ColumnCombination;
       fds: Array<FunctionalDependency>;
     }>();
+    if (table.pk)
+      clusters.push({
+        columns: table.columns.copy(),
+        fds: new Array(
+          new FunctionalDependency(table.pk!.copy(), table.columns.copy())
+        ),
+      });
     for (let fd of this.splittableFdsOf(table)) {
-      let cluster = [...clusters].find((c) =>
-        c.columns.equals(fd.rhs)
-      );
+      let cluster = [...clusters].find((c) => c.columns.equals(fd.rhs));
       if (!cluster) {
         cluster = { columns: fd.rhs.copy(), fds: new Array() };
         clusters.push(cluster);
