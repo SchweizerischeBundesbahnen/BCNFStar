@@ -16,13 +16,21 @@ export default class Table {
   private _keys?: Array<ColumnCombination>;
 
   /**
+   * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
+   */
+  public _splittableFdClusters!: Array<{
+    columns: ColumnCombination;
+    fds: Array<FunctionalDependency>;
+  }>;
+  /**
+  /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
   public _fks!: Set<{ relationship: Relationship; table: Table }>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
-  public _inds!: Set<{ relationship: Relationship; table: Table }>;
+  public _inds!: Array<{ relationship: Relationship; table: Table }>;
   /**
    * This variable tracks if the cached results fks and inds are still valid
    */

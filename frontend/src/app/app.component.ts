@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { DatabaseService } from './database.service';
+import { isDevMode } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -8,6 +9,7 @@ import { DatabaseService } from './database.service';
 export class AppComponent {
   title = 'bcnfstar';
   public queueUrl: string;
+  public devMode = isDevMode();
   constructor(private dataService: DatabaseService) {
     this.queueUrl = dataService.baseUrl + '/queue';
   }

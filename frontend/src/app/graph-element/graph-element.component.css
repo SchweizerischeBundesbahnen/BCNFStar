@@ -20,6 +20,11 @@
   font-style: italic;
 }
 
+.highlighted {
+  font-weight: bold;
+  color: red;
+}
+
 .table-head {
   background-color: lightgray;
   /* if you change this, also change graphElementHeaderHeight in schema-graph.component.ts */

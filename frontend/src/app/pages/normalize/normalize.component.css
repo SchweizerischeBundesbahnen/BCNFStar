@@ -1,13 +1,21 @@
 .normalize-sidebar {
-  height: min(80vh, 100%);
   overflow-y: scroll;
   display: block;
 }
 
 .col-4 {
-  height: 90vh;
+  /* 97% to leave some room for border and prevnt scrollbar*/
+  height: calc(97vh - var(--sbb-header-lean-height));
+}
+
+.col-8 {
+  height: calc(97vh - var(--sbb-header-lean-height));
 }
 
 .row > * {
   padding: 0;
+}
+
+.undo-redo {
+  float: right;
 }

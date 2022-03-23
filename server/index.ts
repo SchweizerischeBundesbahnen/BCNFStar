@@ -2,7 +2,7 @@ import express from "express";
 import expressStaticGzip from "express-static-gzip";
 // import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
-import getTableHeadFromNameFunction from "./routes/tableHeadFromName";
+import { getTableRowCounts } from "./routes/rowCounts";
 import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
 import getINDsForTablesFunction from "./routes/indsForTables";
 import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanomeFD";
@@ -12,6 +12,7 @@ import morgan from "morgan";
 // import postCreateForeignKey from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
+import { getTableHead } from "./routes/tableHeads";
 import createQueueMonitor from "./queueMonitor";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
@@ -44,7 +45,8 @@ if (global.__coverage__) {
 createQueueMonitor(app);
 
 app.get("/tables", getTablesFunction);
-app.get("/tables/head", getTableHeadFromNameFunction);
+app.get("/tables/rows", getTableRowCounts);
+app.get("/tables/heads", getTableHead);
 app.get("/tables/:name/fds", getFDsFromTableNameFunction);
 app.get("/fks", getFksFunction);
 
