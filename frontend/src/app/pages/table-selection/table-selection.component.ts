@@ -15,11 +15,11 @@ export class TableSelectionComponent implements OnInit {
   // public tables: Map<Table, Boolean> = new Map();
   public tableHeads: Map<string, ITableHead> = new Map();
   public tableRowCounts: Map<string, number> = new Map();
-  public headLimit: number = 100;
+  public headLimit = 100;
 
-  public hoveredTable: Table = new Table();
-  public tableColumns: string[] = [];
-  public dataSource: SbbTableDataSource<any> = new SbbTableDataSource<any>([]);
+  public hoveredTable = new Table();
+  public tableColumns: Array<string> = [];
+  public dataSource = new SbbTableDataSource<Record<string, any>>([]);
 
   public tables: Array<Table> = [];
   public selectedTables = new Map<Table, Boolean>();
