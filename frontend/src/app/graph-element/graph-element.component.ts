@@ -1,3 +1,4 @@
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import Table from 'src/model/schema/Table';
 
@@ -9,11 +10,12 @@ import Table from 'src/model/schema/Table';
 export class GraphElementComponent {
   @Input() table!: Table;
   @Input() bbox!: Record<string, string>;
-  @Output() selected = new EventEmitter<Table>();
+  @Input() selectedColumns?: ColumnCombination;
+  @Output() selectedTable = new EventEmitter<Table>();
 
   constructor() {}
 
   select() {
-    this.selected.emit(this.table);
+    this.selectedTable.emit(this.table);
   }
 }

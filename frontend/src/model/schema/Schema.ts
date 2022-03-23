@@ -1,3 +1,4 @@
+import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import Relationship from './Relationship';
 import Table from './Table';
@@ -138,6 +139,39 @@ export default class Schema {
         });
     }
     return inds;
+  }
+
+  public splittableFdClustersOf(
+    table: Table
+  ): Array<{ columns: ColumnCombination; fds: Array<FunctionalDependency> }> {
+    if (!table._splittableFdClusters)
+      table._splittableFdClusters = this.calculateSplittableFdClustersOf(table);
+    return table._splittableFdClusters;
+  }
+
+  public calculateSplittableFdClustersOf(
+    table: Table
+  ): Array<{ columns: ColumnCombination; fds: Array<FunctionalDependency> }> {
+    let clusters = new Array<{
+      columns: ColumnCombination;
+      fds: Array<FunctionalDependency>;
+    }>();
+    if (table.pk)
+      clusters.push({
+        columns: table.columns.copy(),
+        fds: new Array(
+          new FunctionalDependency(table.pk!.copy(), table.columns.copy())
+        ),
+      });
+    for (let fd of this.splittableFdsOf(table)) {
+      let cluster = [...clusters].find((c) => c.columns.equals(fd.rhs));
+      if (!cluster) {
+        cluster = { columns: fd.rhs.copy(), fds: new Array() };
+        clusters.push(cluster);
+      }
+      cluster.fds.push(fd);
+    }
+    return clusters;
   }
 
   public splittableFdsOf(table: Table): Array<FunctionalDependency> {
