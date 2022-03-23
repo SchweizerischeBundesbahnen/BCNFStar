@@ -5,25 +5,28 @@
       <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
         [schema]="this.schema"
-        [(selection)]="this.selectedTable"
+        [(selectedTable)]="this.selectedTable"
+        [selectedColumns]="this.selectedColumns"
         [schemaChanged]="this.schemaChanged.asObservable()"
         (joinFk)="onJoin($event)"
       ></app-normalize-schema-graph>
     </div>
-    <div class="col-4 border">
+    <div class="col-4 border normalize-sidebar">
+      <button type="button" sbb-button (click)="this.onAutoNormalize()">
+        {{
+          this.selectedTable !== undefined
+            ? "Auto-normalize this table"
+            : "Auto-normalize all tables"
+        }}
+      </button>
       <app-normalize-undo-redo
+        class="undo-redo"
         [canUndo]="this.commandProcessor.canUndo()"
         [canRedo]="this.commandProcessor.canRedo()"
         (undo)="onUndo()"
         (redo)="onRedo()"
       ></app-normalize-undo-redo>
-      <button type="button" sbb-button (click)="this.onAutoNormalize()">
-        {{
-          this.selectedTable !== undefined
-            ? "Auto-Normalize this table"
-            : "Auto-Normalize all tables"
-        }}
-      </button>
+
       <input
         type="text"
         sbbInput
@@ -35,24 +38,10 @@
         type="button"
         sbb-button
         [disabled]="!this.schemaName"
-        (click)="persistSchema(this.schemaName)"
-      >
-        Persist Schema
-      </button>
-
-      <button
-        type="button"
-        sbb-button
-        [disabled]="!this.schemaName"
         (click)="download()"
       >
         Download SQL
       </button>
-      <div>{{ sql.databasePreparation }}</div>
-      <div>{{ sql.createTableStatements }}</div>
-      <div>{{ sql.primaryKeyConstraints }}</div>
-      <div>{{ sql.foreignKeyConstraints }}</div>
-      <div>{{ sql.dataTransferStatements }}</div>
       <app-normalize-side-bar
         class="normalize-sidebar"
         *ngIf="this.selectedTable"
@@ -60,6 +49,7 @@
         [schema]="this.schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
+        (selectColumns)="onSelectColumns($event)"
       ></app-normalize-side-bar>
     </div>
   </div>

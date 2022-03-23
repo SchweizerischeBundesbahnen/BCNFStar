@@ -17,6 +17,14 @@ export default class Table {
   private _keys?: Array<ColumnCombination>;
 
   /**
+   * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
+   */
+  public _splittableFdClusters!: Array<{
+    columns: ColumnCombination;
+    fds: Array<FunctionalDependency>;
+  }>;
+  /**
+  /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
   public _fks!: Set<{ relationship: Relationship; table: Table }>;

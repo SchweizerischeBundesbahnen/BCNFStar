@@ -1,3 +1,5 @@
+import ITableHead from "@/definitions/ITableHead";
+import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
 import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
 import IAttribute from "../definitions/IAttribute";
@@ -56,23 +58,38 @@ export default class MsSqlUtils extends SqlUtils {
     return result.recordset;
   }
   public async getTableHead(
+    tablename: string,
     schemaname: string,
-    tablename: string
-  ): Promise<
-    | { data: Array<Record<string, any>>; columns: Array<string> }
-    | { error: string }
-  > {
+    limit: number
+  ): Promise<ITableHead> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
-        `SELECT TOP (10) * FROM [${schemaname}].[${tablename}]`
+        `SELECT TOP (${limit}) * FROM [${schemaname}].[${tablename}]`
       );
       return {
-        data: result.recordset,
-        columns: Object.keys(result.recordset.columns),
+        rows: result.recordset,
+        attributes: Object.keys(result.recordset.columns),
       };
     } else {
-      return { error: "Table or schema doesn't exist" };
+      throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  public async getTableRowCount(
+    table: string,
+    schema: string
+  ): Promise<number> {
+    const tableExists = await this.tableExistsInSchema(schema, table);
+    if (tableExists) {
+      const query_result = await sql.query(
+        `SELECT COUNT(*) as count FROM ${schema}.${table}`
+      );
+      return query_result.recordset[0].count;
+    } else {
+      throw {
+        error: "Table or schema does not exist in database",
+      };
     }
   }
 

@@ -10,7 +10,9 @@
   >
     <div
       [ngClass]="{
-        pk: table.pk && table.pk.includes(column)
+        pk: table.pk && table.pk.includes(column),
+        highlighted:
+          this.selectedColumns && this.selectedColumns.includes(column)
       }"
       class="col-6 ellipses"
     >
