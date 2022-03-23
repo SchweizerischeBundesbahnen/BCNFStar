@@ -70,13 +70,20 @@ export class NormalizeComponent {
       data: fd,
     });
 
-    dialogRef.afterClosed().subscribe((fd: FunctionalDependency) => {
-      if (fd) this.onSplitFd(fd);
-    });
+    dialogRef
+      .afterClosed()
+      .subscribe((value: { fd: FunctionalDependency; name?: string }) => {
+        if (fd) this.onSplitFd(value);
+      });
   }
 
-  onSplitFd(fd: FunctionalDependency): void {
-    let command = new SplitCommand(this.schema, this.selectedTable!, fd);
+  onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
+    let command = new SplitCommand(
+      this.schema,
+      this.selectedTable!,
+      value.fd,
+      value.name
+    );
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);

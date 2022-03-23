@@ -1,5 +1,13 @@
 <div sbbDialogTitle>Split Options</div>
 <div sbbDialogContent>
+  Name of the generated table
+  <input
+    type="text"
+    sbbInput
+    [value]="fd.lhs.columnNames().join('_').substring(0, 50)"
+    placeholder="if empty: column names of the left hand side"
+    (input)="setSchemaName($event)"
+  />
   <div>
     Which of these attributes are determined by {{ fd.lhs.toString() }}:
   </div>
