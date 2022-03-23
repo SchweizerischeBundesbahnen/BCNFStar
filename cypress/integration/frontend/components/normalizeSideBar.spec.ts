@@ -49,10 +49,10 @@ describe("The normalize side bar", () => {
 
   it("displays Inclusion Dependencies", () => {
     cy.get("sbb-expansion-panel").contains("Possible Foreign Keys");
-    cy.get("sbb-expansion-panel-header").contains(
+    cy.contains(
       "r_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
     );
-    cy.get("sbb-expansion-panel").contains(
+    cy.contains(
       "n_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
     );
   });
