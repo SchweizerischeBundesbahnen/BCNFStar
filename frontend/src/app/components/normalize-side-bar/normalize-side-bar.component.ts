@@ -5,6 +5,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -17,7 +18,7 @@ import Table from 'src/model/schema/Table';
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent {
+export class NormalizeSideBarComponent implements OnChanges {
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
   @Input() table!: Table;
@@ -33,6 +34,10 @@ export class NormalizeSideBarComponent {
     table: Table;
     newName: string;
   }>();
+
+  ngOnChanges(): void {
+    this.editingName = false;
+  }
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
