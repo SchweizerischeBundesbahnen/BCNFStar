@@ -1,45 +1,53 @@
-import { exampleSchema, exampleTable } from './exampleTables';
+import { exampleSchema } from './exampleTables';
 import Schema from './Schema';
+import Table from './Table';
 
 describe('Schema', () => {
   let schema: Schema;
+  let tableA: Table;
+  let tableB: Table;
+  let tableC: Table;
 
   beforeEach(() => {
-    schema = new Schema(exampleTable());
+    schema = exampleSchema();
+    tableA = [...schema.tables].find((table) => table.name == 'TableA')!;
+    tableB = [...schema.tables].find((table) => table.name == 'TableB')!;
+    tableC = [...schema.tables].find((table) => table.name == 'TableC')!;
   });
 
-  it('should have table which it is constructed with', () => {
-    expect(schema.tables).toEqual(new Set([exampleTable()]));
+  it('calculates fks of a table correctly', () => {
+    let fks = schema.fksOf(tableA);
+    expect(fks.size).toEqual(1);
+    let fk = [...fks][0];
+    expect(fk.table).toEqual(tableB);
   });
 
-  it('should not contain a table after splitting it', () => {
-    let table = [...schema.tables][0];
-    schema.split(table, table.violatingFds()[0]);
-    expect(schema.tables).not.toContain(table);
+  it('calculates inds of a table correctly', () => {
+    let inds = schema.indsOf(tableA);
+    expect(inds.length).toEqual(1);
+    let ind = inds[0];
+    expect(ind.table).toEqual(tableC);
   });
 
-  it('should auto-normalize correctly', () => {
-    let table = [...schema.tables][0];
-    schema.autoNormalize(table);
-    let schema2 = new Schema(table);
-    let children = schema2.split(table, table.violatingFds()[0]);
-    schema2.split(children[1], children[1].violatingFds()[0]);
-    expect([...schema.tables].map((table) => table.toString())).toEqual(
-      [...schema2.tables].map((table) => table.toString())
-    );
-  });
-
-  it('should join columns correctly', () => {
-    let schema = exampleSchema();
-    let tableA = [...schema.tables].filter(
-      (table) => table.name == 'TableA'
-    )[0];
-    let tableB = [...schema.tables].filter(
-      (table) => table.name == 'TableB'
-    )[0];
-    schema.join(tableA, tableB, [...schema.fks][0]);
-    let expectedColumns = tableA.columns.columnsFromNames('A1', 'A2');
-    expectedColumns.union(tableB.columns.copy());
-    expect([...schema.tables][0].columns).toEqual(expectedColumns);
+  it('fds of joined table contain fds of parent tables', () => {
+    let relationship = [...schema.fkRelationships].find(
+      (rel) => rel.appliesTo(tableA, tableB) || rel.appliesTo(tableB, tableA)
+    )!;
+    let joinedTable = schema.join(tableA, tableB, relationship);
+    for (let table of [tableA, tableB]) {
+      table.fds.forEach((requiredFd) => {
+        let requiredLhs = relationship.referencingToReferencedColumnsIn(
+          requiredFd.lhs
+        );
+        let requiredRhs = relationship.referencingToReferencedColumnsIn(
+          requiredFd.rhs
+        );
+        expect(
+          joinedTable.fds.find(
+            (fd) => requiredLhs.equals(fd.lhs) && requiredRhs.isSubsetOf(fd.rhs)
+          )
+        ).toBeDefined();
+      });
+    }
   });
 });

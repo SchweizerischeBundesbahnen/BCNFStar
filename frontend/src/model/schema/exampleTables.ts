@@ -1,5 +1,6 @@
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
+import Schema from './Schema';
 import Table from './Table';
 
 export const exampleITable: Array<ITable> = [
@@ -74,44 +75,55 @@ export function exampleTable(): Table {
   );
   return table;
 }
-/*export function exampleSchema(): Schema {
+export function exampleSchema(): Schema {
   let schema = new Schema();
 
-  let tableA = Table.fromColumnNames('A1', 'A2', 'A3', 'A4');
+  let tableA = Table.fromColumnNames('A1', 'A2', 'A3');
+  let tableB = Table.fromColumnNames('B1', 'B2', 'B3');
+  let tableC = Table.fromColumnNames('C1', 'C2', 'C3');
+  tableA.pk = tableB.columns.columnsFromNames('A1');
+  tableB.pk = tableB.columns.columnsFromNames('B1');
+  tableC.pk = tableB.columns.columnsFromNames('C1');
   tableA.name = 'TableA';
-  tableA.addFd(
-    tableA.columns.columnsFromNames('A2'),
-    tableA.columns.columnsFromNames('A3', 'A4')
-  );
+  tableB.name = 'TableB';
+  tableC.name = 'TableC';
   tableA.addFd(
     tableA.columns.columnsFromNames('A1'),
-    tableA.columns.columnsFromNames('A3')
-  );
-  let tableB = Table.fromColumnNames('B1', 'B2', 'B3', 'B4');
-  tableB.name = 'TableB';
-  tableB.pk = tableB.columns.columnsFromNames('B1', 'B2');
-  tableB.addFd(
-    tableB.columns.columnsFromNames('B1', 'B2'),
-    tableB.columns.columnsFromNames('B1', 'B2', 'B3', 'B4')
+    tableA.columns.columnsFromNames('A2', 'A3')
   );
   tableB.addFd(
     tableB.columns.columnsFromNames('B1'),
-    tableB.columns.columnsFromNames('B4')
+    tableA.columns.columnsFromNames('B2', 'B3')
   );
-  schema.add(tableA, tableB);
+  tableC.addFd(
+    tableC.columns.columnsFromNames('C1'),
+    tableA.columns.columnsFromNames('C2', 'C3')
+  );
+  tableA.addFd(
+    tableA.columns.columnsFromNames('A2'),
+    tableA.columns.columnsFromNames('A3')
+  );
+
+  schema.add(tableA, tableB, tableC);
 
   let relAB = new Relationship();
   relAB.add(
-    tableA.columns.columnFromName('A3')!,
+    tableA.columns.columnFromName('A2')!,
     tableB.columns.columnFromName('B1')!
   );
-  relAB.add(
-    tableA.columns.columnFromName('A4')!,
-    tableB.columns.columnFromName('B2')!
+  let relBC = new Relationship();
+  relBC.add(
+    tableB.columns.columnFromName('B2')!,
+    tableC.columns.columnFromName('C1')!
   );
-  schema.addFk(relAB);
-
-  schema.join(tableA, tableB, relAB);
+  let relAC = new Relationship();
+  relAC.add(
+    tableA.columns.columnFromName('A3')!,
+    tableC.columns.columnFromName('C1')!
+  );
+  schema.addFkRelationship(relAB);
+  schema.addFkRelationship(relBC);
+  schema.addIndRelationship(relAC);
 
   return schema;
-}*/
+}
