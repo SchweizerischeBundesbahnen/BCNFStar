@@ -29,6 +29,10 @@ export class NormalizeSideBarComponent {
     relationship: Relationship;
   }>();
   @Output() selectColumns = new EventEmitter<ColumnCombination>();
+  @Output() renameTable = new EventEmitter<{
+    table: Table;
+    newName: string;
+  }>();
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
@@ -36,8 +40,11 @@ export class NormalizeSideBarComponent {
   }
 
   public editingName = false;
-  setTableName(evt: Event) {
-    console.log(evt);
+  setTableName(value: Event) {
+    this.renameTable.emit({
+      table: this.table,
+      newName: (value.target! as HTMLInputElement).value,
+    });
   }
 
   transformIndToFk(): void {

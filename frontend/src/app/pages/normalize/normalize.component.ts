@@ -14,6 +14,7 @@ import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import Relationship from '@/src/model/schema/Relationship';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
+import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 
 @Component({
   selector: 'app-normalize',
@@ -117,6 +118,16 @@ export class NormalizeComponent {
     command.onUndo = function () {
       self.selectedTable = previousSelectedTable;
     };
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  onChangeTableName(value: { table: Table; newName: string }): void {
+    let command = new TableRenameCommand(value.table, value.newName);
+
+    command.onDo = () => (this.selectedTable = command.table);
+    command.onUndo = () => (this.selectedTable = command.table);
+
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }

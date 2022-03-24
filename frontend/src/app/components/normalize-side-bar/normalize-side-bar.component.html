@@ -9,6 +9,7 @@
       sbbInput
       [value]="table.name"
       (input)="setTableName($event)"
+      (keyup.enter)="editingName = false"
     />
   </ng-template>
 
