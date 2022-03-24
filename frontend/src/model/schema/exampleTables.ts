@@ -1,4 +1,5 @@
 import ITable from '@server/definitions/ITable';
+import Relationship from './Relationship';
 import Table from './Table';
 
 export const exampleITable: Array<ITable> = [
@@ -36,15 +37,41 @@ export function exampleTableSportartVerein(): Table {
 export function exampleTable(): Table {
   const table = Table.fromITable(exampleITable[0]);
 
+  let otherSourceTable = Table.fromColumnNames('Interpret', 'Gründungsjahr');
+  table.columns
+    .setMinus(table.columns.columnsFromNames('Gründungsjahr'))
+    .union(otherSourceTable.columns.columnsFromNames('Gründungsjahr'));
+  table.sourceTables.add(otherSourceTable);
+  let relationship = new Relationship();
+  relationship.add(
+    table.columns.columnFromName('Interpret')!,
+    otherSourceTable.columns.columnFromName('Interpret')!
+  );
+  table.relationships.add(relationship);
+
   table.addFd(
-    table.columns.columnsFromIds(0, 5),
-    table.columns.columnsFromIds(1, 2, 3, 4, 6)
+    table.columns.columnsFromNames('CD_ID', 'Tracknr'),
+    table.columns.columnsFromNames(
+      'Albumtitel',
+      'Interpret',
+      'Gründungsjahr',
+      'Erscheinungsjahr',
+      'Titel'
+    )
   );
   table.addFd(
-    table.columns.columnsFromIds(0),
-    table.columns.columnsFromIds(1, 2, 3, 4)
+    table.columns.columnsFromNames('CD_ID'),
+    table.columns.columnsFromNames(
+      'Albumtitel',
+      'Interpret',
+      'Gründungsjahr',
+      'Erscheinungsjahr'
+    )
   );
-  table.addFd(table.columns.columnsFromIds(2), table.columns.columnsFromIds(3));
+  table.addFd(
+    table.columns.columnsFromNames('Interpret'),
+    table.columns.columnsFromNames('Gründungsjahr')
+  );
   return table;
 }
 /*export function exampleSchema(): Schema {

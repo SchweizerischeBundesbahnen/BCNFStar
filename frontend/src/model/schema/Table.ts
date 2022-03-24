@@ -40,7 +40,12 @@ export default class Table {
   public _relationshipsValid = true;
 
   public constructor(columns?: ColumnCombination) {
-    if (columns) this.columns = columns;
+    if (columns) {
+      this.columns = columns;
+      columns
+        .sourceTables()
+        .forEach((sourceTable) => this.sourceTables.add(sourceTable));
+    }
   }
 
   public static fromITable(iTable: ITable): Table {

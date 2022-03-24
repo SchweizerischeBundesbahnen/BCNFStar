@@ -1,5 +1,6 @@
 import { exampleTable } from './exampleTables';
 import FunctionalDependency from './FunctionalDependency';
+import Relationship from './Relationship';
 import Table from './Table';
 
 describe('Table', () => {
@@ -9,64 +10,84 @@ describe('Table', () => {
     table = exampleTable();
   });
 
-  it('should initially be its own origin', () => {
-    expect(table.origin).toBe(table);
+  it('splits columns correcty', () => {
+    let splitTables = table.split(table.fds[1]);
+    let expectedSplitTables = expectedSplitTablesFd1(table);
+    expect(splitTables[0].columns).toEqual(expectedSplitTables[0].columns);
+    expect(splitTables[1].columns).toEqual(expectedSplitTables[1].columns);
   });
 
-  it('should split columns correctly', () => {
-    let children = table.split(table.fds[1]);
+  it('splits fds correcty', () => {
+    let splitTables = table.split(table.fds[1]);
+    let expectedSplitTables = expectedSplitTablesFd1(table);
+    expect(splitTables[0].fds).toEqual(expectedSplitTables[0].fds);
+    expect(splitTables[1].fds).toEqual(expectedSplitTables[1].fds);
+  });
 
-    expect(children[0].columns).toEqual(table.columns.columnsFromIds(0, 5, 6));
-    expect(children[1].columns).toEqual(
-      table.columns.columnsFromIds(0, 1, 2, 3, 4)
+  it('splits sourceTables and relationships correcty', () => {
+    let splitTables = table.split(table.fds[1]);
+    let expectedSplitTables = expectedSplitTablesFd1(table);
+    expect(splitTables[0].sourceTables).toEqual(
+      expectedSplitTables[0].sourceTables
+    );
+    expect(splitTables[1].sourceTables).toEqual(
+      expectedSplitTables[1].sourceTables
+    );
+    expect(splitTables[0].relationships).toEqual(
+      expectedSplitTables[0].relationships
+    );
+    expect(splitTables[1].relationships).toEqual(
+      expectedSplitTables[1].relationships
     );
   });
 
-  it('should split references correctly', () => {
-    let children = table.split(table.fds[1]);
-
-    expect(children[0].referencedTables).toEqual(new Set([children[1]]));
-    expect(children[0].referencingTables.size).toEqual(0);
-
-    expect(children[1].referencingTables).toEqual(new Set([children[0]]));
-    expect(children[1].referencedTables.size).toEqual(0);
+  it('joins columns correcty', () => {
+    let splitTables = expectedSplitTablesFd1(table);
+    let joinedTable = splitTables[0].join(
+      splitTables[1],
+      Relationship.fromTables(splitTables[0], splitTables[1])
+    );
+    expect(joinedTable.columns).toEqual(table.columns);
   });
 
-  it('should pass the origin reference when splitting', () => {
-    let children = table.split(table.fds[1]);
-
-    expect(children[0].origin).toBe(table.origin);
-    expect(children[1].origin).toBe(table.origin);
-  });
-
-  it('should split fds correctly', () => {
-    let children = table.split(table.fds[1]);
-
-    let fd1 = new FunctionalDependency(
-      children[0],
-      children[0].columns.columnsFromIds(0, 1),
-      children[0].columns.columnsFromIds(0, 1, 2)
+  it('joins sourceTables and relationships correcty', () => {
+    let splitTables = expectedSplitTablesFd1(table);
+    let joinedTable = splitTables[0].join(
+      splitTables[1],
+      Relationship.fromTables(splitTables[0], splitTables[1])
     );
-    expect(children[0].fds).toEqual([fd1]);
-
-    let fd2 = new FunctionalDependency(
-      children[1],
-      children[1].columns.columnsFromIds(0),
-      children[1].columns.columnsFromIds(0, 1, 2, 3, 4, 5)
-    );
-    let fd3 = new FunctionalDependency(
-      children[1],
-      children[1].columns.columnsFromIds(2),
-      children[1].columns.columnsFromIds(2, 3)
-    );
-    expect(children[1].fds).toEqual([fd2, fd3]);
-  });
-
-  it('should join correctly', () => {
-    let [remaining, generating] = table.split(table.violatingFds()[0]);
-    let mergedTable = remaining.join(generating);
-    expect(mergedTable).toEqual(table);
-    let mergedTable2 = generating.join(remaining);
-    expect(mergedTable2).toEqual(table);
+    expect(joinedTable.sourceTables).toEqual(table.sourceTables);
+    expect(joinedTable.relationships).toEqual(table.relationships);
   });
 });
+
+function expectedSplitTablesFd1(table: Table): Array<Table> {
+  //columns
+  let remaining = new Table(
+    table.columns.columnsFromNames('CD_ID', 'Tracknr', 'Titel')
+  );
+  let generating = new Table(
+    table.columns.columnsFromNames(
+      'CD_ID',
+      'Albumtitel',
+      'Interpret',
+      'Gründungsjahr',
+      'Erscheinungsjahr'
+    )
+  );
+  //fds
+  remaining.fds = [
+    new FunctionalDependency(
+      table.fds[0].lhs.copy(),
+      table.columns.columnsFromNames('Titel')
+    ),
+  ];
+  generating.fds = [table.fds[1], table.fds[2]];
+  //sourceTables
+  remaining.sourceTables = new Set([table]);
+  generating.sourceTables = new Set(Array.from(table.sourceTables));
+  //relationships
+  remaining.relationships = new Set();
+  generating.relationships = new Set([...table.relationships]);
+  return [remaining, generating];
+}
