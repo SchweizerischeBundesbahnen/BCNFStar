@@ -50,6 +50,7 @@ export class NormalizeSideBarComponent implements OnChanges {
       table: this.table,
       newName: (value.target! as HTMLInputElement).value,
     });
+    this.editingName = false;
   }
 
   transformIndToFk(): void {
