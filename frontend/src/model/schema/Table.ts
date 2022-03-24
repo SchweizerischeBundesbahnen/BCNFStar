@@ -185,6 +185,7 @@ export default class Table {
 
     // name, pk
     newTable.name = remaining.name;
+    newTable.schemaName = remaining.schemaName
     newTable.pk = remaining.pk;
 
     // source tables
