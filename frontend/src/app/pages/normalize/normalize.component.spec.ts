@@ -8,8 +8,6 @@ import { DatabaseService } from 'src/app/database.service';
 import { exampleTable } from 'src/model/schema/exampleTables';
 import { NormalizeSchemaGraphComponent } from 'src/app/components/normalize-schema-graph/normalize-schema-graph.component';
 import { NormalizeSideBarComponent } from 'src/app/components/normalize-side-bar/normalize-side-bar.component';
-import { By } from '@angular/platform-browser';
-import Table from 'src/model/schema/Table';
 
 describe('NormalizeComponent', () => {
   let component: NormalizeComponent;
@@ -41,7 +39,7 @@ describe('NormalizeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have a normalize-schema-graph', () => {
+  /*it('should have a normalize-schema-graph', () => {
     const schemaGraph = getSchemaGraph(fixture);
     expect(schemaGraph).toBeTruthy();
   });
@@ -94,10 +92,10 @@ describe('NormalizeComponent', () => {
 
   it('should have a normalize-side-bar when a table is selected', () => {
     expect(getSideBar(fixture, component)).toBeTruthy();
-  });
+  });*/
 });
 
-function getSchemaGraph(
+/*function getSchemaGraph(
   fixture: ComponentFixture<NormalizeComponent>
 ): NormalizeSchemaGraphComponent {
   return fixture.debugElement.query(By.directive(NormalizeSchemaGraphComponent))
@@ -113,4 +111,4 @@ function getSideBar(
   fixture.detectChanges();
   return fixture.debugElement.query(By.directive(NormalizeSideBarComponent))
     .componentInstance;
-}
+}*/

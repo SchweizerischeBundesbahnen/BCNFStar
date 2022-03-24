@@ -1,6 +1,4 @@
 import ITable from '@server/definitions/ITable';
-import Relationship from './Relationship';
-import Schema from './Schema';
 import Table from './Table';
 
 export const exampleITable: Array<ITable> = [
@@ -25,12 +23,16 @@ export function exampleTableSportartVerein(): Table {
     'Example Table'
   );
   table.addFd(
-    table.columns.columnsFromIds(0, 1),
-    table.columns.columnsFromIds(2)
+    table.columns.columnsFromNames('Name', 'Sportart'),
+    table.columns.columnsFromNames('Verein')
   );
-  table.addFd(table.columns.columnsFromIds(2), table.columns.columnsFromIds(1));
+  table.addFd(
+    table.columns.columnsFromNames('Verein'),
+    table.columns.columnsFromNames('Sportart')
+  );
   return table;
 }
+
 export function exampleTable(): Table {
   const table = Table.fromITable(exampleITable[0]);
 
@@ -45,10 +47,11 @@ export function exampleTable(): Table {
   table.addFd(table.columns.columnsFromIds(2), table.columns.columnsFromIds(3));
   return table;
 }
-export function exampleSchema(): Schema {
+/*export function exampleSchema(): Schema {
   let schema = new Schema();
 
-  let tableA = Table.fromColumnNames(['A1', 'A2', 'A3', 'A4'], 'TableA');
+  let tableA = Table.fromColumnNames('A1', 'A2', 'A3', 'A4');
+  tableA.name = 'TableA';
   tableA.addFd(
     tableA.columns.columnsFromNames('A2'),
     tableA.columns.columnsFromNames('A3', 'A4')
@@ -57,7 +60,8 @@ export function exampleSchema(): Schema {
     tableA.columns.columnsFromNames('A1'),
     tableA.columns.columnsFromNames('A3')
   );
-  let tableB = Table.fromColumnNames(['B1', 'B2', 'B3', 'B4'], 'TableB');
+  let tableB = Table.fromColumnNames('B1', 'B2', 'B3', 'B4');
+  tableB.name = 'TableB';
   tableB.pk = tableB.columns.columnsFromNames('B1', 'B2');
   tableB.addFd(
     tableB.columns.columnsFromNames('B1', 'B2'),
@@ -83,4 +87,4 @@ export function exampleSchema(): Schema {
   schema.join(tableA, tableB, relAB);
 
   return schema;
-}
+}*/
