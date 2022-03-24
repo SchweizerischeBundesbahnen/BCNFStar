@@ -35,6 +35,11 @@ export class NormalizeSideBarComponent {
     return this.indSelectionGroup.value;
   }
 
+  public editingName = false;
+  setTableName(evt: Event) {
+    console.log(evt);
+  }
+
   transformIndToFk(): void {
     this.indToFk.emit({
       source: this.table!,

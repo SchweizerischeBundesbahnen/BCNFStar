@@ -1,5 +1,17 @@
 <div>
-  <h2>{{ table.name }}</h2>
+  <h2 *ngIf="!editingName; else editing">
+    {{ table.name }}
+    <sbb-icon svgIcon="kom:pen-small" (click)="editingName = true"></sbb-icon>
+  </h2>
+  <ng-template #editing>
+    <input
+      type="text"
+      sbbInput
+      [value]="table.name"
+      (input)="setTableName($event)"
+    />
+  </ng-template>
+
   <sbb-accordion [multi]="true">
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>

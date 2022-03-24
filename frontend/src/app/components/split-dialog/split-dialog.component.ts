@@ -29,7 +29,7 @@ export class SplitDialogComponent {
       });
   }
 
-  setSchemaName(value: Event): void {
+  setTableName(value: Event): void {
     this.schemaName = (value.target! as HTMLInputElement).value;
   }
 
