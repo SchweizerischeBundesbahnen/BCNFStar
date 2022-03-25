@@ -1,85 +1,89 @@
-import { exampleTable } from './exampleTables';
-import FunctionalDependency from './FunctionalDependency';
-import Relationship from './Relationship';
-import Table from './Table';
+import { exampleTable } from "../../utils/exampleTables";
+import FunctionalDependency from "../../../frontend/src/model/schema/FunctionalDependency";
+import Relationship from "../../../frontend/src/model/schema/Relationship";
+import Table from "../../../frontend/src/model/schema/Table";
 
-describe('Table', () => {
+describe("Table", () => {
   let table: Table;
 
   beforeEach(() => {
     table = exampleTable();
   });
 
-  it('splits columns correcty', () => {
+  it("splits columns correcty", () => {
     let splitTables = table.split(table.fds[1]);
     let expectedSplitTables = expectedSplitTablesFd1(table);
-    expect(splitTables[0].columns).toEqual(expectedSplitTables[0].columns);
-    expect(splitTables[1].columns).toEqual(expectedSplitTables[1].columns);
+    expect(
+      splitTables[0].columns.equals(expectedSplitTables[0].columns)
+    ).to.equal(true);
+    expect(
+      splitTables[1].columns.equals(expectedSplitTables[1].columns)
+    ).to.equal(true);
   });
 
-  it('splits fds correcty', () => {
+  it("splits fds correcty", () => {
     let splitTables = table.split(table.fds[1]);
     let expectedSplitTables = expectedSplitTablesFd1(table);
-    expect(splitTables[0].fds).toEqual(expectedSplitTables[0].fds);
-    expect(splitTables[1].fds).toEqual(expectedSplitTables[1].fds);
+    expect(splitTables[0].fds).to.deep.equal(expectedSplitTables[0].fds);
+    expect(splitTables[1].fds).to.deep.equal(expectedSplitTables[1].fds);
   });
 
-  it('splits sourceTables and relationships correcty', () => {
+  it("splits sourceTables and relationships correcty", () => {
     let splitTables = table.split(table.fds[1]);
     let expectedSplitTables = expectedSplitTablesFd1(table);
-    expect(splitTables[0].sourceTables).toEqual(
+    expect(splitTables[0].sourceTables).to.deep.equal(
       expectedSplitTables[0].sourceTables
     );
-    expect(splitTables[1].sourceTables).toEqual(
+    expect(splitTables[1].sourceTables).to.deep.equal(
       expectedSplitTables[1].sourceTables
     );
-    expect(splitTables[0].relationships).toEqual(
+    expect(splitTables[0].relationships).to.deep.equal(
       expectedSplitTables[0].relationships
     );
-    expect(splitTables[1].relationships).toEqual(
+    expect(splitTables[1].relationships).to.deep.equal(
       expectedSplitTables[1].relationships
     );
   });
 
-  it('joins columns correcty', () => {
+  it("joins columns correcty", () => {
     let splitTables = expectedSplitTablesFd1(table);
     let joinedTable = splitTables[0].join(
       splitTables[1],
       Relationship.fromTables(splitTables[0], splitTables[1])
     );
-    expect(joinedTable.columns).toEqual(table.columns);
+    expect(joinedTable.columns.equals(table.columns)).to.equal(true);
   });
 
-  it('joins sourceTables and relationships correcty', () => {
+  it("joins sourceTables and relationships correcty", () => {
     let splitTables = expectedSplitTablesFd1(table);
     let joinedTable = splitTables[0].join(
       splitTables[1],
       Relationship.fromTables(splitTables[0], splitTables[1])
     );
-    expect(joinedTable.sourceTables).toEqual(table.sourceTables);
-    expect(joinedTable.relationships).toEqual(table.relationships);
+    expect(joinedTable.sourceTables).to.deep.equal(table.sourceTables);
+    expect(joinedTable.relationships).to.deep.equal(table.relationships);
   });
 });
 
 function expectedSplitTablesFd1(table: Table): Array<Table> {
   //columns
   let remaining = new Table(
-    table.columns.columnsFromNames('CD_ID', 'Tracknr', 'Titel')
+    table.columns.columnsFromNames("CD_ID", "Tracknr", "Titel")
   );
   let generating = new Table(
     table.columns.columnsFromNames(
-      'CD_ID',
-      'Albumtitel',
-      'Interpret',
-      'Gründungsjahr',
-      'Erscheinungsjahr'
+      "CD_ID",
+      "Albumtitel",
+      "Interpret",
+      "Gründungsjahr",
+      "Erscheinungsjahr"
     )
   );
   //fds
   remaining.fds = [
     new FunctionalDependency(
       table.fds[0].lhs.copy(),
-      table.columns.columnsFromNames('Titel')
+      table.columns.columnsFromNames("Titel")
     ),
   ];
   generating.fds = [table.fds[1], table.fds[2]];
