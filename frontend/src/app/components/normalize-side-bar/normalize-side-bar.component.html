@@ -45,6 +45,14 @@
       <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).length > 0">
         <sbb-radio-button
           *ngFor="let rel of schema.indsOf(table)"
+          (mouseenter)="
+            selectColumns.emit(
+              rel.relationship
+                .referencing()
+                .union(rel.relationship.referenced())
+            )
+          "
+          (mouseleave)="selectColumns.emit()"
           [value]="rel"
           >{{
             rel.relationship.referencing().toString() +
