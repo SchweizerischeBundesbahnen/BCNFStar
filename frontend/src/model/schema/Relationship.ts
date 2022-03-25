@@ -73,12 +73,12 @@ export default class Relationship {
     return {
       referencing: {
         name: `${this.referencing().sourceTable().name}`,
-        schemaName: `${this.referencing().sourceTable().schemaName!}`,
+        schemaName: `${this.referencing().sourceTable().schemaName}`,
         attribute: [],
       },
       referenced: {
         name: `${this.referenced().sourceTable().name}`,
-        schemaName: `${this.referenced().sourceTable().schemaName!}`,
+        schemaName: `${this.referenced().sourceTable().schemaName}`,
         attribute: [],
       },
       columnRelationships: this._referencing.map((element, index) => {

@@ -1,5 +1,5 @@
 import Column from './Column';
-import Table from './Table';
+import TableIdentifier from './TableIdentifier';
 
 export default class ColumnCombination {
   private _columns = new Set<Column>();
@@ -36,7 +36,7 @@ export default class ColumnCombination {
     );
   }
 
-  public sourceTable(): Table {
+  public sourceTable(): TableIdentifier {
     let sourceTables = this.sourceTables();
     if (sourceTables.length > 1)
       console.log(
@@ -46,11 +46,11 @@ export default class ColumnCombination {
     return sourceTables[0];
   }
 
-  public sourceTables(): Array<Table> {
-    let sourceTables = new Array<Table>();
+  public sourceTables(): Array<TableIdentifier> {
+    let sourceTables = new Array<TableIdentifier>();
     this._columns.forEach((column) => {
-      if (!sourceTables.includes(column.sourceTable))
-        sourceTables.push(column.sourceTable);
+      if (!sourceTables.includes(column.source.table))
+        sourceTables.push(column.source.table);
     });
     return sourceTables;
   }

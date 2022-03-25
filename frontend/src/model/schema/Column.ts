@@ -1,36 +1,36 @@
 import IAttribute from '@server/definitions/IAttribute';
-import Table from './Table';
+import ColumnIdentifier from './ColumnIdentifier';
 
 export default class Column {
   name: string;
   dataType: string;
   prio: number;
-  sourceTable: Table;
+  source: ColumnIdentifier;
 
   public constructor(
     name: string,
     dataType: string,
     prio: number,
-    sourceTable: Table
+    source: ColumnIdentifier
   ) {
     this.name = name;
     this.dataType = dataType;
     this.prio = prio;
-    this.sourceTable = sourceTable;
+    this.source = source;
   }
 
   public copy(): Column {
-    return new Column(this.name, this.dataType, this.prio, this.sourceTable);
+    return new Column(this.name, this.dataType, this.prio, this.source);
   }
 
   public equals(column: Column): boolean {
-    return this.sourceTable == column.sourceTable && this.name == column.name;
+    return this.source == column.source;
   }
 
   public toIAttribute(): IAttribute {
     return {
       name: this.name,
-      table: this.sourceTable.name,
+      table: this.source.table.name,
       dataType: this.dataType,
     };
   }
