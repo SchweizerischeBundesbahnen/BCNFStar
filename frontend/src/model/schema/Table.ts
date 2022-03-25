@@ -19,13 +19,21 @@ export default class Table {
   private _keys?: Array<ColumnCombination>;
 
   /**
+   * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
+   */
+  public _splittableFdClusters!: Array<{
+    columns: ColumnCombination;
+    fds: Array<FunctionalDependency>;
+  }>;
+  /**
+  /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
   public _fks!: Set<{ relationship: Relationship; table: Table }>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
-  public _inds!: Set<{ relationship: Relationship; table: Table }>;
+  public _inds!: Array<{ relationship: Relationship; table: Table }>;
   /**
    * This variable tracks if the cached results fks and inds are still valid
    */
@@ -116,8 +124,9 @@ export default class Table {
     generating.pk = fd.lhs.copy();
 
     remaining.name = this.name;
+    remaining.schemaName = this.schemaName;
     generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
-
+    generating.schemaName = this.schemaName;
     return [remaining, generating];
   }
 
@@ -190,6 +199,7 @@ export default class Table {
 
     // name, pk
     newTable.name = remaining.name;
+    newTable.schemaName = remaining.schemaName;
     newTable.pk = remaining.pk;
 
     // source tables
@@ -235,8 +245,7 @@ export default class Table {
           let score1 = new FdScore(this, fd1).get();
           let score2 = new FdScore(this, fd2).get();
           return score2 - score1;
-        })
-        .slice(0, 100);
+        });
     }
     return this._violatingFds;
   }

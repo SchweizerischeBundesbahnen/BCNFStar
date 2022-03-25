@@ -3,7 +3,8 @@
   <button sbb-button (click)="resetView()" id="reset-btn">Reset view</button>
   <app-graph-element
     *ngFor="let item of graphStorage | keyvalue"
-    (selected)="selectionChange.emit($event)"
+    (selectedTable)="selectedTableChange.emit($event)"
+    [selectedColumns]="this.selectedColumnsFor(item.value.table)"
     [table]="item.value.table"
     [bbox]="item.value.style"
   ></app-graph-element>

@@ -4,23 +4,28 @@ import ColumnIdentifier from './ColumnIdentifier';
 export default class Column {
   name: string;
   dataType: string;
-  prio: number;
+  ordinalPosition: number;
   source: ColumnIdentifier;
 
   public constructor(
     name: string,
     dataType: string,
-    prio: number,
+    ordinalPosition: number,
     source: ColumnIdentifier
   ) {
     this.name = name;
     this.dataType = dataType;
-    this.prio = prio;
+    this.ordinalPosition = ordinalPosition;
     this.source = source;
   }
 
   public copy(): Column {
-    return new Column(this.name, this.dataType, this.prio, this.source);
+    return new Column(
+      this.name,
+      this.dataType,
+      this.ordinalPosition,
+      this.source
+    );
   }
 
   public equals(column: Column): boolean {

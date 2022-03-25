@@ -1,5 +1,7 @@
 import IAttribute from "../definitions/IAttribute";
 import IRelationship from "../definitions/IRelationship";
+import ITableHead from "@/definitions/ITableHead";
+
 export type SchemaQueryRow = {
   table_name: string;
   column_name: string;
@@ -15,26 +17,23 @@ export type ForeignKeyResult = {
   foreign_table_name: string;
   foreign_column_name: string;
 };
-
-export type TableHead = {
-  data: Array<Record<string, any>>;
-  columns: Array<string>;
-};
-
 export default abstract class SqlUtils {
   abstract init(): void;
   public abstract getSchema(): Promise<Array<SchemaQueryRow>>;
   public abstract getTableHead(
     tablename: string,
-    tableschema: string
-  ): Promise<TableHead | { error: string }>;
+    schemaname: string,
+    limit: number
+  ): Promise<ITableHead>;
+  public abstract getTableRowCount(
+    table: string,
+    schema: string
+  ): Promise<number>;
 
   public abstract tableExistsInSchema(
     schema: string,
     table: string
   ): Promise<boolean>;
-
-  public abstract schemaExistsInDatabase(schema: string): Promise<boolean>;
 
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
   public abstract getJdbcPath(): string;

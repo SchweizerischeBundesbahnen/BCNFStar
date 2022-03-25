@@ -1,6 +1,7 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
+import ITableHead from '@server/definitions/ITableHead';
 import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
 import {
   IRequestBodyCreateTableSql,
@@ -38,6 +39,26 @@ export class DatabaseService {
   public async loadTables(): Promise<Array<Table>> {
     this.iFks = await this.getIFks();
     return this.getTables();
+  }
+
+  public async loadTableHeads(
+    limit: number
+  ): Promise<Record<string, ITableHead>> {
+    let tableHeads;
+    tableHeads = await firstValueFrom(
+      this.http.get<Record<string, ITableHead>>(
+        `${this.baseUrl}/tables/heads?limit=${limit}`
+      )
+    );
+    return tableHeads;
+  }
+
+  public async loadTableRowCounts(): Promise<Record<string, number>> {
+    let tableRowCounts;
+    tableRowCounts = await firstValueFrom(
+      this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
+    );
+    return tableRowCounts;
   }
 
   private async getTables(): Promise<Array<Table>> {
@@ -104,9 +125,9 @@ export class DatabaseService {
         let referencedColumn = schemaColumns.find(
           (column) =>
             referencedIColumn.columnIdentifier == column.source.name &&
-            dependantIColumn.schemaIdentifier ==
+            referencedIColumn.schemaIdentifier ==
               column.source.table.schemaName &&
-            dependantIColumn.tableIdentifier == column.source.table.name
+            referencedIColumn.tableIdentifier == column.source.table.name
         )!;
 
         indRelationship.add(dependantColumn, referencedColumn);
@@ -180,10 +201,9 @@ export class DatabaseService {
       relationship: relationship_,
     };
 
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/createForeignKey`, data)
-      .toPromise();
-
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/createForeignKey`, data)
+    );
     return result;
   }
 
@@ -192,9 +212,9 @@ export class DatabaseService {
       schema: schemaName,
       tables: tables.map((table) => table.name),
     };
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/schemaPreparation`, data)
-      .toPromise();
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/schemaPreparation`, data)
+    );
     return result;
   }
 
@@ -233,9 +253,9 @@ export class DatabaseService {
       table: table,
       primaryKey: primaryKey,
     };
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/createPrimaryKey`, data)
-      .toPromise();
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/createPrimaryKey`, data)
+    );
     return result;
   }
 
@@ -253,9 +273,9 @@ export class DatabaseService {
       }),
       primaryKey: primaryKey,
     };
-    let result: any = this.http
-      .post(`${this.baseUrl}/persist/createTable`, data)
-      .toPromise();
+    let result: any = firstValueFrom(
+      this.http.post(`${this.baseUrl}/persist/createTable`, data)
+    );
     return result;
   }
 }

@@ -1,5 +1,5 @@
 <div>
-  <h3>{{ table.name }}</h3>
+  <h2>{{ table.name }}</h2>
   <sbb-accordion [multi]="true">
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
@@ -12,34 +12,37 @@
 
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header>
-        Functional Dependencies
+        Contained Subtables
       </sbb-expansion-panel-header>
-      <div *ngIf="schema.splittableFdsOf(table).length > 0">
-        <sbb-radio-group #fdSelection>
-          <sbb-radio-button
-            *ngFor="let fd of schema.splittableFdsOf(table).slice(0, 10)"
-            [value]="fd"
-          >
-            {{ fd.toString() }}
-          </sbb-radio-button>
-        </sbb-radio-group>
-        <br />
-        <button
-          type="button"
-          sbb-button
-          [disabled]="!selectedFd()"
-          (click)="splitSelectedFd()"
+      <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
+        <sbb-expansion-panel
+          *ngFor="let cluster of schema.splittableFdClustersOf(table)"
+          (mouseenter)="selectColumns.emit(cluster.columns)"
+          (mouseleave)="selectColumns.emit()"
         >
-          Split Functional Dependency
-        </button>
-      </div>
+          <sbb-expansion-panel-header>
+            {{ cluster.columns }}
+          </sbb-expansion-panel-header>
+          Keys:
+          <br />
+          <button
+            *ngFor="let fd of cluster.fds"
+            type="button"
+            sbb-button
+            style="margin: 3px"
+            (click)="splitFd.emit(fd)"
+          >
+            {{ fd.lhs }}
+          </button>
+        </sbb-expansion-panel>
+      </sbb-accordion>
     </sbb-expansion-panel>
 
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header
-        >Inclusion Dependencies</sbb-expansion-panel-header
+        >Possible Foreign Keys</sbb-expansion-panel-header
       >
-      <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).size > 0">
+      <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).length > 0">
         <sbb-radio-button
           *ngFor="let rel of schema.indsOf(table)"
           [value]="rel"
