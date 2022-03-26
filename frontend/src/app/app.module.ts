@@ -13,6 +13,7 @@ import { SbbAccordionModule } from '@sbb-esta/angular/accordion';
 import { SbbButtonModule } from '@sbb-esta/angular/button';
 import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
 import { SbbDialogModule } from '@sbb-esta/angular/dialog';
+import { SbbPaginationModule } from '@sbb-esta/angular/pagination';
 import { SbbHeaderLeanModule } from '@sbb-esta/angular/header-lean';
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
@@ -45,6 +46,7 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
     SbbHeaderLeanModule,
     SbbIconModule,
     SbbCheckboxModule,
+    SbbPaginationModule,
     SbbDialogModule,
     SbbTableModule,
     FormsModule,
