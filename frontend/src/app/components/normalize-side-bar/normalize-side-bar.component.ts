@@ -26,7 +26,7 @@ export class NormalizeSideBarComponent {
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
   page: number = 0;
-  pageSize = 10;
+  pageSize = 5;
   @Output() indToFk = new EventEmitter<{
     source: Table;
     target: Table;
