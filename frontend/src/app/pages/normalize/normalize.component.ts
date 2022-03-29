@@ -131,7 +131,6 @@ export class NormalizeComponent {
 
   onInputChange(value: Event): void {
     this.schemaName = (value.target! as HTMLInputElement).value;
-    console.log(this.schemaName);
   }
 
   async persistSchema(): Promise<void> {

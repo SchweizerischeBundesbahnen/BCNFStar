@@ -34,10 +34,6 @@ export class NormalizeSideBarComponent {
     relationship: Relationship;
   }>();
 
-  onInputChange(value: Event): void {
-    this.schemaName = (value.target! as HTMLInputElement).value;
-  }
-
   @Output() selectColumns = new EventEmitter<ColumnCombination>();
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
