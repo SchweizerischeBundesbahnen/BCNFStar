@@ -104,10 +104,11 @@ export default class ColumnCombination {
 
   public inOrder(): Array<Column> {
     return this.asArray().sort((col1, col2) => {
-      if (col1.ordinalPosition == col2.ordinalPosition) {
-        if (col1.name < col2.name) return 1;
-        else return -1;
-      } else return col1.ordinalPosition - col2.ordinalPosition;
+      if (col1.sourceTable.schemaAndName() == col2.sourceTable.schemaAndName())
+        return col1.ordinalPosition - col2.ordinalPosition;
+      // Todo: make sure most important tables are on top, not just alphabetically
+      if (col1.sourceTable.name < col2.sourceTable.name) return 1;
+      else return -1;
     });
   }
 

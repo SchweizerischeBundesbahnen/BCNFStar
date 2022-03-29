@@ -61,7 +61,7 @@ export default abstract class SqlUtils {
     return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributes
       .map((attr) => `${attr.table}.${attr.name}`)
       .join(", ")} FROM ${sourceTables.join(", ")}
-    ${this.where(relationships)}
+    ${this.where(relationships)};
     `;
   }
 

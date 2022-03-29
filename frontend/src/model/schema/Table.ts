@@ -185,6 +185,7 @@ export default class Table {
 
     // name, pk
     newTable.name = remaining.name;
+    newTable.schemaName = remaining.schemaName;
     newTable.pk = remaining.pk;
 
     // source tables
@@ -230,8 +231,7 @@ export default class Table {
           let score1 = new FdScore(this, fd1).get();
           let score2 = new FdScore(this, fd2).get();
           return score2 - score1;
-        })
-        .slice(0, 100);
+        });
     }
     return this._violatingFds;
   }

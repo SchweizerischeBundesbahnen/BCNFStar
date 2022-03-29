@@ -134,68 +134,63 @@ export class NormalizeComponent {
     console.log(this.schemaName);
   }
 
-  persistSchema(schemaName: string): void {
-    this.schema.tables.forEach((table) => (table.schemaName = schemaName));
+  async persistSchema(): Promise<void> {
+    this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
 
     const tables: Table[] = Array.from(this.schema.tables);
 
     console.log('Requesting SQL-Generation (Prepare Schema Statements)');
-    this.dataService
-      .getSchemaPreparationSql(schemaName, tables)
-      .then((res) => (this.sql.databasePreparation += '\n' + res.sql + '\n'));
+    const res = await this.dataService.getSchemaPreparationSql(
+      this.schemaName,
+      tables
+    );
+    this.sql.databasePreparation += '\n' + res.sql + '\n';
 
     console.log('Requesting SQL-Generation (Create Table Statements)');
-    this.schema.tables.forEach((table) => {
-      this.dataService
-        .getCreateTableSql(table)
-        .then(
-          (res) => (this.sql.createTableStatements += '\n' + res.sql + '\n')
-        );
-    });
+    for (const table of this.schema.tables) {
+      const createTableSql = await this.dataService.getCreateTableSql(table);
+      this.sql.createTableStatements += '\n' + createTableSql.sql + '\n';
+      const dataTransferSql = await this.dataService.getDataTransferSql(
+        table,
+        table.columns.asArray()
+      );
+      this.sql.dataTransferStatements += '\n' + dataTransferSql.sql + '\n';
 
-    console.log('Requesting SQL-Generation (Data Transfer)');
-    this.schema.tables.forEach((table) => {
-      this.dataService
-        .getDataTransferSql(table, table.columns.asArray())
-        .then(
-          (res) => (this.sql.dataTransferStatements += '\n' + res.sql + '\n')
+      if (table.pk) {
+        const pk = await this.dataService.getPrimaryKeySql(
+          table.schemaName,
+          table.name,
+          table.pk!.columnNames()
         );
-    });
+        this.sql.primaryKeyConstraints += '\n' + pk.sql + '\n';
+      }
+
+      for (const fk of this.schema.fksOf(table)) {
+        const fkSql = await this.dataService.getForeignKeySql(
+          table,
+          fk.relationship,
+          fk.table
+        );
+        this.sql.foreignKeyConstraints += '\n' + fkSql.sql + '\n';
+      }
+    }
 
     console.log('Requesting SQL-Generation (Primary Keys)');
-    this.schema.tables.forEach((table) => {
-      if (table.pk) {
-        this.dataService
-          .getPrimaryKeySql(
-            table.schemaName,
-            table.name,
-            table.pk!.columnNames()
-          )
-          .then(
-            (res) => (this.sql.primaryKeyConstraints += '\n' + res.sql + '\n')
-          );
-      }
-    });
 
     console.log('Requesting SQL-Generation (Foreign Keys)');
 
-    this.schema.tables.forEach((table) => {
-      this.schema.fksOf(table).forEach((elem) => {
-        this.dataService
-          .getForeignKeySql(table, elem.relationship, elem.table)
-          .then(
-            (res) => (this.sql.foreignKeyConstraints += '\n' + res.sql + '\n')
-          );
-      });
-    });
-
-    console.log('Finished! ' + schemaName);
+    console.log('Finished! ' + this.schemaName);
   }
 
-  download(): void {
-    const file: File = new File([this.sql.to_string()], 'persist_schema.sql', {
-      type: 'text/plain;charset=utf-8',
-    });
+  async download(): Promise<void> {
+    await this.persistSchema();
+    const file: File = new File(
+      [this.sql.to_string()],
+      this.schemaName + '.sql',
+      {
+        type: 'text/plain;charset=utf-8',
+      }
+    );
     saveAs(file);
   }
 }

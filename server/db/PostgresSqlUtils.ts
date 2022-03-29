@@ -116,7 +116,7 @@ export default class PostgresSqlUtils extends SqlUtils {
             ON ccu.constraint_name = tc.constraint_name
             AND ccu.table_schema = tc.table_schema
         WHERE tc.constraint_type = 'FOREIGN KEY'
-            AND tc.table_schema NOT IN ('pg_catalog', 'information_schema')`);
+            AND tc.table_schema NOT IN ('pg_catalog', 'information_schema');`);
     return result.rows;
   }
 
@@ -146,7 +146,7 @@ export default class PostgresSqlUtils extends SqlUtils {
       )
       .join(",");
     console.log(primaryKey);
-    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString})`;
+    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString});`;
   }
 
   public override SQL_ADD_PRIMARY_KEY(
