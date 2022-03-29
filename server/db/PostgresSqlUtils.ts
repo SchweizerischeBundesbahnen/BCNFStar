@@ -91,23 +91,34 @@ export default class PostgresSqlUtils extends SqlUtils {
   }
 
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
-    const result = await this.pool.query<ForeignKeyResult>(`SELECT
-            tc.table_schema,
-            tc.table_name, 
-            kcu.column_name, 
-            ccu.table_schema AS foreign_table_schema,
-            ccu.table_name AS foreign_table_name,
-            ccu.column_name AS foreign_column_name 
-        FROM 
-            information_schema.table_constraints AS tc 
-            JOIN information_schema.key_column_usage AS kcu
-            ON tc.constraint_name = kcu.constraint_name
-            AND tc.table_schema = kcu.table_schema
-            JOIN information_schema.constraint_column_usage AS ccu
-            ON ccu.constraint_name = tc.constraint_name
-            AND ccu.table_schema = tc.table_schema
-        WHERE tc.constraint_type = 'FOREIGN KEY'
-            AND tc.table_schema NOT IN ('pg_catalog', 'information_schema')`);
+    const result = await this.pool.query<ForeignKeyResult>(`select 
+    ns.nspname as "foreign_table_schema",
+    cl.relname as "foreign_table_name", 
+    att.attname as "foreign_column_name",
+    table_schema,
+    rel_referencing as "table_name",
+    att2.attname as "column_name"
+from
+   (select 
+        unnest(con1.conkey) as "parent", 
+        unnest(con1.confkey) as "child", 
+        con1.confrelid, 
+        con1.conrelid,
+        con1.conname,
+        ns.nspname as table_schema,
+        cl.relname as rel_referencing
+    from 
+        pg_class cl
+        join pg_namespace ns on cl.relnamespace = ns.oid
+        join pg_constraint con1 on con1.conrelid = cl.oid
+   ) con
+   join pg_attribute att on
+       att.attrelid = con.confrelid and att.attnum = con.child
+   join pg_class cl on
+       cl.oid = con.confrelid
+   join pg_attribute att2 on
+       att2.attrelid = con.conrelid and att2.attnum = con.parent
+   join pg_namespace ns on cl.relnamespace = ns.oid;`);
     return result.rows;
   }
   public getJdbcPath(): string {
