@@ -127,12 +127,12 @@ export default class MsSqlUtils extends SqlUtils {
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
     const result = await sql.query<ForeignKeyResult>(`
   SELECT 
-    sch.name AS foreign_table_schema,
-    tab1.name AS foreign_table_name,
-    col1.name AS foreign_column_name,
-	sch.name AS table_schema,
-    tab2.name AS table_name,
-    col2.name AS column_name
+    sch.name AS table_schema,
+    tab1.name AS table_name,
+    col1.name AS column_name,
+	sch.name AS foreign_table_schema,
+    tab2.name AS foreign_table_name,
+    col2.name AS foreign_column_name
 FROM sys.foreign_key_columns fkc
 INNER JOIN sys.objects obj
     ON obj.object_id = fkc.constraint_object_id
