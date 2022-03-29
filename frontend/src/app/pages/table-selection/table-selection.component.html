@@ -1,43 +1,88 @@
-<div class="container">
-  <div class="sbb-checkbox-group-vertical">
-    <sbb-accordion multi="true">
-      <sbb-expansion-panel *ngFor="let item of tablesInSchema | keyvalue">
-        <!-- item.key = schema name, item.value = list of associated table objects -->
-        <sbb-expansion-panel-header>{{ item.key }}</sbb-expansion-panel-header>
-        <sbb-checkbox
-          (change)="clickSelectAll(item.key)"
-          [disabled]="isLoading"
-          [checked]="areAllSelectedIn(item.key)"
-          [indeterminate]="
-            !areAllSelectedIn(item.key) && !areZeroSelectedIn(item.key)
+<div class="container-fluid ml-2 mr-2">
+  <div class="row">
+    <div class="col-4">
+      <div class="sbb-checkbox-group-vertical">
+        <sbb-accordion multi="true">
+          <sbb-expansion-panel *ngFor="let item of tablesInSchema | keyvalue">
+            <!-- item.key = schema name, item.value = list of associated table objects -->
+            <sbb-expansion-panel-header>{{
+              item.key
+            }}</sbb-expansion-panel-header>
+            <sbb-checkbox
+              (change)="clickSelectAll(item.key)"
+              [disabled]="isLoading"
+              [checked]="areAllSelectedIn(item.key)"
+              [indeterminate]="
+                !areAllSelectedIn(item.key) && !areZeroSelectedIn(item.key)
+              "
+            >
+              All
+            </sbb-checkbox>
+            <sbb-checkbox
+              *ngFor="let table of item.value"
+              [ngModel]="selectedTables.get(table)"
+              (ngModelChange)="selectedTables.set(table, $event)"
+              [disabled]="isLoading"
+              class="table-checkbox"
+              (mouseenter)="mouseEnter(table)"
+            >
+              <!-- hide schema and dot from name -->
+              {{ table.name.substring(item.key.length + 1) }}
+            </sbb-checkbox>
+          </sbb-expansion-panel>
+        </sbb-accordion>
+      </div>
+
+      <button
+        type="button"
+        sbb-button
+        [disabled]="!hasSelectedTables() || isLoading"
+        (click)="selectTables()"
+      >
+        Go
+      </button>
+    </div>
+    <div class="col-8">
+      <h3>
+        <ng-container
+          [ngSwitch]="
+            tableRowCounts.get(hoveredTable.name)! >= headLimit
+              ? 1
+              : tableRowCounts.get(hoveredTable.name)! >= 0 &&
+                tableRowCounts.get(hoveredTable.name)! < headLimit
+              ? 2
+              : -1
           "
         >
-          All
-        </sbb-checkbox>
-        <sbb-checkbox
-          *ngFor="let table of item.value"
-          [ngModel]="selectedTables.get(table)"
-          (ngModelChange)="selectedTables.set(table, $event)"
-          [disabled]="isLoading"
-          class="table-checkbox"
-        >
-          {{ table.name }}
-        </sbb-checkbox>
-      </sbb-expansion-panel>
-    </sbb-accordion>
+          <ng-container *ngSwitchCase="1">
+            Displaying {{ hoveredTable.name }} {{ headLimit }} of
+            {{ tableRowCounts.get(hoveredTable.name) }} rows
+          </ng-container>
+          <ng-container *ngSwitchCase="2">
+            {{ hoveredTable.name }}
+            {{ tableRowCounts.get(hoveredTable.name)! }} von
+            {{ tableRowCounts.get(hoveredTable.name) }}
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            {{ hoveredTable.name }}
+          </ng-container>
+        </ng-container>
+      </h3>
+      <sbb-table-wrapper class="table-wrapper">
+        <table sbb-table [dataSource]="dataSource">
+          <sbb-text-column
+            *ngFor="let column of tableColumns"
+            name="{{ column }}"
+          >
+          </sbb-text-column>
+          <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
+          <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+        </table>
+      </sbb-table-wrapper>
+    </div>
   </div>
-
-  <button
-    type="button"
-    sbb-button
-    [disabled]="!hasSelectedTables() || isLoading"
-    (click)="selectTables()"
-  >
-    Go
-  </button>
 </div>
 
-<!-- <div *ngIf="isLoading">lol</div> -->
 <div *ngIf="isLoading" class="loading-box">
   <sbb-loading
     mode="medium"

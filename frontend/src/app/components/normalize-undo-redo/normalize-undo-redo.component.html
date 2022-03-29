@@ -1,18 +1,20 @@
-<div>
-  <button
-    type="button"
-    sbb-button
-    [disabled]="!this.canUndo"
-    (click)="this.undo.emit()"
-  >
-    Undo
-  </button>
-  <button
-    type="button"
-    sbb-button
-    [disabled]="!this.canRedo"
-    (click)="this.redo.emit()"
-  >
-    Redo
-  </button>
-</div>
+<button
+  type="button"
+  sbb-button
+  id="undo"
+  [disabled]="!this.canUndo"
+  (click)="this.undo.emit()"
+>
+  &lt;
+  <!-- <sbb-icon svgIcon="kom:chevron-left-small"></sbb-icon> -->
+</button>
+<button
+  type="button"
+  sbb-button
+  id="redo"
+  [disabled]="!this.canRedo"
+  (click)="this.redo.emit()"
+>
+  &gt;
+  <!-- <sbb-icon svgIcon="kom:chevron-right-small"></sbb-icon> -->
+</button>

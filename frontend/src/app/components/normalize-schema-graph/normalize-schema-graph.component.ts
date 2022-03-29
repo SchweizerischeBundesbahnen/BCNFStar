@@ -13,6 +13,7 @@ import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Observable } from 'rxjs';
 import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -33,9 +34,10 @@ enum PortSide {
 })
 export class NormalizeSchemaGraphComponent implements AfterContentInit {
   @Input() schema!: Schema;
-  @Input() selection?: Table;
+  @Input() selectedTable?: Table;
+  @Input() selectedColumns?: ColumnCombination;
   @Input() schemaChanged!: Observable<void>;
-  @Output() selectionChange = new EventEmitter<Table>();
+  @Output() selectedTableChange = new EventEmitter<Table>();
   @Output() joinFk = new EventEmitter<{
     source: Table;
     target: Table;
@@ -309,5 +311,9 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
       transform: `scale(${this.panzoomTransform.scale})`,
       'transform-origin': 'left top',
     };
+  }
+
+  selectedColumnsFor(table: Table): ColumnCombination | undefined {
+    return table == this.selectedTable ? this.selectedColumns : undefined;
   }
 }

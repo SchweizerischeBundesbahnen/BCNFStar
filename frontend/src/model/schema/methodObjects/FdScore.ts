@@ -19,7 +19,7 @@ export default class FdScore {
   }
 
   public calculate(): number {
-    //TODO: change score for fds with NULL values
+    //TODO: change score for fds with NULL values to zero
     return (
       (this.fdLengthScore() +
         this.keyValueScore() +
@@ -45,6 +45,10 @@ export default class FdScore {
     return (this.lhsLengthScore() + this.rhsLengthScore()) / 2;
   }
 
+  /**
+   * 1 for keys where all key columns have values of length at most 1, less if values can be longer
+   * @returns score between 0 and 1
+   */
   private keyValueScore(): number {
     //TODO
     return 0;
@@ -69,7 +73,7 @@ export default class FdScore {
   public numAttributesBetween(attributes: ColumnCombination): number {
     let firstColumn = attributes.inOrder()[0];
     let lastColumn = attributes.inOrder()[attributes.cardinality - 1];
-    let range = lastColumn.prio - firstColumn.prio + 1;
+    let range = lastColumn.ordinalPosition - firstColumn.ordinalPosition + 1;
     return range - attributes.cardinality;
   }
 

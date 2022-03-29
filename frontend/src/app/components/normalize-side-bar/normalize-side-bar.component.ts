@@ -1,5 +1,6 @@
 import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import {
   Component,
   EventEmitter,
@@ -10,6 +11,7 @@ import {
 import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
+import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 @Component({
   selector: 'app-normalize-side-bar',
@@ -17,8 +19,6 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./normalize-side-bar.component.css'],
 })
 export class NormalizeSideBarComponent {
-  @ViewChild('fdSelection', { read: SbbRadioGroup })
-  fdSelectionGroup!: SbbRadioGroup;
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
   @Input() table!: Table;
@@ -26,28 +26,27 @@ export class NormalizeSideBarComponent {
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
   schemaName: string = '';
+  page: number = 0;
+  pageSize = 5;
   @Output() indToFk = new EventEmitter<{
     source: Table;
     target: Table;
     relationship: Relationship;
   }>();
 
-  selectedFd(): FunctionalDependency | undefined {
-    if (!this.fdSelectionGroup) return undefined;
-    return this.fdSelectionGroup.value;
-  }
-
   onInputChange(value: Event): void {
     this.schemaName = (value.target! as HTMLInputElement).value;
   }
 
-  splitSelectedFd(): void {
-    this.splitFd.emit(this.selectedFd()!);
-  }
+  @Output() selectColumns = new EventEmitter<ColumnCombination>();
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
+  }
+
+  changePage(evt: SbbPageEvent) {
+    this.page = evt.pageIndex;
   }
 
   transformIndToFk(): void {

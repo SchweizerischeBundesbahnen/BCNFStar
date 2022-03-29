@@ -1,5 +1,11 @@
-<div class="navbar">
-  <h1>BCNFStar</h1>
-  <a [href]="queueUrl" target="_blank">Metanome Queue</a>
+<div class="app">
+  <sbb-header-lean label="BCNFStar">
+    <sbb-header-environment *ngIf="devMode">dev</sbb-header-environment>
+    <a routerLink="/">Home</a>
+    <a [href]="queueUrl" target="_blank">Metanome Queue</a>
+    <!-- if no element with brand class exists, sbb logo is shown -->
+    <div class="brand"></div>
+  </sbb-header-lean>
+
+  <router-outlet class="content"></router-outlet>
 </div>
-<router-outlet></router-outlet>
