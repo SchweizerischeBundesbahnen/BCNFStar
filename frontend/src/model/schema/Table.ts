@@ -63,7 +63,7 @@ export default class Table {
   }
 
   public schemaAndName(): string {
-    return this.schemaName! + '.' + this.name;
+    return this.schemaName + '.' + this.name;
   }
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();

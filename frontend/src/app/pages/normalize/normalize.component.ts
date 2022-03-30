@@ -29,17 +29,15 @@ export class NormalizeComponent {
   public sql: PersistSchemaSql = new PersistSchemaSql();
   public selectedColumns?: ColumnCombination;
   public schemaChanged: Subject<void> = new Subject();
-  private dataService: DatabaseService;
 
   constructor(
-    dataService: DatabaseService,
+    public dataService: DatabaseService,
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog,
     public router: Router
   ) {
     this.schema = dataService.inputSchema!;
     if (!this.schema) router.navigate(['']);
-    this.dataService = dataService;
     // this.schemaChanged.next();
   }
 
