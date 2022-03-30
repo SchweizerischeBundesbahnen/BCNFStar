@@ -28,6 +28,7 @@ export class NormalizeSideBarComponent implements OnInit {
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
   schemaName: string = '';
+  inds: { relationship: Relationship; table: Table }[] = [];
   clusters: Array<{
     columns: ColumnCombination;
     fds: Array<FunctionalDependency>;
@@ -37,6 +38,7 @@ export class NormalizeSideBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.clusters = this.schema.splittableFdClustersOf(this.table);
+    this.inds = this.schema.indsOf(this.table);
   }
   @Output() indToFk = new EventEmitter<{
     source: Table;
@@ -55,12 +57,19 @@ export class NormalizeSideBarComponent implements OnInit {
     this.page = evt.pageIndex;
   }
 
-  filter(event: SbbSelectChange) {
+  filterClusters(event: SbbSelectChange) {
     const cc = new ColumnCombination(...event.value);
-    console.log(cc.toString());
     this.clusters = this.schema
       .splittableFdClustersOf(this.table)
       .filter((c) => cc.isSubsetOf(c.columns));
+  }
+
+  filterInds(event: SbbSelectChange) {
+    const tables: Array<Table> = event.value;
+    console.log(tables);
+    this.inds = this.schema
+      .indsOf(this.table)
+      .filter((r) => tables.includes(r.table));
   }
 
   transformIndToFk(): void {
