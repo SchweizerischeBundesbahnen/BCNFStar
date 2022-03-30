@@ -14,18 +14,30 @@
       <sbb-expansion-panel-header>
         Contained Subtables
       </sbb-expansion-panel-header>
-      <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
+      <sbb-select
+        multiple
+        placeholder="Filter columns"
+        (selectionChange)="filter($event)"
+      >
+        <sbb-option
+          *ngFor="let column of table.columns.asArray()"
+          [value]="column"
+          >{{ column.name }}</sbb-option
+        >
+      </sbb-select>
+      <sbb-accordion *ngIf="clusters.length > 0; else noClusters">
         <sbb-paginator
           (page)="changePage($event)"
           [pageSize]="pageSize"
-          [length]="schema.splittableFdClustersOf(table).length"
+          [length]="clusters.length"
         >
         </sbb-paginator>
         <sbb-expansion-panel
           *ngFor="
-            let cluster of schema
-              .splittableFdClustersOf(table)
-              .slice(page * pageSize, (page + 1) * pageSize)
+            let cluster of clusters.slice(
+              page * pageSize,
+              (page + 1) * pageSize
+            )
           "
           (mouseenter)="selectColumns.emit(cluster.columns)"
           (mouseleave)="selectColumns.emit()"
@@ -46,6 +58,9 @@
           </button>
         </sbb-expansion-panel>
       </sbb-accordion>
+      <ng-template #noClusters>
+        No contained subtables found with current filter settings for this table
+      </ng-template>
     </sbb-expansion-panel>
 
     <sbb-expansion-panel [expanded]="true">
