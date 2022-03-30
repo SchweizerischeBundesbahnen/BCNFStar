@@ -44,7 +44,7 @@ export default class Table {
   public static fromITable(iTable: ITable): Table {
     let columns = new ColumnCombination();
     let table = new Table(columns);
-    iTable.attribute.forEach((iAttribute, index) => {
+    iTable.attributes.forEach((iAttribute, index) => {
       columns.add(
         new Column(iAttribute.name, iAttribute.dataType, index, table)
       );
@@ -246,7 +246,7 @@ export default class Table {
     return {
       name: this.name,
       schemaName: this.schemaName,
-      attribute: this.columns.asArray().map((attr) => attr.toIAttribute()),
+      attributes: this.columns.asArray().map((attr) => attr.toIAttribute()),
     };
   }
 }

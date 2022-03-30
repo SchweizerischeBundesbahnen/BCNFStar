@@ -4,8 +4,8 @@
   <app-graph-element
     *ngFor="let item of graphStorage | keyvalue"
     (selectedTable)="selectedTableChange.emit($event)"
-    [selectedColumns]="this.selectedColumnsFor(item.value.table)"
-    [table]="item.value.table"
+    [selectedColumns]="this.selectedColumnsFor(item.key)"
+    [table]="item.key"
     [bbox]="item.value.style"
   ></app-graph-element>
 </div>
