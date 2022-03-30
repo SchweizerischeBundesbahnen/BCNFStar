@@ -73,18 +73,15 @@ describe("The normalize side bar", () => {
   // ############# Rename table in sidebar #############
   it("changes table name when editing it", () => {
     cy.get('[svgIcon="kom:pen-small"]').click();
-    cy.get('[type="text"]').clear();
-    cy.get('[type="text"]').type("Nations{enter}");
+    cy.get("#rename-table-input").clear().type("Nations{enter}");
     cy.get("h2").contains("Nations");
-    cy.contains("Nations");
+    cy.get(".table-head-title").contains("Nations");
   });
 
   it("leaves editing mode and not renames table when something changes", () => {
     cy.get('[svgIcon="kom:pen-small"]').click();
-    cy.get("span")
-      .contains("public.customer_orders_lineitem_denormalized")
-      .click();
-    cy.get("h2").contains("public.customer_orders_lineitem_denormalized");
+    cy.get(".table-head-title").contains("part_partsupp").click();
+    cy.get("h2").contains("part_partsupp");
   });
 
   // ############# Rename table in split dialog #############
@@ -102,8 +99,7 @@ describe("The normalize side bar", () => {
       .contains("n_regionkey, r_regionkey, r_name, r_comment")
       .click();
     cy.get(".sbb-expansion-panel-body button").contains("r_regionkey").click();
-    cy.get('[type="text"]').clear();
-    cy.get('[type="text"]').type("Regions");
+    cy.get('app-split-dialog [type="text"]').clear().type("Regions");
     cy.get("button").contains("Ok").click();
     cy.contains("Regions");
   });
