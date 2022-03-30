@@ -147,7 +147,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   generateElements() {
     for (const table of this.schema.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
-        attrs: { root: { id: '__jointel__' + table.name } },
+        attrs: { root: { id: '__jointel__' + table.schemaAndName() } },
       });
       jointjsEl.attr({
         body: {
@@ -230,7 +230,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
             port:
-              fkReferencing.sourceTable.name +
+              fkReferencing.sourceTable.schemaAndName() +
               '.' +
               fkReferencing.name +
               '_right',
@@ -238,7 +238,10 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
           target: {
             id: this.graphStorage.get(fk.table)?.jointjsEl.id,
             port:
-              fkReferenced.sourceTable.name + '.' + fkReferenced.name + '_left',
+              fkReferenced.sourceTable.schemaAndName() +
+              '.' +
+              fkReferenced.name +
+              '_left',
           },
           z: -1,
         });
@@ -263,14 +266,14 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     for (let column of table.columns.inOrder()) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_left', // generated if `id` value is not present
+        id: column.sourceTable.schemaAndName() + '.' + column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
       args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
-        id: column.sourceTable.name + '.' + column.name + '_right', // generated if `id` value is not present
+        id: column.sourceTable.schemaAndName() + '.' + column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
         args,
         markup: this.generatePortMarkup(args),

@@ -14,7 +14,7 @@ describe("The normalize side bar", () => {
     cy.contains("Go").click();
 
     cy.contains("public.nation_region_denormalized", {
-      timeout: 60 * 1000,
+      timeout: 10 * 60 * 1000,
     }).click();
   });
   it("renders", () => {
