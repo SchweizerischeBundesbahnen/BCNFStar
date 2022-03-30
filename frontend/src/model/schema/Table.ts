@@ -172,7 +172,9 @@ export default class Table {
 
     // name, pk
     newTable.name = remaining.name;
-    newTable.pk = remaining.pk;
+    newTable.pk = remaining.pk
+      ? relationship.referencingToReferencedColumnsIn(remaining.pk)
+      : undefined;
 
     // source tables
     this.sourceTables.forEach((sourceTable) =>
