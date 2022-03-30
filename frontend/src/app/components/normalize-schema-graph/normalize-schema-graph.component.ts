@@ -17,9 +17,8 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
-  table: Table;
   style: Record<string, any>;
-  links: Record<string, joint.dia.Link>;
+  links: Map<Table, joint.dia.Link>;
 };
 
 enum PortSide {
@@ -48,7 +47,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
 
   protected portDiameter = 22.5;
 
-  public graphStorage: Record<string, GraphStorageItem> = {};
+  public graphStorage = new Map<Table, GraphStorageItem>();
 
   protected graph!: joint.dia.Graph;
   protected paper!: joint.dia.Paper;
@@ -70,7 +69,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     // move the corresponding HTML overlay whenever a graph element changes position
     this.graph.on('change:position', (element) => {
       if (element.isElement)
-        for (const item of Object.values(this.graphStorage)) {
+        for (const item of this.graphStorage.values()) {
           if (item.jointjsEl == element) {
             this.updateBBox(item);
           }
@@ -86,10 +85,10 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   }
 
   updateGraph() {
-    for (const item in this.graphStorage) {
-      this.graphStorage[item].jointjsEl.remove();
+    for (const item of this.graphStorage.keys()) {
+      this.graphStorage.get(item)?.jointjsEl.remove();
     }
-    this.graphStorage = {};
+    this.graphStorage = new Map<Table, GraphStorageItem>();
     this.generateElements();
     this.generateLinks();
     joint.layout.DirectedGraph.layout(this.graph, {
@@ -160,13 +159,12 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
         this.elementWidth,
         60 + this.portDiameter * table.columns.cardinality
       );
-      this.graphStorage[table.schemaAndName()] = {
+      this.graphStorage.set(table, {
         // alternative to HtmlElement: joint.shapes.html.Element
         jointjsEl,
         style: {},
-        table,
-        links: {},
-      };
+        links: new Map(),
+      });
       this.generatePorts(jointjsEl, table);
       this.graph.addCell(jointjsEl);
     }
@@ -230,7 +228,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
         let fkReferencing = fk.relationship.referencing().asArray()[0];
         let link = new joint.shapes.standard.Link({
           source: {
-            id: this.graphStorage[table.schemaAndName()].jointjsEl.id,
+            id: this.graphStorage.get(table)?.jointjsEl.id,
             port:
               fkReferencing.sourceTable.schemaAndName() +
               '.' +
@@ -238,7 +236,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
               '_right',
           },
           target: {
-            id: this.graphStorage[fk.table.schemaAndName()].jointjsEl.id,
+            id: this.graphStorage.get(fk.table)?.jointjsEl.id,
             port:
               fkReferenced.sourceTable.schemaAndName() +
               '.' +
@@ -247,9 +245,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
           },
           z: -1,
         });
-        this.graphStorage[table.schemaAndName()].links[
-          fk.table.schemaAndName()
-        ] = link;
+        this.graphStorage.get(table)?.links.set(fk.table, link);
         this.graph.addCell(link);
         this.addJoinButton(link, table, fk.table, fk.relationship);
       }
@@ -292,8 +288,8 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   }
 
   updateAllBBoxes() {
-    for (const item in this.graphStorage) {
-      this.updateBBox(this.graphStorage[item]);
+    for (const item of this.graphStorage.keys()) {
+      this.updateBBox(this.graphStorage.get(item)!);
     }
   }
 
