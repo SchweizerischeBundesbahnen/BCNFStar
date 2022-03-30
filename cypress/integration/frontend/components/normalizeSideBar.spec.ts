@@ -13,7 +13,7 @@ describe("The normalize side bar", () => {
 
     cy.contains("Go").click();
 
-    cy.get("app-graph-element")
+    cy.get(".table-head-title")
       .contains("public.nation_region_denormalized", {
         timeout: 10 * 60 * 1000,
       })
@@ -60,7 +60,7 @@ describe("The normalize side bar", () => {
   });
 
   it("displays valid Inclusion Dependencies", () => {
-    cy.get("app-graph-element").contains("public.part_partsupp").click();
+    cy.get(".table-head-title").contains("public.part_partsupp").click();
     cy.contains("s_nationkey->(public.nation_region_denormalized) n_nationkey");
   });
 
