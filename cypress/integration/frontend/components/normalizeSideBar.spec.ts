@@ -13,10 +13,10 @@ describe("The normalize side bar", () => {
 
     cy.contains("Go").click();
 
-    cy.get(".table-head-title")
-      .contains("public.nation_region_denormalized", {
-        timeout: 10 * 60 * 1000,
-      })
+    cy.get(".table-head-title", {
+      timeout: 10 * 60 * 1000,
+    })
+      .contains("public.nation_region_denormalized")
       .click();
   });
   it("renders", () => {
