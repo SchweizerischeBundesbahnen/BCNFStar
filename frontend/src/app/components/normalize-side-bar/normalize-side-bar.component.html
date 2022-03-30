@@ -83,6 +83,14 @@
       <br />
       <sbb-radio-group #indSelection *ngIf="inds.length > 0; else noInds">
         <sbb-radio-button
+          (mouseenter)="
+            selectColumns.emit(
+              rel.relationship
+                .referencing()
+                .union(rel.relationship.referenced())
+            )
+          "
+          (mouseleave)="selectColumns.emit()"
           *ngFor="let rel of inds"
           [value]="rel"
           style="display: block"

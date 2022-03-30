@@ -2,6 +2,7 @@
 node_modules
 dist
 server/metanome/temp
+server/metanome/BINDER_temp
 server/metanome/results
 server/results
 server/temp
