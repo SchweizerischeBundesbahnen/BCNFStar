@@ -1,4 +1,3 @@
-import ColumnCombination from '../schema/ColumnCombination';
 import Relationship from '../schema/Relationship';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
@@ -9,7 +8,6 @@ export default class IndToFkCommand extends Command {
   relationship: Relationship;
   referencing: Table;
   referenced: Table;
-  formerPk?: ColumnCombination;
 
   public constructor(
     schema: Schema,
@@ -25,18 +23,14 @@ export default class IndToFkCommand extends Command {
   }
 
   protected override _do(): void {
-    this.formerPk = this.referenced.pk;
     this.schema.addFkRelationship(this.relationship);
-    this.referenced.pk = this.relationship.referenced();
   }
 
   protected override _undo(): void {
     this.schema.deleteFkRelationship(this.relationship);
-    this.referenced.pk = this.formerPk;
   }
 
   protected override _redo(): void {
     this.schema.addFkRelationship(this.relationship);
-    this.referenced.pk = this.relationship.referenced();
   }
 }
