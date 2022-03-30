@@ -14,7 +14,7 @@ describe("The app routing", () => {
     cy.url().should(
       "contain",
       Cypress.env("FRONTEND_BASEURL") + "/edit-schema",
-      { timeout: 60 * 1000 }
+      { timeout: 10 * 60 * 1000 }
     );
   });
 
