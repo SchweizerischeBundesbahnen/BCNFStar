@@ -132,9 +132,6 @@ export class NormalizeComponent {
   onChangeTableName(value: { table: Table; newName: string }): void {
     let command = new TableRenameCommand(value.table, value.newName);
 
-    command.onDo = () => (this.selectedTable = command.table);
-    command.onUndo = () => (this.selectedTable = command.table);
-
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }
