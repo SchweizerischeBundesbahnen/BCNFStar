@@ -9,12 +9,11 @@ describe("The app routing", () => {
   it("renders the normalize component", () => {
     cy.visitFrontend();
     cy.contains("public").click();
-    cy.contains("customer_orders_lineitem_denormalized").click();
+    cy.contains("lineitem").click();
     cy.contains("Go").click();
-    cy.url().should(
+    cy.url({ timeout: 10 * 60 * 1000 }).should(
       "contain",
-      Cypress.env("FRONTEND_BASEURL") + "/edit-schema",
-      { timeout: 600 * 1000 }
+      Cypress.env("FRONTEND_BASEURL") + "/edit-schema"
     );
   });
 

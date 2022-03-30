@@ -26,7 +26,24 @@
         (undo)="onUndo()"
         (redo)="onRedo()"
       ></app-normalize-undo-redo>
+
+      <input
+        type="text"
+        sbbInput
+        placeholder="Schema Name"
+        (input)="onInputChange($event)"
+      />
+
+      <button
+        type="button"
+        sbb-button
+        [disabled]="!this.schemaName"
+        (click)="download()"
+      >
+        Download SQL
+      </button>
       <app-normalize-side-bar
+        class="normalize-sidebar"
         *ngIf="this.selectedTable"
         [table]="this.selectedTable"
         [schema]="this.schema"

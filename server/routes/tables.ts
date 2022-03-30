@@ -12,9 +12,13 @@ export default async function getTables(
     for (const row of query_result) {
       const nameWithSchema = `${row.table_schema}.${row.table_name}`;
       if (!tempTables[nameWithSchema]) {
-        tempTables[nameWithSchema] = { name: nameWithSchema, attribute: [] };
+        tempTables[nameWithSchema] = {
+          name: row.table_name,
+          schemaName: row.table_schema,
+          attributes: [],
+        };
       }
-      tempTables[nameWithSchema].attribute.push({
+      tempTables[nameWithSchema].attributes.push({
         name: row.column_name,
         dataType: row.data_type,
       });
