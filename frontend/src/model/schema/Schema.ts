@@ -134,7 +134,12 @@ export default class Schema {
     for (let otherTable of this.tables) {
       if (otherTable == table) continue;
       possibleIndRelationships
-        .filter((rel) => rel.appliesTo(table, otherTable))
+        .filter(
+          (rel) =>
+            rel.appliesTo(table, otherTable) &&
+            otherTable.keys().find((key) => key.equals(rel.referenced())) &&
+            (!otherTable.pk || otherTable.pk?.equals(rel.referenced()))
+        )
         .forEach((rel) => {
           inds.push({ relationship: rel, table: otherTable });
         });
