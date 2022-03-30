@@ -7,9 +7,10 @@
     <input
       type="text"
       sbbInput
-      [value]="table.name"
-      (keyup.enter)="setTableName($event)"
+      [(ngModel)]="tableName"
+      (keyup.enter)="setTableName()"
     />
+    <sbb-icon svgIcon="kom:tick-medium" (click)="setTableName()"></sbb-icon>
   </ng-template>
 
   <sbb-accordion [multi]="true">

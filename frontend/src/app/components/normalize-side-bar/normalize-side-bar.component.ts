@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -19,14 +20,14 @@ import { SbbPageEvent } from '@sbb-esta/angular/pagination';
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent implements OnChanges {
+export class NormalizeSideBarComponent implements OnChanges, OnInit {
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
-  schemaName: string = '';
+  public tableName: string = '';
   page: number = 0;
   pageSize = 5;
   @Output() indToFk = new EventEmitter<{
@@ -41,6 +42,10 @@ export class NormalizeSideBarComponent implements OnChanges {
     newName: string;
   }>();
 
+  ngOnInit(): void {
+    this.tableName = this.table.name;
+  }
+
   ngOnChanges(): void {
     this.editingName = false;
   }
@@ -51,10 +56,10 @@ export class NormalizeSideBarComponent implements OnChanges {
   }
 
   public editingName = false;
-  setTableName(value: Event) {
+  setTableName() {
     this.renameTable.emit({
       table: this.table,
-      newName: (value.target! as HTMLInputElement).value,
+      newName: this.tableName,
     });
     this.editingName = false;
   }
