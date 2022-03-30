@@ -90,7 +90,11 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onIndToFk(event: any): void {
+  onIndToFk(event: {
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }): void {
     let command = new IndToFkCommand(
       this.schema,
       event.relationship,

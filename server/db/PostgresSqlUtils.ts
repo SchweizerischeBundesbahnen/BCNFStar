@@ -154,9 +154,9 @@ export default class PostgresSqlUtils extends SqlUtils {
     newTable: string,
     primaryKey: string[]
   ): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey
-      .map((a) => `"${a}"`)
-      .join(", ")});`;
+    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
+      primaryKey
+    )});`;
   }
 
   public override SQL_FOREIGN_KEY(
@@ -170,11 +170,15 @@ export default class PostgresSqlUtils extends SqlUtils {
   ): string {
     return `ALTER TABLE ${referencingSchema}.${referencingTable} 
     ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${referencingColumns.map((a) => '"' + a + '"').join(", ")})
-    REFERENCES ${referencedSchema}.${referencedTable} (${referencedColumns
-      .map((a) => '"' + a + '"')
-      .join(", ")});
+    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
+    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
+      referencedColumns
+    )});
 `;
+  }
+
+  private generateColumnString(columns: string[]): string {
+    return columns.map((c) => `"${c}"`).join(", ");
   }
 
   public getJdbcPath(): string {

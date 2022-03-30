@@ -49,7 +49,7 @@ export default class Table {
         new Column(iAttribute.name, iAttribute.dataType, index, table)
       );
     });
-    table.name = iTable.name; //mermaid tablenames must not contain dots
+    table.name = iTable.name;
     table.schemaName = iTable.schemaName;
     table.sourceTables.add(table.copy());
     return table;

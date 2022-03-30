@@ -194,17 +194,21 @@ GO`;
     return `
     ALTER TABLE ${referencingSchema}.${referencingTable} 
     ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${referencingColumns.join(", ")})
-    REFERENCES ${referencedSchema}.${referencedTable} (${referencedColumns.join(
-      ", "
+    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
+    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
+      referencedColumns
     )});
 `;
   }
 
   public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey.join(
-      ", "
+    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
+      primaryKey
     )});`;
+  }
+
+  private generateColumnString(columns: string[]) {
+    return columns.map((c) => `[${c}]`).join(", ");
   }
 
   public getJdbcPath(): string {
