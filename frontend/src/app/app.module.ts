@@ -22,6 +22,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './graph-element/graph-element.component';
 import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/normalize-undo-redo.component';
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
+import { SbbSelectModule } from '@sbb-esta/angular/select';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
     SbbButtonModule,
     SbbAccordionModule,
     SbbLoadingModule,
+    SbbSelectModule,
     SbbHeaderLeanModule,
     SbbIconModule,
     SbbCheckboxModule,
