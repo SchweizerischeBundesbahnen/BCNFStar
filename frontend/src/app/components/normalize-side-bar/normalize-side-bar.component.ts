@@ -66,7 +66,6 @@ export class NormalizeSideBarComponent implements OnInit {
 
   filterInds(event: SbbSelectChange) {
     const tables: Array<Table> = event.value;
-    console.log(tables);
     this.inds = this.schema
       .indsOf(this.table)
       .filter((r) => tables.includes(r.table));
