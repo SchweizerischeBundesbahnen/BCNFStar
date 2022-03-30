@@ -149,10 +149,6 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onInputChange(value: Event): void {
-    this.schemaName = (value.target! as HTMLInputElement).value;
-  }
-
   async persistSchema(): Promise<void> {
     this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
 

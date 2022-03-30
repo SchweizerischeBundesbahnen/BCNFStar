@@ -12,7 +12,8 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 export class SplitDialogComponent {
   selectedColumns = new Map<Column, Boolean>();
   columns = new Array<Column>();
-  schemaName?: String;
+
+  tableName: string;
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<SplitDialogComponent>,
@@ -27,10 +28,7 @@ export class SplitDialogComponent {
         this.selectedColumns.set(column, true);
         this.columns.push(column);
       });
-  }
-
-  setTableName(value: Event): void {
-    this.schemaName = (value.target! as HTMLInputElement).value;
+    this.tableName = fd.lhs.columnNames().join('_').substring(0, 50);
   }
 
   canConfirm() {
@@ -45,6 +43,6 @@ export class SplitDialogComponent {
       this.fd.lhs,
       new ColumnCombination(...new_rhs)
     );
-    this.dialogRef.close({ fd: new_fd, name: this.schemaName });
+    this.dialogRef.close({ fd: new_fd, name: this.tableName });
   }
 }

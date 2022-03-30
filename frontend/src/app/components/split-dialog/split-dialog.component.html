@@ -4,9 +4,8 @@
   <input
     type="text"
     sbbInput
-    [value]="fd.lhs.columnNames().join('_').substring(0, 50)"
+    [(ngModel)]="tableName"
     placeholder="if empty: column names of the left hand side"
-    (input)="setTableName($event)"
   />
   <div>
     Which of these attributes are determined by {{ fd.lhs.toString() }}:
