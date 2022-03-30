@@ -15,10 +15,10 @@ export default async function getTables(
         tempTables[nameWithSchema] = {
           name: row.table_name,
           schemaName: row.table_schema,
-          attribute: [],
+          attributes: [],
         };
       }
-      tempTables[nameWithSchema].attribute.push({
+      tempTables[nameWithSchema].attributes.push({
         name: row.column_name,
         dataType: row.data_type,
       });
