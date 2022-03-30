@@ -1,6 +1,7 @@
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import { Component } from '@angular/core';
+import * as saveAs from 'file-saver';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
@@ -24,11 +25,13 @@ export class NormalizeComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
+  public schemaName: string = '';
+  public sql: PersistSchemaSql = new PersistSchemaSql();
   public selectedColumns?: ColumnCombination;
   public schemaChanged: Subject<void> = new Subject();
 
   constructor(
-    dataService: DatabaseService,
+    public dataService: DatabaseService,
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog,
     public router: Router
@@ -85,7 +88,11 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onIndToFk(event: any): void {
+  onIndToFk(event: {
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }): void {
     let command = new IndToFkCommand(
       this.schema,
       event.relationship,
@@ -122,5 +129,96 @@ export class NormalizeComponent {
   onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
+  }
+
+  onInputChange(value: Event): void {
+    this.schemaName = (value.target! as HTMLInputElement).value;
+  }
+
+  async persistSchema(): Promise<void> {
+    this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
+
+    const tables: Table[] = Array.from(this.schema.tables);
+
+    console.log('Requesting SQL-Generation (Prepare Schema Statements)');
+    const res = await this.dataService.getSchemaPreparationSql(
+      this.schemaName,
+      tables
+    );
+    this.sql.databasePreparation += '\n' + res.sql + '\n';
+
+    console.log('Requesting SQL-Generation (Create Table Statements)');
+    for (const table of this.schema.tables) {
+      const createTableSql = await this.dataService.getCreateTableSql(table);
+      this.sql.createTableStatements += '\n' + createTableSql.sql + '\n';
+      const dataTransferSql = await this.dataService.getDataTransferSql(
+        table,
+        table.columns.asArray()
+      );
+      this.sql.dataTransferStatements += '\n' + dataTransferSql.sql + '\n';
+
+      if (table.pk) {
+        const pk = await this.dataService.getPrimaryKeySql(
+          table.schemaName,
+          table.name,
+          table.pk!.columnNames()
+        );
+        this.sql.primaryKeyConstraints += '\n' + pk.sql + '\n';
+      }
+
+      for (const fk of this.schema.fksOf(table)) {
+        const fkSql = await this.dataService.getForeignKeySql(
+          table,
+          fk.relationship,
+          fk.table
+        );
+        this.sql.foreignKeyConstraints += '\n' + fkSql.sql + '\n';
+      }
+    }
+
+    console.log('Requesting SQL-Generation (Primary Keys)');
+
+    console.log('Requesting SQL-Generation (Foreign Keys)');
+
+    console.log('Finished! ' + this.schemaName);
+  }
+
+  async download(): Promise<void> {
+    await this.persistSchema();
+    const file: File = new File(
+      [this.sql.to_string()],
+      this.schemaName + '.sql',
+      {
+        type: 'text/plain;charset=utf-8',
+      }
+    );
+    saveAs(file);
+  }
+}
+
+class PersistSchemaSql {
+  public databasePreparation: string = '';
+  public createTableStatements: string = '';
+  public dataTransferStatements: string = '';
+  public primaryKeyConstraints: string = '';
+  public foreignKeyConstraints: string = '';
+  public to_string(): string {
+    return (
+      '/* SCHEMA PREPARATION: */\n' +
+      this.databasePreparation! +
+      '\n' +
+      '/* SCHEMA CREATION: */\n' +
+      this.createTableStatements! +
+      '\n' +
+      '/* DATA TRANSER: */\n' +
+      this.dataTransferStatements! +
+      '\n' +
+      '/* PRIMARY KEYS: */\n' +
+      this.primaryKeyConstraints! +
+      '\n' +
+      '/* FOREIGN KEYS: */\n' +
+      this.foreignKeyConstraints! +
+      '\n'
+    );
   }
 }

@@ -7,6 +7,7 @@ import FdScore from './methodObjects/FdScore';
 
 export default class Table {
   public name = '';
+  public schemaName = '';
   public columns = new ColumnCombination();
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
@@ -43,16 +44,27 @@ export default class Table {
   public static fromITable(iTable: ITable): Table {
     let columns = new ColumnCombination();
     let table = new Table(columns);
-    iTable.attribute.forEach((iAttribute, index) => {
+    iTable.attributes.forEach((iAttribute, index) => {
       columns.add(
         new Column(iAttribute.name, iAttribute.dataType, index, table)
       );
     });
-    table.sourceTables.add(table);
     table.name = iTable.name;
+    table.schemaName = iTable.schemaName;
+    table.sourceTables.add(table.copy());
     return table;
   }
 
+  public copy(): Table {
+    const copy: Table = new Table(this.columns);
+    copy.name = this.name;
+    copy.schemaName = this.schemaName;
+    return copy;
+  }
+
+  public schemaAndName(): string {
+    return this.schemaName + '.' + this.name;
+  }
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
     names.forEach((name, i) =>
@@ -98,8 +110,9 @@ export default class Table {
     generating.pk = fd.lhs.copy();
 
     remaining.name = this.name;
+    remaining.schemaName = this.schemaName;
     generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
-
+    generating.schemaName = this.schemaName;
     return [remaining, generating];
   }
 
@@ -175,6 +188,7 @@ export default class Table {
     newTable.pk = remaining.pk
       ? relationship.referencingToReferencedColumnsIn(remaining.pk)
       : undefined;
+    newTable.schemaName = remaining.schemaName;
 
     // source tables
     this.sourceTables.forEach((sourceTable) =>
@@ -224,8 +238,7 @@ export default class Table {
           let score1 = new FdScore(this, fd1).get();
           let score2 = new FdScore(this, fd2).get();
           return score2 - score1;
-        })
-        .slice(0, 100);
+        });
     }
     return this._violatingFds;
   }
@@ -234,5 +247,13 @@ export default class Table {
     let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;
+  }
+
+  public toITable(): ITable {
+    return {
+      name: this.name,
+      schemaName: this.schemaName,
+      attributes: this.columns.asArray().map((attr) => attr.toIAttribute()),
+    };
   }
 }
