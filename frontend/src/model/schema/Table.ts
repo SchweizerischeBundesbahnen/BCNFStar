@@ -185,14 +185,19 @@ export default class Table {
     return newTable;
   }
 
-  public isKey(fd: FunctionalDependency): boolean {
+  public isKeyFd(fd: FunctionalDependency): boolean {
     // assume fd is fully extended
     // TODO what about null values
     return fd.rhs.equals(this.columns);
   }
 
+  public isKey(columns: ColumnCombination): boolean {
+    if (this.keys().find((cc) => cc.equals(columns))) return true;
+    else return false;
+  }
+
   public isBCNFViolating(fd: FunctionalDependency): boolean {
-    if (this.isKey(fd)) return false;
+    if (this.isKeyFd(fd)) return false;
     if (fd.lhs.cardinality == 0) return false;
     if (this.pk && !this.pk.isSubsetOf(this.remainingSchema(fd))) return false;
     return true;
@@ -201,7 +206,7 @@ export default class Table {
   public keys(): Array<ColumnCombination> {
     if (!this._keys) {
       let keys: Array<ColumnCombination> = this.fds
-        .filter((fd) => this.isKey(fd))
+        .filter((fd) => this.isKeyFd(fd))
         .map((fd) => fd.lhs);
       if (keys.length == 0) keys.push(this.columns.copy());
       this._keys = keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);

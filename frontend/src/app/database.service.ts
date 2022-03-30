@@ -9,7 +9,6 @@ import Relationship from '../model/schema/Relationship';
 import { firstValueFrom } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
-import ColumnCombination from '../model/schema/ColumnCombination';
 import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependencies';
 
@@ -83,9 +82,6 @@ export class DatabaseService {
         let pkColumn = referencedTable.columns.columnFromName(
           fk.foreignColumn
         )!;
-
-        if (!referencedTable.pk) referencedTable.pk = new ColumnCombination();
-        referencedTable.pk.add(pkColumn);
 
         let relationship =
           [...this.inputSchema!.fkRelationships].find((rel) =>

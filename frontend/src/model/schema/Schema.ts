@@ -98,13 +98,13 @@ export default class Schema {
       rel.referencing().isSubsetOf(table.columns)
     );
     for (let otherTable of this.tables) {
-      if (otherTable == table || !otherTable.pk) continue;
+      if (otherTable == table) continue;
 
       // intersects. Apply in case of splitting tables
       let intersect = table.columns.copy().intersect(otherTable.columns);
       if (
         intersect.cardinality > 0 &&
-        otherTable.pk!.equals(intersect) // TODO subset
+        otherTable.isKey(intersect) // TODO subset
       ) {
         fks.add({
           relationship: Relationship.fromTables(table, otherTable),
@@ -114,7 +114,7 @@ export default class Schema {
 
       // fkRelationships
       possibleFkRelationships
-        .filter((rel) => otherTable.pk!.equals(rel.referenced()))
+        .filter((rel) => otherTable.isKey(rel.referenced()))
         .forEach((relationship) => {
           fks.add({ relationship: relationship, table: otherTable });
         });
@@ -137,8 +137,7 @@ export default class Schema {
         .filter(
           (rel) =>
             rel.appliesTo(table, otherTable) &&
-            otherTable.keys().find((key) => key.equals(rel.referenced())) &&
-            (!otherTable.pk || otherTable.pk?.equals(rel.referenced()))
+            otherTable.isKey(rel.referenced())
         )
         .forEach((rel) => {
           inds.push({ relationship: rel, table: otherTable });
