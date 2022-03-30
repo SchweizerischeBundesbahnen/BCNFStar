@@ -11,6 +11,7 @@ import {
 import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
+import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 @Component({
   selector: 'app-normalize-side-bar',
@@ -23,6 +24,9 @@ export class NormalizeSideBarComponent {
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
+
+  page: number = 0;
+  pageSize = 5;
   @Output() indToFk = new EventEmitter<{
     source: Table;
     target: Table;
@@ -33,6 +37,10 @@ export class NormalizeSideBarComponent {
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
+  }
+
+  changePage(evt: SbbPageEvent) {
+    this.page = evt.pageIndex;
   }
 
   transformIndToFk(): void {
