@@ -15,11 +15,11 @@ export class TableSelectionComponent implements OnInit {
   // public tables: Map<Table, Boolean> = new Map();
   public tableHeads: Map<string, ITableHead> = new Map();
   public tableRowCounts: Map<string, number> = new Map();
-  public headLimit: number = 100;
+  public headLimit = 100;
 
-  public hoveredTable: Table = new Table();
-  public tableColumns: string[] = [];
-  public dataSource: SbbTableDataSource<any> = new SbbTableDataSource<any>([]);
+  public hoveredTable = new Table();
+  public tableColumns: Array<string> = [];
+  public dataSource = new SbbTableDataSource<Record<string, any>>([]);
 
   public tables: Array<Table> = [];
   public selectedTables = new Map<Table, Boolean>();
@@ -35,9 +35,9 @@ export class TableSelectionComponent implements OnInit {
     this.tables = await this.dataService.loadTables();
     for (const table of this.tables) {
       this.selectedTables.set(table, false);
-      const schema = table.name.split('.')[0];
-      if (!this.tablesInSchema[schema]) this.tablesInSchema[schema] = [];
-      this.tablesInSchema[schema].push(table);
+      if (!this.tablesInSchema[table.schemaName])
+        this.tablesInSchema[table.schemaName] = [];
+      this.tablesInSchema[table.schemaName].push(table);
     }
     const tableHeads = await this.dataService.loadTableHeads(this.headLimit);
     this.tableHeads = new Map(Object.entries(tableHeads));
@@ -84,7 +84,7 @@ export class TableSelectionComponent implements OnInit {
   }
 
   private getDataSourceAndRenderTable(table: Table) {
-    let hoveredTableHead = this.tableHeads.get(table.name);
+    let hoveredTableHead = this.tableHeads.get(table.schemaAndName());
     if (hoveredTableHead) {
       this.tableColumns = hoveredTableHead.attributes;
       this.dataSource.data = hoveredTableHead.rows;

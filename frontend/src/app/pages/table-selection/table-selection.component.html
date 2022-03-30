@@ -26,8 +26,7 @@
               class="table-checkbox"
               (mouseenter)="mouseEnter(table)"
             >
-              <!-- hide schema and dot from name -->
-              {{ table.name.substring(item.key.length + 1) }}
+              {{ table.name }}
             </sbb-checkbox>
           </sbb-expansion-panel>
         </sbb-accordion>
@@ -46,25 +45,25 @@
       <h3>
         <ng-container
           [ngSwitch]="
-            tableRowCounts.get(hoveredTable.name)! >= headLimit
+            tableRowCounts.get(hoveredTable.schemaAndName())! >= headLimit
               ? 1
-              : tableRowCounts.get(hoveredTable.name)! >= 0 &&
-                tableRowCounts.get(hoveredTable.name)! < headLimit
+              : tableRowCounts.get(hoveredTable.schemaAndName())! >= 0 &&
+                tableRowCounts.get(hoveredTable.schemaAndName())! < headLimit
               ? 2
               : -1
           "
         >
           <ng-container *ngSwitchCase="1">
-            Displaying {{ hoveredTable.name }} {{ headLimit }} of
-            {{ tableRowCounts.get(hoveredTable.name) }} rows
+            Displaying {{ hoveredTable.schemaAndName() }} {{ headLimit }} of
+            {{ tableRowCounts.get(hoveredTable.schemaAndName()) }} rows
           </ng-container>
           <ng-container *ngSwitchCase="2">
-            {{ hoveredTable.name }}
-            {{ tableRowCounts.get(hoveredTable.name)! }} von
-            {{ tableRowCounts.get(hoveredTable.name) }}
+            {{ hoveredTable.schemaAndName() }}
+            {{ tableRowCounts.get(hoveredTable.schemaAndName())! }} von
+            {{ tableRowCounts.get(hoveredTable.schemaAndName()) }}
           </ng-container>
           <ng-container *ngSwitchDefault>
-            {{ hoveredTable.name }}
+            {{ hoveredTable.schemaAndName() }}
           </ng-container>
         </ng-container>
       </h3>

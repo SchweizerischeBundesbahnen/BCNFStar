@@ -1,3 +1,4 @@
+import IAttribute from '@server/definitions/IAttribute';
 import Table from './Table';
 
 export default class Column {
@@ -29,5 +30,13 @@ export default class Column {
 
   public equals(column: Column): boolean {
     return this.sourceTable == column.sourceTable && this.name == column.name;
+  }
+
+  public toIAttribute(): IAttribute {
+    return {
+      name: this.name,
+      table: this.sourceTable.name,
+      dataType: this.dataType,
+    };
   }
 }

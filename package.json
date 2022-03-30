@@ -18,7 +18,7 @@
     "build:server": "cd server && npm run build",
     "build:frontend": "cd frontend && npm run build",
     "dev:server": "cd server && npm run dev",
-    "dev:frontend": "cd frontend && ng serve",
+    "dev:frontend": "cd frontend && npm run dev",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "generateTypeGuards": "ts-auto-guard --export-all --debug",

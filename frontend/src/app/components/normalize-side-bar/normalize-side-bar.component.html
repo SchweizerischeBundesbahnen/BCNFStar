@@ -15,8 +15,18 @@
         Contained Subtables
       </sbb-expansion-panel-header>
       <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
+        <sbb-paginator
+          (page)="changePage($event)"
+          [pageSize]="pageSize"
+          [length]="schema.splittableFdClustersOf(table).length"
+        >
+        </sbb-paginator>
         <sbb-expansion-panel
-          *ngFor="let cluster of schema.splittableFdClustersOf(table)"
+          *ngFor="
+            let cluster of schema
+              .splittableFdClustersOf(table)
+              .slice(page * pageSize, (page + 1) * pageSize)
+          "
           (mouseenter)="selectColumns.emit(cluster.columns)"
           (mouseleave)="selectColumns.emit()"
         >
@@ -57,7 +67,7 @@
           >{{
             rel.relationship.referencing().toString() +
               "->(" +
-              rel.table.name +
+              rel.table.schemaAndName() +
               ") " +
               rel.relationship.referenced().toString()
           }}</sbb-radio-button
