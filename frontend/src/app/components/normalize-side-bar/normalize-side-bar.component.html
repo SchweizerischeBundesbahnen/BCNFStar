@@ -59,7 +59,7 @@
           >{{
             rel.relationship.referencing().toString() +
               "->(" +
-              rel.table.name +
+              rel.table.schemaAndName() +
               ") " +
               rel.relationship.referenced().toString()
           }}</sbb-radio-button

@@ -7,7 +7,7 @@ export const exampleITable: Array<ITable> = [
   {
     name: 'Example Table',
     schemaName: 'public',
-    attribute: [
+    attributes: [
       { dataType: 'int', name: 'CD_ID' },
       { dataType: 'varchar', name: 'Albumtitel' },
       { dataType: 'varchar', name: 'Interpret' },

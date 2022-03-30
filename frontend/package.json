@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "dev": "ng serve",
     "build": "ng build",
     "postbuild": "npm run build:coverage && gzip -f dist/**/*",
     "build:coverage": "rm -rf dist/bcnfstar-coverage && nyc instrument dist/bcnfstar dist/bcnfstar-coverage --complete-copy",
@@ -29,7 +29,6 @@
     "@types/file-saver": "^2.0.5",
     "bootstrap": "^5.1.3",
     "file-saver": "^2.0.5",
-    "mermaid": "^8.13.4",
     "dagre": "^0.8.5",
     "graphlib": "^2.1.8",
     "jointjs": "^3.4.4",

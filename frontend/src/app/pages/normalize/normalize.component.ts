@@ -29,17 +29,15 @@ export class NormalizeComponent {
   public sql: PersistSchemaSql = new PersistSchemaSql();
   public selectedColumns?: ColumnCombination;
   public schemaChanged: Subject<void> = new Subject();
-  private dataService: DatabaseService;
 
   constructor(
-    dataService: DatabaseService,
+    public dataService: DatabaseService,
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog,
     public router: Router
   ) {
     this.schema = dataService.inputSchema!;
     if (!this.schema) router.navigate(['']);
-    this.dataService = dataService;
     // this.schemaChanged.next();
   }
 
@@ -90,7 +88,11 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onIndToFk(event: any): void {
+  onIndToFk(event: {
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }): void {
     let command = new IndToFkCommand(
       this.schema,
       event.relationship,
@@ -131,7 +133,6 @@ export class NormalizeComponent {
 
   onInputChange(value: Event): void {
     this.schemaName = (value.target! as HTMLInputElement).value;
-    console.log(this.schemaName);
   }
 
   async persistSchema(): Promise<void> {

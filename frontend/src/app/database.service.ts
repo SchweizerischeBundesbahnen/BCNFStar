@@ -177,7 +177,7 @@ export class DatabaseService {
     referencing: Table,
     relationship: Relationship,
     referenced: Table
-  ): Promise<any> {
+  ): Promise<{ sql: string }> {
     const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
 
     const relationship_: IRelationship = {
@@ -188,7 +188,7 @@ export class DatabaseService {
           referencingColumn:
             relationship._referencing[
               relationship._referenced.indexOf(
-                relationship._referenced.filter((c) => c.equals(element))[0]
+                relationship._referenced.find((c) => c.equals(element))!
               )
             ].name,
           referencedColumn: element.name,
@@ -201,21 +201,28 @@ export class DatabaseService {
       relationship: relationship_,
     };
 
-    let result: any = firstValueFrom(
-      this.http.post(`${this.baseUrl}/persist/createForeignKey`, data)
+    return firstValueFrom(
+      this.http.post<{ sql: string }>(
+        `${this.baseUrl}/persist/createForeignKey`,
+        data
+      )
     );
-    return result;
   }
 
-  getSchemaPreparationSql(schemaName: string, tables: Table[]): Promise<any> {
+  getSchemaPreparationSql(
+    schemaName: string,
+    tables: Table[]
+  ): Promise<{ sql: string }> {
     const data = {
       schema: schemaName,
       tables: tables.map((table) => table.name),
     };
-    let result: any = firstValueFrom(
-      this.http.post(`${this.baseUrl}/persist/schemaPreparation`, data)
+    return firstValueFrom(
+      this.http.post<{ sql: string }>(
+        `${this.baseUrl}/persist/schemaPreparation`,
+        data
+      )
     );
-    return result;
   }
 
   getDataTransferSql(
@@ -247,19 +254,21 @@ export class DatabaseService {
     schema: string,
     table: string,
     primaryKey: string[]
-  ): Promise<any> {
+  ): Promise<{ sql: string }> {
     const data = {
       schema: schema,
       table: table,
       primaryKey: primaryKey,
     };
-    let result: any = firstValueFrom(
-      this.http.post(`${this.baseUrl}/persist/createPrimaryKey`, data)
+    return firstValueFrom(
+      this.http.post<{ sql: string }>(
+        `${this.baseUrl}/persist/createPrimaryKey`,
+        data
+      )
     );
-    return result;
   }
 
-  getCreateTableSql(table: Table): Promise<any> {
+  getCreateTableSql(table: Table): Promise<{ sql: string }> {
     const [newSchema, newTable]: string[] = [table.schemaName, table.name];
     let primaryKey: string[] = [];
     if (table.pk) {
@@ -273,9 +282,11 @@ export class DatabaseService {
       }),
       primaryKey: primaryKey,
     };
-    let result: any = firstValueFrom(
-      this.http.post(`${this.baseUrl}/persist/createTable`, data)
+    return firstValueFrom(
+      this.http.post<{ sql: string }>(
+        `${this.baseUrl}/persist/createTable`,
+        data
+      )
     );
-    return result;
   }
 }

@@ -44,12 +44,12 @@ export default class Table {
   public static fromITable(iTable: ITable): Table {
     let columns = new ColumnCombination();
     let table = new Table(columns);
-    iTable.attribute.forEach((iAttribute, index) => {
+    iTable.attributes.forEach((iAttribute, index) => {
       columns.add(
         new Column(iAttribute.name, iAttribute.dataType, index, table)
       );
     });
-    table.name = iTable.name; //mermaid tablenames must not contain dots
+    table.name = iTable.name;
     table.schemaName = iTable.schemaName;
     table.sourceTables.add(table.copy());
     return table;
@@ -63,7 +63,7 @@ export default class Table {
   }
 
   public schemaAndName(): string {
-    return this.schemaName! + '.' + this.name;
+    return this.schemaName + '.' + this.name;
   }
   public static fromColumnNames(...names: Array<string>) {
     const table: Table = new Table();
@@ -185,7 +185,7 @@ export default class Table {
 
     // name, pk
     newTable.name = remaining.name;
-    newTable.schemaName = remaining.schemaName
+    newTable.schemaName = remaining.schemaName;
     newTable.pk = remaining.pk;
 
     // source tables
@@ -246,7 +246,7 @@ export default class Table {
     return {
       name: this.name,
       schemaName: this.schemaName,
-      attribute: this.columns.asArray().map((attr) => attr.toIAttribute()),
+      attributes: this.columns.asArray().map((attr) => attr.toIAttribute()),
     };
   }
 }

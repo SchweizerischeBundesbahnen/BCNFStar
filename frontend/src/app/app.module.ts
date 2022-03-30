@@ -8,7 +8,6 @@ import { NormalizeComponent } from './pages/normalize/normalize.component';
 import { NormalizeSideBarComponent } from './components/normalize-side-bar/normalize-side-bar.component';
 import { SbbIconModule } from '@sbb-esta/angular/icon';
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
-import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
 import { SbbAccordionModule } from '@sbb-esta/angular/accordion';
 import { SbbButtonModule } from '@sbb-esta/angular/button';
 import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
@@ -40,7 +39,6 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
     AppRoutingModule,
     SbbRadioButtonModule,
     SbbButtonModule,
-    SbbFormFieldModule,
     SbbAccordionModule,
     SbbLoadingModule,
     SbbHeaderLeanModule,

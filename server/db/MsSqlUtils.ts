@@ -8,6 +8,8 @@ import IAttribute from "../definitions/IAttribute";
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
 // prevent new queries
 // * this means: use try-finally
+
+const suffix = "\nGO\n";
 export default class MsSqlUtils extends SqlUtils {
   private config: sql.config;
   public connection: sql.ConnectionPool;
@@ -127,12 +129,12 @@ export default class MsSqlUtils extends SqlUtils {
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
     const result = await sql.query<ForeignKeyResult>(`
   SELECT 
-    sch.name AS foreign_table_schema,
-    tab1.name AS foreign_table_name,
-    col1.name AS foreign_column_name,
-	sch.name AS table_schema,
-    tab2.name AS table_name,
-    col2.name AS column_name
+    sch.name AS table_schema,
+    tab1.name AS table_name,
+    col1.name AS column_name,
+	sch.name AS foreign_table_schema,
+    tab2.name AS foreign_table_name,
+    col2.name AS foreign_column_name
 FROM sys.foreign_key_columns fkc
 INNER JOIN sys.objects obj
     ON obj.object_id = fkc.constraint_object_id
@@ -154,14 +156,13 @@ INNER JOIN sys.columns col2
     return `IF NOT EXISTS ( SELECT  *
       FROM    sys.schemas
       WHERE   name = N'${newSchema}' )
-EXEC('CREATE SCHEMA [${newSchema}]');
-GO`;
+EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
   }
   public override SQL_DROP_TABLE_IF_EXISTS(
     newSchema: string,
     newTable: string
   ): string {
-    return `DROP TABLE IF EXISTS ${newSchema}.${newTable}; GO`;
+    return `DROP TABLE IF EXISTS ${newSchema}.${newTable}; ${suffix}`;
   }
   public SQL_CREATE_TABLE(
     attributes: IAttribute[],
@@ -179,7 +180,7 @@ GO`;
       )
       .join(",");
     console.log(primaryKey);
-    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) GO`;
+    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) ${suffix}`;
   }
 
   public override SQL_FOREIGN_KEY(
@@ -194,17 +195,21 @@ GO`;
     return `
     ALTER TABLE ${referencingSchema}.${referencingTable} 
     ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${referencingColumns.join(", ")})
-    REFERENCES ${referencedSchema}.${referencedTable} (${referencedColumns.join(
-      ", "
+    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
+    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
+      referencedColumns
     )});
 `;
   }
 
   public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${primaryKey.join(
-      ", "
+    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
+      primaryKey
     )});`;
+  }
+
+  private generateColumnString(columns: string[]) {
+    return columns.map((c) => `[${c}]`).join(", ");
   }
 
   public getJdbcPath(): string {
