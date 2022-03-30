@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "dev": "ng serve",
     "build": "ng build",
     "postbuild": "npm run build:coverage && gzip -f dist/**/*",
     "build:coverage": "rm -rf dist/bcnfstar-coverage && nyc instrument dist/bcnfstar dist/bcnfstar-coverage --complete-copy",
