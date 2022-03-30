@@ -25,6 +25,7 @@ export class NormalizeSideBarComponent {
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
+  schemaName: string = '';
   page: number = 0;
   pageSize = 5;
   @Output() indToFk = new EventEmitter<{
@@ -32,6 +33,7 @@ export class NormalizeSideBarComponent {
     target: Table;
     relationship: Relationship;
   }>();
+
   @Output() selectColumns = new EventEmitter<ColumnCombination>();
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {

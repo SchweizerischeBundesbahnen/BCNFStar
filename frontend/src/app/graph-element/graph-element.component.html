@@ -1,7 +1,7 @@
 <div class="container px-0" [ngStyle]="bbox">
   <div class="table-head ellipses">
     <span class="table-head-title" (click)="select()">
-      {{ table.name }}
+      {{ table.schemaAndName() }}
     </span>
   </div>
   <div
@@ -14,11 +14,11 @@
         highlighted:
           this.selectedColumns && this.selectedColumns.includes(column)
       }"
-      class="col-6 ellipses"
+      class="col-7 ellipses"
     >
       {{ column.name }}
     </div>
-    <div class="col-6 text-end ellipses">{{ column.dataType }}</div>
+    <div class="col-5 text-end ellipses">{{ column.dataType }}</div>
   </div>
   <div class="row">
     <sbb-icon

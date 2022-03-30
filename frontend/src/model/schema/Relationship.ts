@@ -1,3 +1,4 @@
+import IRelationship from '@server/definitions/IRelationship';
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
 import Table from './Table';
@@ -5,8 +6,8 @@ import Table from './Table';
 export default class Relationship {
   // these arrays are linked, the column in _referencing has the same index as the
   // corresponding column in _referenced
-  private _referencing = new Array<Column>();
-  private _referenced = new Array<Column>();
+  public _referencing = new Array<Column>();
+  public _referenced = new Array<Column>();
 
   /**
    * cached result of the score calculation. Should not be accessed directly
@@ -71,5 +72,26 @@ export default class Relationship {
 
   public toString(): String {
     return this.referencing().toString() + '->' + this.referenced().toString();
+  }
+
+  public toIRelationship(): IRelationship {
+    return {
+      referencing: {
+        name: `${this.referencing().sourceTable().name}`,
+        schemaName: `${this.referencing().sourceTable().schemaName!}`,
+        attributes: [],
+      },
+      referenced: {
+        name: `${this.referenced().sourceTable().name}`,
+        schemaName: `${this.referenced().sourceTable().schemaName!}`,
+        attributes: [],
+      },
+      columnRelationships: this._referencing.map((element, index) => {
+        return {
+          referencingColumn: element.name,
+          referencedColumn: this._referenced[index].name,
+        };
+      }),
+    };
   }
 }
