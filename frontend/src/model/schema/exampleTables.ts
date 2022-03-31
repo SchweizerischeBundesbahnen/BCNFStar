@@ -78,7 +78,7 @@ export function exampleSchema(): Schema {
     tableA.columns.columnFromName('A4')!,
     tableB.columns.columnFromName('B2')!
   );
-  schema.addFkRelationship(relAB);
+  schema.addFk(relAB);
 
   schema.join(tableA, tableB, relAB);
 

@@ -90,11 +90,11 @@ export class DatabaseService {
         )!;
 
         let relationship =
-          [...this.inputSchema!.fkRelationships].find((rel) =>
+          [...this.inputSchema!.fks].find((rel) =>
             rel.appliesTo(referencingTable!, referencedTable!)
           ) || new Relationship();
         relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.addFkRelationship(relationship);
+        this.inputSchema!.addFk(relationship);
       }
     });
   }
@@ -128,7 +128,7 @@ export class DatabaseService {
 
         indRelationship.add(dependantColumn, referencedColumn);
       }
-      this.inputSchema!.addIndRelationship(indRelationship);
+      this.inputSchema!.addInd(indRelationship);
     });
   }
 
