@@ -17,7 +17,10 @@ describe("The /tables route", () => {
 
         expect(result.body).to.be.an("array");
         for (const table of result.body)
-          expect(isITable(table), "type guard check").to.be.true;
+          expect(
+            isITable(table),
+            `expected the following to be an iTable: ${JSON.stringify(table)}`
+          ).to.be.true;
       }
     );
   });

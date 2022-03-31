@@ -8,11 +8,11 @@ import { NormalizeComponent } from './pages/normalize/normalize.component';
 import { NormalizeSideBarComponent } from './components/normalize-side-bar/normalize-side-bar.component';
 import { SbbIconModule } from '@sbb-esta/angular/icon';
 import { NormalizeSchemaGraphComponent } from './components/normalize-schema-graph/normalize-schema-graph.component';
-import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
 import { SbbAccordionModule } from '@sbb-esta/angular/accordion';
 import { SbbButtonModule } from '@sbb-esta/angular/button';
 import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
 import { SbbDialogModule } from '@sbb-esta/angular/dialog';
+import { SbbPaginationModule } from '@sbb-esta/angular/pagination';
 import { SbbHeaderLeanModule } from '@sbb-esta/angular/header-lean';
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
@@ -22,6 +22,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './graph-element/graph-element.component';
 import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/normalize-undo-redo.component';
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
+import { SbbSelectModule } from '@sbb-esta/angular/select';
 
 @NgModule({
   declarations: [
@@ -39,12 +40,13 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
     AppRoutingModule,
     SbbRadioButtonModule,
     SbbButtonModule,
-    SbbFormFieldModule,
     SbbAccordionModule,
     SbbLoadingModule,
+    SbbSelectModule,
     SbbHeaderLeanModule,
     SbbIconModule,
     SbbCheckboxModule,
+    SbbPaginationModule,
     SbbDialogModule,
     SbbTableModule,
     FormsModule,

@@ -2,21 +2,6 @@ import { IRequestBodyForeignKeySql } from "@/definitions/IBackendAPI";
 import { Request, Response, RequestHandler } from "express";
 import { sqlUtils } from "../../db";
 
-function parseBody(body: any): string[] {
-  return [
-    body.referencingSchema,
-    body.referencingTable,
-    body.referencedSchema,
-    body.referencedTable,
-    body.constraintName,
-  ];
-}
-
-interface IDict {
-  value: string;
-  key: string;
-}
-
 export default function getCreateForeignKey(): RequestHandler {
   async function createForeignKey(req: Request, res: Response): Promise<void> {
     try {

@@ -31,7 +31,7 @@
         type="text"
         sbbInput
         placeholder="Schema Name"
-        (input)="onInputChange($event)"
+        [(ngModel)]="schemaName"
       />
 
       <button
@@ -50,6 +50,7 @@
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
         (selectColumns)="onSelectColumns($event)"
+        (renameTable)="onChangeTableName($event)"
       ></app-normalize-side-bar>
     </div>
   </div>

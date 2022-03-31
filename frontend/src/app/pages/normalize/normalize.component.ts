@@ -15,6 +15,7 @@ import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import Relationship from '@/src/model/schema/Relationship';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
+import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 
 @Component({
   selector: 'app-normalize',
@@ -29,17 +30,15 @@ export class NormalizeComponent {
   public sql: PersistSchemaSql = new PersistSchemaSql();
   public selectedColumns?: ColumnCombination;
   public schemaChanged: Subject<void> = new Subject();
-  private dataService: DatabaseService;
 
   constructor(
-    dataService: DatabaseService,
+    public dataService: DatabaseService,
     // eslint-disable-next-line no-unused-vars
     public dialog: SbbDialog,
     public router: Router
   ) {
     this.schema = dataService.inputSchema!;
     if (!this.schema) router.navigate(['']);
-    this.dataService = dataService;
     // this.schemaChanged.next();
   }
 
@@ -75,13 +74,20 @@ export class NormalizeComponent {
       data: fd,
     });
 
-    dialogRef.afterClosed().subscribe((fd: FunctionalDependency) => {
-      if (fd) this.onSplitFd(fd);
-    });
+    dialogRef
+      .afterClosed()
+      .subscribe((value: { fd: FunctionalDependency; name?: string }) => {
+        if (fd) this.onSplitFd(value);
+      });
   }
 
-  onSplitFd(fd: FunctionalDependency): void {
-    let command = new SplitCommand(this.schema, this.selectedTable!, fd);
+  onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
+    let command = new SplitCommand(
+      this.schema,
+      this.selectedTable!,
+      value.fd,
+      value.name
+    );
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
@@ -90,7 +96,11 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onIndToFk(event: any): void {
+  onIndToFk(event: {
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }): void {
     let command = new IndToFkCommand(
       this.schema,
       event.relationship,
@@ -119,6 +129,13 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
+  onChangeTableName(value: { table: Table; newName: string }): void {
+    let command = new TableRenameCommand(value.table, value.newName);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
   onUndo() {
     this.commandProcessor.undo();
     this.schemaChanged.next();
@@ -127,11 +144,6 @@ export class NormalizeComponent {
   onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
-  }
-
-  onInputChange(value: Event): void {
-    this.schemaName = (value.target! as HTMLInputElement).value;
-    console.log(this.schemaName);
   }
 
   async persistSchema(): Promise<void> {

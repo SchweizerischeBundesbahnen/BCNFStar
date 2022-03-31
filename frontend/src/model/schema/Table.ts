@@ -47,7 +47,7 @@ export default class Table {
     let columns = new ColumnCombination();
     let table = new Table(columns);
     let tableIdentifier = new TableIdentifier(iTable.name, iTable.schemaName);
-    iTable.attribute.forEach((iAttribute, index) => {
+    iTable.attributes.forEach((iAttribute, index) => {
       let columnIdentifier = new ColumnIdentifier(
         iAttribute.name,
         tableIdentifier
@@ -68,7 +68,7 @@ export default class Table {
   }
 
   public schemaAndName(): string {
-    return this.schemaName! + '.' + this.name;
+    return this.schemaName + '.' + this.name;
   }
 
   public static fromColumnNames(...names: Array<string>) {
@@ -109,7 +109,10 @@ export default class Table {
     return fd.rhs.copy();
   }
 
-  public split(fd: FunctionalDependency): Array<Table> {
+  public split(
+    fd: FunctionalDependency,
+    generatingName?: string
+  ): Array<Table> {
     let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
     fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
@@ -123,10 +126,13 @@ export default class Table {
     remaining.pk = this.pk;
     generating.pk = fd.lhs.copy();
 
-    remaining.name = this.name;
     remaining.schemaName = this.schemaName;
-    generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
+    remaining.name = this.name;
+
     generating.schemaName = this.schemaName;
+    generating.name =
+      generatingName || fd.lhs.columnNames().join('_').substring(0, 50);
+
     return [remaining, generating];
   }
 
@@ -199,8 +205,10 @@ export default class Table {
 
     // name, pk
     newTable.name = remaining.name;
+    newTable.pk = remaining.pk
+      ? relationship.referencingToReferencedColumnsIn(remaining.pk)
+      : undefined;
     newTable.schemaName = remaining.schemaName;
-    newTable.pk = remaining.pk;
 
     // source tables
     this.sourceTables.forEach((sourceTable) =>
@@ -213,14 +221,19 @@ export default class Table {
     return newTable;
   }
 
-  public isKey(fd: FunctionalDependency): boolean {
+  public isKeyFd(fd: FunctionalDependency): boolean {
     // assume fd is fully extended
     // TODO what about null values
     return fd.rhs.equals(this.columns);
   }
 
+  public isKey(columns: ColumnCombination): boolean {
+    if (this.keys().find((cc) => cc.equals(columns))) return true;
+    else return false;
+  }
+
   public isBCNFViolating(fd: FunctionalDependency): boolean {
-    if (this.isKey(fd)) return false;
+    if (this.isKeyFd(fd)) return false;
     if (fd.lhs.cardinality == 0) return false;
     if (this.pk && !this.pk.isSubsetOf(this.remainingSchema(fd))) return false;
     return true;
@@ -229,7 +242,7 @@ export default class Table {
   public keys(): Array<ColumnCombination> {
     if (!this._keys) {
       let keys: Array<ColumnCombination> = this.fds
-        .filter((fd) => this.isKey(fd))
+        .filter((fd) => this.isKeyFd(fd))
         .map((fd) => fd.lhs);
       if (keys.length == 0) keys.push(this.columns.copy());
       this._keys = keys.sort((cc1, cc2) => cc1.cardinality - cc2.cardinality);
@@ -260,7 +273,7 @@ export default class Table {
     return {
       name: this.name,
       schemaName: this.schemaName,
-      attribute: this.columns.asArray().map((attr) => attr.toIAttribute()),
+      attributes: this.columns.asArray().map((attr) => attr.toIAttribute()),
     };
   }
 }

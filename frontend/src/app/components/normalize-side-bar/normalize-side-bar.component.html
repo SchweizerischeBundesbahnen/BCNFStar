@@ -1,5 +1,19 @@
 <div>
-  <h2>{{ table.name }}</h2>
+  <h2 *ngIf="!editingName; else editing">
+    {{ table.schemaAndName() }}
+    <sbb-icon svgIcon="kom:pen-small" (click)="editingName = true"></sbb-icon>
+  </h2>
+  <ng-template #editing>
+    <input
+      id="rename-table-input"
+      type="text"
+      sbbInput
+      [(ngModel)]="tableName"
+      (keyup.enter)="setTableName()"
+    />
+    <sbb-icon svgIcon="kom:tick-medium" (click)="setTableName()"></sbb-icon>
+  </ng-template>
+
   <sbb-accordion [multi]="true">
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
@@ -14,9 +28,32 @@
       <sbb-expansion-panel-header>
         Contained Subtables
       </sbb-expansion-panel-header>
-      <sbb-accordion *ngIf="schema.splittableFdClustersOf(table).length > 0">
+      <sbb-select
+        multiple
+        placeholder="Filter columns"
+        (selectionChange)="filterClusters($event)"
+      >
+        <sbb-option
+          *ngFor="let column of table.columns.asArray()"
+          [value]="column"
+          >{{ column.name }}</sbb-option
+        >
+      </sbb-select>
+      <br />
+      <sbb-accordion *ngIf="clusters.length > 0; else noClusters">
+        <sbb-paginator
+          (page)="changePage($event)"
+          [pageSize]="pageSize"
+          [length]="clusters.length"
+        >
+        </sbb-paginator>
         <sbb-expansion-panel
-          *ngFor="let cluster of schema.splittableFdClustersOf(table)"
+          *ngFor="
+            let cluster of clusters.slice(
+              page * pageSize,
+              (page + 1) * pageSize
+            )
+          "
           (mouseenter)="selectColumns.emit(cluster.columns)"
           (mouseleave)="selectColumns.emit()"
         >
@@ -36,25 +73,56 @@
           </button>
         </sbb-expansion-panel>
       </sbb-accordion>
+      <ng-template #noClusters>
+        <h2>
+          No contained subtables were found with the current filter for this
+          table
+        </h2>
+      </ng-template>
     </sbb-expansion-panel>
 
     <sbb-expansion-panel [expanded]="true">
       <sbb-expansion-panel-header
         >Possible Foreign Keys</sbb-expansion-panel-header
       >
-      <sbb-radio-group #indSelection *ngIf="schema.indsOf(table).length > 0">
+      <sbb-select
+        multiple
+        placeholder="Filter tables"
+        (selectionChange)="filterInds($event)"
+      >
+        <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
+          table.schemaAndName()
+        }}</sbb-option>
+      </sbb-select>
+      <br />
+      <sbb-radio-group #indSelection *ngIf="inds.length > 0; else noInds">
         <sbb-radio-button
-          *ngFor="let rel of schema.indsOf(table)"
+          (mouseenter)="
+            selectColumns.emit(
+              rel.relationship
+                .referencing()
+                .union(rel.relationship.referenced())
+            )
+          "
+          (mouseleave)="selectColumns.emit()"
+          *ngFor="let rel of inds"
           [value]="rel"
+          style="display: block"
           >{{
             rel.relationship.referencing().toString() +
               "->(" +
-              rel.table.name +
+              rel.table.schemaAndName() +
               ") " +
               rel.relationship.referenced().toString()
           }}</sbb-radio-button
         >
       </sbb-radio-group>
+      <ng-template #noInds>
+        <h2>
+          No possible foreign keys were found with the current filter for this
+          table
+        </h2>
+      </ng-template>
       <br />
       <button
         type="button"
