@@ -28,7 +28,7 @@ export class NormalizeComponent {
   public selectedTable?: Table;
   public schemaName: string = '';
   public sql: PersistSchemaSql = new PersistSchemaSql();
-  public selectedColumns?: ColumnCombination;
+  public selectedColumns?: Map<Table, ColumnCombination>;
   public schemaChanged: Subject<void> = new Subject();
 
   constructor(
@@ -42,7 +42,7 @@ export class NormalizeComponent {
     // this.schemaChanged.next();
   }
 
-  onSelectColumns(columns: ColumnCombination) {
+  onSelectColumns(columns: Map<Table, ColumnCombination>) {
     this.selectedColumns = columns;
   }
 

@@ -34,7 +34,7 @@ enum PortSide {
 export class NormalizeSchemaGraphComponent implements AfterContentInit {
   @Input() schema!: Schema;
   @Input() selectedTable?: Table;
-  @Input() selectedColumns?: ColumnCombination;
+  @Input() selectedColumns?: Map<Table, ColumnCombination>;
   @Input() schemaChanged!: Observable<void>;
   @Output() selectedTableChange = new EventEmitter<Table>();
   @Output() joinFk = new EventEmitter<{

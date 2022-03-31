@@ -54,7 +54,7 @@
               (page + 1) * pageSize
             )
           "
-          (mouseenter)="selectColumns.emit(cluster.columns)"
+          (mouseenter)="emitHighlightedCluster(cluster)"
           (mouseleave)="selectColumns.emit()"
         >
           <sbb-expansion-panel-header>
@@ -96,14 +96,9 @@
       </sbb-select>
       <br />
       <sbb-radio-group #indSelection *ngIf="inds.length > 0; else noInds">
+        <!-- (mouseleave)="selectColumns.emit(new Map())" -->
         <sbb-radio-button
-          (mouseenter)="
-            selectColumns.emit(
-              rel.relationship
-                .referencing()
-                .union(rel.relationship.referenced())
-            )
-          "
+          (mouseenter)="emitHighlightedInd(rel)"
           (mouseleave)="selectColumns.emit()"
           *ngFor="let rel of inds"
           [value]="rel"

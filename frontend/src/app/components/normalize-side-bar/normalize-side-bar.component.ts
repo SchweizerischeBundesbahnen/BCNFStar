@@ -28,6 +28,16 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
+  @Output() indToFk = new EventEmitter<{
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }>();
+  @Output() selectColumns = new EventEmitter<Map<Table, ColumnCombination>>();
+  @Output() renameTable = new EventEmitter<{
+    table: Table;
+    newName: string;
+  }>();
 
   public tableName: string = '';
   inds: { relationship: Relationship; table: Table }[] = [];
@@ -52,21 +62,24 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     }
   }
 
-  @Output() indToFk = new EventEmitter<{
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }>();
-
-  @Output() selectColumns = new EventEmitter<ColumnCombination>();
-  @Output() renameTable = new EventEmitter<{
-    table: Table;
-    newName: string;
-  }>();
-
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
+  }
+
+  emitHighlightedInd(rel: { relationship: Relationship; table: Table }) {
+    const map = new Map<Table, ColumnCombination>();
+    map.set(this.table, rel.relationship.referencing());
+    map.set(rel.table, rel.relationship.referenced());
+    this.selectColumns.emit(map);
+  }
+  emitHighlightedCluster(cluster: {
+    columns: ColumnCombination;
+    fds: Array<FunctionalDependency>;
+  }) {
+    const map = new Map<Table, ColumnCombination>();
+    map.set(this.table, cluster.columns);
+    this.selectColumns.emit(map);
   }
 
   public editingName = false;
