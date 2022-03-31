@@ -231,7 +231,7 @@ export class DatabaseService {
       relationships: [...table.relationships].map((rel) =>
         rel.toIRelationship()
       ),
-      sourceTables: Array.from(table.sourceTables).map(
+      sourceTables: Array.from(table.sources).map(
         (table) => `${table.schemaAndName()}`
       ),
       attributes: attributes.map((attr) => attr.toIAttribute()),

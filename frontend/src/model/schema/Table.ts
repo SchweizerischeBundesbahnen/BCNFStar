@@ -14,7 +14,7 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Set<Relationship>();
-  public sourceTables = new Set<TableIdentifier>();
+  public sources = new Set<TableIdentifier>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -63,7 +63,7 @@ export default class Table {
     });
     table.name = iTable.name;
     table.schemaName = iTable.schemaName;
-    table.sourceTables.add(tableIdentifier);
+    table.sources.add(tableIdentifier);
     return table;
   }
 
@@ -85,7 +85,7 @@ export default class Table {
         )
       )
     );
-    table.sourceTables.add(table);
+    table.sources.add(table);
     return table;
   }
 
@@ -140,7 +140,7 @@ export default class Table {
   public projectRelationships(table: Table): void {
     // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
     let neededSourceTables = new Set(table.columns.sourceTables());
-    let sourceTables = new Set(this.sourceTables);
+    let sourceTables = new Set(this.sources);
     let relationships = new Set(this.relationships);
 
     let toRemove: Set<TableIdentifier>;
@@ -163,7 +163,7 @@ export default class Table {
       toRemove.forEach((table) => sourceTables.delete(table));
     } while (toRemove.size > 0);
 
-    table.sourceTables = sourceTables;
+    table.sources = sourceTables;
     table.relationships = relationships;
   }
 
@@ -212,11 +212,9 @@ export default class Table {
     newTable.schemaName = remaining.schemaName;
 
     // source tables
-    this.sourceTables.forEach((sourceTable) =>
-      newTable.sourceTables.add(sourceTable)
-    );
-    otherTable.sourceTables.forEach((sourceTable) =>
-      newTable.sourceTables.add(sourceTable)
+    this.sources.forEach((sourceTable) => newTable.sources.add(sourceTable));
+    otherTable.sources.forEach((sourceTable) =>
+      newTable.sources.add(sourceTable)
     );
 
     return newTable;
