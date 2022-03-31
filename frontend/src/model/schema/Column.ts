@@ -1,4 +1,5 @@
 import IAttribute from '@server/definitions/IAttribute';
+import * as _ from 'underscore';
 import ColumnIdentifier from './ColumnIdentifier';
 
 export default class Column {
@@ -29,7 +30,7 @@ export default class Column {
   }
 
   public equals(column: Column): boolean {
-    return this.source == column.source;
+    return _.isEqual(this.source, column.source);
   }
 
   public toIAttribute(): IAttribute {
