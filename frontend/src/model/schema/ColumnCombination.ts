@@ -39,7 +39,7 @@ export default class ColumnCombination {
   public sourceTable(): TableIdentifier {
     let sourceTables = this.sourceTables();
     if (sourceTables.length > 1)
-      console.log(
+      console.warn(
         'Warning: expected only one sourceTable but there are ' +
           sourceTables.length
       );
