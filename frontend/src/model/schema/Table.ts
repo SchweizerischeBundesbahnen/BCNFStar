@@ -71,10 +71,11 @@ export default class Table {
     return this.schemaName + '.' + this.name;
   }
 
-  public static fromColumnNames(...names: Array<string>) {
+  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
     const table: Table = new Table();
-    let tableIdentifier = new TableIdentifier(table.name, table.schemaName);
-    names.forEach((name, i) =>
+    table.name = tableName;
+    let tableIdentifier = new TableIdentifier(tableName, '');
+    columnNames.forEach((name, i) =>
       table.columns.add(
         new Column(
           name,
