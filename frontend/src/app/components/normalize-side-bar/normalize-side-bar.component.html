@@ -40,16 +40,16 @@
         >
       </sbb-select>
       <br />
-      <sbb-accordion *ngIf="clusters.length > 0; else noClusters">
+      <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
         <sbb-paginator
           (page)="changePage($event)"
           [pageSize]="pageSize"
-          [length]="clusters.length"
+          [length]="fdClusters().length"
         >
         </sbb-paginator>
         <sbb-expansion-panel
           *ngFor="
-            let cluster of clusters.slice(
+            let cluster of fdClusters().slice(
               page * pageSize,
               (page + 1) * pageSize
             )
@@ -95,7 +95,7 @@
         }}</sbb-option>
       </sbb-select>
       <br />
-      <sbb-radio-group #indSelection *ngIf="inds.length > 0; else noInds">
+      <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">
         <sbb-radio-button
           (mouseenter)="
             selectColumns.emit(
@@ -105,7 +105,7 @@
             )
           "
           (mouseleave)="selectColumns.emit()"
-          *ngFor="let rel of inds"
+          *ngFor="let rel of inds()"
           [value]="rel"
           style="display: block"
           >{{
