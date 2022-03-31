@@ -95,7 +95,10 @@ export default class Table {
     return fd.rhs.copy();
   }
 
-  public split(fd: FunctionalDependency): Array<Table> {
+  public split(
+    fd: FunctionalDependency,
+    generatingName?: string
+  ): Array<Table> {
     let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
     fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
@@ -109,10 +112,13 @@ export default class Table {
     remaining.pk = this.pk;
     generating.pk = fd.lhs.copy();
 
-    remaining.name = this.name;
     remaining.schemaName = this.schemaName;
-    generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
+    remaining.name = this.name;
+
     generating.schemaName = this.schemaName;
+    generating.name =
+      generatingName || fd.lhs.columnNames().join('_').substring(0, 50);
+
     return [remaining, generating];
   }
 

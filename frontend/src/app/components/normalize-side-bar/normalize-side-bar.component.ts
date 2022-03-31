@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -16,7 +17,6 @@ import Table from 'src/model/schema/Table';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 import { SbbSelectChange } from '@sbb-esta/angular/select';
-import { OnInit } from '@angular/core';
 @Component({
   selector: 'app-normalize-side-bar',
   templateUrl: './normalize-side-bar.component.html',
@@ -29,7 +29,7 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
 
-  schemaName: string = '';
+  public tableName: string = '';
   inds: { relationship: Relationship; table: Table }[] = [];
   clusters: Array<{
     columns: ColumnCombination;
@@ -39,11 +39,13 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   pageSize = 5;
 
   ngOnInit(): void {
+    this.tableName = this.table.name;
     this.clusters = this.schema.splittableFdClustersOf(this.table);
     this.inds = this.schema.indsOf(this.table);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.editingName = false;
     if (changes['table']) {
       this.clusters = this.schema.splittableFdClustersOf(this.table);
       this.inds = this.schema.indsOf(this.table);
@@ -57,12 +59,24 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   }>();
 
   @Output() selectColumns = new EventEmitter<ColumnCombination>();
+  @Output() renameTable = new EventEmitter<{
+    table: Table;
+    newName: string;
+  }>();
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
   }
 
+  public editingName = false;
+  setTableName() {
+    this.renameTable.emit({
+      table: this.table,
+      newName: this.tableName,
+    });
+    this.editingName = false;
+  }
   changePage(evt: SbbPageEvent) {
     this.page = evt.pageIndex;
   }

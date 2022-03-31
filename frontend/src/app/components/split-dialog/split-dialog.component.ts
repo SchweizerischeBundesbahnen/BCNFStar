@@ -13,6 +13,7 @@ export class SplitDialogComponent {
   selectedColumns = new Map<Column, Boolean>();
   columns = new Array<Column>();
 
+  tableName: string;
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<SplitDialogComponent>,
@@ -27,6 +28,7 @@ export class SplitDialogComponent {
         this.selectedColumns.set(column, true);
         this.columns.push(column);
       });
+    this.tableName = fd.lhs.columnNames().join('_').substring(0, 50);
   }
 
   canConfirm() {
@@ -41,6 +43,6 @@ export class SplitDialogComponent {
       this.fd.lhs,
       new ColumnCombination(...new_rhs)
     );
-    this.dialogRef.close(new_fd);
+    this.dialogRef.close({ fd: new_fd, name: this.tableName });
   }
 }

@@ -198,8 +198,19 @@ export default class Schema {
     });
   }
 
-  public split(table: Table, fd: FunctionalDependency) {
-    let tables = table.split(fd);
+  /**
+   *
+   * @param table Table to split
+   * @param fd Functional Dependency to split on
+   * @param generatingName Name to give to the newly created table
+   * @returns the resulting tables
+   */
+  public split(
+    table: Table,
+    fd: FunctionalDependency,
+    generatingName?: string
+  ) {
+    let tables = table.split(fd, generatingName);
     this.add(...tables);
     this.delete(table);
     return tables;
