@@ -4,6 +4,7 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
+import { TableRelationship } from '../types/TableRelationship';
 
 export default class Table {
   public name = '';
@@ -27,11 +28,11 @@ export default class Table {
   /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
-  public _fks!: Set<{ relationship: Relationship; table: Table }>;
+  public _fks!: Set<TableRelationship>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
-  public _inds!: Array<{ relationship: Relationship; table: Table }>;
+  public _inds!: Array<TableRelationship>;
   /**
    * This variable tracks if the cached results fks and inds are still valid
    */

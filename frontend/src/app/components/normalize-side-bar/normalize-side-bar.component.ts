@@ -17,6 +17,8 @@ import Table from 'src/model/schema/Table';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 import { SbbSelectChange } from '@sbb-esta/angular/select';
+import { FdCluster } from '@/src/model/types/FdCluster';
+import { TableRelationship } from '@/src/model/types/TableRelationship';
 @Component({
   selector: 'app-normalize-side-bar',
   templateUrl: './normalize-side-bar.component.html',
@@ -40,11 +42,8 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   }>();
 
   public tableName: string = '';
-  inds: { relationship: Relationship; table: Table }[] = [];
-  clusters: Array<{
-    columns: ColumnCombination;
-    fds: Array<FunctionalDependency>;
-  }> = [];
+  inds: Array<TableRelationship> = [];
+  clusters: Array<FdCluster> = [];
   page: number = 0;
   pageSize = 5;
 
@@ -62,21 +61,18 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     }
   }
 
-  selectedInd(): { relationship: Relationship; table: Table } | undefined {
+  selectedInd(): TableRelationship | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
   }
 
-  emitHighlightedInd(rel: { relationship: Relationship; table: Table }) {
+  emitHighlightedInd(rel: TableRelationship) {
     const map = new Map<Table, ColumnCombination>();
     map.set(this.table, rel.relationship.referencing());
     map.set(rel.table, rel.relationship.referenced());
     this.selectColumns.emit(map);
   }
-  emitHighlightedCluster(cluster: {
-    columns: ColumnCombination;
-    fds: Array<FunctionalDependency>;
-  }) {
+  emitHighlightedCluster(cluster: FdCluster) {
     const map = new Map<Table, ColumnCombination>();
     map.set(this.table, cluster.columns);
     this.selectColumns.emit(map);
