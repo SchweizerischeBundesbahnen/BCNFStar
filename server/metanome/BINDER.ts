@@ -29,13 +29,14 @@ export default class BINDER extends MetanomeAlgorithm {
     return "BINDERFile.jar";
   }
 
-  // location in the JAR where the algorithm is located
   protected algoClass(): string {
     return "de.metanome.algorithms.binder.BINDERFile";
   }
 
-  // returns all files, that could contain relevant INDs for the table
-  public outputPath(): string {
+  /**
+   * @returns path where metanome put the results initially
+   */
+  protected originalOutputPath(): string {
     return join(OUTPUT_DIR, this.outputFileName() + "_inds");
   }
 
@@ -53,17 +54,21 @@ export default class BINDER extends MetanomeAlgorithm {
       await mkdir("metanome/inds");
     }
     return rename(
-      this.outputPath(),
+      this.originalOutputPath(),
       "metanome/inds/" + this.schemaAndTables.join(",")
     );
   }
 
+  /**
+   * Metanome outputs INDs as a file where every line is a JSON object
+   * describing an IND. This function adds a schemaIdentifier to that
+   * object and stores all of them as a JSON array
+   */
   public async processFiles(): Promise<void> {
     const filename = `metanome/inds/${this.schemaAndTables}`;
     const content = await readFile(filename, { encoding: "utf-8" });
-    const result: Array<IInclusionDependency> = splitlines(content)
-      .filter((s) => s)
-      .map((line) => {
+    const result: Array<IInclusionDependency> = splitlines(content).map(
+      (line) => {
         let ind: IInclusionDependency;
         try {
           ind = JSON.parse(line);
@@ -78,7 +83,8 @@ export default class BINDER extends MetanomeAlgorithm {
           splitTableIdentifier(cc, this.schemaAndTables)
         );
         return ind;
-      });
+      }
+    );
     await writeFile(filename, JSON.stringify(result));
   }
 
@@ -87,6 +93,7 @@ export default class BINDER extends MetanomeAlgorithm {
   }
 
   public async getResults(): Promise<Array<IInclusionDependency>> {
+    // find any file that includes INDs for the desired tables
     const possibleFiles = await readdir("metanome/inds");
     const goodFile = possibleFiles.find((filename) =>
       this.schemaAndTables.every((table) => filename.includes(table))

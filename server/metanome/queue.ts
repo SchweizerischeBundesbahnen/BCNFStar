@@ -52,6 +52,7 @@ function executeCommand(
   job: Job<JobData, void>
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {
+    job.log(`Executing command: "${command}"`);
     let process = exec(command, {
       cwd: absoluteServerDir + "/metanome",
     });
@@ -105,7 +106,7 @@ const worker = new Worker<JobData, void>(
   async (job) => {
     const algo = getAlgoInstance(job.data);
     if (job.progress < 90) {
-      job.log("Running metanome: ");
+      job.log("Running metanome... ");
       await emptyMetanomeDirs();
       await executeCommand(algo.command(), job);
       job.updateProgress(90);

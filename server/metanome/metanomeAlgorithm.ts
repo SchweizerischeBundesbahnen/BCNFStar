@@ -80,8 +80,8 @@ export default abstract class MetanomeAlgorithm {
   /**
    * Returns the desired metanome results for the
    * selected table if they exists.
-   * Throws an error otherwise that is of form
-   * {}
+   * @throws an error that is of form
+   * { code: 'EMOENT' } if no results exist
    */
   public abstract getResults(): Promise<any>;
 

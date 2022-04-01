@@ -28,7 +28,6 @@ export default class Normi extends MetanomeAlgorithm {
     return this.schemaAndTable;
   }
 
-  // location of the algorithm JAR relative to the package.json directory
   protected override algoJarPath(): string {
     return "Normalize-1.2-SNAPSHOT.jar";
   }
@@ -43,7 +42,6 @@ export default class Normi extends MetanomeAlgorithm {
     );
   }
 
-  // location in the JAR where the algorithm is located
   protected override algoClass(): string {
     return "de.metanome.algorithms.normalize.Normi";
   }
@@ -65,6 +63,10 @@ export default class Normi extends MetanomeAlgorithm {
     return rename(this.originalOutputPath(), this.resultOutputPath());
   }
 
+  /**
+   * Reads metanome output, converts it from Metanome FD strings to JSON
+   * and saves it
+   */
   public async processFiles(): Promise<void> {
     const content = await readFile(this.resultOutputPath(), {
       encoding: "utf-8",
