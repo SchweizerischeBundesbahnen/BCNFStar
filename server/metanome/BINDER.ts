@@ -3,6 +3,7 @@ import { join } from "path";
 import {
   access,
   mkdir,
+  open,
   readdir,
   readFile,
   rename,
@@ -53,10 +54,22 @@ export default class BINDER extends MetanomeAlgorithm {
     } catch (e) {
       await mkdir("metanome/inds");
     }
-    return rename(
-      this.originalOutputPath(),
-      "metanome/inds/" + this.schemaAndTables.join(",")
-    );
+    try {
+      return await rename(
+        this.originalOutputPath(),
+        "metanome/inds/" + this.schemaAndTables.join(",")
+      );
+    } catch (e) {
+      // no file found, this likey means metanome didn't create a file
+      // because there are no INDs. Therefore, create an empty file
+      if (e.code == "ENOENT") {
+        const handle = await open(
+          "metanome/inds/" + this.schemaAndTables.join(","),
+          "wx"
+        );
+        await handle.close();
+      } else throw e;
+    }
   }
 
   /**
