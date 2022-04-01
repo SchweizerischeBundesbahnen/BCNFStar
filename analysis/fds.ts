@@ -1,4 +1,5 @@
 import { readFile } from "fs/promises";
+import { splitlines } from "../server/utils/files";
 
 // give filename as first argument
 (async function () {
@@ -13,7 +14,7 @@ async function calculateFdStatistics(filename: string) {
   const rhsCounts = {};
   const fds: { lhs: string[]; rhs: string[] }[] = [];
   const fileContent = await readFile(filename, { encoding: "utf-8" });
-  for (const fdString of fileContent.split("\r\n")) {
+  for (const fdString of splitlines(fileContent)) {
     if (!fdString) continue;
     let [lhsString, rhsString] = fdString.split("] --> ");
     lhsString = lhsString.substring(1);

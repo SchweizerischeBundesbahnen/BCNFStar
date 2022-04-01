@@ -1,8 +1,8 @@
 import { join } from "path";
-import { access, mkdir, readFile, rename } from "fs/promises";
+import { access, mkdir, readFile, rename, writeFile } from "fs/promises";
 
 import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
-import { absoluteServerDir } from "../utils/files";
+import { absoluteServerDir, splitlines } from "../utils/files";
 import { metanomeQueue, queueEvents } from "./queue";
 import { splitTableString } from "../utils/databaseUtils";
 import { sqlUtils } from "../db";
@@ -22,6 +22,10 @@ export default class Normi extends MetanomeAlgorithm {
 
   get schemaAndTable(): string {
     return this.schemaAndTables[0];
+  }
+
+  protected outputFileName(): string {
+    return this.schemaAndTable;
   }
 
   // location of the algorithm JAR relative to the package.json directory
@@ -44,8 +48,8 @@ export default class Normi extends MetanomeAlgorithm {
     return "de.metanome.algorithms.normalize.Normi";
   }
 
-  protected outputFileName(): string {
-    return this.schemaAndTable;
+  protected resultOutputPath() {
+    return `metanome/fds/${this.schemaAndTable}.json`;
   }
 
   protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
@@ -54,20 +58,38 @@ export default class Normi extends MetanomeAlgorithm {
 
   public async moveFiles(): Promise<void> {
     try {
-      await access("/metanome/inds/");
+      await access("metanome/fds/");
     } catch (e) {
-      mkdir("/metanome/inds");
+      await mkdir("metanome/fds");
     }
-    rename(this.originalOutputPath(), "/metanome/fds/" + this.schemaAndTable);
+    return rename(this.originalOutputPath(), this.resultOutputPath());
   }
 
-  public processFiles(): Promise<void> {
-    throw Error("Not implemented!");
+  public async processFiles(): Promise<void> {
+    const content = await readFile(this.resultOutputPath(), {
+      encoding: "utf-8",
+    });
+    //  format of fdString: "[c_address, c_anothercol] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
+    const mutatedContent: Array<IFunctionalDependency> = splitlines(
+      content
+    ).map((fdString) => {
+      const [lhsString, rhsString] = fdString.split(" --> ");
+      return {
+        lhsColumns: lhsString
+          // remove brackets
+          .slice(1, -1)
+          .split(",")
+          .map((s) => s.trim()),
+        rhsColumns: rhsString.split(",").map((s) => s.trim()),
+      };
+    });
+
+    await writeFile(this.resultOutputPath(), JSON.stringify(mutatedContent));
   }
 
   public async getResults(): Promise<Array<IFunctionalDependency>> {
     return JSON.parse(
-      await readFile("/metanome/fds/" + this.schemaAndTable, {
+      await readFile(this.resultOutputPath(), {
         encoding: "utf-8",
       })
     );
@@ -79,7 +101,7 @@ export default class Normi extends MetanomeAlgorithm {
       {
         schemaAndTables: [this.schemaAndTable],
         jobType: "fd",
-        config: { humanInTheLoop: false },
+        config: { isHumanInTheLoop: false },
       }
     );
     return job.waitUntilFinished(queueEvents);

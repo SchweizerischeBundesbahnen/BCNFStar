@@ -60,7 +60,7 @@ export default abstract class MetanomeAlgorithm {
   protected configString(): string {
     if (!Object.keys(this.config).length) return "";
     return (
-      "--algorihtm-config " +
+      "--algorithm-config " +
       Object.entries(this.config)
         .map((item) => `${item[0]}:${item[1]}`)
         .join(",")

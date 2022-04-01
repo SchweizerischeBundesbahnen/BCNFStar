@@ -1,4 +1,4 @@
-import BINDER from "@/metanome/BINDER";
+import BINDER from "../metanome/BINDER";
 import { Request, Response } from "express";
 
 export default async function getFDs(
@@ -6,7 +6,7 @@ export default async function getFDs(
   res: Response
 ): Promise<void> {
   try {
-    const schemaAndTables = req.params.name.split(",");
+    const schemaAndTables = req.params.tableNames.split(",");
     const forceRerun: boolean = !!req.params.forceRerun;
     const binder = new BINDER(schemaAndTables);
     if (forceRerun) {

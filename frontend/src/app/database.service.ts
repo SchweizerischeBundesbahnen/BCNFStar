@@ -2,7 +2,7 @@ import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import ITableHead from '@server/definitions/ITableHead';
-import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
+import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import {
   IRequestBodyCreateTableSql,
   IRequestBodyDataTransferSql,
@@ -15,7 +15,7 @@ import { firstValueFrom } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
 import Column from '../model/schema/Column';
-import IInclusionDependency from '@server/definitions/IInclusionDependencies';
+import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IRelationship from '@server/definitions/IRelationship';
 
 @Injectable({
@@ -134,15 +134,19 @@ export class DatabaseService {
 
   public async setInputTables(tables: Array<Table>) {
     const indPromise = this.getINDs(tables);
-    const fdResults = await Promise.all(tables.map((v) => this.getFDs(v)));
+    const fdPromises: Record<
+      string,
+      Promise<Array<IFunctionalDependency>>
+    > = {};
+    for (const table of tables)
+      fdPromises[table.schemaAndName()] = this.getFDs(table);
 
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
-      const iFDs = fdResults.find(
-        (v) => v.tableName == table.schemaAndName()
-      ) as IFunctionalDependencies;
-      const fds = iFDs.functionalDependencies.map((fds) =>
-        FunctionalDependency.fromString(table, fds)
+      const iFDs = await fdPromises[table.schemaAndName()];
+
+      const fds = iFDs.map((fds) =>
+        FunctionalDependency.fromIFunctionalDependency(table, fds)
       );
       table.setFds(...fds);
     }
@@ -150,9 +154,9 @@ export class DatabaseService {
     this.resolveIFks(this.iFks);
   }
 
-  private getFDs(table: Table): Promise<IFunctionalDependencies> {
+  private getFDs(table: Table): Promise<Array<IFunctionalDependency>> {
     return firstValueFrom(
-      this.http.get<IFunctionalDependencies>(
+      this.http.get<Array<IFunctionalDependency>>(
         `${this.baseUrl}/tables/${table.schemaAndName()}/fds`
       )
     );
