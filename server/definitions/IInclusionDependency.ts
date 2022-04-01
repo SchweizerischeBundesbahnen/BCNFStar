@@ -5,7 +5,7 @@ export interface IColumnIdentifier {
 }
 
 interface IColumnCombination {
-  columnIdentifiers: IColumnIdentifier[];
+  columnIdentifiers: Array<IColumnIdentifier>;
 }
 
 export default interface IInclusionDependency {

@@ -195,7 +195,7 @@ from
   public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
   }
-  public getDbmsName(): string {
+  public getDbmsName(): "mssql" | "postgres" {
     return "postgres";
   }
 }
