@@ -63,6 +63,8 @@ export default abstract class MetanomeAlgorithm {
     );
   }
 
+  public abstract resultPath(): string;
+
   // INTERNAL
 
   protected classpath_separator = process.platform === "win32" ? ";" : ":";
@@ -122,7 +124,6 @@ export default abstract class MetanomeAlgorithm {
   /**
    * @returns location where file shouuld be moved to
    */
-  protected abstract resultPath(): string;
 
   protected configString(): string {
     if (!Object.keys(this.config).length) return "";

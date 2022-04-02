@@ -33,7 +33,7 @@ export default class BINDER extends MetanomeAlgorithm {
     return join(OUTPUT_DIR, this.outputFileName() + "_inds");
   }
 
-  protected resultPath(): string {
+  public resultPath(): string {
     return `metanome/inds/${this.schemaAndTables}.json`;
   }
   protected outputFileName(): string {

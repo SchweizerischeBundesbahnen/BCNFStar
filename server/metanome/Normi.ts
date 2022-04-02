@@ -46,7 +46,7 @@ export default class Normi extends MetanomeAlgorithm {
     );
   }
 
-  protected resultPath() {
+  public resultPath() {
     return `metanome/fds/${this.schemaAndTable}.json`;
   }
 
