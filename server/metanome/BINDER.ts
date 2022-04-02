@@ -1,14 +1,6 @@
 import { absoluteServerDir, splitlines } from "../utils/files";
 import { join } from "path";
-import {
-  access,
-  mkdir,
-  open,
-  readdir,
-  readFile,
-  rename,
-  writeFile,
-} from "fs/promises";
+import { open, readdir, readFile, writeFile } from "fs/promises";
 
 import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import { metanomeQueue, queueEvents } from "./queue";
@@ -41,6 +33,9 @@ export default class BINDER extends MetanomeAlgorithm {
     return join(OUTPUT_DIR, this.outputFileName() + "_inds");
   }
 
+  protected resultPath(): string {
+    return `metanome/inds/${this.schemaAndTables}.json`;
+  }
   protected outputFileName(): string {
     return (
       this.schemaAndTables.map((table) => table.replace(".", "_")).join("_") +
@@ -50,23 +45,12 @@ export default class BINDER extends MetanomeAlgorithm {
 
   public async moveFiles(): Promise<void> {
     try {
-      await access("metanome/inds/");
-    } catch (e) {
-      await mkdir("metanome/inds");
-    }
-    try {
-      return await rename(
-        this.originalOutputPath(),
-        "metanome/inds/" + this.schemaAndTables.join(",")
-      );
+      super.moveFiles();
     } catch (e) {
       // no file found, this likey means metanome didn't create a file
       // because there are no INDs. Therefore, create an empty file
       if (e.code == "ENOENT") {
-        const handle = await open(
-          "metanome/inds/" + this.schemaAndTables.join(","),
-          "wx"
-        );
+        const handle = await open(this.resultPath(), "wx");
         await handle.close();
       } else throw e;
     }
@@ -78,8 +62,7 @@ export default class BINDER extends MetanomeAlgorithm {
    * object and stores all of them as a JSON array
    */
   public async processFiles(): Promise<void> {
-    const filename = `metanome/inds/${this.schemaAndTables}`;
-    const content = await readFile(filename, { encoding: "utf-8" });
+    const content = await readFile(this.resultPath(), { encoding: "utf-8" });
     const result: Array<IInclusionDependency> = splitlines(content).map(
       (line) => {
         let ind: IInclusionDependency;
@@ -98,7 +81,7 @@ export default class BINDER extends MetanomeAlgorithm {
         return ind;
       }
     );
-    await writeFile(filename, JSON.stringify(result));
+    await writeFile(this.resultPath(), JSON.stringify(result));
   }
 
   protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
@@ -106,14 +89,17 @@ export default class BINDER extends MetanomeAlgorithm {
   }
 
   public async getResults(): Promise<Array<IInclusionDependency>> {
-    // find any file that includes INDs for the desired tables
     const possibleFiles = await readdir("metanome/inds");
+    const perfectFile = possibleFiles.find((filename) =>
+      this.resultPath().endsWith(filename)
+    );
+    // find any file that includes INDs for the desired tables
     const goodFile = possibleFiles.find((filename) =>
       this.schemaAndTables.every((table) => filename.includes(table))
     );
-    if (goodFile)
+    if (perfectFile || goodFile)
       return JSON.parse(
-        await readFile("metanome/inds/" + goodFile, {
+        await readFile("metanome/inds/" + perfectFile || goodFile, {
           encoding: "utf-8",
         })
       );

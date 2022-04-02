@@ -1,5 +1,5 @@
 import { join } from "path";
-import { access, mkdir, readFile, rename, writeFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 
 import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import { absoluteServerDir, splitlines } from "../utils/files";
@@ -32,6 +32,10 @@ export default class Normi extends MetanomeAlgorithm {
     return "Normalize-1.2-SNAPSHOT.jar";
   }
 
+  protected override algoClass(): string {
+    return "de.metanome.algorithms.normalize.Normi";
+  }
+
   protected originalOutputPath(): string {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
@@ -42,11 +46,7 @@ export default class Normi extends MetanomeAlgorithm {
     );
   }
 
-  protected override algoClass(): string {
-    return "de.metanome.algorithms.normalize.Normi";
-  }
-
-  protected resultOutputPath() {
+  protected resultPath() {
     return `metanome/fds/${this.schemaAndTable}.json`;
   }
 
@@ -54,21 +54,12 @@ export default class Normi extends MetanomeAlgorithm {
     return "INPUT_GENERATOR";
   }
 
-  public async moveFiles(): Promise<void> {
-    try {
-      await access("metanome/fds/");
-    } catch (e) {
-      await mkdir("metanome/fds");
-    }
-    return rename(this.originalOutputPath(), this.resultOutputPath());
-  }
-
   /**
    * Reads metanome output, converts it from Metanome FD strings to JSON
    * and saves it
    */
   public async processFiles(): Promise<void> {
-    const content = await readFile(this.resultOutputPath(), {
+    const content = await readFile(this.resultPath(), {
       encoding: "utf-8",
     });
     //  format of fdString: "[c_address, c_anothercol] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
@@ -86,12 +77,12 @@ export default class Normi extends MetanomeAlgorithm {
       };
     });
 
-    await writeFile(this.resultOutputPath(), JSON.stringify(mutatedContent));
+    await writeFile(this.resultPath(), JSON.stringify(mutatedContent));
   }
 
   public async getResults(): Promise<Array<IFunctionalDependency>> {
     return JSON.parse(
-      await readFile(this.resultOutputPath(), {
+      await readFile(this.resultPath(), {
         encoding: "utf-8",
       })
     );
