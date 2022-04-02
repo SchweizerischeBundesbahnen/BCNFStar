@@ -6,8 +6,8 @@ import Table from './Table';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
-  private _fkRelationships = new Set<Relationship>();
-  private _indRelationships = new Set<Relationship>();
+  private _fks = new Set<Relationship>();
+  private _inds = new Set<Relationship>();
 
   public constructor(...tables: Array<Table>) {
     this.add(...tables);
@@ -30,39 +30,39 @@ export default class Schema {
   /**
    * Returns a copy of the set of foreign key relationships
    */
-  public get fkRelationships(): Set<Relationship> {
-    return new Set(this._fkRelationships);
+  public get fks(): Set<Relationship> {
+    return new Set(this._fks);
   }
 
-  public set fkRelationships(fkRelationships: Set<Relationship>) {
-    this._fkRelationships = fkRelationships;
+  public set fks(fkRelationships: Set<Relationship>) {
+    this._fks = fkRelationships;
     this.relationshipsValid = false;
   }
 
-  public addFkRelationship(fkRelationship: Relationship) {
-    this._fkRelationships.add(fkRelationship);
+  public addFk(fk: Relationship) {
+    this._fks.add(fk);
     this.relationshipsValid = false;
   }
 
-  public deleteFkRelationship(fkRelationship: Relationship) {
-    this._fkRelationships.delete(fkRelationship);
+  public deleteFk(fk: Relationship) {
+    this._fks.delete(fk);
     this.relationshipsValid = false;
   }
 
   /**
    * Returns a copy of the set of inclusion dependency relationships
    */
-  public get indRelationships(): Set<Relationship> {
-    return new Set(this._indRelationships);
+  public get inds(): Set<Relationship> {
+    return new Set(this._inds);
   }
 
-  public set indRelationships(indRelationships: Set<Relationship>) {
-    this._indRelationships = indRelationships;
+  public set inds(inds: Set<Relationship>) {
+    this._inds = inds;
     this.relationshipsValid = false;
   }
 
-  public addIndRelationship(indRelationship: Relationship) {
-    this._indRelationships.add(indRelationship);
+  public addInd(ind: Relationship) {
+    this._inds.add(ind);
     this.relationshipsValid = false;
   }
 
@@ -94,7 +94,7 @@ export default class Schema {
     table: Table
   ): Set<{ relationship: Relationship; table: Table }> {
     let fks = new Set<{ relationship: Relationship; table: Table }>();
-    let possibleFkRelationships = [...this.fkRelationships].filter((rel) =>
+    let possibleFkRelationships = [...this.fks].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
     for (let otherTable of this.tables) {
@@ -126,8 +126,8 @@ export default class Schema {
     table: Table
   ): Array<{ relationship: Relationship; table: Table }> {
     let inds = new Array<{ relationship: Relationship; table: Table }>();
-    let onlyIndRelationships = new Set(this.indRelationships);
-    this.fkRelationships.forEach((rel) => onlyIndRelationships.delete(rel));
+    let onlyIndRelationships = new Set(this.inds);
+    this.fks.forEach((rel) => onlyIndRelationships.delete(rel));
     let possibleIndRelationships = [...onlyIndRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
@@ -198,8 +198,19 @@ export default class Schema {
     });
   }
 
-  public split(table: Table, fd: FunctionalDependency) {
-    let tables = table.split(fd);
+  /**
+   *
+   * @param table Table to split
+   * @param fd Functional Dependency to split on
+   * @param generatingName Name to give to the newly created table
+   * @returns the resulting tables
+   */
+  public split(
+    table: Table,
+    fd: FunctionalDependency,
+    generatingName?: string
+  ) {
+    let tables = table.split(fd, generatingName);
     this.add(...tables);
     this.delete(table);
     return tables;

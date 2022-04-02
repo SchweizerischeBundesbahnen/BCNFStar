@@ -1,5 +1,5 @@
 import Column from './Column';
-import Table from './Table';
+import TableIdentifier from './TableIdentifier';
 
 export default class ColumnCombination {
   private _columns = new Set<Column>();
@@ -36,21 +36,21 @@ export default class ColumnCombination {
     );
   }
 
-  public sourceTable(): Table {
+  public sourceTable(): TableIdentifier {
     let sourceTables = this.sourceTables();
     if (sourceTables.length > 1)
-      console.log(
+      console.warn(
         'Warning: expected only one sourceTable but there are ' +
           sourceTables.length
       );
     return sourceTables[0];
   }
 
-  public sourceTables(): Array<Table> {
-    let sourceTables = new Array<Table>();
+  public sourceTables(): Array<TableIdentifier> {
+    let sourceTables = new Array<TableIdentifier>();
     this._columns.forEach((column) => {
-      if (!sourceTables.includes(column.sourceTable))
-        sourceTables.push(column.sourceTable);
+      if (!sourceTables.includes(column.source.table))
+        sourceTables.push(column.source.table);
     });
     return sourceTables;
   }
@@ -104,10 +104,12 @@ export default class ColumnCombination {
 
   public inOrder(): Array<Column> {
     return this.asArray().sort((col1, col2) => {
-      if (col1.sourceTable.schemaAndName() == col2.sourceTable.schemaAndName())
+      if (
+        col1.source.table.schemaAndName() == col2.source.table.schemaAndName()
+      )
         return col1.ordinalPosition - col2.ordinalPosition;
       // Todo: make sure most important tables are on top, not just alphabetically
-      if (col1.sourceTable.name < col2.sourceTable.name) return 1;
+      if (col1.source.table.name < col2.source.table.name) return 1;
       else return -1;
     });
   }

@@ -4,6 +4,8 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
+import TableIdentifier from './TableIdentifier';
+import ColumnIdentifier from './ColumnIdentifier';
 
 export default class Table {
   public name = '';
@@ -12,7 +14,7 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Set<Relationship>();
-  public sourceTables = new Set<Table>();
+  public sources = new Set<TableIdentifier>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -44,33 +46,46 @@ export default class Table {
   public static fromITable(iTable: ITable): Table {
     let columns = new ColumnCombination();
     let table = new Table(columns);
+    let tableIdentifier = new TableIdentifier(iTable.name, iTable.schemaName);
     iTable.attributes.forEach((iAttribute, index) => {
+      let columnIdentifier = new ColumnIdentifier(
+        iAttribute.name,
+        tableIdentifier
+      );
       columns.add(
-        new Column(iAttribute.name, iAttribute.dataType, index, table)
+        new Column(
+          iAttribute.name,
+          iAttribute.dataType,
+          index,
+          columnIdentifier
+        )
       );
     });
     table.name = iTable.name;
     table.schemaName = iTable.schemaName;
-    table.sourceTables.add(table.copy());
+    table.sources.add(tableIdentifier);
     return table;
-  }
-
-  public copy(): Table {
-    const copy: Table = new Table(this.columns);
-    copy.name = this.name;
-    copy.schemaName = this.schemaName;
-    return copy;
   }
 
   public schemaAndName(): string {
     return this.schemaName + '.' + this.name;
   }
-  public static fromColumnNames(...names: Array<string>) {
+
+  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
     const table: Table = new Table();
-    names.forEach((name, i) =>
-      table.columns.add(new Column(name, 'unknown data type', i, table))
+    table.name = tableName;
+    let tableIdentifier = new TableIdentifier(tableName, '');
+    columnNames.forEach((name, i) =>
+      table.columns.add(
+        new Column(
+          name,
+          'unknown data type',
+          i,
+          new ColumnIdentifier(name, tableIdentifier)
+        )
+      )
     );
-    table.sourceTables.add(table);
+    table.sources.add(table);
     return table;
   }
 
@@ -95,7 +110,10 @@ export default class Table {
     return fd.rhs.copy();
   }
 
-  public split(fd: FunctionalDependency): Array<Table> {
+  public split(
+    fd: FunctionalDependency,
+    generatingName?: string
+  ): Array<Table> {
     let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
     fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
@@ -109,20 +127,23 @@ export default class Table {
     remaining.pk = this.pk;
     generating.pk = fd.lhs.copy();
 
-    remaining.name = this.name;
     remaining.schemaName = this.schemaName;
-    generating.name = fd.lhs.columnNames().join('_').substring(0, 50);
+    remaining.name = this.name;
+
     generating.schemaName = this.schemaName;
+    generating.name =
+      generatingName || fd.lhs.columnNames().join('_').substring(0, 50);
+
     return [remaining, generating];
   }
 
   public projectRelationships(table: Table): void {
     // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
     let neededSourceTables = new Set(table.columns.sourceTables());
-    let sourceTables = new Set(this.sourceTables);
+    let sourceTables = new Set(this.sources);
     let relationships = new Set(this.relationships);
 
-    let toRemove: Set<Table>;
+    let toRemove: Set<TableIdentifier>;
     do {
       toRemove = new Set();
       sourceTables.forEach((sourceTable) => {
@@ -142,7 +163,7 @@ export default class Table {
       toRemove.forEach((table) => sourceTables.delete(table));
     } while (toRemove.size > 0);
 
-    table.sourceTables = sourceTables;
+    table.sources = sourceTables;
     table.relationships = relationships;
   }
 
@@ -191,11 +212,9 @@ export default class Table {
     newTable.schemaName = remaining.schemaName;
 
     // source tables
-    this.sourceTables.forEach((sourceTable) =>
-      newTable.sourceTables.add(sourceTable)
-    );
-    otherTable.sourceTables.forEach((sourceTable) =>
-      newTable.sourceTables.add(sourceTable)
+    this.sources.forEach((sourceTable) => newTable.sources.add(sourceTable));
+    otherTable.sources.forEach((sourceTable) =>
+      newTable.sources.add(sourceTable)
     );
 
     return newTable;

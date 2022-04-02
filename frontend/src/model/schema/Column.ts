@@ -1,22 +1,23 @@
 import IAttribute from '@server/definitions/IAttribute';
-import Table from './Table';
+import * as _ from 'underscore';
+import ColumnIdentifier from './ColumnIdentifier';
 
 export default class Column {
   name: string;
   dataType: string;
   ordinalPosition: number;
-  sourceTable: Table;
+  source: ColumnIdentifier;
 
   public constructor(
     name: string,
     dataType: string,
     ordinalPosition: number,
-    sourceTable: Table
+    source: ColumnIdentifier
   ) {
     this.name = name;
     this.dataType = dataType;
     this.ordinalPosition = ordinalPosition;
-    this.sourceTable = sourceTable;
+    this.source = source;
   }
 
   public copy(): Column {
@@ -24,18 +25,18 @@ export default class Column {
       this.name,
       this.dataType,
       this.ordinalPosition,
-      this.sourceTable
+      this.source
     );
   }
 
   public equals(column: Column): boolean {
-    return this.sourceTable == column.sourceTable && this.name == column.name;
+    return _.isEqual(this.source, column.source);
   }
 
   public toIAttribute(): IAttribute {
     return {
       name: this.name,
-      table: this.sourceTable.name,
+      table: this.source.table.name,
       dataType: this.dataType,
     };
   }
