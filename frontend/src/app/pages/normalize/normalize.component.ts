@@ -16,6 +16,7 @@ import Relationship from '@/src/model/schema/Relationship';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
+import { TableRelationship } from '@/src/model/types/TableRelationship';
 
 @Component({
   selector: 'app-normalize',
@@ -96,16 +97,12 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onIndToFk(event: {
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }): void {
+  onIndToFk(event: TableRelationship): void {
     let command = new IndToFkCommand(
       this.schema,
       event.relationship,
-      event.source,
-      event.target
+      event.referencing,
+      event.referenced
     );
 
     this.commandProcessor.do(command);
@@ -179,9 +176,9 @@ export class NormalizeComponent {
 
       for (const fk of this.schema.fksOf(table)) {
         const fkSql = await this.dataService.getForeignKeySql(
-          table,
+          fk.referencing,
           fk.relationship,
-          fk.table
+          fk.referenced
         );
         this.sql.foreignKeyConstraints += '\n' + fkSql.sql + '\n';
       }

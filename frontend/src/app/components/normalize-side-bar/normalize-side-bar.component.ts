@@ -1,4 +1,3 @@
-import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import {
@@ -30,11 +29,7 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() indToFk = new EventEmitter<{
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }>();
+  @Output() indToFk = new EventEmitter<TableRelationship>();
   @Output() selectColumns = new EventEmitter<Map<Table, ColumnCombination>>();
   @Output() renameTable = new EventEmitter<{
     table: Table;
@@ -68,8 +63,8 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
 
   emitHighlightedInd(rel: TableRelationship) {
     const map = new Map<Table, ColumnCombination>();
-    map.set(this.table, rel.relationship.referencing());
-    map.set(rel.table, rel.relationship.referenced());
+    map.set(rel.referencing, rel.relationship.referencing());
+    map.set(rel.referenced, rel.relationship.referenced());
     this.selectColumns.emit(map);
   }
   emitHighlightedCluster(cluster: FdCluster) {
@@ -101,14 +96,12 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     const tables: Array<Table> = event.value;
     this.inds = this.schema
       .indsOf(this.table)
-      .filter((r) => tables.includes(r.table));
+      .filter((r) => tables.includes(r.referenced));
   }
 
   transformIndToFk(): void {
-    this.indToFk.emit({
-      source: this.table!,
-      target: this.selectedInd()!.table,
-      relationship: this.selectedInd()!.relationship,
-    });
+    const ind = this.selectedInd();
+    if (!ind) return;
+    this.indToFk.emit(ind);
   }
 }

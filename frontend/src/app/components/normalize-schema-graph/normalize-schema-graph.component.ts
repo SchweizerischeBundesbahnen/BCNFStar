@@ -236,7 +236,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
               '_right',
           },
           target: {
-            id: this.graphStorage.get(fk.table)?.jointjsEl.id,
+            id: this.graphStorage.get(fk.referenced)?.jointjsEl.id,
             port:
               fkReferenced.source.table.schemaAndName() +
               '.' +
@@ -245,9 +245,9 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
           },
           z: -1,
         });
-        this.graphStorage.get(table)?.links.set(fk.table, link);
+        this.graphStorage.get(table)?.links.set(fk.referenced, link);
         this.graph.addCell(link);
-        this.addJoinButton(link, table, fk.table, fk.relationship);
+        this.addJoinButton(link, table, fk.referenced, fk.relationship);
       }
     }
   }

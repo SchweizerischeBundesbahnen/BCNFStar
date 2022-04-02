@@ -87,6 +87,11 @@ export default class Schema {
     table._relationshipsValid = true;
   }
 
+  /**
+   *
+   * @param table
+   * @returns FKs, where table is on the referencing side
+   */
   private calculateFksOf(table: Table): Set<TableRelationship> {
     let fks = new Set<TableRelationship>();
     let possibleFkRelationships = [...this.fks].filter((rel) =>
@@ -103,7 +108,8 @@ export default class Schema {
       ) {
         fks.add({
           relationship: Relationship.fromTables(table, otherTable),
-          table: otherTable,
+          referenced: otherTable,
+          referencing: table,
         });
       }
 
@@ -111,15 +117,25 @@ export default class Schema {
       possibleFkRelationships
         .filter((rel) => otherTable.isKey(rel.referenced()))
         .forEach((relationship) => {
-          fks.add({ relationship: relationship, table: otherTable });
+          fks.add({
+            relationship: relationship,
+            referencing: table,
+            referenced: otherTable,
+          });
         });
     }
     return fks;
   }
 
+  /**
+   * @param table
+   * @returns All INDs where table is referencing,
+   * except for the ones that are akready foreign keys
+   */
   private calculateIndsOf(table: Table): Array<TableRelationship> {
     let inds = new Array<TableRelationship>();
     let onlyIndRelationships = new Set(this.inds);
+    // TODO: find out why this doesn't delete anythign anymore
     this.fks.forEach((rel) => onlyIndRelationships.delete(rel));
     let possibleIndRelationships = [...onlyIndRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
@@ -133,7 +149,11 @@ export default class Schema {
             otherTable.isKey(rel.referenced())
         )
         .forEach((rel) => {
-          inds.push({ relationship: rel, table: otherTable });
+          inds.push({
+            relationship: rel,
+            referenced: otherTable,
+            referencing: table,
+          });
         });
     }
     inds.sort((ind1, ind2) => {

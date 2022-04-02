@@ -3,5 +3,6 @@ import Table from '../schema/Table';
 
 export interface TableRelationship {
   relationship: Relationship;
-  table: Table;
+  referencing: Table;
+  referenced: Table;
 }
