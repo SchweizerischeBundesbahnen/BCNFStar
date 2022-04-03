@@ -40,9 +40,9 @@ export default class Normi extends MetanomeAlgorithm {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
       OUTPUT_DIR,
-      sqlUtils.getDbmsName() == "mssql"
+      (sqlUtils.getDbmsName() == "mssql"
         ? this.schemaAndTable
-        : table + "-hyfd_extended.txt"
+        : table) + "-hyfd_extended.txt"
     );
   }
 
