@@ -5,8 +5,8 @@
 
 // execute from within server folder (!) with `ts-node ./metanome/convert.ts`
 
-// Will not work if the table name contained any dot except for the
-// one between schema name and table name
+// Will not work if the table name contained any underscores or dots except
+// for the dot between schema name and table name
 // If it runs through successfully, you may delete the metanome/temp
 // and metanome/results folders
 
