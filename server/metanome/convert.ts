@@ -42,8 +42,8 @@ import Normi from "./Normi";
     }
   }
 
-  await createFolder("/metanome/inds");
-  await createFolder("/metanome/fds");
+  await createFolder("./metanome/inds");
+  await createFolder("./metanome/fds");
 
   for (let i = 0; i < fdNames.length; i++) {
     const normi = new Normi(fdNames[i]);
