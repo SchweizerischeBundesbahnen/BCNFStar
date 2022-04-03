@@ -3,7 +3,7 @@
 // if there are files in the metanome/inds and metanome/fds folder,
 // you are using the new version and there is no need to convert
 
-// execute from within server folder (!) with `ts-node convert.ts`
+// execute from within server folder (!) with `ts-node ./metanome/convert.ts`
 
 // Will not work if the table name contained any dot except for the
 // one between schema name and table name
