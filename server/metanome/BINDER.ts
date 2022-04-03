@@ -120,7 +120,7 @@ export default class BINDER extends MetanomeAlgorithm {
 }
 
 /**
- * This function takes a metanone result column identifier, which just
+ * This function takes a metanome result column identifier, which just
  * includes a table- and columnIdentifier, and adds a schemaIdentifier to it
  * @param cId column identifier obtained from metanome output
  * @param tablesWithSchema list of tables metanome was executed on
