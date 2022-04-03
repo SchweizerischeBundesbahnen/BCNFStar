@@ -99,7 +99,7 @@ export default class BINDER extends MetanomeAlgorithm {
     );
     if (perfectFile || goodFile)
       return JSON.parse(
-        await readFile("metanome/inds/" + perfectFile || goodFile, {
+        await readFile("metanome/inds/" + (perfectFile || goodFile), {
           encoding: "utf-8",
         })
       );
