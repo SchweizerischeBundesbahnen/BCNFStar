@@ -2,6 +2,7 @@ import { exampleTable } from "../../utils/exampleTables";
 import FunctionalDependency from "../../../frontend/src/model/schema/FunctionalDependency";
 import Relationship from "../../../frontend/src/model/schema/Relationship";
 import Table from "../../../frontend/src/model/schema/Table";
+import TableIdentifier from "../../../frontend/src/model/schema/TableIdentifier";
 
 describe("Table", () => {
   let table: Table;
@@ -88,7 +89,8 @@ function expectedSplitTablesFd1(table: Table): Array<Table> {
   ];
   generating.fds = [table.fds[1], table.fds[2]];
   //sourceTables
-  remaining.sources = new Set([table]);
+  let tableIdentifier = new TableIdentifier("Example Table", "public");
+  remaining.sources = new Set([tableIdentifier, table]);
   generating.sources = new Set(Array.from(table.sources));
   //relationships
   remaining.relationships = new Set();

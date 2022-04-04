@@ -16,6 +16,7 @@ describe("Schema", () => {
   });
 
   it("calculates fks of a table correctly", () => {
+    console.log(schema);
     let fks = schema.fksOf(tableA);
     expect(fks.size).to.equal(1);
     let fk = [...fks][0];
