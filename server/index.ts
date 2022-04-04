@@ -16,6 +16,10 @@ import getDataTransferSQL from "./routes/persist_schema/transferData";
 import getAddPrimaryKeySQL from "./routes/persist_schema/createPrimaryKey";
 import { getTableHead } from "./routes/tableHeads";
 import createQueueMonitor from "./queueMonitor";
+import {
+  deleteMetanomeResults,
+  getMetanomeResults,
+} from "./routes/metanomeResults";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -54,6 +58,8 @@ app.get("/fks", getFksFunction);
 // Metanome
 app.get("/tables/:name/fds", getFDsFromTableNameFunction);
 app.get("/tables/:tableNames/inds", getINDsForTablesFunction);
+app.get("/tables/metanomeResults", getMetanomeResults);
+app.delete("/tables/metanomeResults/:file", deleteMetanomeResults);
 
 app.post("/persist/createTable", getCreateTableSQL());
 app.post("/persist/createForeignKey", getCreateForeignKeySQL());

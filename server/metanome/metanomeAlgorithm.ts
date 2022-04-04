@@ -20,7 +20,7 @@ export interface IndexFileEntry {
 export default abstract class MetanomeAlgorithm {
   public memory = "12g";
 
-  protected static resultsFolder = join(
+  public static resultsFolder = join(
     absoluteServerDir,
     "metanome",
     "bcnfstar_results"
@@ -72,7 +72,7 @@ export default abstract class MetanomeAlgorithm {
     const content = await this.getIndexContent();
     return writeFile(
       this.indexFileLocation,
-      JSON.stringify(content.filter((entry) => entry.fileName == fileName))
+      JSON.stringify(content.filter((entry) => entry.fileName !== fileName))
     );
   }
 
