@@ -9,6 +9,7 @@ import IInclusionDependency, {
 } from "../definitions/IInclusionDependency";
 import { splitTableString } from "../utils/databaseUtils";
 import { sqlUtils } from "../db";
+import { isEqual } from "lodash";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
@@ -39,8 +40,6 @@ export default class BINDER extends MetanomeAlgorithm {
       // no file found, this likey means metanome didn't create a file
       // because there are no INDs. Therefore, create an empty file
       if (e.code == "ENOENT") {
-        console.log("failed to move file. creating empty file in:");
-        console.log(await this.resultPath());
         const handle = await open(await this.resultPath(), "wx");
         await handle.close();
       } else throw e;
@@ -57,13 +56,7 @@ export default class BINDER extends MetanomeAlgorithm {
     const content = await readFile(path, { encoding: "utf-8" });
     const result: Array<IInclusionDependency> = splitlines(content).map(
       (line) => {
-        let ind: IInclusionDependency;
-        try {
-          ind = JSON.parse(line);
-        } catch (e) {
-          console.log(e);
-          console.log(line);
-        }
+        let ind: IInclusionDependency = JSON.parse(line);
         ind.dependant.columnIdentifiers.map((cc) =>
           splitTableIdentifier(cc, this.schemaAndTables)
         );
@@ -80,32 +73,48 @@ export default class BINDER extends MetanomeAlgorithm {
     return "INPUT_FILES";
   }
 
+  /**
+   * Tries to find INDs from existing results for this.schemaAndTables
+   * First tries to find a perfect match (results where the list of tables
+   * is identical to this.schemaAndTables). If nothing is found, it tries to
+   * find a file that contains INDs for a superset of the desired tables isntead.
+   * @throws {code: 'EMOENT'} if nothing is found
+   */
   public async getResults(): Promise<Array<IInclusionDependency>> {
-    const possibleFiles = await MetanomeAlgorithm.getIndexContent();
-    const perfectFile = possibleFiles.find(
-      (entry) =>
-        this.schemaAndTables.length === entry.tables.length &&
-        this.schemaAndTables.every(
-          (item, index) => item === entry.tables[index]
-        )
+    const possibleFiles = (await MetanomeAlgorithm.getIndexContent()).filter(
+      (entry) => entry.algorithm === this.algoClass()
+    );
+    const perfectFile = possibleFiles.find((entry) =>
+      isEqual(entry.tables, this.schemaAndTables)
     );
     // find any file that includes INDs for the desired tables
     const goodFile = possibleFiles.find((entry) =>
       this.schemaAndTables.every((table) => entry.tables.includes(table))
     );
-    if (perfectFile || goodFile)
-      return JSON.parse(
-        await readFile(
-          join(
-            absoluteServerDir,
-            "metanome",
-            "inds",
-            perfectFile?.fileName || goodFile.fileName
-          ),
-          { encoding: "utf-8" }
-        )
+    const file = perfectFile || goodFile;
+    if (file) {
+      const content: Array<IInclusionDependency> = JSON.parse(
+        await readFile(join(MetanomeAlgorithm.resultsFolder, file.fileName), {
+          encoding: "utf-8",
+        })
       );
-    else throw { code: "ENOENT" };
+      // if file contains additional tables, filter out ones that were not requested
+      return perfectFile
+        ? content
+        : content.filter(
+            (ind) =>
+              ind.dependant.columnIdentifiers.every((cc) =>
+                this.schemaAndTables.includes(
+                  `${cc.schemaIdentifier}.${cc.tableIdentifier}`
+                )
+              ) &&
+              ind.referenced.columnIdentifiers.every((cc) =>
+                this.schemaAndTables.includes(
+                  `${cc.schemaIdentifier}.${cc.tableIdentifier}`
+                )
+              )
+          );
+    } else throw { code: "ENOENT" };
   }
 
   async execute(): Promise<void> {

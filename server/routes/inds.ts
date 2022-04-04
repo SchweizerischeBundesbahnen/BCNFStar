@@ -1,7 +1,7 @@
 import BINDER from "../metanome/BINDER";
 import { Request, Response } from "express";
 
-export default async function getFDs(
+export default async function getINDs(
   req: Request,
   res: Response
 ): Promise<void> {
@@ -9,25 +9,26 @@ export default async function getFDs(
     const schemaAndTables = req.params.tableNames.split(",");
     const forceRerun: boolean = !!req.params.forceRerun;
     const binder = new BINDER(schemaAndTables);
-    if (forceRerun) {
+    const executeAndSend = async () => {
       await binder.execute();
       res.json(await binder.getResults());
-      return;
-    }
-    try {
-      res.json(await binder.getResults());
-    } catch (err) {
-      // means file not found
-      if (err.code === "ENOENT") {
-        await binder.execute();
+    };
+    if (forceRerun) await executeAndSend();
+    else {
+      try {
         res.json(await binder.getResults());
-      } else {
-        throw err;
+      } catch (err) {
+        // means file not found
+        if (err.code === "ENOENT") {
+          await executeAndSend();
+        } else {
+          throw err;
+        }
       }
     }
   } catch (error) {
     console.error(error);
     if (!res.headersSent)
-      res.status(502).json({ error: "Could not get inds for tables." });
+      res.status(502).json({ error: "Could not get fds for table... " });
   }
 }

@@ -1,7 +1,7 @@
-import { absoluteServerDir } from "../utils/files";
-import { dirname, join } from "path";
+import { absoluteServerDir, initFile } from "../utils/files";
+import { join } from "path";
 import { sqlUtils } from "../db";
-import { access, mkdir, readFile, rename, writeFile } from "fs/promises";
+import { readFile, rename, writeFile } from "fs/promises";
 import { createHash, randomUUID } from "crypto";
 import * as _ from "lodash";
 
@@ -20,6 +20,12 @@ export interface IndexFileEntry {
 export default abstract class MetanomeAlgorithm {
   public memory = "12g";
 
+  protected static resultsFolder = join(
+    absoluteServerDir,
+    "metanome",
+    "bcnfstar_results"
+  );
+
   // FOR USE FROM INSIIDE QUEUE
 
   /**
@@ -29,15 +35,14 @@ export default abstract class MetanomeAlgorithm {
     return rename(this.originalOutputPath(), await this.resultPath());
   }
 
-  private static indexFileLocation = join(
-    absoluteServerDir,
-    "metanome",
-    "bcnfstar_results",
-    "index.json"
-  );
+  private static indexFileLocation = join(this.resultsFolder, "index.json");
 
   /**
-   *
+   * adds this algorithm execution to the index file.
+   * The index file is used to locate metanome result files.
+   * Previously, the file was identified by concatenating the
+   * table names in the file name, but this was impossible
+   * since file names have limited length
    */
   public async addToIndexFile(): Promise<void> {
     const content = await MetanomeAlgorithm.getIndexContent();
@@ -61,22 +66,18 @@ export default abstract class MetanomeAlgorithm {
    * possible, and is either completely clears or completely
    * fails, but doen't leave corrupted state. The calling context
    * is responsible for making sure both actions succeed
+   * @param fileName name of the file to be deleted (without folders)
    */
-  public static async deleteFileFromIndex(path: string): Promise<void> {
+  public static async deleteFileFromIndex(fileName: string): Promise<void> {
     const content = await this.getIndexContent();
     return writeFile(
       this.indexFileLocation,
-      JSON.stringify(content.filter((entry) => entry.fileName == path))
+      JSON.stringify(content.filter((entry) => entry.fileName == fileName))
     );
   }
 
   public static async getIndexContent(): Promise<IndexFileEntry[]> {
-    try {
-      await access(this.indexFileLocation);
-    } catch (e) {
-      await mkdir(dirname(this.indexFileLocation));
-      await writeFile(this.indexFileLocation, "[]");
-    }
+    await initFile(this.indexFileLocation, "[]");
     const contentString = await readFile(this.indexFileLocation, {
       encoding: "utf-8",
     });
@@ -105,7 +106,6 @@ export default abstract class MetanomeAlgorithm {
   public abstract execute(): Promise<void>;
 
   /**
-   *
    * @returns terminal command to execute the algorithm as string
    */
   public command(): string {
@@ -119,18 +119,6 @@ export default abstract class MetanomeAlgorithm {
       /(\r\n|\n|\r)/gm,
       ""
     );
-  }
-
-  public async resultPath(): Promise<string> {
-    const metadata = await MetanomeAlgorithm.getIndexContent();
-    const entry = metadata.find((entry) => {
-      return (
-        _.isEqual(this.schemaAndTables, entry.tables) &&
-        _.isEqual(this.config, entry.config) &&
-        entry.algorithm == this.algoClass()
-      );
-    });
-    return join(absoluteServerDir, "bcnfstar-results", entry.fileName);
   }
 
   // INTERNAL
@@ -154,6 +142,23 @@ export default abstract class MetanomeAlgorithm {
       sqlUtils.getJdbcPath(),
       this.algoJarPath(),
     ].join(classpath_separator);
+  }
+
+  /**
+   * @returns absolute location of a file containing results for these this.schemaAndTables and this algorithm
+   * this is the final path after all operations
+   */
+  public async resultPath(): Promise<string> {
+    const metadata = await MetanomeAlgorithm.getIndexContent();
+    const entry = metadata.find((entry) => {
+      return (
+        _.isEqual(this.schemaAndTables, entry.tables) &&
+        // _.isEqual(this.config, entry.config) &&
+        entry.algorithm == this.algoClass()
+      );
+    });
+    if (!entry) throw { code: "ENOENT" };
+    return join(MetanomeAlgorithm.resultsFolder, entry.fileName);
   }
   /**
    * Location of the algorithm-specific jar file relative to the metanome folder
