@@ -1,4 +1,3 @@
-import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import {
@@ -15,6 +14,9 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 import Column from '@/src/model/schema/Column';
+import { FdCluster } from '@/src/model/types/FdCluster';
+import { TableRelationship } from '@/src/model/types/TableRelationship';
+
 @Component({
   selector: 'app-normalize-side-bar',
   templateUrl: './normalize-side-bar.component.html',
@@ -24,12 +26,8 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() indToFk = new EventEmitter<{
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }>();
-  @Output() selectColumns = new EventEmitter<ColumnCombination>();
+  @Output() indToFk = new EventEmitter<TableRelationship>();
+  @Output() selectColumns = new EventEmitter<Map<Table, ColumnCombination>>();
   @Output() renameTable = new EventEmitter<{
     table: Table;
     newName: string;
@@ -57,9 +55,21 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     this.indFilter = Array.from(this.schema.tables);
   }
 
-  selectedInd(): { relationship: Relationship; table: Table } | undefined {
+  selectedInd(): TableRelationship | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
+  }
+
+  emitHighlightedInd(rel: TableRelationship) {
+    const map = new Map<Table, ColumnCombination>();
+    map.set(rel.referencing, rel.relationship.referencing());
+    map.set(rel.referenced, rel.relationship.referenced());
+    this.selectColumns.emit(map);
+  }
+  emitHighlightedCluster(cluster: FdCluster) {
+    const map = new Map<Table, ColumnCombination>();
+    map.set(this.table, cluster.columns);
+    this.selectColumns.emit(map);
   }
 
   setTableName() {
@@ -84,14 +94,12 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   inds() {
     return this.schema
       .indsOf(this.table)
-      .filter((r) => this.indFilter.includes(r.table));
+      .filter((r) => this.indFilter.includes(r.referenced));
   }
 
   transformIndToFk(): void {
-    this.indToFk.emit({
-      source: this.table!,
-      target: this.selectedInd()!.table,
-      relationship: this.selectedInd()!.relationship,
-    });
+    const ind = this.selectedInd();
+    if (!ind) return;
+    this.indToFk.emit(ind);
   }
 }
