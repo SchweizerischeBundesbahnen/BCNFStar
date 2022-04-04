@@ -17,6 +17,7 @@ export async function getMetanomeResults(req: Request, res: Response) {
 
 export async function deleteMetanomeResults(req: Request, res: Response) {
   try {
+    console.log("deleting");
     const file = req.params.file;
     res.json(
       await metanomeQueue.add(`Deleting metanome result: ${file}`, {

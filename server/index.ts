@@ -58,8 +58,8 @@ app.get("/fks", getFksFunction);
 // Metanome
 app.get("/tables/:name/fds", getFDsFromTableNameFunction);
 app.get("/tables/:tableNames/inds", getINDsForTablesFunction);
-app.get("/tables/metanomeResults", getMetanomeResults);
-app.delete("/tables/metanomeResults/:file", deleteMetanomeResults);
+app.get("/metanomeResults", getMetanomeResults);
+app.delete("/metanomeResults/:file", deleteMetanomeResults);
 
 app.post("/persist/createTable", getCreateTableSQL());
 app.post("/persist/createForeignKey", getCreateForeignKeySQL());

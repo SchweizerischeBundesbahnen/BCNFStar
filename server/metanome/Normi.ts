@@ -1,7 +1,8 @@
 import { join } from "path";
 import { readFile, writeFile } from "fs/promises";
 
-import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
+import MetanomeAlgorithm from "./metanomeAlgorithm";
+import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
 import { absoluteServerDir, splitlines } from "../utils/files";
 import { metanomeQueue, queueEvents } from "./queue";
 import { splitTableString } from "../utils/databaseUtils";

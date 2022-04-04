@@ -2,7 +2,8 @@ import { absoluteServerDir, splitlines } from "../utils/files";
 import { join } from "path";
 import { open, readFile, writeFile } from "fs/promises";
 
-import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
+import MetanomeAlgorithm from "./metanomeAlgorithm";
+import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
 import { metanomeQueue, queueEvents } from "./queue";
 import IInclusionDependency, {
   IColumnIdentifier,

@@ -12,7 +12,8 @@ import { join } from "path";
 import { rm } from "fs/promises";
 
 import { absoluteServerDir } from "../utils/files";
-import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
+import MetanomeAlgorithm from "./metanomeAlgorithm";
+import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
 import Normi from "./Normi";
 import BINDER from "./BINDER";
 

@@ -14,6 +14,7 @@ import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
 import { SbbDialogModule } from '@sbb-esta/angular/dialog';
 import { SbbPaginationModule } from '@sbb-esta/angular/pagination';
 import { SbbHeaderLeanModule } from '@sbb-esta/angular/header-lean';
+import { SbbNotificationToastModule } from '@sbb-esta/angular/notification-toast';
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
 import { SbbTableModule } from '@sbb-esta/angular/table';
@@ -23,6 +24,7 @@ import { GraphElementComponent } from './graph-element/graph-element.component';
 import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/normalize-undo-redo.component';
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
+import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
     GraphElementComponent,
     NormalizeUndoRedoComponent,
     SplitDialogComponent,
+    MetanomeResultsViewerComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,6 +47,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
     SbbLoadingModule,
     SbbSelectModule,
     SbbHeaderLeanModule,
+    SbbNotificationToastModule,
     SbbIconModule,
     SbbCheckboxModule,
     SbbPaginationModule,

@@ -4,18 +4,13 @@ import { sqlUtils } from "../db";
 import { readFile, rename, writeFile } from "fs/promises";
 import { createHash, randomUUID } from "crypto";
 import * as _ from "lodash";
+import {
+  IIndexFileEntry,
+  MetanomeConfig,
+} from "@/definitions/IIndexTableEntry";
 
-export type MetanomeConfig = Record<string, string | number | boolean>;
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
-
-export interface IndexFileEntry {
-  tables: string[];
-  algorithm: string;
-  fileName: string;
-  config: MetanomeConfig;
-  createDate: string;
-}
 
 export default abstract class MetanomeAlgorithm {
   public memory = "12g";
@@ -76,7 +71,7 @@ export default abstract class MetanomeAlgorithm {
     );
   }
 
-  public static async getIndexContent(): Promise<IndexFileEntry[]> {
+  public static async getIndexContent(): Promise<IIndexFileEntry[]> {
     await initFile(this.indexFileLocation, "[]");
     const contentString = await readFile(this.indexFileLocation, {
       encoding: "utf-8",
