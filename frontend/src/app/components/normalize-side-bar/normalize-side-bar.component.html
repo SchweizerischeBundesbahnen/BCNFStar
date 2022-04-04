@@ -31,7 +31,7 @@
       <sbb-select
         multiple
         placeholder="Filter columns"
-        (selectionChange)="filterClusters($event)"
+        [(ngModel)]="fdClusterFilter"
       >
         <sbb-option
           *ngFor="let column of table.columns.asArray()"
@@ -85,11 +85,7 @@
       <sbb-expansion-panel-header
         >Possible Foreign Keys</sbb-expansion-panel-header
       >
-      <sbb-select
-        multiple
-        placeholder="Filter tables"
-        (selectionChange)="filterInds($event)"
-      >
+      <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
         <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
           table.schemaAndName()
         }}</sbb-option>

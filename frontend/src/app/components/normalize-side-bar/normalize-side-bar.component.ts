@@ -14,23 +14,36 @@ import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
-
-import { SbbSelectChange } from '@sbb-esta/angular/select';
+import Column from '@/src/model/schema/Column';
 @Component({
   selector: 'app-normalize-side-bar',
   templateUrl: './normalize-side-bar.component.html',
   styleUrls: ['./normalize-side-bar.component.css'],
 })
 export class NormalizeSideBarComponent implements OnInit, OnChanges {
-  @ViewChild('indSelection', { read: SbbRadioGroup })
-  indSelectionGroup!: SbbRadioGroup;
-  fdClusterFilter = new ColumnCombination();
-  indFilter = new Array<Table>();
   @Input() table!: Table;
   @Input() schema!: Schema;
   @Output() splitFd = new EventEmitter<FunctionalDependency>();
+  @Output() indToFk = new EventEmitter<{
+    source: Table;
+    target: Table;
+    relationship: Relationship;
+  }>();
+  @Output() selectColumns = new EventEmitter<ColumnCombination>();
+  @Output() renameTable = new EventEmitter<{
+    table: Table;
+    newName: string;
+  }>();
 
+  @ViewChild('indSelection', { read: SbbRadioGroup })
+  indSelectionGroup!: SbbRadioGroup;
+
+  fdClusterFilter = new Array<Column>();
+  indFilter = new Array<Table>();
+
+  public editingName = false;
   public tableName: string = '';
+
   page: number = 0;
   pageSize = 5;
 
@@ -40,26 +53,15 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.editingName = false;
+    this.fdClusterFilter = [];
+    this.indFilter = Array.from(this.schema.tables);
   }
-
-  @Output() indToFk = new EventEmitter<{
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }>();
-
-  @Output() selectColumns = new EventEmitter<ColumnCombination>();
-  @Output() renameTable = new EventEmitter<{
-    table: Table;
-    newName: string;
-  }>();
 
   selectedInd(): { relationship: Relationship; table: Table } | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
   }
 
-  public editingName = false;
   setTableName() {
     this.renameTable.emit({
       table: this.table,
@@ -74,21 +76,15 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   fdClusters() {
     return this.schema
       .splittableFdClustersOf(this.table)
-      .filter((c) => this.fdClusterFilter.isSubsetOf(c.columns));
+      .filter((c) =>
+        new ColumnCombination(...this.fdClusterFilter).isSubsetOf(c.columns)
+      );
   }
 
   inds() {
     return this.schema
       .indsOf(this.table)
       .filter((r) => this.indFilter.includes(r.table));
-  }
-
-  filterClusters(event: SbbSelectChange) {
-    this.fdClusterFilter = new ColumnCombination(...event.value);
-  }
-
-  filterInds(event: SbbSelectChange) {
-    this.indFilter = event.value;
   }
 
   transformIndToFk(): void {
