@@ -6,8 +6,7 @@ dist
 server/metanome/temp
 server/metanome/BINDER_temp
 server/metanome/results
-server/metanome/inds
-server/metanome/fds
+server/metanome/bcnfstar_results
 
 # local env files
 .env.local

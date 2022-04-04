@@ -1,6 +1,6 @@
 import { absoluteServerDir, splitlines } from "../utils/files";
 import { join } from "path";
-import { open, readdir, readFile, writeFile } from "fs/promises";
+import { open, readFile, writeFile } from "fs/promises";
 
 import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import { metanomeQueue, queueEvents } from "./queue";
@@ -11,7 +11,6 @@ import { splitTableString } from "../utils/databaseUtils";
 import { sqlUtils } from "../db";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
-const OUTPUT_SUFFIX = "_inds_binder.json";
 
 export default class BINDER extends MetanomeAlgorithm {
   constructor(tables: string[], config?: MetanomeConfig) {
@@ -33,21 +32,6 @@ export default class BINDER extends MetanomeAlgorithm {
     return join(OUTPUT_DIR, this.outputFileName() + "_inds");
   }
 
-  public resultPath(): string {
-    return join(
-      absoluteServerDir,
-      "metanome",
-      "inds",
-      `${this.schemaAndTables}.json`
-    );
-  }
-  protected outputFileName(): string {
-    return (
-      this.schemaAndTables.map((table) => table.replace(".", "_")).join("_") +
-      OUTPUT_SUFFIX
-    );
-  }
-
   public async moveFiles(): Promise<void> {
     try {
       super.moveFiles();
@@ -55,7 +39,9 @@ export default class BINDER extends MetanomeAlgorithm {
       // no file found, this likey means metanome didn't create a file
       // because there are no INDs. Therefore, create an empty file
       if (e.code == "ENOENT") {
-        const handle = await open(this.resultPath(), "wx");
+        console.log("failed to move file. creating empty file in:");
+        console.log(await this.resultPath());
+        const handle = await open(await this.resultPath(), "wx");
         await handle.close();
       } else throw e;
     }
@@ -67,7 +53,8 @@ export default class BINDER extends MetanomeAlgorithm {
    * object and stores all of them as a JSON array
    */
   public async processFiles(): Promise<void> {
-    const content = await readFile(this.resultPath(), { encoding: "utf-8" });
+    const path = await this.resultPath();
+    const content = await readFile(path, { encoding: "utf-8" });
     const result: Array<IInclusionDependency> = splitlines(content).map(
       (line) => {
         let ind: IInclusionDependency;
@@ -86,7 +73,7 @@ export default class BINDER extends MetanomeAlgorithm {
         return ind;
       }
     );
-    await writeFile(this.resultPath(), JSON.stringify(result));
+    await writeFile(path, JSON.stringify(result));
   }
 
   protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
@@ -94,24 +81,28 @@ export default class BINDER extends MetanomeAlgorithm {
   }
 
   public async getResults(): Promise<Array<IInclusionDependency>> {
-    const possibleFiles = await readdir(
-      join(absoluteServerDir, "metanome", "inds")
-    );
-    const perfectFile = possibleFiles.find((filename) =>
-      this.resultPath().endsWith(filename)
+    const possibleFiles = await MetanomeAlgorithm.getIndexContent();
+    const perfectFile = possibleFiles.find(
+      (entry) =>
+        this.schemaAndTables.length === entry.tables.length &&
+        this.schemaAndTables.every(
+          (item, index) => item === entry.tables[index]
+        )
     );
     // find any file that includes INDs for the desired tables
-    const goodFile = possibleFiles.find((filename) =>
-      this.schemaAndTables.every((table) => filename.includes(table))
+    const goodFile = possibleFiles.find((entry) =>
+      this.schemaAndTables.every((table) => entry.tables.includes(table))
     );
     if (perfectFile || goodFile)
       return JSON.parse(
         await readFile(
-          join(absoluteServerDir, "metanome", "inds") +
-            (perfectFile || goodFile),
-          {
-            encoding: "utf-8",
-          }
+          join(
+            absoluteServerDir,
+            "metanome",
+            "inds",
+            perfectFile?.fileName || goodFile.fileName
+          ),
+          { encoding: "utf-8" }
         )
       );
     else throw { code: "ENOENT" };

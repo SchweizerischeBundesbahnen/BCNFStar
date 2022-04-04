@@ -1,0 +1,16 @@
+[
+  {
+    "tables": ["public.part_partsupp_supplier_denormalized"],
+    "algorithm": "de.metanome.algorithms.binder.BINDERFile",
+    "fileName": "887cee1e-1354-45c4-99df-11e86b4cdeac.json",
+    "config": { "MAX_NARY_LEVEL": 2, "DETECT_NARY": true },
+    "createDate": "1649080574455"
+  },
+  {
+    "tables": ["public.part_partsupp_supplier_denormalized"],
+    "algorithm": "de.metanome.algorithms.binder.BINDERFile",
+    "fileName": "6c17f23d-3284-4cb5-aaab-1a339c274e29.json",
+    "config": { "MAX_NARY_LEVEL": 2, "DETECT_NARY": true },
+    "createDate": "1649080890657"
+  }
+]

@@ -24,10 +24,6 @@ export default class Normi extends MetanomeAlgorithm {
     return this.schemaAndTables[0];
   }
 
-  protected outputFileName(): string {
-    return this.schemaAndTable;
-  }
-
   protected override algoJarPath(): string {
     return "Normalize-1.2-SNAPSHOT.jar";
   }
@@ -45,15 +41,6 @@ export default class Normi extends MetanomeAlgorithm {
     );
   }
 
-  public resultPath() {
-    return join(
-      absoluteServerDir,
-      "metanome",
-      "fds",
-      `${this.schemaAndTable}.json`
-    );
-  }
-
   protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
     return "INPUT_GENERATOR";
   }
@@ -63,7 +50,8 @@ export default class Normi extends MetanomeAlgorithm {
    * and saves it
    */
   public async processFiles(): Promise<void> {
-    const content = await readFile(this.resultPath(), {
+    const path = await this.resultPath();
+    const content = await readFile(path, {
       encoding: "utf-8",
     });
     //  format of fdString: "[c_address, c_anothercol] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
@@ -81,12 +69,12 @@ export default class Normi extends MetanomeAlgorithm {
       };
     });
 
-    await writeFile(this.resultPath(), JSON.stringify(mutatedContent));
+    await writeFile(path, JSON.stringify(mutatedContent));
   }
 
   public async getResults(): Promise<Array<IFunctionalDependency>> {
     return JSON.parse(
-      await readFile(this.resultPath(), {
+      await readFile(await this.resultPath(), {
         encoding: "utf-8",
       })
     );

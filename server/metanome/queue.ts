@@ -110,10 +110,15 @@ const worker = new Worker<JobData, void>(
   queueName,
   async (job) => {
     const algo = getAlgoInstance(job.data);
-    if (job.progress < 90) {
+    if (job.progress < 85) {
       job.log("Running metanome... ");
       await emptyMetanomeDirs();
       await executeCommand(algo.command(), job);
+      job.updateProgress(85);
+    }
+    if (job.progress < 90) {
+      job.log("Writing metadata file...");
+      await algo.addToIndexFile();
       job.updateProgress(90);
     }
     if (job.progress < 95) {
