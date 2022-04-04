@@ -90,11 +90,11 @@ export class DatabaseService {
         )!;
 
         let relationship =
-          [...this.inputSchema!.fkRelationships].find((rel) =>
+          [...this.inputSchema!.fks].find((rel) =>
             rel.appliesTo(referencingTable!, referencedTable!)
           ) || new Relationship();
         relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.addFkRelationship(relationship);
+        this.inputSchema!.addFk(relationship);
       }
     });
   }
@@ -111,24 +111,24 @@ export class DatabaseService {
         let dependantIColumn = ind.dependant.columnIdentifiers[i];
         let dependantColumn = schemaColumns.find(
           (column) =>
-            dependantIColumn.columnIdentifier == column.name &&
+            dependantIColumn.columnIdentifier == column.source.name &&
             dependantIColumn.schemaIdentifier ==
-              column.sourceTable.schemaName &&
-            dependantIColumn.tableIdentifier == column.sourceTable.name
+              column.source.table.schemaName &&
+            dependantIColumn.tableIdentifier == column.source.table.name
         )!;
 
         let referencedIColumn = ind.referenced.columnIdentifiers[i];
         let referencedColumn = schemaColumns.find(
           (column) =>
-            referencedIColumn.columnIdentifier == column.name &&
+            referencedIColumn.columnIdentifier == column.source.name &&
             referencedIColumn.schemaIdentifier ==
-              column.sourceTable.schemaName &&
-            referencedIColumn.tableIdentifier == column.sourceTable.name
+              column.source.table.schemaName &&
+            referencedIColumn.tableIdentifier == column.source.table.name
         )!;
 
         indRelationship.add(dependantColumn, referencedColumn);
       }
-      this.inputSchema!.addIndRelationship(indRelationship);
+      this.inputSchema!.addInd(indRelationship);
     });
   }
 
@@ -231,7 +231,7 @@ export class DatabaseService {
       relationships: [...table.relationships].map((rel) =>
         rel.toIRelationship()
       ),
-      sourceTables: Array.from(table.sourceTables).map(
+      sourceTables: Array.from(table.sources).map(
         (table) => `${table.schemaAndName()}`
       ),
       attributes: attributes.map((attr) => attr.toIAttribute()),
