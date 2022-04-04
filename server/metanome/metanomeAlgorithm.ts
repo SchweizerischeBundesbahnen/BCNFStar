@@ -71,6 +71,12 @@ export default abstract class MetanomeAlgorithm {
   }
 
   public static async getIndexContent(): Promise<IndexFileEntry[]> {
+    try {
+      await access(this.indexFileLocation);
+    } catch (e) {
+      await mkdir(dirname(this.indexFileLocation));
+      await writeFile(this.indexFileLocation, "[]");
+    }
     const contentString = await readFile(this.indexFileLocation, {
       encoding: "utf-8",
     });
