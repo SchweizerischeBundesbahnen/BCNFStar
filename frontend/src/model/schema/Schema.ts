@@ -1,4 +1,5 @@
-import ColumnCombination from './ColumnCombination';
+import { FdCluster } from '@/src/model/types/FdCluster';
+import { TableRelationship } from '../types/TableRelationship';
 import FunctionalDependency from './FunctionalDependency';
 import IndScore from './methodObjects/IndScore';
 import Relationship from './Relationship';
@@ -70,16 +71,12 @@ export default class Schema {
     this.tables.forEach((table) => (table._relationshipsValid = valid));
   }
 
-  public fksOf(
-    table: Table
-  ): Set<{ relationship: Relationship; table: Table }> {
+  public fksOf(table: Table): Set<TableRelationship> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._fks;
   }
 
-  public indsOf(
-    table: Table
-  ): Array<{ relationship: Relationship; table: Table }> {
+  public indsOf(table: Table): Array<TableRelationship> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._inds;
   }
@@ -90,10 +87,13 @@ export default class Schema {
     table._relationshipsValid = true;
   }
 
-  private calculateFksOf(
-    table: Table
-  ): Set<{ relationship: Relationship; table: Table }> {
-    let fks = new Set<{ relationship: Relationship; table: Table }>();
+  /**
+   *
+   * @param table
+   * @returns FKs, where table is on the referencing side
+   */
+  private calculateFksOf(table: Table): Set<TableRelationship> {
+    let fks = new Set<TableRelationship>();
     let possibleFkRelationships = [...this.fks].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
     );
@@ -108,7 +108,8 @@ export default class Schema {
       ) {
         fks.add({
           relationship: Relationship.fromTables(table, otherTable),
-          table: otherTable,
+          referenced: otherTable,
+          referencing: table,
         });
       }
 
@@ -116,17 +117,25 @@ export default class Schema {
       possibleFkRelationships
         .filter((rel) => otherTable.isKey(rel.referenced()))
         .forEach((relationship) => {
-          fks.add({ relationship: relationship, table: otherTable });
+          fks.add({
+            relationship: relationship,
+            referencing: table,
+            referenced: otherTable,
+          });
         });
     }
     return fks;
   }
 
-  private calculateIndsOf(
-    table: Table
-  ): Array<{ relationship: Relationship; table: Table }> {
-    let inds = new Array<{ relationship: Relationship; table: Table }>();
+  /**
+   * @param table
+   * @returns All INDs where table is referencing,
+   * except for the ones that are akready foreign keys
+   */
+  private calculateIndsOf(table: Table): Array<TableRelationship> {
+    let inds = new Array<TableRelationship>();
     let onlyIndRelationships = new Set(this.inds);
+    // TODO: find out why this doesn't delete anythign anymore
     this.fks.forEach((rel) => onlyIndRelationships.delete(rel));
     let possibleIndRelationships = [...onlyIndRelationships].filter((rel) =>
       rel.referencing().isSubsetOf(table.columns)
@@ -140,7 +149,11 @@ export default class Schema {
             otherTable.isKey(rel.referenced())
         )
         .forEach((rel) => {
-          inds.push({ relationship: rel, table: otherTable });
+          inds.push({
+            relationship: rel,
+            referenced: otherTable,
+            referencing: table,
+          });
         });
     }
     inds.sort((ind1, ind2) => {
@@ -151,21 +164,14 @@ export default class Schema {
     return inds;
   }
 
-  public splittableFdClustersOf(
-    table: Table
-  ): Array<{ columns: ColumnCombination; fds: Array<FunctionalDependency> }> {
+  public splittableFdClustersOf(table: Table): Array<FdCluster> {
     if (!table._splittableFdClusters)
       table._splittableFdClusters = this.calculateSplittableFdClustersOf(table);
     return table._splittableFdClusters;
   }
 
-  public calculateSplittableFdClustersOf(
-    table: Table
-  ): Array<{ columns: ColumnCombination; fds: Array<FunctionalDependency> }> {
-    let clusters = new Array<{
-      columns: ColumnCombination;
-      fds: Array<FunctionalDependency>;
-    }>();
+  public calculateSplittableFdClustersOf(table: Table): Array<FdCluster> {
+    let clusters = new Array<FdCluster>();
     if (table.pk)
       clusters.push({
         columns: table.columns.copy(),

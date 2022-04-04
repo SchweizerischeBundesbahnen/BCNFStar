@@ -31,11 +31,11 @@ describe("Table", () => {
   it("splits sourceTables and relationships correcty", () => {
     let splitTables = table.split(table.fds[1]);
     let expectedSplitTables = expectedSplitTablesFd1(table);
-    expect(splitTables[0].sourceTables).to.deep.equal(
-      expectedSplitTables[0].sourceTables
+    expect(splitTables[0].sources).to.deep.equal(
+      expectedSplitTables[0].sources
     );
-    expect(splitTables[1].sourceTables).to.deep.equal(
-      expectedSplitTables[1].sourceTables
+    expect(splitTables[1].sources).to.deep.equal(
+      expectedSplitTables[1].sources
     );
     expect(splitTables[0].relationships).to.deep.equal(
       expectedSplitTables[0].relationships
@@ -60,7 +60,7 @@ describe("Table", () => {
       splitTables[1],
       Relationship.fromTables(splitTables[0], splitTables[1])
     );
-    expect(joinedTable.sourceTables).to.deep.equal(table.sourceTables);
+    expect(joinedTable.sources).to.deep.equal(table.sources);
     expect(joinedTable.relationships).to.deep.equal(table.relationships);
   });
 });
@@ -88,8 +88,8 @@ function expectedSplitTablesFd1(table: Table): Array<Table> {
   ];
   generating.fds = [table.fds[1], table.fds[2]];
   //sourceTables
-  remaining.sourceTables = new Set([table]);
-  generating.sourceTables = new Set(Array.from(table.sourceTables));
+  remaining.sources = new Set([table]);
+  generating.sources = new Set(Array.from(table.sources));
   //relationships
   remaining.relationships = new Set();
   generating.relationships = new Set([...table.relationships]);

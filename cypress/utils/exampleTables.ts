@@ -6,7 +6,8 @@ import Table from "../../frontend/src/model/schema/Table";
 export const exampleITable: Array<ITable> = [
   {
     name: "Example Table",
-    attribute: [
+    schemaName: "public",
+    attributes: [
       { dataType: "int", name: "CD_ID" },
       { dataType: "varchar", name: "Albumtitel" },
       { dataType: "varchar", name: "Interpret" },
@@ -19,7 +20,10 @@ export const exampleITable: Array<ITable> = [
 ];
 
 export function exampleTableSportartVerein(): Table {
-  const table: Table = Table.fromColumnNames("Name", "Sportart", "Verein");
+  const table: Table = Table.fromColumnNames(
+    ["Name", "Sportart", "Verein"],
+    "Example Table"
+  );
   table.name = "Example Table";
   table.addFd(
     table.columns.columnsFromNames("Name", "Sportart"),
@@ -35,11 +39,14 @@ export function exampleTableSportartVerein(): Table {
 export function exampleTable(): Table {
   const table = Table.fromITable(exampleITable[0]);
 
-  let otherSourceTable = Table.fromColumnNames("Interpret", "Gründungsjahr");
+  let otherSourceTable = Table.fromColumnNames(
+    ["Interpret", "Gründungsjahr"],
+    "other Example Table"
+  );
   table.columns
     .setMinus(table.columns.columnsFromNames("Gründungsjahr"))
     .union(otherSourceTable.columns.columnsFromNames("Gründungsjahr"));
-  table.sourceTables.add(otherSourceTable);
+  table.sources.add(otherSourceTable);
   let relationship = new Relationship();
   relationship.add(
     table.columns.columnFromName("Interpret")!,
@@ -75,9 +82,9 @@ export function exampleTable(): Table {
 export function exampleSchema(): Schema {
   let schema = new Schema();
 
-  let tableA = Table.fromColumnNames("A1", "A2", "A3");
-  let tableB = Table.fromColumnNames("B1", "B2", "B3");
-  let tableC = Table.fromColumnNames("C1", "C2", "C3");
+  let tableA = Table.fromColumnNames(["A1", "A2", "A3"], "TableA");
+  let tableB = Table.fromColumnNames(["B1", "B2", "B3"], "TableB");
+  let tableC = Table.fromColumnNames(["C1", "C2", "C3"], "TableC");
   tableA.pk = tableB.columns.columnsFromNames("A1");
   tableB.pk = tableB.columns.columnsFromNames("B1");
   tableC.pk = tableB.columns.columnsFromNames("C1");
@@ -118,9 +125,9 @@ export function exampleSchema(): Schema {
     tableA.columns.columnFromName("A3")!,
     tableC.columns.columnFromName("C1")!
   );
-  schema.addFkRelationship(relAB);
-  schema.addFkRelationship(relBC);
-  schema.addIndRelationship(relAC);
+  schema.addFk(relAB);
+  schema.addFk(relBC);
+  schema.addInd(relAC);
 
   return schema;
 }

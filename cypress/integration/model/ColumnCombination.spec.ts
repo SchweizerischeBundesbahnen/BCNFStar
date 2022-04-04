@@ -1,14 +1,30 @@
 import Column from "../../../frontend/src/model/schema/Column";
 import ColumnCombination from "../../../frontend/src/model/schema/ColumnCombination";
-import Table from "../../../frontend/src/model/schema/Table";
+import TableIdentifier from "../../../frontend/src/model/schema/TableIdentifier";
+import ColumnIdentifier from "../../../frontend/src/model/schema/ColumnIdentifier";
 
 describe("ColumnCombination", () => {
   let cc1: ColumnCombination;
   let cc2: ColumnCombination;
 
-  let columnA = new Column("A", "varchar", 0, new Table());
-  let columnB = new Column("B", "varchar", 1, new Table());
-  let columnC = new Column("C", "varchar", 2, new Table());
+  let columnA = new Column(
+    "A",
+    "varchar",
+    0,
+    new ColumnIdentifier("CI1", new TableIdentifier("TI1", "public"))
+  );
+  let columnB = new Column(
+    "B",
+    "varchar",
+    1,
+    new ColumnIdentifier("CI2", new TableIdentifier("TI2", "public"))
+  );
+  let columnC = new Column(
+    "C",
+    "varchar",
+    2,
+    new ColumnIdentifier("CI3", new TableIdentifier("TI3", "public"))
+  );
 
   beforeEach(() => {
     cc1 = new ColumnCombination(columnA, columnB);

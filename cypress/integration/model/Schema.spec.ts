@@ -19,18 +19,18 @@ describe("Schema", () => {
     let fks = schema.fksOf(tableA);
     expect(fks.size).to.equal(1);
     let fk = [...fks][0];
-    expect(fk.table).to.deep.equal(tableB);
+    expect(fk.referencing).to.deep.equal(tableB);
   });
 
   it("calculates inds of a table correctly", () => {
     let inds = schema.indsOf(tableA);
     expect(inds.length).to.equal(1);
     let ind = inds[0];
-    expect(ind.table).to.deep.equal(tableC);
+    expect(ind.referencing).to.deep.equal(tableC);
   });
 
   it("fds of joined table contain fds of parent tables", () => {
-    let relationship = [...schema.fkRelationships].find(
+    let relationship = [...schema.fks].find(
       (rel) => rel.appliesTo(tableA, tableB) || rel.appliesTo(tableB, tableA)
     )!;
     let joinedTable = schema.join(tableA, tableB, relationship);

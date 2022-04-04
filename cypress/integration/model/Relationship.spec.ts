@@ -8,8 +8,8 @@ describe("Relationship", () => {
   let relationship: Relationship;
 
   beforeEach(() => {
-    table1 = Table.fromColumnNames("A", "B", "C");
-    table2 = Table.fromColumnNames("D", "E", "F");
+    table1 = Table.fromColumnNames(["A", "B", "C"], "table1");
+    table2 = Table.fromColumnNames(["D", "E", "F"], "table2");
   });
 
   it("creates relationship from two tables correctly", () => {

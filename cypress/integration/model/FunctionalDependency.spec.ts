@@ -4,7 +4,7 @@ describe("FunctionalDependency", () => {
   let table: Table;
 
   beforeEach(() => {
-    table = Table.fromColumnNames("A", "B", "C", "D");
+    table = Table.fromColumnNames(["A", "B", "C", "D"], "table1");
     table.addFd(
       table.columns.columnsFromNames("A"),
       table.columns.columnsFromNames("B", "C")
