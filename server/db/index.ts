@@ -16,8 +16,9 @@ export function setupDBCredentials(): SqlUtils {
     if (process.env.DB_PASSFILE.startsWith("~"))
       process.env.DB_PASSFILE =
         process.env.HOME + process.env.DB_PASSFILE.slice(1);
-    // .pgpass format: hostname:port:database:username:password
+    // use readFileSync here instead of promises to prevent any requests before environment is set up
     const content = readFileSync(process.env.DB_PASSFILE, "utf-8");
+    // .pgpass format: hostname:port:database:username:password
     const [hostname, port, database, username, password] = content
       .split(":")
       .map((v) => splitlines(v)[0].trim());

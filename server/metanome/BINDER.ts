@@ -34,7 +34,12 @@ export default class BINDER extends MetanomeAlgorithm {
   }
 
   public resultPath(): string {
-    return `metanome/inds/${this.schemaAndTables}.json`;
+    return join(
+      absoluteServerDir,
+      "metanome",
+      "inds",
+      `${this.schemaAndTables}.json`
+    );
   }
   protected outputFileName(): string {
     return (
@@ -89,7 +94,9 @@ export default class BINDER extends MetanomeAlgorithm {
   }
 
   public async getResults(): Promise<Array<IInclusionDependency>> {
-    const possibleFiles = await readdir("metanome/inds");
+    const possibleFiles = await readdir(
+      join(absoluteServerDir, "metanome", "inds")
+    );
     const perfectFile = possibleFiles.find((filename) =>
       this.resultPath().endsWith(filename)
     );
@@ -99,9 +106,13 @@ export default class BINDER extends MetanomeAlgorithm {
     );
     if (perfectFile || goodFile)
       return JSON.parse(
-        await readFile("metanome/inds/" + (perfectFile || goodFile), {
-          encoding: "utf-8",
-        })
+        await readFile(
+          join(absoluteServerDir, "metanome", "inds") +
+            (perfectFile || goodFile),
+          {
+            encoding: "utf-8",
+          }
+        )
       );
     else throw { code: "ENOENT" };
   }

@@ -40,14 +40,18 @@ export default class Normi extends MetanomeAlgorithm {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
       OUTPUT_DIR,
-      (sqlUtils.getDbmsName() == "mssql"
-        ? this.schemaAndTable
-        : table) + "-hyfd_extended.txt"
+      (sqlUtils.getDbmsName() == "mssql" ? this.schemaAndTable : table) +
+        "-hyfd_extended.txt"
     );
   }
 
   public resultPath() {
-    return `metanome/fds/${this.schemaAndTable}.json`;
+    return join(
+      absoluteServerDir,
+      "metanome",
+      "fds",
+      `${this.schemaAndTable}.json`
+    );
   }
 
   protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
