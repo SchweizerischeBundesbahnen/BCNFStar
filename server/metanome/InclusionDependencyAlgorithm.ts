@@ -11,8 +11,8 @@ import { isEqual } from "lodash";
 import IInclusionDependency, {
   IColumnIdentifier,
 } from "@/definitions/IInclusionDependency";
-import { sqlUtils } from "@/db";
-import { splitTableString } from "@/utils/databaseUtils";
+import { sqlUtils } from "../db";
+import { splitTableString } from "../utils/databaseUtils";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
