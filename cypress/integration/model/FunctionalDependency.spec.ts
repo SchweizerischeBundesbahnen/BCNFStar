@@ -16,10 +16,6 @@ describe("FunctionalDependency", () => {
   });
 
   it("extends correctly", () => {
-    table.addFd(
-      table.columns.columnsFromNames("A"),
-      table.columns.columnsFromNames("B", "C")
-    );
     expect(
       table.fds[0].lhs.equals(table.columns.columnsFromNames("A"))
     ).to.equals(true);
