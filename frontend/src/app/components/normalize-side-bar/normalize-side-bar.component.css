@@ -9,3 +9,7 @@ sbb-select {
 .cluster-header {
     font-size: 15px;
 }
+
+.in-focus {
+    color: red;
+}

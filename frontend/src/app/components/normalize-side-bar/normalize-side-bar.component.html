@@ -31,7 +31,7 @@
       <sbb-select
         multiple
         placeholder="Filter columns"
-        [(ngModel)]="fdClusterFilter"
+        [(ngModel)]="_fdClusterFilter"
       >
         <sbb-option
           *ngFor="let column of table.columns.asArray()"
@@ -58,7 +58,17 @@
           (mouseleave)="selectColumns.emit()"
         >
           <sbb-expansion-panel-header style="padding: 0.2rem">
-            <span class="cluster-header"> {{ cluster.columns }}</span>
+            <span>
+              <span
+                *ngFor="
+                  let column of cluster.columns.asArray();
+                  let isLast = last
+                "
+                [style.color]="textColor(column)"
+              >
+                {{ column.name + (isLast ? "" : ",") }}
+              </span>
+            </span>
           </sbb-expansion-panel-header>
           Keys:
           <br />
