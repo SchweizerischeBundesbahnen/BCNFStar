@@ -10,6 +10,10 @@ sbb-select {
     font-size: 15px;
 }
 
-.in-focus {
-    color: red;
-}
+/* set comma between elemnts by adding one before each except the first */
+.cluster-header::before {
+    content: ',';
+  }
+  .cluster-header:first-child::before {
+    content: '';
+  }

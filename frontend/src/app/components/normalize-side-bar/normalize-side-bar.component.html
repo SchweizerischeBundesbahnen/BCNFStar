@@ -60,14 +60,12 @@
           <sbb-expansion-panel-header style="padding: 0.2rem">
             <span>
               <span
-                *ngFor="
-                  let column of cluster.columns.asArray();
-                  let isLast = last
-                "
+                *ngFor="let column of cluster.columns.asArray()"
                 [style.color]="textColor(column)"
+                class="cluster-header"
               >
-                {{ column.name + (isLast ? "" : ",") }}
-              </span>
+                {{ column.name }}</span
+              >
             </span>
           </sbb-expansion-panel-header>
           Keys:
