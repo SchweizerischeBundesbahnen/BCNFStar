@@ -98,7 +98,7 @@ export default abstract class MetanomeAlgorithm {
    * Adds a job to the metanome queue that runs the requested algorithm
    * @returns Promise that resolves once the algorithm execution finishes
    */
-  public abstract execute(): Promise<void>;
+  public abstract execute(config?: MetanomeConfig): Promise<void>;
 
   /**
    * @returns terminal command to execute the algorithm as string

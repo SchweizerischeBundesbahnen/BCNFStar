@@ -1,5 +1,6 @@
 import BINDER from "../metanome/BINDER";
 import { Request, Response } from "express";
+import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
 
 export default async function getINDs(
   req: Request,
@@ -10,7 +11,7 @@ export default async function getINDs(
     const forceRerun: boolean = !!req.params.forceRerun;
     const binder = new BINDER(schemaAndTables);
     const executeAndSend = async () => {
-      await binder.execute();
+      await binder.execute(req.query as MetanomeConfig);
       res.json(await binder.getResults());
     };
     if (forceRerun) await executeAndSend();

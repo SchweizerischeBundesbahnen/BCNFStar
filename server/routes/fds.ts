@@ -1,3 +1,4 @@
+import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
 import { Request, Response } from "express";
 import Normi from "../metanome/Normi";
 
@@ -10,7 +11,7 @@ export default async function getFDs(
     const forceRerun: boolean = !!req.params.forceRerun;
     const normi = new Normi(schemaAndTable);
     const executeAndSend = async () => {
-      await normi.execute();
+      await normi.execute(req.query as MetanomeConfig);
       res.json(await normi.getResults());
     };
     if (forceRerun) await executeAndSend();

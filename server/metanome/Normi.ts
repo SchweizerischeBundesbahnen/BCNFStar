@@ -81,13 +81,15 @@ export default class Normi extends MetanomeAlgorithm {
     );
   }
 
-  async execute(): Promise<void> {
+  async execute(config: MetanomeConfig): Promise<void> {
+    if (config.memory && typeof config.memory == "string")
+      this.memory = config.memory;
     let job = await metanomeQueue.add(
       `Getting functional dependencies for ${this.schemaAndTable}`,
       {
         schemaAndTables: [this.schemaAndTable],
         jobType: "fd",
-        config: { isHumanInTheLoop: false },
+        config: Object.assign({ isHumanInTheLoop: false }, config),
       }
     );
     return job.waitUntilFinished(queueEvents);

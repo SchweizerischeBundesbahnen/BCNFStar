@@ -118,13 +118,15 @@ export default class BINDER extends MetanomeAlgorithm {
     } else throw { code: "ENOENT" };
   }
 
-  async execute(): Promise<void> {
+  async execute(config: MetanomeConfig): Promise<void> {
+    if (config.memory && typeof config.memory == "string")
+      this.memory = config.memory;
     let job = await metanomeQueue.add(
       `Getting inclusion dependencies for ${this.schemaAndTables}`,
       {
         schemaAndTables: this.schemaAndTables,
         jobType: "ind",
-        config: { MAX_NARY_LEVEL: 2, DETECT_NARY: true },
+        config: Object.assign({ MAX_NARY_LEVEL: 2, DETECT_NARY: true }, config),
       }
     );
     return job.waitUntilFinished(queueEvents);
