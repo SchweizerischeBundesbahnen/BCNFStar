@@ -177,7 +177,9 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
           attribute.name +
           " " +
           attribute.dataType +
-          (primaryKey.includes(attribute.name) ? " NOT NULL " : " NULL")
+          (primaryKey.includes(attribute.name) || attribute.nullable == false
+            ? " NOT NULL "
+            : " NULL")
       )
       .join(",");
     console.log(primaryKey);

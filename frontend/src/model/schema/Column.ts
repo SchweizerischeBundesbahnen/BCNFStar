@@ -33,6 +33,10 @@ export default class Column {
     );
   }
 
+  public dataTypeString() {
+    return `(${this.dataType}, ${this.nullable == true ? 'null' : 'not null'})`;
+  }
+
   public equals(column: Column): boolean {
     return _.isEqual(this.source, column.source);
   }
