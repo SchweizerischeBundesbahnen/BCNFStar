@@ -5,3 +5,7 @@ h2 {
 sbb-select {
     width: 50%;
 }
+
+.cluster-header {
+    font-size: 15px;
+}
