@@ -31,7 +31,7 @@
       <sbb-select
         multiple
         placeholder="Filter columns"
-        (selectionChange)="filterClusters($event)"
+        [(ngModel)]="fdClusterFilter"
       >
         <sbb-option
           *ngFor="let column of table.columns.asArray()"
@@ -40,21 +40,21 @@
         >
       </sbb-select>
       <br />
-      <sbb-accordion *ngIf="clusters.length > 0; else noClusters">
+      <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
         <sbb-paginator
           (page)="changePage($event)"
           [pageSize]="pageSize"
-          [length]="clusters.length"
+          [length]="fdClusters().length"
         >
         </sbb-paginator>
         <sbb-expansion-panel
           *ngFor="
-            let cluster of clusters.slice(
+            let cluster of fdClusters().slice(
               page * pageSize,
               (page + 1) * pageSize
             )
           "
-          (mouseenter)="selectColumns.emit(cluster.columns)"
+          (mouseenter)="emitHighlightedCluster(cluster)"
           (mouseleave)="selectColumns.emit()"
         >
           <sbb-expansion-panel-header style="padding: 0.2rem">
@@ -85,33 +85,24 @@
       <sbb-expansion-panel-header
         >Possible Foreign Keys</sbb-expansion-panel-header
       >
-      <sbb-select
-        multiple
-        placeholder="Filter tables"
-        (selectionChange)="filterInds($event)"
-      >
+      <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
         <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
           table.schemaAndName()
         }}</sbb-option>
       </sbb-select>
       <br />
-      <sbb-radio-group #indSelection *ngIf="inds.length > 0; else noInds">
+      <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">
+        <!-- (mouseleave)="selectColumns.emit(new Map())" -->
         <sbb-radio-button
-          (mouseenter)="
-            selectColumns.emit(
-              rel.relationship
-                .referencing()
-                .union(rel.relationship.referenced())
-            )
-          "
+          (mouseenter)="emitHighlightedInd(rel)"
           (mouseleave)="selectColumns.emit()"
-          *ngFor="let rel of inds"
+          *ngFor="let rel of inds()"
           [value]="rel"
           style="display: block"
           >{{
             rel.relationship.referencing().toString() +
               "->(" +
-              rel.table.schemaAndName() +
+              rel.referenced.schemaAndName() +
               ") " +
               rel.relationship.referenced().toString()
           }}</sbb-radio-button
