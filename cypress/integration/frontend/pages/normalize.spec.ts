@@ -36,6 +36,25 @@ describe("The normalize page", () => {
     cy.get("app-normalize-schema-graph");
   });
 
+  it("displays existing primary keys", () => {
+    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
+      "have.length",
+      3
+    );
+    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
+      "contain",
+      "ps_partkey"
+    );
+    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
+      "contain",
+      "ps_suppkey"
+    );
+    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
+      "contain",
+      "ps_supplycost"
+    );
+  });
+
   it("renders all tables", () => {
     cy.get("app-graph-element").should("have.length", 2);
     cy.get("app-graph-element").should("contain", "nation_region_denormalized");
