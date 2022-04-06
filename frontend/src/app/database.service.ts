@@ -14,9 +14,11 @@ import Relationship from '../model/schema/Relationship';
 import { firstValueFrom } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
+import IPrimaryKey from '@server/definitions/IPrimaryKey';
 import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependencies';
 import IRelationship from '@server/definitions/IRelationship';
+import ColumnCombination from '../model/schema/ColumnCombination';
 
 @Injectable({
   providedIn: 'root',
@@ -31,12 +33,14 @@ export class DatabaseService {
    **/
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   private iFks: Array<IForeignKey> = [];
+  private iPks: Array<IPrimaryKey> = [];
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
 
   public async loadTables(): Promise<Array<Table>> {
     this.iFks = await this.getIFks();
+    this.iPks = await this.getIPks();
     return this.getTables();
   }
 
@@ -66,6 +70,28 @@ export class DatabaseService {
     );
     const tables = iTables.map((iTable) => Table.fromITable(iTable));
     return tables;
+  }
+
+  private getIPks(): Promise<Array<IPrimaryKey>> {
+    return firstValueFrom(
+      this.http.get<Array<IPrimaryKey>>(this.baseUrl + '/pks')
+    );
+  }
+
+  private resolveIPks(pks: Array<IPrimaryKey>) {
+    pks.forEach((fk) => {
+      let table: Table | undefined = [...this.inputSchema!.tables].find(
+        (table) =>
+          table.schemaName == fk.table_schema && table.name == fk.table_name
+      );
+      if (table) {
+        table!.pk = new ColumnCombination(
+          ...table!.columns
+            .asArray()
+            .filter((column) => fk.attributes.includes(column.name))
+        );
+      }
+    });
   }
 
   private getIFks(): Promise<Array<IForeignKey>> {
@@ -148,6 +174,7 @@ export class DatabaseService {
     }
     this.resolveInds(await indPromise);
     this.resolveIFks(this.iFks);
+    this.resolveIPks(this.iPks);
   }
 
   private getFDs(table: Table): Promise<IFunctionalDependencies> {
