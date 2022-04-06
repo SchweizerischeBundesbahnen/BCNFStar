@@ -10,7 +10,7 @@ export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 export default abstract class MetanomeAlgorithm {
   public memory = "12g";
 
-  // FOR USE FROM INSIIDE QUEUE
+  // FOR USE FROM INSIDE QUEUE
 
   /**
    * Moves files from metanome output folder to a more permanent location
