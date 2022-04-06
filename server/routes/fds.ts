@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Normi from "../metanome/Normi";
 
-export default async function getFDsFromTableName(
+export default async function getFDs(
   req: Request,
   res: Response
 ): Promise<void> {

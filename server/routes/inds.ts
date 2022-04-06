@@ -1,7 +1,7 @@
 import BINDER from "../metanome/BINDER";
 import { Request, Response } from "express";
 
-export default async function getFDs(
+export default async function getINDs(
   req: Request,
   res: Response
 ): Promise<void> {
