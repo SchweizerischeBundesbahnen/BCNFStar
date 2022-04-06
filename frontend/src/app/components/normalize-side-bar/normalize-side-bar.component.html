@@ -61,7 +61,9 @@
             <span>
               <span
                 *ngFor="let column of cluster.columns.asArray()"
-                [style.color]="textColor(column)"
+                [ngClass]="{
+                  filtered: fdClusterFilter.includes(column)
+                }"
                 class="cluster-header"
               >
                 {{ column.name }}</span

@@ -94,11 +94,6 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
       .filter((c) => cc.isSubsetOf(c.columns));
   }
 
-  textColor(column: Column) {
-    if (this.fdClusterFilter.cardinality == 0) return 'black';
-    return this.fdClusterFilter.includes(column) ? 'grey' : 'black';
-  }
-
   inds() {
     return this.schema
       .indsOf(this.table)
