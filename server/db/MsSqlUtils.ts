@@ -1,7 +1,11 @@
 import ITableHead from "@/definitions/ITableHead";
 import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
-import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
+import SqlUtils, {
+  ForeignKeyResult,
+  PrimaryKeyResult,
+  SchemaQueryRow,
+} from "./SqlUtils";
 import IAttribute from "../definitions/IAttribute";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
@@ -149,6 +153,11 @@ INNER JOIN sys.tables tab2
 INNER JOIN sys.columns col2
     ON col2.column_id = referenced_column_id AND col2.object_id = tab2.object_id
 `);
+    return result.recordset;
+  }
+
+  public async getPrimaryKeys(): Promise<PrimaryKeyResult[]> {
+    const result = await sql.query<ForeignKeyResult>(this.QUERY_PRIMARY_KEYS);
     return result.recordset;
   }
 
