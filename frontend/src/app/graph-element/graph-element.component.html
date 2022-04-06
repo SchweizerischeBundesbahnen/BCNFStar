@@ -15,10 +15,16 @@
           this.selectedColumns && this.selectedColumns.includes(column)
       }"
       class="col-7 ellipses"
+      data-cy="graph-element-column"
     >
       {{ column.name }}
     </div>
-    <div class="col-5 text-end ellipses">{{ column.dataTypeString() }}</div>
+    <div
+      class="col-5 text-end ellipses"
+      data-cy="graph-element-column-datatype"
+    >
+      {{ column.dataTypeString() }}
+    </div>
   </div>
   <div class="row">
     <sbb-icon
