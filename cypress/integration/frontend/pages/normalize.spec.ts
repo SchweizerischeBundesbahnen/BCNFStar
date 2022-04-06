@@ -37,22 +37,18 @@ describe("The normalize page", () => {
   });
 
   it("displays existing primary keys", () => {
-    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
-      "have.length",
-      3
-    );
-    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
-      "contain",
-      "ps_partkey"
-    );
-    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
-      "contain",
-      "ps_suppkey"
-    );
-    cy.get("[data-cy=graph-element-columns][class=col-7 ellipses pk]").should(
-      "contain",
-      "ps_supplycost"
-    );
+    cy.get(
+      '[data-cy="graph-element-columns"][class="col-7 ellipses pk"]'
+    ).should("have.length", 3);
+    cy.get(
+      '[data-cy="graph-element-columns"][class="col-7 ellipses pk"]'
+    ).should("contain", "ps_partkey");
+    cy.get(
+      '[data-cy="graph-element-columns"][class="col-7 ellipses pk"]'
+    ).should("contain", "ps_suppkey");
+    cy.get(
+      '[data-cy="graph-element-columns"][class="col-7 ellipses pk"]'
+    ).should("contain", "ps_supplycost");
   });
 
   it("renders all tables", () => {
