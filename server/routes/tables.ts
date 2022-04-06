@@ -21,7 +21,7 @@ export default async function getTables(
       tempTables[nameWithSchema].attributes.push({
         name: row.column_name,
         dataType: row.data_type,
-        nullable: row.is_nullable,
+        nullable: !!row.is_nullable,
       });
     }
     const tables: ITable[] = Object.values(tempTables);
