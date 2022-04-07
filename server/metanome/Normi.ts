@@ -24,10 +24,6 @@ export default class Normi extends MetanomeAlgorithm {
     return this.schemaAndTables[0];
   }
 
-  protected outputFileName(): string {
-    return this.schemaAndTable;
-  }
-
   protected override algoJarPath(): string {
     return "Normalize-1.2-SNAPSHOT.jar";
   }
@@ -36,29 +32,32 @@ export default class Normi extends MetanomeAlgorithm {
     return "de.metanome.algorithms.normalize.Normi";
   }
 
-  protected originalOutputPath(): string {
+  protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
+    return "INPUT_GENERATOR";
+  }
+
+  protected override outputFileName(): string {
+    return this.schemaAndTable;
+  }
+
+  protected override originalOutputPath(): string {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
       OUTPUT_DIR,
-      (sqlUtils.getDbmsName() == "mssql"
-        ? this.schemaAndTable
-        : table) + "-hyfd_extended.txt"
+      (sqlUtils.getDbmsName() == "mssql" ? this.schemaAndTable : table) +
+        "-hyfd_extended.txt"
     );
   }
 
-  public resultPath() {
+  public override resultPath() {
     return `metanome/fds/${this.schemaAndTable}.json`;
-  }
-
-  protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
-    return "INPUT_GENERATOR";
   }
 
   /**
    * Reads metanome output, converts it from Metanome FD strings to JSON
    * and saves it
    */
-  public async processFiles(): Promise<void> {
+  public override async processFiles(): Promise<void> {
     const content = await readFile(this.resultPath(), {
       encoding: "utf-8",
     });
@@ -80,7 +79,7 @@ export default class Normi extends MetanomeAlgorithm {
     await writeFile(this.resultPath(), JSON.stringify(mutatedContent));
   }
 
-  public async getResults(): Promise<Array<IFunctionalDependency>> {
+  public override async getResults(): Promise<Array<IFunctionalDependency>> {
     return JSON.parse(
       await readFile(this.resultPath(), {
         encoding: "utf-8",
@@ -88,7 +87,7 @@ export default class Normi extends MetanomeAlgorithm {
     );
   }
 
-  async execute(): Promise<void> {
+  public override async execute(): Promise<void> {
     let job = await metanomeQueue.add(
       `Getting functional dependencies for ${this.schemaAndTable}`,
       {

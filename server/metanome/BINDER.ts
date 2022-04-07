@@ -11,39 +11,39 @@ import { splitTableString } from "../utils/databaseUtils";
 import { sqlUtils } from "../db";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
-const OUTPUT_SUFFIX = "_inds_binder.json";
 
 export default class BINDER extends MetanomeAlgorithm {
   constructor(tables: string[], config?: MetanomeConfig) {
     super(tables.sort(), config);
   }
 
-  protected algoJarPath(): string {
+  protected override algoJarPath(): string {
     return "BINDERFile.jar";
   }
 
-  protected algoClass(): string {
+  protected override algoClass(): string {
     return "de.metanome.algorithms.binder.BINDERFile";
   }
 
-  /**
-   * @returns path where metanome put the results initially
-   */
-  protected originalOutputPath(): string {
+  protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
+    return "INPUT_FILES";
+  }
+
+  protected override outputFileName(): string {
+    return this.schemaAndTables
+      .map((table) => table.replace(".", "_"))
+      .join("_");
+  }
+
+  protected override originalOutputPath(): string {
     return join(OUTPUT_DIR, this.outputFileName() + "_inds");
   }
 
-  public resultPath(): string {
+  public override resultPath(): string {
     return `metanome/inds/${this.schemaAndTables}.json`;
   }
-  protected outputFileName(): string {
-    return (
-      this.schemaAndTables.map((table) => table.replace(".", "_")).join("_") +
-      OUTPUT_SUFFIX
-    );
-  }
 
-  public async moveFiles(): Promise<void> {
+  public override async moveFiles(): Promise<void> {
     try {
       super.moveFiles();
     } catch (e) {
@@ -61,7 +61,7 @@ export default class BINDER extends MetanomeAlgorithm {
    * describing an IND. This function adds a schemaIdentifier to that
    * object and stores all of them as a JSON array
    */
-  public async processFiles(): Promise<void> {
+  public override async processFiles(): Promise<void> {
     const content = await readFile(this.resultPath(), { encoding: "utf-8" });
     const result: Array<IInclusionDependency> = splitlines(content).map(
       (line) => {
@@ -84,11 +84,7 @@ export default class BINDER extends MetanomeAlgorithm {
     await writeFile(this.resultPath(), JSON.stringify(result));
   }
 
-  protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
-    return "INPUT_FILES";
-  }
-
-  public async getResults(): Promise<Array<IInclusionDependency>> {
+  public override async getResults(): Promise<Array<IInclusionDependency>> {
     const possibleFiles = await readdir("metanome/inds");
     const perfectFile = possibleFiles.find((filename) =>
       this.resultPath().endsWith(filename)
@@ -106,7 +102,7 @@ export default class BINDER extends MetanomeAlgorithm {
     else throw { code: "ENOENT" };
   }
 
-  async execute(): Promise<void> {
+  public override async execute(): Promise<void> {
     let job = await metanomeQueue.add(
       `Getting inclusion dependencies for ${this.schemaAndTables}`,
       {

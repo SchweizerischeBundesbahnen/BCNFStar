@@ -112,7 +112,7 @@ export default abstract class MetanomeAlgorithm {
   }
 
   /**
-   * @returns File name to be passed to metanonme as a name for result files
+   * @returns File name to be passed to metanome as a name for result files
    */
   protected abstract outputFileName(): string;
 
