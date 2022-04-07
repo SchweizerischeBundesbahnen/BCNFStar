@@ -17,7 +17,7 @@ describe("The normalize side bar", () => {
       timeout: 10 * 60 * 1000,
     })
       .contains("public.nation_region_denormalized")
-      .click();
+      .click({ force: true });
   });
 
   // ############# Show elements #############
