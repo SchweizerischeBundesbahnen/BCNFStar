@@ -6,6 +6,7 @@ export type SchemaQueryRow = {
   table_name: string;
   column_name: string;
   data_type: string;
+  is_nullable: boolean;
   table_schema: string;
 };
 

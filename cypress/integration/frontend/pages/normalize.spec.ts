@@ -49,19 +49,32 @@ describe("The normalize page", () => {
     cy.get(
       '[data-cy="graph-element-columns"][class="col-7 ellipses pk"]'
     ).should("contain", "ps_supplycost");
-  });
+    it("shows nullable information for columns", () => {
+      cy.get('[data-cy="graph-element-column-datatype"]').should(
+        "contain",
+        "(integer, not null)"
+      );
+      cy.get('[data-cy="graph-element-column-datatype"]').should(
+        "contain",
+        "(varchar(25), null)"
+      );
+    });
 
-  it("renders all tables", () => {
-    cy.get("app-graph-element").should("have.length", 2);
-    cy.get("app-graph-element").should("contain", "nation_region_denormalized");
-    // cy.get("app-graph-element").should("contain", "denormalized_data");
-    // cy.get("app-graph-element").should(
-    //   "contain",
-    //   "customer_orders_lineitem_denormalized"
-    // );
-    cy.get("app-graph-element").should(
-      "contain",
-      "part_partsupp_supplier_denormalized"
-    );
+    it("renders all tables", () => {
+      cy.get("app-graph-element").should("have.length", 2);
+      cy.get("app-graph-element").should(
+        "contain",
+        "nation_region_denormalized"
+      );
+      // cy.get("app-graph-element").should("contain", "denormalized_data");
+      // cy.get("app-graph-element").should(
+      //   "contain",
+      //   "customer_orders_lineitem_denormalized"
+      // );
+      cy.get("app-graph-element").should(
+        "contain",
+        "part_partsupp_supplier_denormalized"
+      );
+    });
   });
 });

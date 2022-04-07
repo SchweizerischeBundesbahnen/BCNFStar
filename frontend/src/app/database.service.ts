@@ -300,9 +300,9 @@ export class DatabaseService {
     const data: IRequestBodyCreateTableSql = {
       newSchema: newSchema,
       newTable: newTable,
-      attributes: table.columns.asArray().map((column) => {
-        return { name: column.name, dataType: column.dataType };
-      }),
+      attributes: table.columns
+        .asArray()
+        .map((column) => column.toIAttribute()),
       primaryKey: primaryKey,
     };
     return firstValueFrom(

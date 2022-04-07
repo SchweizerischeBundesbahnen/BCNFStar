@@ -58,6 +58,7 @@ export default class Table {
           iAttribute.name,
           iAttribute.dataType,
           index,
+          iAttribute.nullable,
           columnIdentifier
         )
       );
@@ -72,6 +73,7 @@ export default class Table {
     return this.schemaName + '.' + this.name;
   }
 
+  // should/must not be used in production as important information (datatype and nullable) are missing
   public static fromColumnNames(columnNames: Array<string>, tableName: string) {
     const table: Table = new Table();
     table.name = tableName;
@@ -82,6 +84,7 @@ export default class Table {
           name,
           'unknown data type',
           i,
+          false,
           new ColumnIdentifier(name, tableIdentifier)
         )
       )
