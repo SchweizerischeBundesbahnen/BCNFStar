@@ -13,6 +13,7 @@ import { SbbButtonModule } from '@sbb-esta/angular/button';
 import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
 import { SbbDialogModule } from '@sbb-esta/angular/dialog';
 import { SbbPaginationModule } from '@sbb-esta/angular/pagination';
+import { SbbTooltipModule } from '@sbb-esta/angular/tooltip';
 import { SbbHeaderLeanModule } from '@sbb-esta/angular/header-lean';
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
@@ -43,6 +44,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
     SbbAccordionModule,
     SbbLoadingModule,
     SbbSelectModule,
+    SbbTooltipModule,
     SbbHeaderLeanModule,
     SbbIconModule,
     SbbCheckboxModule,
