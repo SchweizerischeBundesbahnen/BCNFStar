@@ -60,7 +60,7 @@
           <sbb-expansion-panel-header style="padding: 0.2rem">
             <span>
               <span
-                *ngFor="let column of cluster.columns.asArray()"
+                *ngFor="let column of cluster.columns.inOrder()"
                 [ngClass]="{
                   filtered: fdClusterFilter.includes(column)
                 }"

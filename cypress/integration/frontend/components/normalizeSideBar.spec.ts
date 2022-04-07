@@ -43,7 +43,8 @@ describe("The normalize side bar", () => {
   it("displays Functional Dependencies", () => {
     cy.get("sbb-expansion-panel").contains("Contained Subtables");
     cy.get("sbb-expansion-panel-header")
-      .contains("n_regionkey, r_regionkey, r_name, r_comment")
+      // commas that exist on page between these columns are just css
+      .contains("n_regionkey r_regionkey r_name r_comment")
       .click();
     cy.get(".sbb-expansion-panel-body button").contains("r_regionkey");
     cy.get(".sbb-expansion-panel-body button").contains("r_comment");
@@ -87,7 +88,7 @@ describe("The normalize side bar", () => {
   // ############# Rename table in split dialog #############
   it("sets default name when splitting by fd", () => {
     cy.get("sbb-expansion-panel-header")
-      .contains("n_regionkey, r_regionkey, r_name, r_comment")
+      .contains("n_regionkey r_regionkey r_name r_comment")
       .click();
     cy.get(".sbb-expansion-panel-body button").contains("r_regionkey").click();
     cy.get("button").contains("Ok").click();
@@ -96,7 +97,7 @@ describe("The normalize side bar", () => {
 
   it("sets new name when splitting by fd and change table name", () => {
     cy.get("sbb-expansion-panel-header")
-      .contains("n_regionkey, r_regionkey, r_name, r_comment")
+      .contains("n_regionkey r_regionkey r_name r_comment")
       .click();
     cy.get(".sbb-expansion-panel-body button").contains("r_regionkey").click();
     cy.get('app-split-dialog [type="text"]').clear().type("Regions");
