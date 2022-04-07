@@ -15,7 +15,6 @@
     "prebuild": "npm run generateTypeGuards",
     "install:server": "cd server && npm install",
     "install:frontend": "cd frontend && npm install",
-    "build:server": "cd server && npm run build",
     "build:frontend": "cd frontend && npm run build",
     "dev:server": "cd server && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",

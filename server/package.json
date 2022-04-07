@@ -7,8 +7,7 @@
     "start": "ts-node index",
     "dev": "ts-node-dev index",
     "start:coverage": "nyc ts-node index",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "true #noop - build is not required"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
