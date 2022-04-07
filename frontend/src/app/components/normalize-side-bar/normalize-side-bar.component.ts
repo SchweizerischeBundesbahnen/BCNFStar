@@ -36,7 +36,7 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   @ViewChild('indSelection', { read: SbbRadioGroup })
   indSelectionGroup!: SbbRadioGroup;
 
-  fdClusterFilter = new Array<Column>();
+  _fdClusterFilter = new Array<Column>();
   indFilter = new Array<Table>();
 
   public editingName = false;
@@ -51,7 +51,7 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.editingName = false;
-    this.fdClusterFilter = [];
+    this._fdClusterFilter = [];
     this.indFilter = Array.from(this.schema.tables);
   }
 
@@ -83,12 +83,15 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     this.page = evt.pageIndex;
   }
 
+  get fdClusterFilter(): ColumnCombination {
+    return new ColumnCombination(...this._fdClusterFilter);
+  }
+
   fdClusters() {
+    const cc = this.fdClusterFilter;
     return this.schema
       .splittableFdClustersOf(this.table)
-      .filter((c) =>
-        new ColumnCombination(...this.fdClusterFilter).isSubsetOf(c.columns)
-      );
+      .filter((c) => cc.isSubsetOf(c.columns));
   }
 
   inds() {

@@ -31,7 +31,7 @@
       <sbb-select
         multiple
         placeholder="Filter columns"
-        [(ngModel)]="fdClusterFilter"
+        [(ngModel)]="_fdClusterFilter"
       >
         <sbb-option
           *ngFor="let column of table.columns.asArray()"
@@ -57,8 +57,18 @@
           (mouseenter)="emitHighlightedCluster(cluster)"
           (mouseleave)="selectColumns.emit()"
         >
-          <sbb-expansion-panel-header>
-            {{ cluster.columns }}
+          <sbb-expansion-panel-header style="padding: 0.2rem">
+            <span>
+              <span
+                *ngFor="let column of cluster.columns.inOrder()"
+                [ngClass]="{
+                  filtered: fdClusterFilter.includes(column)
+                }"
+                class="cluster-header"
+              >
+                {{ column.name }}</span
+              >
+            </span>
           </sbb-expansion-panel-header>
           Keys:
           <br />
