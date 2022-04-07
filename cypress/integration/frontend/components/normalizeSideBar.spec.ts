@@ -17,7 +17,7 @@ describe("The normalize side bar", () => {
       timeout: 10 * 60 * 1000,
     })
       .contains("public.nation_region_denormalized")
-      .click();
+      .click({ force: true });
   });
 
   // ############# Show elements #############
@@ -62,7 +62,7 @@ describe("The normalize side bar", () => {
     ).should("not.exist");
   });
 
-  it("displays valid Inclusion Dependencies", () => {
+  it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {
     cy.get(".table-head-title").contains("public.part_partsupp").click();
     cy.contains("s_nationkey->(public.nation_region_denormalized) n_nationkey");
   });
