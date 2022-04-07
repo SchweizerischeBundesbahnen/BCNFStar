@@ -62,12 +62,7 @@ describe("The normalize side bar", () => {
   });
 
   it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {
-    // force means: don't fail if other elements are over the element to be clicked
-    // the graph element can be below the schema graph, so we need it here
-    // this has no consequences for the user
-    cy.get(".table-head-title")
-      .contains("public.part_partsupp")
-      .click({ force: true });
+    cy.get(".table-head-title").contains("public.part_partsupp").click();
     cy.contains("s_nationkey->(public.nation_region_denormalized) n_nationkey");
   });
 
