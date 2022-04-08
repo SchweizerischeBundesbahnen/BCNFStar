@@ -2,15 +2,11 @@ import { absoluteServerDir, splitlines } from "../utils/files";
 import { join } from "path";
 import { open, readFile } from "fs/promises";
 
-import MetanomeAlgorithm from "./metanomeAlgorithm";
-import {
-  IIndexFileEntry,
-  MetanomeConfig,
-} from "@/definitions/IIndexTableEntry";
+import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import { isEqual } from "lodash";
 import IInclusionDependency from "@/definitions/IInclusionDependency";
-
-export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
+import { getIndexContent } from "./IndexFile";
+import { IIndexFileEntry } from "@/definitions/IIndexTableEntry";
 
 export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgorithm {
   constructor(tables: string[], config?: MetanomeConfig) {
@@ -67,7 +63,7 @@ export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgor
    * @throws {error: 'EMOENT'} if nothing is found
    */
   protected async getMatchingFile(): Promise<IIndexFileEntry> {
-    const possibleFiles = (await MetanomeAlgorithm.getIndexContent()).filter(
+    const possibleFiles = (await getIndexContent()).filter(
       (entry) => entry.algorithm === this.algoClass()
     );
     const perfectFile = possibleFiles.find((entry) =>

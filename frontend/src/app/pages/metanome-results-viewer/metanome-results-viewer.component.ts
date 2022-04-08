@@ -36,6 +36,7 @@ export class MetanomeResultsViewerComponent {
       this.notification.open('Deleted entry');
       await this.reload();
     } catch (e) {
+      console.error(e);
       this.notification.open(
         'An error ocurred while trying to delete this metanome result',
         {

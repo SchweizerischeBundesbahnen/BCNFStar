@@ -1,13 +1,11 @@
 import { join } from "path";
 import { readFile } from "fs/promises";
 
-import MetanomeAlgorithm from "./metanomeAlgorithm";
-import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
+import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import { absoluteServerDir, splitlines } from "../utils/files";
 import IFunctionalDependency from "@/definitions/IFunctionalDependency";
 
-export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
-export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
+const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
 export function outputPath(schemaAndTable: string): string {
   return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");

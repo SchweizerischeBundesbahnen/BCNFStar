@@ -1,16 +1,14 @@
-import { absoluteServerDir, initFile } from "../utils/files";
+import { absoluteServerDir } from "../utils/files";
 import { join } from "path";
 import { sqlUtils } from "../db";
-import { readFile, rename, writeFile } from "fs/promises";
+import { rename } from "fs/promises";
 import { createHash, randomUUID } from "crypto";
 import * as _ from "lodash";
-import {
-  IIndexFileEntry,
-  MetanomeConfig,
-} from "@/definitions/IIndexTableEntry";
+import { addToIndex, getIndexContent } from "./IndexFile";
+
+export type MetanomeConfig = Record<string, string | number | boolean>;
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
-export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
 export default abstract class MetanomeAlgorithm {
   public memory = "12g";
@@ -30,8 +28,6 @@ export default abstract class MetanomeAlgorithm {
     return rename(this.originalOutputPath(), await this.resultPath());
   }
 
-  private static indexFileLocation = join(this.resultsFolder, "index.json");
-
   /**
    * adds this algorithm execution to the index file.
    * The index file is used to locate metanome result files.
@@ -39,44 +35,14 @@ export default abstract class MetanomeAlgorithm {
    * table names in the file name, but this was impossible
    * since file names have limited length
    */
-  public async addToIndexFile(): Promise<void> {
-    const content = await MetanomeAlgorithm.getIndexContent();
-    content.push({
+  public addToIndexFile(): Promise<void> {
+    return addToIndex({
       tables: this.schemaAndTables,
       algorithm: this.algoClass(),
       fileName: randomUUID() + ".json",
       config: this.config,
       createDate: Date.now().toString(),
     });
-    return writeFile(
-      MetanomeAlgorithm.indexFileLocation,
-      JSON.stringify(content)
-    );
-  }
-
-  /**
-   * Deletes this file from the metanome index file
-   * ATTENTION: THIS WONT DELETE THE FILE ITSELF
-   * This is done so that this operation is as atomic as
-   * possible, and is either completely clears or completely
-   * fails, but doen't leave corrupted state. The calling context
-   * is responsible for making sure both actions succeed
-   * @param fileName name of the file to be deleted (without folders)
-   */
-  public static async deleteFileFromIndex(fileName: string): Promise<void> {
-    const content = await this.getIndexContent();
-    return writeFile(
-      this.indexFileLocation,
-      JSON.stringify(content.filter((entry) => entry.fileName !== fileName))
-    );
-  }
-
-  public static async getIndexContent(): Promise<IIndexFileEntry[]> {
-    await initFile(this.indexFileLocation, "[]");
-    const contentString = await readFile(this.indexFileLocation, {
-      encoding: "utf-8",
-    });
-    return JSON.parse(contentString);
   }
 
   /**
@@ -144,7 +110,7 @@ export default abstract class MetanomeAlgorithm {
    * this is the final path after all operations
    */
   public async resultPath(): Promise<string> {
-    const metadata = await MetanomeAlgorithm.getIndexContent();
+    const metadata = await getIndexContent();
     const entry = metadata.find((entry) => {
       return (
         _.isEqual(this.schemaAndTables, entry.tables) &&

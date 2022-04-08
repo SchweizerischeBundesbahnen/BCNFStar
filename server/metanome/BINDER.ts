@@ -1,7 +1,6 @@
 import { absoluteServerDir, splitlines } from "../utils/files";
 import { join } from "path";
 
-import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
 import { metanomeQueue, queueEvents } from "./queue";
 import InclusionDependencyAlgorithm from "./InclusionDependencyAlgorithm";
 import { readFile, writeFile } from "fs/promises";
@@ -10,8 +9,9 @@ import IInclusionDependency, {
 } from "@/definitions/IInclusionDependency";
 import { sqlUtils } from "../db";
 import { splitTableString } from "../utils/databaseUtils";
+import { MetanomeConfig } from "./metanomeAlgorithm";
 
-export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
+const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
 export default class BINDER extends InclusionDependencyAlgorithm {
   protected override algoJarPath(): string {

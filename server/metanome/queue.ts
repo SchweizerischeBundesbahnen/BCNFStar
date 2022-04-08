@@ -12,10 +12,9 @@ import { join } from "path";
 import { rm } from "fs/promises";
 
 import { absoluteServerDir } from "../utils/files";
-import MetanomeAlgorithm from "./metanomeAlgorithm";
-import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
-import Normi from "./Normi";
+import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import BINDER from "./BINDER";
+import Normi from "./Normi";
 
 const queueName = "metanome";
 const connection = {
@@ -24,9 +23,8 @@ const connection = {
 };
 
 export interface JobData {
-  // if type is 'delete', the file named schemaAndTables[0] will be removed from results
   schemaAndTables: string[];
-  jobType: "ind" | "fd" | "delete";
+  jobType: "ind" | "fd";
   config: MetanomeConfig;
 }
 
@@ -106,38 +104,11 @@ async function emptyMetanomeDirs(): Promise<any> {
   );
 }
 
-async function deleteMetanomeResults(job: Job<JobData, void>) {
-  const toBeDeleted = job.data.schemaAndTables[0];
-  job.log("Deleting " + toBeDeleted);
-  if (job.progress < 50) {
-    job.log("Deleting file from index...");
-    await MetanomeAlgorithm.deleteFileFromIndex(toBeDeleted);
-    job.log("Done!");
-    job.updateProgress(50);
-  }
-  if (job.progress < 100) {
-    job.log("Deleting file...");
-    // if we fail to delete the file, its likely no catastrophe, so
-    // don't throw
-    try {
-      await rm(join(MetanomeAlgorithm.resultsFolder, toBeDeleted));
-    } catch (e) {
-      job.log("An error ocurred while deleting the file:");
-      job.log(e);
-    }
-    job.log("Done!");
-  }
-}
-
 export const queueEvents = new QueueEvents(queueName, { connection });
 // types: <type of job.data, type of returnValue>
 const worker = new Worker<JobData, void>(
   queueName,
   async (job) => {
-    if (job.data.jobType === "delete") {
-      await deleteMetanomeResults(job);
-      return;
-    }
     const algo = getAlgoInstance(job.data);
     if (job.progress < 85) {
       job.log("Running metanome... ");

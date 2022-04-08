@@ -59,7 +59,7 @@ app.get("/fks", getFksFunction);
 app.get("/tables/:name/fds", getFDs);
 app.get("/tables/:tableNames/inds", getINDs);
 app.get("/metanomeResults", getMetanomeResults);
-app.delete("/metanomeResults/:file", deleteMetanomeResults);
+app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
 
 app.post("/persist/createTable", getCreateTableSQL());
 app.post("/persist/createForeignKey", getCreateForeignKeySQL());
