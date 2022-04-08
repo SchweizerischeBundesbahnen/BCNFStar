@@ -1,35 +1,23 @@
 import IAttribute from '@server/definitions/IAttribute';
-import ColumnIdentifier from './ColumnIdentifier';
+import SourceColumn from './SourceColumn';
 
 export default class Column {
-  name: string;
-  dataType: string;
-  ordinalPosition: number;
-  nullable: boolean;
-  source: ColumnIdentifier;
-
-  public constructor(
-    name: string,
-    dataType: string,
-    ordinalPosition: number,
-    nullable: boolean,
-    source: ColumnIdentifier
-  ) {
-    this.name = name;
-    this.dataType = dataType;
-    this.ordinalPosition = ordinalPosition;
-    this.nullable = nullable;
-    this.source = source;
-  }
+  public constructor(public name: string, public source: SourceColumn) {}
 
   public copy(): Column {
-    return new Column(
-      this.name,
-      this.dataType,
-      this.ordinalPosition,
-      this.nullable,
-      this.source
-    );
+    return new Column(this.name, this.source);
+  }
+
+  public get dataType() {
+    return this.source.dataType;
+  }
+
+  public get nullable() {
+    return this.source.nullable;
+  }
+
+  public get ordinalPosition() {
+    return this.source.ordinalPosition;
   }
 
   public dataTypeString() {

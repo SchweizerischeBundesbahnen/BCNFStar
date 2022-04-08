@@ -5,8 +5,8 @@ import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
 import { TableRelationship } from '../types/TableRelationship';
-import TableIdentifier from './TableIdentifier';
-import ColumnIdentifier from './ColumnIdentifier';
+import SourceTable from './SourceTable';
+import SourceColumn from './SourceColumn';
 
 export default class Table {
   public name = '';
@@ -15,7 +15,7 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Set<Relationship>();
-  public sources = new Set<TableIdentifier>();
+  public sources = new Set<SourceTable>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -47,21 +47,16 @@ export default class Table {
   public static fromITable(iTable: ITable): Table {
     let columns = new ColumnCombination();
     let table = new Table(columns);
-    let tableIdentifier = new TableIdentifier(iTable.name, iTable.schemaName);
+    let tableIdentifier = new SourceTable(iTable.name, iTable.schemaName);
     iTable.attributes.forEach((iAttribute, index) => {
-      let columnIdentifier = new ColumnIdentifier(
+      let columnIdentifier = new SourceColumn(
         iAttribute.name,
-        tableIdentifier
+        tableIdentifier,
+        iAttribute.dataType,
+        index,
+        iAttribute.nullable
       );
-      columns.add(
-        new Column(
-          iAttribute.name,
-          iAttribute.dataType,
-          index,
-          iAttribute.nullable,
-          columnIdentifier
-        )
-      );
+      columns.add(new Column(iAttribute.name, columnIdentifier));
     });
     table.name = iTable.name;
     table.schemaName = iTable.schemaName;
@@ -77,15 +72,12 @@ export default class Table {
   public static fromColumnNames(columnNames: Array<string>, tableName: string) {
     const table: Table = new Table();
     table.name = tableName;
-    let tableIdentifier = new TableIdentifier(tableName, '');
+    let tableIdentifier = new SourceTable(tableName, '');
     columnNames.forEach((name, i) =>
       table.columns.add(
         new Column(
           name,
-          'unknown data type',
-          i,
-          false,
-          new ColumnIdentifier(name, tableIdentifier)
+          new SourceColumn(name, tableIdentifier, 'unknown data type', i, false)
         )
       )
     );
@@ -147,7 +139,7 @@ export default class Table {
     let sourceTables = new Set(this.sources);
     let relationships = new Set(this.relationships);
 
-    let toRemove: Set<TableIdentifier>;
+    let toRemove: Set<SourceTable>;
     do {
       toRemove = new Set();
       sourceTables.forEach((sourceTable) => {

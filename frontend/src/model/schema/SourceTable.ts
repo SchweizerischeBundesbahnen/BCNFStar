@@ -1,4 +1,4 @@
-export default class TableIdentifier {
+export default class SourceTable {
   public name: string;
   public schemaName: string;
 
