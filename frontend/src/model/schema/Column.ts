@@ -6,17 +6,20 @@ export default class Column {
   name: string;
   dataType: string;
   ordinalPosition: number;
+  nullable: boolean;
   source: ColumnIdentifier;
 
   public constructor(
     name: string,
     dataType: string,
     ordinalPosition: number,
+    nullable: boolean,
     source: ColumnIdentifier
   ) {
     this.name = name;
     this.dataType = dataType;
     this.ordinalPosition = ordinalPosition;
+    this.nullable = nullable;
     this.source = source;
   }
 
@@ -25,8 +28,13 @@ export default class Column {
       this.name,
       this.dataType,
       this.ordinalPosition,
+      this.nullable,
       this.source
     );
+  }
+
+  public dataTypeString() {
+    return `(${this.dataType}, ${this.nullable == true ? 'null' : 'not null'})`;
   }
 
   public equals(column: Column): boolean {
@@ -38,6 +46,7 @@ export default class Column {
       name: this.name,
       table: this.source.table.name,
       dataType: this.dataType,
+      nullable: this.nullable,
     };
   }
 }
