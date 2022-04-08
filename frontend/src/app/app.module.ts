@@ -13,6 +13,7 @@ import { SbbButtonModule } from '@sbb-esta/angular/button';
 import { SbbCheckboxModule } from '@sbb-esta/angular/checkbox';
 import { SbbDialogModule } from '@sbb-esta/angular/dialog';
 import { SbbPaginationModule } from '@sbb-esta/angular/pagination';
+import { SbbTooltipModule } from '@sbb-esta/angular/tooltip';
 import { SbbHeaderLeanModule } from '@sbb-esta/angular/header-lean';
 import { SbbNotificationToastModule } from '@sbb-esta/angular/notification-toast';
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
@@ -46,6 +47,7 @@ import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/
     SbbAccordionModule,
     SbbLoadingModule,
     SbbSelectModule,
+    SbbTooltipModule,
     SbbHeaderLeanModule,
     SbbNotificationToastModule,
     SbbIconModule,

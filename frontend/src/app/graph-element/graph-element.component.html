@@ -1,5 +1,5 @@
 <div class="container px-0" [ngStyle]="bbox">
-  <div class="table-head ellipses">
+  <div class="table-head ellipsis" [sbbTooltip]="table.schemaAndName()">
     <span class="table-head-title" (click)="select()">
       {{ table.schemaAndName() }}
     </span>
@@ -9,16 +9,24 @@
     class="row justify-content-between table-body"
   >
     <div
+      [sbbTooltip]="column.name"
       [ngClass]="{
         pk: table.pk && table.pk.includes(column),
         highlighted:
           this.selectedColumns && this.selectedColumns.includes(column)
       }"
-      class="col-7 ellipses"
+      class="col-7 ellipsis"
+      data-cy="graph-element-column"
     >
       {{ column.name }}
     </div>
-    <div class="col-5 text-end ellipses">{{ column.dataType }}</div>
+    <div
+      [sbbTooltip]="column.dataTypeString()"
+      class="col-5 text-end ellipsis"
+      data-cy="graph-element-column-datatype"
+    >
+      {{ column.dataTypeString() }}
+    </div>
   </div>
   <div class="row">
     <sbb-icon

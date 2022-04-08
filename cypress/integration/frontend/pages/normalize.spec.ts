@@ -36,6 +36,17 @@ describe("The normalize page", () => {
     cy.get("app-normalize-schema-graph");
   });
 
+  it("shows nullable information for columns", () => {
+    cy.get('[data-cy="graph-element-column-datatype"]').should(
+      "contain",
+      "(integer, not null)"
+    );
+    cy.get('[data-cy="graph-element-column-datatype"]').should(
+      "contain",
+      "(varchar(25), null)"
+    );
+  });
+
   it("renders all tables", () => {
     cy.get("app-graph-element").should("have.length", 2);
     cy.get("app-graph-element").should("contain", "nation_region_denormalized");

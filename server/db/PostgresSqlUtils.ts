@@ -41,7 +41,11 @@ export default class PostgresSqlUtils extends SqlUtils {
         when data_type='numeric' THEN 'numeric('||numeric_precision||','||numeric_scale||')'
         else data_type
       end as data_type, 
-      table_schema 
+      table_schema,
+      case when 
+      is_nullable = 'NO' then CAST(0 AS BIT) 
+      else CAST(1 AS BIT) 
+      end as is_nullable 
         FROM information_schema.columns 
         WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
         ORDER BY ordinal_position`,
@@ -153,7 +157,9 @@ from
           attribute.name +
           " " +
           attribute.dataType +
-          (primaryKey.includes(attribute.name) ? " NOT NULL " : " NULL")
+          (primaryKey.includes(attribute.name) || attribute.nullable == false
+            ? " NOT NULL "
+            : " NULL")
       )
       .join(",");
     console.log(primaryKey);
