@@ -1,5 +1,4 @@
 import IAttribute from '@server/definitions/IAttribute';
-import * as _ from 'underscore';
 import ColumnIdentifier from './ColumnIdentifier';
 
 export default class Column {
@@ -37,10 +36,13 @@ export default class Column {
     return `(${this.dataType}, ${this.nullable == true ? 'null' : 'not null'})`;
   }
 
-  public equals(column: Column): boolean {
-    return _.isEqual(this.source, column.source);
+  public equals(other: Column): boolean {
+    return (
+      this.source.name == other.source.name &&
+      this.source.table.name == other.source.table.name &&
+      this.source.table.schemaName == other.source.table.schemaName
+    );
   }
-
   public toIAttribute(): IAttribute {
     return {
       name: this.name,
