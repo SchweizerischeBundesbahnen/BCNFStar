@@ -38,11 +38,8 @@ export default class Column {
 
   public equals(other: Column): boolean {
     return (
-      this.name == other.name &&
       this.source.name == other.source.name &&
       this.source.table.name == other.source.table.name &&
-      this.dataType == other.dataType &&
-      this.ordinalPosition == other.ordinalPosition &&
       this.source.table.schemaName == other.source.table.schemaName
     );
   }
