@@ -62,9 +62,9 @@ export default class ColumnCombination {
   }
 
   public delete(...columns: Array<Column>) {
-    columns.forEach((column) => {
-      this._columns = this.asArray().filter((col) => !col.equals(column));
-    });
+    this._columns = this._columns.filter(
+      (col) => !columns.some((deleteCol) => deleteCol.equals(col))
+    );
   }
 
   public includes(column: Column): boolean {
@@ -87,12 +87,12 @@ export default class ColumnCombination {
   }
 
   public union(other: ColumnCombination): ColumnCombination {
-    other._columns.forEach((col) => this.add(col));
+    this.add(...other._columns);
     return this;
   }
 
   public setMinus(other: ColumnCombination): ColumnCombination {
-    other._columns.forEach((col) => this.delete(col));
+    this.delete(...other._columns);
     return this;
   }
 
