@@ -1,8 +1,9 @@
 <sbb-table-wrapper>
+  <h1>Metanome results</h1>
   <table class="sbb-table">
     <thead>
       <tr>
-        <th>File Name</th>
+        <th>File name</th>
         <th>Algorithm</th>
         <th>Tables</th>
         <th>Config</th>
@@ -21,7 +22,11 @@
         </td>
         <td>{{ entry.createDate | date }}</td>
         <td>
-          <button sbb-icon-button (click)="deleteEntry(entry)">
+          <button
+            class="delete-btn"
+            sbb-icon-button
+            (click)="deleteEntry(entry)"
+          >
             <sbb-icon
               svgIcon="kom:trash-medium"
               class="sbb-icon-fit"
