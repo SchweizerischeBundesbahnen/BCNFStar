@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { absoluteServerDir } from "../utils/files";
+import { absoluteServerDir, splitlines } from "../utils/files";
 import MsSqlUtils from "./MsSqlUtils";
 import PostgresSqlUtils from "./PostgresSqlUtils";
 import SqlUtils from "./SqlUtils";
@@ -20,7 +20,7 @@ export function setupDBCredentials(): SqlUtils {
     const content = readFileSync(process.env.DB_PASSFILE, "utf-8");
     const [hostname, port, database, username, password] = content
       .split(":")
-      .map((v) => v.split("\n")[0].trim());
+      .map((v) => splitlines(v)[0].trim());
 
     process.env.DB_HOST = hostname;
     process.env.DB_PORT = port;

@@ -3,10 +3,8 @@ import expressStaticGzip from "express-static-gzip";
 // import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import { getTableRowCounts } from "./routes/rowCounts";
-import getFDsFromTableNameFunction from "./routes/fdsFromTableName";
-import getINDsForTablesFunction from "./routes/indsForTables";
-import postRunMetanomeFDAlgorithmFunction from "./routes/runMetanomeFD";
-import postRunMetanomeINDAlgorithmFunction from "./routes/runMetanomeIND";
+import getFDs from "./routes/fds";
+import getINDs from "./routes/inds";
 import { getStaticDir } from "./utils/files";
 import morgan from "morgan";
 import getCreateForeignKeySQL from "./routes/persist_schema/createForeignKey";
@@ -51,23 +49,17 @@ createQueueMonitor(app);
 app.get("/tables", getTablesFunction);
 app.get("/tables/rows", getTableRowCounts);
 app.get("/tables/heads", getTableHead);
-app.get("/tables/:name/fds", getFDsFromTableNameFunction);
 app.get("/fks", getFksFunction);
+
+// Metanome
+app.get("/tables/:name/fds", getFDs);
+app.get("/tables/:tableNames/inds", getINDs);
 
 app.post("/persist/createTable", getCreateTableSQL());
 app.post("/persist/createForeignKey", getCreateForeignKeySQL());
 app.post("/persist/schemaPreparation", getSchemaPreparationSQL());
 app.post("/persist/dataTransfer", getDataTransferSQL());
 app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
-
-app.get("/tables/:tableNames/inds", getINDsForTablesFunction);
-
-// app.post("/persist/createTable", postCreateTable(pool));
-// app.post("/persist/createForeignKey", postCreateForeignKey(pool));
-// DB_PASSFILE=C:\.pgpass
-// localhost:80/tables/public.customer/fds
-app.post("/tables/:name/fds/run", postRunMetanomeFDAlgorithmFunction);
-app.post("/tables/inds/run", postRunMetanomeINDAlgorithmFunction);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 

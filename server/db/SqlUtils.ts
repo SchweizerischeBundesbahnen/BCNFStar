@@ -38,7 +38,7 @@ export default abstract class SqlUtils {
 
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
   public abstract getJdbcPath(): string;
-  public abstract getDbmsName(): string;
+  public abstract getDbmsName(): "mssql" | "postgres";
 
   public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
   public abstract SQL_DROP_TABLE_IF_EXISTS(
