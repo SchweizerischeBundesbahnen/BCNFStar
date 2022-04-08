@@ -1,4 +1,8 @@
-import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
+import SqlUtils, {
+  ForeignKeyResult,
+  PrimaryKeyResult,
+  SchemaQueryRow,
+} from "./SqlUtils";
 import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
@@ -132,6 +136,13 @@ from
    join pg_attribute att2 on
        att2.attrelid = con.conrelid and att2.attnum = con.parent
    join pg_namespace ns on cl.relnamespace = ns.oid;`);
+    return result.rows;
+  }
+
+  public async getPrimaryKeys(): Promise<PrimaryKeyResult[]> {
+    const result = await this.pool.query<PrimaryKeyResult>(
+      this.QUERY_PRIMARY_KEYS
+    );
     return result.rows;
   }
 

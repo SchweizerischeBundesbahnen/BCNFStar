@@ -10,6 +10,7 @@ import morgan from "morgan";
 import getCreateForeignKeySQL from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
+import getPksFunction from "./routes/pks";
 import getCreateTableSQL from "./routes/persist_schema/createTable";
 import getSchemaPreparationSQL from "./routes/persist_schema/prepareSchema";
 import getDataTransferSQL from "./routes/persist_schema/transferData";
@@ -50,6 +51,7 @@ app.get("/tables", getTablesFunction);
 app.get("/tables/rows", getTableRowCounts);
 app.get("/tables/heads", getTableHead);
 app.get("/fks", getFksFunction);
+app.get("/pks", getPksFunction);
 
 // Metanome
 app.get("/tables/:name/fds", getFDs);
