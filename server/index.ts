@@ -17,6 +17,8 @@ import getSchemaPreparationSQL from "./routes/persist_schema/prepareSchema";
 import getDataTransferSQL from "./routes/persist_schema/transferData";
 import getAddPrimaryKeySQL from "./routes/persist_schema/createPrimaryKey";
 import { getTableHead } from "./routes/tableHeads";
+import { getTablePage } from "./routes/tablePage";
+
 import createQueueMonitor from "./queueMonitor";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
@@ -51,6 +53,8 @@ createQueueMonitor(app);
 app.get("/tables", getTablesFunction);
 app.get("/tables/rows", getTableRowCounts);
 app.get("/tables/heads", getTableHead);
+app.get("/tables/page", getTablePage);
+
 app.get("/tables/:name/fds", getFDsFromTableNameFunction);
 app.get("/fks", getFksFunction);
 
