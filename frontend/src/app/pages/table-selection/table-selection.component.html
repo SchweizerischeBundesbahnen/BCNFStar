@@ -53,6 +53,13 @@
               : -1
           "
         >
+          <sbb-paginator
+            (page)="changePage($event)"
+            [pageSize]="headLimit"
+            [length]="tableRowCounts.get(hoveredTable)"
+          >
+          </sbb-paginator>
+
           <ng-container *ngSwitchCase="1">
             Displaying {{ hoveredTable.schemaAndName() }} {{ headLimit }} of
             {{ tableRowCounts.get(hoveredTable) }} rows

@@ -1,10 +1,11 @@
 import Table from '@/src/model/schema/Table';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import ITableHead from '@server/definitions/ITableHead';
+import ITablePage from '@server/definitions/ITablePage';
 import { DatabaseService } from 'src/app/database.service';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import { Router } from '@angular/router';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 @Component({
   selector: 'app-table-selection',
@@ -12,12 +13,14 @@ import { SbbDialog } from '@sbb-esta/angular/dialog';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  @ViewChild(SbbTable) table!: SbbTable<ITableHead>;
+  @ViewChild(SbbTable) table!: SbbTable<ITablePage>;
   @ViewChild('errorDialog') errorDialog!: TemplateRef<any>;
   // public tables: Map<Table, Boolean> = new Map();
-  public tableHeads: Map<Table, ITableHead> = new Map();
+  public tableHeads: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
   public headLimit = 100;
+
+  public page: number = 0;
 
   public hoveredTable?: Table;
   public tableColumns: Array<string> = [];
@@ -113,6 +116,22 @@ export class TableSelectionComponent implements OnInit {
       this.dataSource.data = [];
     }
     this.table.renderRows();
+  }
+
+  changePage(evt: SbbPageEvent) {
+    this.page = evt.pageIndex;
+    this.reloadData();
+  }
+
+  public async reloadData() {
+    const result = await this.dataService.loadTablePage(
+      this.hoveredTable!.schemaName,
+      this.hoveredTable!.name,
+      this.page * this.headLimit,
+      this.headLimit
+    );
+    this.tableColumns = result.attributes;
+    this.dataSource.data = result.rows;
   }
 
   public mouseEnter(table: Table) {
