@@ -1,5 +1,5 @@
 import { join } from "path";
-import { readFile, writeFile } from "fs/promises";
+import { readFile } from "fs/promises";
 
 import MetanomeAlgorithm from "./metanomeAlgorithm";
 import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
@@ -23,10 +23,9 @@ export default abstract class FunctionalDependencyAlgorithm extends MetanomeAlgo
   }
 
   public override async getResults(): Promise<Array<IFunctionalDependency>> {
-    return JSON.parse(
-      await readFile(await this.resultPath(), {
-        encoding: "utf-8",
-      })
-    );
+    const content = await readFile(await this.resultPath(), {
+      encoding: "utf-8",
+    });
+    return splitlines(content).map((fd) => JSON.parse(fd));
   }
 }

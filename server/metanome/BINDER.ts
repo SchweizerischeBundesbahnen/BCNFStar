@@ -8,8 +8,8 @@ import { readFile, writeFile } from "fs/promises";
 import IInclusionDependency, {
   IColumnIdentifier,
 } from "@/definitions/IInclusionDependency";
-import { sqlUtils } from "@/db";
-import { splitTableString } from "@/utils/databaseUtils";
+import { sqlUtils } from "../db";
+import { splitTableString } from "../utils/databaseUtils";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
@@ -38,8 +38,8 @@ export default class BINDER extends InclusionDependencyAlgorithm {
   public override async processFiles(): Promise<void> {
     const path = await this.resultPath();
     const content = await readFile(path, { encoding: "utf-8" });
-    const result: Array<IInclusionDependency> = splitlines(content).map(
-      (line) => {
+    const result: Array<string> = splitlines(content)
+      .map((line) => {
         let ind: IInclusionDependency = JSON.parse(line);
         ind.dependant.columnIdentifiers.map((cc) =>
           splitTableIdentifier(cc, this.schemaAndTables)
@@ -48,9 +48,9 @@ export default class BINDER extends InclusionDependencyAlgorithm {
           splitTableIdentifier(cc, this.schemaAndTables)
         );
         return ind;
-      }
-    );
-    await writeFile(path, JSON.stringify(result));
+      })
+      .map((ind) => JSON.stringify(ind));
+    await writeFile(path, result.join("\n"));
   }
 
   public override async execute(config: MetanomeConfig): Promise<void> {

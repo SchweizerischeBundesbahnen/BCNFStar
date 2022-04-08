@@ -1,6 +1,6 @@
 import { absoluteServerDir, splitlines } from "../utils/files";
 import { join } from "path";
-import { open, readFile, writeFile } from "fs/promises";
+import { open, readFile } from "fs/promises";
 
 import MetanomeAlgorithm from "./metanomeAlgorithm";
 import {
@@ -8,11 +8,7 @@ import {
   MetanomeConfig,
 } from "@/definitions/IIndexTableEntry";
 import { isEqual } from "lodash";
-import IInclusionDependency, {
-  IColumnIdentifier,
-} from "@/definitions/IInclusionDependency";
-import { sqlUtils } from "../db";
-import { splitTableString } from "../utils/databaseUtils";
+import IInclusionDependency from "@/definitions/IInclusionDependency";
 
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
@@ -39,11 +35,13 @@ export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgor
    * @throws {code: 'EMOENT'} if nothing is found
    */
   public async getResults(): Promise<Array<IInclusionDependency>> {
-    const file = await this.getMatchingFile();
-    const content: Array<IInclusionDependency> = JSON.parse(
-      await readFile(join(MetanomeAlgorithm.resultsFolder, file.fileName), {
-        encoding: "utf-8",
-      })
+    const fileEntry: IIndexFileEntry = await this.getMatchingFile();
+    const fileContent: string = await readFile(
+      join(MetanomeAlgorithm.resultsFolder, fileEntry.fileName),
+      { encoding: "utf-8" }
+    );
+    const content: Array<IInclusionDependency> = splitlines(fileContent).map(
+      (v) => JSON.parse(v)
     );
     // if file contains additional tables, filter out ones that were not requested
     return content.filter(

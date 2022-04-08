@@ -48,21 +48,21 @@ export default class Normi extends FunctionalDependencyAlgorithm {
       encoding: "utf-8",
     });
     //  format of fdString: "[c_address, c_anothercol] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
-    const mutatedContent: Array<IFunctionalDependency> = splitlines(
-      content
-    ).map((fdString) => {
-      const [lhsString, rhsString] = fdString.split(" --> ");
-      return {
-        lhsColumns: lhsString
-          // remove brackets
-          .slice(1, -1)
-          .split(",")
-          .map((s) => s.trim()),
-        rhsColumns: rhsString.split(",").map((s) => s.trim()),
-      };
-    });
+    const result: Array<string> = splitlines(content)
+      .map((fdString) => {
+        const [lhsString, rhsString] = fdString.split(" --> ");
+        return {
+          lhsColumns: lhsString
+            // remove brackets
+            .slice(1, -1)
+            .split(",")
+            .map((s) => s.trim()),
+          rhsColumns: rhsString.split(",").map((s) => s.trim()),
+        };
+      })
+      .map((fd) => JSON.stringify(fd));
 
-    await writeFile(path, JSON.stringify(mutatedContent));
+    await writeFile(path, result.join("\n"));
   }
 
   async execute(config: MetanomeConfig): Promise<void> {
