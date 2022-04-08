@@ -2,18 +2,18 @@ import Column from './Column';
 import TableIdentifier from './TableIdentifier';
 
 export default class ColumnCombination {
-  private _columns = new Set<Column>();
+  private _columns: Array<Column> = [];
 
   public constructor(...columns: Array<Column>) {
     this.add(...columns);
   }
 
   public asSet(): Set<Column> {
-    return this._columns;
+    return new Set(this._columns);
   }
 
   public asArray(): Array<Column> {
-    return [...this._columns];
+    return this._columns;
   }
 
   public copy(): ColumnCombination {
@@ -57,15 +57,13 @@ export default class ColumnCombination {
 
   public add(...columns: Array<Column>) {
     columns.forEach((col) => {
-      if (!this.includes(col)) this._columns.add(col);
+      if (!this.includes(col)) this._columns.push(col);
     });
   }
 
   public delete(...columns: Array<Column>) {
     columns.forEach((column) => {
-      this._columns = new Set(
-        this.asArray().filter((col) => !col.equals(column))
-      );
+      this._columns = this.asArray().filter((col) => !col.equals(column));
     });
   }
 
@@ -74,7 +72,7 @@ export default class ColumnCombination {
   }
 
   public get cardinality(): number {
-    return this._columns.size;
+    return this._columns.length;
   }
 
   public equals(other: ColumnCombination): boolean {
