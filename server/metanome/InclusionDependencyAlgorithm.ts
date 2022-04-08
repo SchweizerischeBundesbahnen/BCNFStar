@@ -35,29 +35,6 @@ export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgor
   }
 
   /**
-   * Metanome outputs INDs as a file where every line is a JSON object
-   * describing an IND. This function adds a schemaIdentifier to that
-   * object and stores all of them as a JSON array
-   */
-  public async processFiles(): Promise<void> {
-    const path = await this.resultPath();
-    const content = await readFile(path, { encoding: "utf-8" });
-    const result: Array<IInclusionDependency> = splitlines(content).map(
-      (line) => {
-        let ind: IInclusionDependency = JSON.parse(line);
-        ind.dependant.columnIdentifiers.map((cc) =>
-          splitTableIdentifier(cc, this.schemaAndTables)
-        );
-        ind.referenced.columnIdentifiers.map((cc) =>
-          splitTableIdentifier(cc, this.schemaAndTables)
-        );
-        return ind;
-      }
-    );
-    await writeFile(path, JSON.stringify(result));
-  }
-
-  /**
    * Tries to find INDs from existing results for this.schemaAndTables
    * @throws {code: 'EMOENT'} if nothing is found
    */
@@ -106,29 +83,4 @@ export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgor
     if (!file) throw { code: "ENOENT" };
     return file;
   }
-}
-
-/**
- * This function takes a metanome result column identifier, which just
- * includes a table- and columnIdentifier, and adds a schemaIdentifier to it
- * @param cId column identifier obtained from metanome output
- * @param tablesWithSchema list of tables metanome was executed on
- */
-function splitTableIdentifier(
-  cId: IColumnIdentifier,
-  tablesWithSchema: string[]
-) {
-  // Depending on the database type, tableIdentifier might contain both schema-
-  // amd table name, or just the table name
-  let tableWithSchema: string;
-  if (sqlUtils.getDbmsName() == "mssql") tableWithSchema = cId.tableIdentifier;
-  else if (sqlUtils.getDbmsName() == "postgres")
-    tableWithSchema = tablesWithSchema.find((entry) => {
-      const entryTable = splitTableString(entry)[1];
-      return cId.tableIdentifier == entryTable;
-    });
-  else throw Error("unknown dbms type");
-
-  cId.schemaIdentifier = splitTableString(tableWithSchema)[0];
-  cId.tableIdentifier = splitTableString(tableWithSchema)[1];
 }

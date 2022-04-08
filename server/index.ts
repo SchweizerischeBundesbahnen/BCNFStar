@@ -3,8 +3,8 @@ import expressStaticGzip from "express-static-gzip";
 // import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import { getTableRowCounts } from "./routes/rowCounts";
-import getFDsFromTableNameFunction from "./routes/fds";
-import getINDsForTablesFunction from "./routes/inds";
+import getFDs from "./routes/fds";
+import getINDs from "./routes/inds";
 import { getStaticDir } from "./utils/files";
 import morgan from "morgan";
 import getCreateForeignKeySQL from "./routes/persist_schema/createForeignKey";
@@ -56,8 +56,8 @@ app.get("/tables/heads", getTableHead);
 app.get("/fks", getFksFunction);
 
 // Metanome
-app.get("/tables/:name/fds", getFDsFromTableNameFunction);
-app.get("/tables/:tableNames/inds", getINDsForTablesFunction);
+app.get("/tables/:name/fds", getFDs);
+app.get("/tables/:tableNames/inds", getINDs);
 app.get("/metanomeResults", getMetanomeResults);
 app.delete("/metanomeResults/:file", deleteMetanomeResults);
 

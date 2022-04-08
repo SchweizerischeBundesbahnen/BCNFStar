@@ -21,7 +21,7 @@ export default abstract class MetanomeAlgorithm {
     "bcnfstar_results"
   );
 
-  // FOR USE FROM INSIIDE QUEUE
+  // FOR USE FROM INSIDE QUEUE
 
   /**
    * Moves files from metanome output folder to a more permanent location
@@ -180,7 +180,7 @@ export default abstract class MetanomeAlgorithm {
   }
 
   /**
-   * @returns File name to be passed to metanonme as a name for result files
+   * @returns File name to be passed to metanome as a name for result files
    */
   protected outputFileName(): string {
     return createHash("md5").update(this.schemaAndTables.join()).digest("hex");

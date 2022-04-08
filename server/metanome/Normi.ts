@@ -1,11 +1,13 @@
 import { join } from "path";
 
 import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
-import { absoluteServerDir } from "../utils/files";
+import { absoluteServerDir, splitlines } from "../utils/files";
 import { metanomeQueue, queueEvents } from "./queue";
 import { splitTableString } from "../utils/databaseUtils";
 import { sqlUtils } from "../db";
 import FunctionalDependencyAlgorithm from "./FuncrtionalDependencyAlgorithm";
+import { readFile, writeFile } from "fs/promises";
+import IFunctionalDependency from "@/definitions/IFunctionalDependency";
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
@@ -23,7 +25,11 @@ export default class Normi extends FunctionalDependencyAlgorithm {
     return "de.metanome.algorithms.normalize.Normi";
   }
 
-  protected originalOutputPath(): string {
+  protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
+    return "INPUT_GENERATOR";
+  }
+
+  protected override originalOutputPath(): string {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
       OUTPUT_DIR,
@@ -32,8 +38,31 @@ export default class Normi extends FunctionalDependencyAlgorithm {
     );
   }
 
-  protected tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
-    return "INPUT_GENERATOR";
+  /**
+   * Reads metanome output, converts it from Metanome FD strings to JSON
+   * and saves it
+   */
+  public override async processFiles(): Promise<void> {
+    const path = await this.resultPath();
+    const content = await readFile(path, {
+      encoding: "utf-8",
+    });
+    //  format of fdString: "[c_address, c_anothercol] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
+    const mutatedContent: Array<IFunctionalDependency> = splitlines(
+      content
+    ).map((fdString) => {
+      const [lhsString, rhsString] = fdString.split(" --> ");
+      return {
+        lhsColumns: lhsString
+          // remove brackets
+          .slice(1, -1)
+          .split(",")
+          .map((s) => s.trim()),
+        rhsColumns: rhsString.split(",").map((s) => s.trim()),
+      };
+    });
+
+    await writeFile(path, JSON.stringify(mutatedContent));
   }
 
   async execute(config: MetanomeConfig): Promise<void> {

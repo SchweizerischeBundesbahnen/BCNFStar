@@ -145,8 +145,8 @@ export class DatabaseService {
     for (const table of tables) {
       const iFDs = await fdPromises[table.schemaAndName()];
 
-      const fds = iFDs.map((fds) =>
-        FunctionalDependency.fromIFunctionalDependency(table, fds)
+      const fds = iFDs.map((fd) =>
+        FunctionalDependency.fromIFunctionalDependency(table, fd)
       );
       table.setFds(...fds);
     }
