@@ -1,6 +1,6 @@
 <div>
   <h2 *ngIf="!editingName; else editing">
-    {{ table.schemaAndName() }}
+    {{ table.fullName }}
     <sbb-icon svgIcon="kom:pen-small" (click)="editingName = true"></sbb-icon>
   </h2>
   <ng-template #editing>
@@ -97,7 +97,7 @@
       >
       <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
         <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
-          table.schemaAndName()
+          table.fullName
         }}</sbb-option>
       </sbb-select>
       <br />
@@ -112,7 +112,7 @@
           >{{
             rel.relationship.referencing().toString() +
               "->(" +
-              rel.referenced.schemaAndName() +
+              rel.referenced.fullName +
               ") " +
               rel.relationship.referenced().toString()
           }}</sbb-radio-button

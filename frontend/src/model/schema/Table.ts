@@ -64,7 +64,10 @@ export default class Table {
     return table;
   }
 
-  public schemaAndName(): string {
+  /**
+   * returns the name of the table in the format "{schemaName}.{tableName}"
+   */
+  public get fullName(): string {
     return this.schemaName + '.' + this.name;
   }
 
@@ -72,16 +75,16 @@ export default class Table {
   public static fromColumnNames(columnNames: Array<string>, tableName: string) {
     const table: Table = new Table();
     table.name = tableName;
-    let tableIdentifier = new SourceTable(tableName, '');
+    let sourceTable = new SourceTable(tableName, '');
     columnNames.forEach((name, i) =>
       table.columns.add(
         new Column(
           name,
-          new SourceColumn(name, tableIdentifier, 'unknown data type', i, false)
+          new SourceColumn(name, sourceTable, 'unknown data type', i, false)
         )
       )
     );
-    table.sources.add(table);
+    table.sources.add(sourceTable);
     return table;
   }
 

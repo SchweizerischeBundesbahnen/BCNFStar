@@ -102,9 +102,7 @@ export default class ColumnCombination {
 
   public inOrder(): Array<Column> {
     return this.asArray().sort((col1, col2) => {
-      if (
-        col1.source.table.schemaAndName() == col2.source.table.schemaAndName()
-      )
+      if (col1.source.table.fullName == col2.source.table.fullName)
         return col1.ordinalPosition - col2.ordinalPosition;
       // Todo: make sure most important tables are on top, not just alphabetically
       if (col1.source.table.name < col2.source.table.name) return 1;

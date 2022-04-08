@@ -77,10 +77,10 @@ export class DatabaseService {
   private resolveIFks(fks: Array<IForeignKey>) {
     fks.forEach((fk) => {
       let referencingTable = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.name == table.schemaAndName()
+        (table: Table) => fk.name == table.fullName
       );
       let referencedTable = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.foreignName == table.schemaAndName()
+        (table: Table) => fk.foreignName == table.fullName
       );
 
       if (referencingTable && referencedTable) {
@@ -139,7 +139,7 @@ export class DatabaseService {
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
       const iFDs = fdResults.find(
-        (v) => v.tableName == table.schemaAndName()
+        (v) => v.tableName == table.fullName
       ) as IFunctionalDependencies;
       const fds = iFDs.functionalDependencies.map((fds) =>
         FunctionalDependency.fromString(table, fds)
@@ -153,14 +153,14 @@ export class DatabaseService {
   private getFDs(table: Table): Promise<IFunctionalDependencies> {
     return firstValueFrom(
       this.http.get<IFunctionalDependencies>(
-        `${this.baseUrl}/tables/${table.schemaAndName()}/fds`
+        `${this.baseUrl}/tables/${table.fullName}/fds`
       )
     );
   }
 
   private getINDs(tables: Array<Table>): Promise<Array<IInclusionDependency>> {
     let tableNamesConcatenation = tables
-      .map((table) => table.schemaAndName())
+      .map((table) => table.fullName)
       .join(',');
     return firstValueFrom(
       this.http.get<Array<IInclusionDependency>>(
@@ -232,7 +232,7 @@ export class DatabaseService {
         rel.toIRelationship()
       ),
       sourceTables: Array.from(table.sources).map(
-        (table) => `${table.schemaAndName()}`
+        (table) => `${table.fullName}`
       ),
       attributes: attributes.map((attr) => attr.toIAttribute()),
     };

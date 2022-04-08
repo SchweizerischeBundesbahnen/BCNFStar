@@ -54,16 +54,16 @@
           "
         >
           <ng-container *ngSwitchCase="1">
-            Displaying {{ hoveredTable.schemaAndName() }} {{ headLimit }} of
+            Displaying {{ hoveredTable.fullName }} {{ headLimit }} of
             {{ tableRowCounts.get(hoveredTable) }} rows
           </ng-container>
           <ng-container *ngSwitchCase="2">
-            {{ hoveredTable.schemaAndName() }}
+            {{ hoveredTable.fullName }}
             {{ tableRowCounts.get(hoveredTable) }} von
             {{ tableRowCounts.get(hoveredTable) }}
           </ng-container>
           <ng-container *ngSwitchDefault>
-            {{ hoveredTable.schemaAndName() }}
+            {{ hoveredTable.fullName }}
           </ng-container>
         </ng-container>
       </h3>

@@ -1,13 +1,10 @@
 export default class SourceTable {
-  public name: string;
-  public schemaName: string;
+  public constructor(public name: string, public schemaName: string) {}
 
-  public constructor(name: string, schemaName: string) {
-    this.name = name;
-    this.schemaName = schemaName;
-  }
-
-  public schemaAndName(): string {
+  /**
+   * returns the name of the table in the format "{schemaName}.{tableName}"
+   */
+  public get fullName(): string {
     return this.schemaName + '.' + this.name;
   }
 }

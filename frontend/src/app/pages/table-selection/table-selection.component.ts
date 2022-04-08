@@ -52,8 +52,8 @@ export class TableSelectionComponent implements OnInit {
     const rowCounts = await rowCountPromise;
 
     for (const table of this.tables) {
-      this.tableRowCounts.set(table, rowCounts[table.schemaAndName()]);
-      this.tableHeads.set(table, tableHeads[table.schemaAndName()]);
+      this.tableRowCounts.set(table, rowCounts[table.fullName]);
+      this.tableHeads.set(table, tableHeads[table.fullName]);
     }
   }
 
