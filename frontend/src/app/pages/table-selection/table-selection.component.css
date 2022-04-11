@@ -1,3 +1,7 @@
+.hover-color-white:hover {
+  color: var(--sbb-color-white);
+}
+
 button {
   margin-top: 0.5vw;
 }

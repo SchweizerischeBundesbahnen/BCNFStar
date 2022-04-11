@@ -94,18 +94,28 @@
 </div>
 
 <ng-template #errorDialog>
-  <div sbbDialogTitle>Warnuing</div>
+  <div sbbDialogTitle>Warning</div>
   <div sbbDialogContent>
     An error occured while getting required table data from the server:
     {{ error.toString() }}
   </div>
 
   <div sbbDialogActions>
-    <a type="button" sbb-button sbbDialogClose [href]="queueUrl"
-      >Investigate Metanome Logs</a
+    <a
+      class="hover-color-white"
+      type="button"
+      sbb-button
+      sbbDialogClose
+      [href]="queueUrl"
+      >Investigate Metanome logs</a
     >
-    <a type="button" sbb-button sbbDialogClose routerLink="/edit-schema"
-      >Edit Schema regardless</a
+    <a
+      class="hover-color-white"
+      type="button"
+      sbb-button
+      sbbDialogClose
+      routerLink="/edit-schema"
+      >Edit schema regardless</a
     >
     <a type="button" sbb-secondary-button sbbDialogClose>Cancel</a>
   </div>
