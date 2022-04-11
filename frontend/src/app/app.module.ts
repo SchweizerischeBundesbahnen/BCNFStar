@@ -21,7 +21,7 @@ import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
 import { SbbTableModule } from '@sbb-esta/angular/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GraphElementComponent } from './graph-element/graph-element.component';
+import { GraphElementComponent } from './components/graph-element/graph-element.component';
 import { UndoRedoComponent } from './components/undo-redo/undo-redo.component';
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
