@@ -1,4 +1,5 @@
 import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
+// import HyFD from "../metanome/HyFD";
 import { Request, Response } from "express";
 import Normi from "../metanome/Normi";
 
@@ -12,16 +13,16 @@ export default async function getFDs(
     const config = req.query as MetanomeConfig;
     delete config["forceRerun"];
 
-    const normi = new Normi(schemaAndTable, config);
+    const algo = new Normi(schemaAndTable, config);
 
     const executeAndSend = async () => {
-      await normi.execute();
-      res.json(await normi.getResults());
+      await algo.execute();
+      res.json(await algo.getResults());
     };
     if (forceRerun) await executeAndSend();
     else {
       try {
-        res.json(await normi.getResults());
+        res.json(await algo.getResults());
       } catch (err) {
         // means file not found
         if (err.code === "ENOENT") {

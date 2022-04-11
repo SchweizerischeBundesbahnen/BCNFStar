@@ -15,6 +15,8 @@ import { absoluteServerDir } from "../utils/files";
 import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import BINDER from "./BINDER";
 import Normi from "./Normi";
+// import HyFD from "./HyFD";
+import FAIDA from "./FAIDA";
 
 const queueName = "metanome";
 const connection = {
@@ -31,7 +33,7 @@ export interface JobData {
 export const metanomeQueue = new Queue<JobData, void, string>(queueName, {
   connection,
   defaultJobOptions: {
-    attempts: 3,
+    attempts: 1,
     backoff: {
       type: "exponential",
       delay: 10_000,
@@ -40,7 +42,7 @@ export const metanomeQueue = new Queue<JobData, void, string>(queueName, {
 });
 
 // uncommenting the next line will cause failed metanome jobs to be re-run
-const queueScheduler = new QueueScheduler(queueName, { connection });
+// const queueScheduler = new QueueScheduler(queueName, { connection });
 
 /**
  *
@@ -81,7 +83,8 @@ function getAlgoInstance(data: JobData): MetanomeAlgorithm {
   if (data.jobType == "fd")
     return new Normi(data.schemaAndTables[0], data.config);
   else if (data.jobType == "ind")
-    return new BINDER(data.schemaAndTables, data.config);
+    return new FAIDA(data.schemaAndTables, data.config);
+  // return new BINDER(data.schemaAndTables, data.config);
   else
     throw Error(
       `Unknown job type. Known ones are  'ind' or 'fd': ${data.jobType}`
@@ -109,27 +112,37 @@ export const queueEvents = new QueueEvents(queueName, { connection });
 const worker = new Worker<JobData, void>(
   queueName,
   async (job) => {
+    let start: number;
     const algo = getAlgoInstance(job.data);
     if (job.progress < 85) {
       job.log("Running metanome... ");
+      start = Date.now();
       await emptyMetanomeDirs();
       await executeCommand(algo.command(), job);
       job.updateProgress(85);
+      job.log(`Done after ${Date.now() - start} ms`);
     }
     if (job.progress < 90) {
+      start = Date.now();
+
       job.log("Writing metadata file...");
       await algo.addToIndexFile();
       job.updateProgress(90);
+      job.log(`Done after ${Date.now() - start} ms`);
     }
     if (job.progress < 95) {
+      start = Date.now();
       job.log("Moving metanome result files...");
       await algo.moveFiles();
       job.updateProgress(95);
+      job.log(`Done after ${Date.now() - start} ms`);
     }
     if (job.progress < 100) {
+      start = Date.now();
       job.log("Processing metanome result files...");
       await algo.processFiles();
       job.updateProgress(100);
+      job.log(`Done after ${Date.now() - start} ms`);
     }
   },
   { connection }

@@ -71,13 +71,11 @@ export default abstract class MetanomeAlgorithm {
    * @returns terminal command to execute the algorithm as string
    */
   public command(): string {
-    return `java -Xmx${
-      this.memory
-    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
+    return `java -Xmx${this.memory()} -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
       process.env.DB_TYPE
     }" --table-key "${this.tableKey()}"  --tables "${this.schemaAndTables.join(
       ","
-    )}" --output "file:${this.outputFileName()}" ${this.configString()}}`.replace(
+    )}" --output "file:${this.outputFileName()}" ${this.configString()}`.replace(
       /(\r\n|\n|\r)/gm,
       ""
     );
@@ -170,7 +168,10 @@ export default abstract class MetanomeAlgorithm {
     if (+asNum && !(asNum % 1024) && asNum >= 2 * 1024 * 1024)
       return this.config.memory.toString();
     // or a number with a suffix abbreviation (kilo, mega, giga...)
-    else if (new RegExp("d+[KkMmGgTt]").test(this.config.memory.toString()))
+    else if (
+      this.config.memory &&
+      new RegExp("d+[KkMmGgTt]").test(this.config.memory.toString())
+    )
       return this.config.memory.toString();
     else return ((totalmem() * 0.75) / 1024).toFixed(0) + "k";
   }
