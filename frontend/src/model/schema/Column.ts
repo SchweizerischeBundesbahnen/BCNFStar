@@ -1,23 +1,32 @@
 import IAttribute from '@server/definitions/IAttribute';
 import SourceColumn from './SourceColumn';
+import SourceTableInstance from './SourceTableInstance';
 
 export default class Column {
-  public constructor(public name: string, public source: SourceColumn) {}
+  public name;
+
+  public constructor(
+    public sourceTable: SourceTableInstance,
+    public sourceColumn: SourceColumn,
+    name?: string
+  ) {
+    this.name = name ? name : sourceColumn.name;
+  }
 
   public copy(): Column {
-    return new Column(this.name, this.source);
+    return new Column(this.sourceTable, this.sourceColumn, this.name);
   }
 
   public get dataType() {
-    return this.source.dataType;
+    return this.sourceColumn.dataType;
   }
 
   public get nullable() {
-    return this.source.nullable;
+    return this.sourceColumn.nullable;
   }
 
   public get ordinalPosition() {
-    return this.source.ordinalPosition;
+    return this.sourceColumn.ordinalPosition;
   }
 
   public dataTypeString() {
@@ -26,15 +35,15 @@ export default class Column {
 
   public equals(other: Column): boolean {
     return (
-      this.source.name == other.source.name &&
-      this.source.table.name == other.source.table.name &&
-      this.source.table.schemaName == other.source.table.schemaName
+      this.sourceColumn.name == other.sourceColumn.name &&
+      this.sourceColumn.table.name == other.sourceColumn.table.name &&
+      this.sourceColumn.table.schemaName == other.sourceColumn.table.schemaName
     );
   }
   public toIAttribute(): IAttribute {
     return {
       name: this.name,
-      table: this.source.table.name,
+      table: this.sourceColumn.table.name,
       dataType: this.dataType,
       nullable: this.nullable,
     };

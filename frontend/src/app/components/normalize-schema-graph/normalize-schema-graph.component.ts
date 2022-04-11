@@ -230,7 +230,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
             port:
-              fkReferencing.source.table.fullName +
+              fkReferencing.sourceColumn.table.fullName +
               '.' +
               fkReferencing.name +
               '_right',
@@ -238,7 +238,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
           target: {
             id: this.graphStorage.get(fk.referenced)?.jointjsEl.id,
             port:
-              fkReferenced.source.table.fullName +
+              fkReferenced.sourceColumn.table.fullName +
               '.' +
               fkReferenced.name +
               '_left',
@@ -266,14 +266,14 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     for (let column of table.columns.inOrder()) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
-        id: column.source.table.fullName + '.' + column.name + '_left', // generated if `id` value is not present
+        id: column.sourceColumn.table.fullName + '.' + column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
       args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
-        id: column.source.table.fullName + '.' + column.name + '_right', // generated if `id` value is not present
+        id: column.sourceColumn.table.fullName + '.' + column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
         args,
         markup: this.generatePortMarkup(args),

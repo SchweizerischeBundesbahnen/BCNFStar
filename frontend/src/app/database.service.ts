@@ -111,19 +111,19 @@ export class DatabaseService {
         let dependantIColumn = ind.dependant.columnIdentifiers[i];
         let dependantColumn = schemaColumns.find(
           (column) =>
-            dependantIColumn.columnIdentifier == column.source.name &&
+            dependantIColumn.columnIdentifier == column.sourceColumn.name &&
             dependantIColumn.schemaIdentifier ==
-              column.source.table.schemaName &&
-            dependantIColumn.tableIdentifier == column.source.table.name
+              column.sourceColumn.table.schemaName &&
+            dependantIColumn.tableIdentifier == column.sourceColumn.table.name
         )!;
 
         let referencedIColumn = ind.referenced.columnIdentifiers[i];
         let referencedColumn = schemaColumns.find(
           (column) =>
-            referencedIColumn.columnIdentifier == column.source.name &&
+            referencedIColumn.columnIdentifier == column.sourceColumn.name &&
             referencedIColumn.schemaIdentifier ==
-              column.source.table.schemaName &&
-            referencedIColumn.tableIdentifier == column.source.table.name
+              column.sourceColumn.table.schemaName &&
+            referencedIColumn.tableIdentifier == column.sourceColumn.table.name
         )!;
 
         indRelationship.add(dependantColumn, referencedColumn);

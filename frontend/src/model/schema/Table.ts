@@ -7,6 +7,7 @@ import FdScore from './methodObjects/FdScore';
 import { TableRelationship } from '../types/TableRelationship';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
+import SourceTableInstance from './SourceTableInstance';
 
 export default class Table {
   public name = '';
@@ -15,7 +16,7 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Set<Relationship>();
-  public sources = new Set<SourceTable>();
+  public sources = new Set<SourceTableInstance>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -45,22 +46,41 @@ export default class Table {
   }
 
   public static fromITable(iTable: ITable): Table {
-    let columns = new ColumnCombination();
-    let table = new Table(columns);
-    let tableIdentifier = new SourceTable(iTable.name, iTable.schemaName);
+    let sourceTable = new SourceTable(iTable.name, iTable.schemaName);
+    let sourceTableInstance = new SourceTableInstance(sourceTable);
+    let table = new Table();
+    let columns = table.columns;
     iTable.attributes.forEach((iAttribute, index) => {
-      let columnIdentifier = new SourceColumn(
+      let sourceColumn = new SourceColumn(
         iAttribute.name,
-        tableIdentifier,
+        sourceTable,
         iAttribute.dataType,
         index,
         iAttribute.nullable
       );
-      columns.add(new Column(iAttribute.name, columnIdentifier));
+      columns.add(new Column(sourceTableInstance, sourceColumn));
     });
-    table.name = iTable.name;
-    table.schemaName = iTable.schemaName;
-    table.sources.add(tableIdentifier);
+    table.name = sourceTable.name;
+    table.schemaName = sourceTable.schemaName;
+    table.sources.add(sourceTableInstance);
+    return table;
+  }
+
+  // should/must not be used in production as important information (datatype and nullable) are missing
+  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
+    let sourceTable = new SourceTable(tableName, '');
+    let sourceTableInstance = new SourceTableInstance(sourceTable);
+    let table = new Table();
+    columnNames.forEach((name, i) =>
+      table.columns.add(
+        new Column(
+          sourceTableInstance,
+          new SourceColumn(name, sourceTable, 'unknown data type', i, false)
+        )
+      )
+    );
+    table.name = tableName;
+    table.sources.add(sourceTableInstance);
     return table;
   }
 
@@ -69,23 +89,6 @@ export default class Table {
    */
   public get fullName(): string {
     return this.schemaName + '.' + this.name;
-  }
-
-  // should/must not be used in production as important information (datatype and nullable) are missing
-  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
-    const table: Table = new Table();
-    table.name = tableName;
-    let sourceTable = new SourceTable(tableName, '');
-    columnNames.forEach((name, i) =>
-      table.columns.add(
-        new Column(
-          name,
-          new SourceColumn(name, sourceTable, 'unknown data type', i, false)
-        )
-      )
-    );
-    table.sources.add(sourceTable);
-    return table;
   }
 
   public get numColumns(): number {

@@ -49,8 +49,8 @@ export default class ColumnCombination {
   public sourceTables(): Array<SourceTable> {
     let sourceTables = new Array<SourceTable>();
     this._columns.forEach((column) => {
-      if (!sourceTables.includes(column.source.table))
-        sourceTables.push(column.source.table);
+      if (!sourceTables.includes(column.sourceColumn.table))
+        sourceTables.push(column.sourceColumn.table);
     });
     return sourceTables;
   }
@@ -102,10 +102,10 @@ export default class ColumnCombination {
 
   public inOrder(): Array<Column> {
     return this.asArray().sort((col1, col2) => {
-      if (col1.source.table.fullName == col2.source.table.fullName)
+      if (col1.sourceColumn.table.fullName == col2.sourceColumn.table.fullName)
         return col1.ordinalPosition - col2.ordinalPosition;
       // Todo: make sure most important tables are on top, not just alphabetically
-      if (col1.source.table.name < col2.source.table.name) return 1;
+      if (col1.sourceColumn.table.name < col2.sourceColumn.table.name) return 1;
       else return -1;
     });
   }
