@@ -11,7 +11,7 @@ describe("The metanoem results page", () => {
     cy.contains("Go").click();
   });
   beforeEach(() => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/metanome-results");
+    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
   });
 
   it("renders", () => {
@@ -36,7 +36,7 @@ describe("The metanoem results page", () => {
           "An error ocurred while trying to delete this metanome result"
         );
         cy.reload();
-        cy.visit(Cypress.env("FRONTEND_BASEURL") + "/metanome-results");
+        cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
         cy.get("tr").should("have.length", length - 1);
       });
   });

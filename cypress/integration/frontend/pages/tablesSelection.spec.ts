@@ -29,13 +29,6 @@ describe("The table selection page", () => {
   });
 
   it("renders the normalize page when clicking on the Go button", () => {
-    cy.contains("public").click();
-
-    cy.contains("nation_region_denormalized").click();
-    // cy.contains("denormalized_data").click();
-    // cy.contains("customer_orders_lineitem_denormalized").click();
-    cy.contains("part_partsupp_supplier_denormalized").click();
-    cy.contains("Go").click();
-    cy.url({ timeout: 10 * 60 * 1000 }).should("contain", "/edit-schema");
+    cy.selectTablesAndGo();
   });
 });
