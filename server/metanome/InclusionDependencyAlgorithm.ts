@@ -60,7 +60,7 @@ export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgor
    * is identical to this.schemaAndTables). If nothing is found, it tries to
    * find a file that contains INDs for a superset of the desired tables isntead.
    * @returns metadata of a file matching this algorithm and tables
-   * @throws {error: 'EMOENT'} if nothing is found
+   * @throws {error: 'ENOENT'} if nothing is found
    */
   protected async getMatchingFile(): Promise<IIndexFileEntry> {
     const possibleFiles = (await getIndexContent()).filter(
