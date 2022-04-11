@@ -27,7 +27,6 @@ export class TableSelectionComponent implements OnInit {
   public selectedTables = new Map<Table, Boolean>();
   public tablesInSchema: Record<string, Table[]> = {};
   public isLoading = false;
-  public error: any;
   public queueUrl: string;
   constructor(
     private dataService: DatabaseService,
@@ -95,7 +94,7 @@ export class TableSelectionComponent implements OnInit {
         this.router.navigate(['/edit-schema']);
       })
       .catch((e) => {
-        this.error = e;
+        console.error(e);
         this.dialog.open(this.errorDialog);
       })
       .finally(() => {
