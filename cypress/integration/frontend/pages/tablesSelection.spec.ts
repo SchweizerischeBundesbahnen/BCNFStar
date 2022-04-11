@@ -29,7 +29,6 @@ describe("The table selection page", () => {
   });
 
   it("renders the normalize page when clicking on the Go button", () => {
-    cy.contains("public").click();
     cy.selectTablesAndGo();
   });
 });
