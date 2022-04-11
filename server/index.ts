@@ -65,14 +65,6 @@ app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 
-/**
- * Redirects unknown routes to the home page. This catches routes like /edit-schema
- * which are not defined in express but in the frontend, and previously caused 404s
- */
-app.get("/*", (req, res) => {
-  res.sendFile(getStaticDir() + "/index.html");
-});
-
 const port = process.env["PORT"] || 80;
 
 const server = app.listen(port, () => {
