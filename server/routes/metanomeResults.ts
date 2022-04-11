@@ -33,7 +33,7 @@ export async function deleteMetanomeResults(req: Request, res: Response) {
     });
     if (wasDeletedFromIndex) {
       await rm(join(MetanomeAlgorithm.resultsFolder, fileName));
-      res.json({ message: "Sucessfully deleted metanone entry!" });
+      res.json({ message: "Sucessfully deleted metanome entry!" });
     } else {
       res
         .status(404)
