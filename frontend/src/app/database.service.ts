@@ -151,8 +151,8 @@ export class DatabaseService {
               column.source.table.schemaName &&
             referencedIColumn.tableIdentifier == column.source.table.name
         )!;
-
-        indRelationship.add(dependantColumn, referencedColumn);
+        if (dependantColumn && referencedColumn)
+          indRelationship.add(dependantColumn, referencedColumn);
       }
       this.inputSchema!.addInd(indRelationship);
     });
