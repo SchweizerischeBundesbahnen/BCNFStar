@@ -18,7 +18,9 @@ export async function getTableHead(req: Request, res: Response): Promise<void> {
         tableHeads[complete_name] = sqlUtils
           .getTableHead(row.table_name, row.table_schema, limit)
           .catch((e) =>
-            console.log("Error while fetching table head for " + complete_name)
+            console.error(
+              "Error while fetching table head for " + complete_name
+            )
           );
       }
     }

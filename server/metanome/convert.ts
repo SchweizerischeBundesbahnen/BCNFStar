@@ -47,12 +47,14 @@ import Normi from "./Normi";
 
   for (let i = 0; i < fdNames.length; i++) {
     const normi = new Normi(fdNames[i]);
-    await rename("metanome/temp/" + fdFiles[i], normi.resultPath());
+    await normi.addToIndexFile();
+    await rename("metanome/temp/" + fdFiles[i], await normi.resultPath());
     await normi.processFiles();
   }
   for (let i = 0; i < indNames.length; i++) {
     const binder = new BINDER(indNames[i]);
-    await rename("metanome/results/" + indFiles[i], binder.resultPath());
+    await binder.addToIndexFile();
+    await rename("metanome/results/" + indFiles[i], await binder.resultPath());
     await binder.processFiles();
   }
   console.log("done");

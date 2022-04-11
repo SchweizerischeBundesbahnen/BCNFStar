@@ -1,22 +1,19 @@
 import { absoluteServerDir, splitlines } from "../utils/files";
 import { join } from "path";
-import { open, readdir, readFile, writeFile } from "fs/promises";
 
-import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
 import { metanomeQueue, queueEvents } from "./queue";
+import InclusionDependencyAlgorithm from "./InclusionDependencyAlgorithm";
+import { readFile, writeFile } from "fs/promises";
 import IInclusionDependency, {
   IColumnIdentifier,
-} from "../definitions/IInclusionDependency";
-import { splitTableString } from "../utils/databaseUtils";
+} from "@/definitions/IInclusionDependency";
 import { sqlUtils } from "../db";
+import { splitTableString } from "../utils/databaseUtils";
+import { MetanomeConfig } from "./metanomeAlgorithm";
 
-export const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
+const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
-export default class BINDER extends MetanomeAlgorithm {
-  constructor(tables: string[], config?: MetanomeConfig) {
-    super(tables.sort(), config);
-  }
-
+export default class BINDER extends InclusionDependencyAlgorithm {
   protected override algoJarPath(): string {
     return "BINDERFile.jar";
   }
@@ -29,31 +26,8 @@ export default class BINDER extends MetanomeAlgorithm {
     return "INPUT_FILES";
   }
 
-  protected override outputFileName(): string {
-    return this.schemaAndTables
-      .map((table) => table.replace(".", "_"))
-      .join("_");
-  }
-
   protected override originalOutputPath(): string {
     return join(OUTPUT_DIR, this.outputFileName() + "_inds");
-  }
-
-  public override resultPath(): string {
-    return `metanome/inds/${this.schemaAndTables}.json`;
-  }
-
-  public override async moveFiles(): Promise<void> {
-    try {
-      super.moveFiles();
-    } catch (e) {
-      // no file found, this likey means metanome didn't create a file
-      // because there are no INDs. Therefore, create an empty file
-      if (e.code == "ENOENT") {
-        const handle = await open(this.resultPath(), "wx");
-        await handle.close();
-      } else throw e;
-    }
   }
 
   /**
@@ -62,16 +36,11 @@ export default class BINDER extends MetanomeAlgorithm {
    * object and stores all of them as a JSON array
    */
   public override async processFiles(): Promise<void> {
-    const content = await readFile(this.resultPath(), { encoding: "utf-8" });
-    const result: Array<IInclusionDependency> = splitlines(content).map(
-      (line) => {
-        let ind: IInclusionDependency;
-        try {
-          ind = JSON.parse(line);
-        } catch (e) {
-          console.log(e);
-          console.log(line);
-        }
+    const path = await this.resultPath();
+    const content = await readFile(path, { encoding: "utf-8" });
+    const result: Array<string> = splitlines(content)
+      .map((line) => {
+        let ind: IInclusionDependency = JSON.parse(line);
         ind.dependant.columnIdentifiers.map((cc) =>
           splitTableIdentifier(cc, this.schemaAndTables)
         );
@@ -79,36 +48,20 @@ export default class BINDER extends MetanomeAlgorithm {
           splitTableIdentifier(cc, this.schemaAndTables)
         );
         return ind;
-      }
-    );
-    await writeFile(this.resultPath(), JSON.stringify(result));
+      })
+      .map((ind) => JSON.stringify(ind));
+    await writeFile(path, result.join("\n"));
   }
 
-  public override async getResults(): Promise<Array<IInclusionDependency>> {
-    const possibleFiles = await readdir("metanome/inds");
-    const perfectFile = possibleFiles.find((filename) =>
-      this.resultPath().endsWith(filename)
-    );
-    // find any file that includes INDs for the desired tables
-    const goodFile = possibleFiles.find((filename) =>
-      this.schemaAndTables.every((table) => filename.includes(table))
-    );
-    if (perfectFile || goodFile)
-      return JSON.parse(
-        await readFile("metanome/inds/" + (perfectFile || goodFile), {
-          encoding: "utf-8",
-        })
-      );
-    else throw { code: "ENOENT" };
-  }
-
-  public override async execute(): Promise<void> {
+  public override async execute(config: MetanomeConfig): Promise<void> {
+    if (config.memory && typeof config.memory == "string")
+      this.memory = config.memory;
     let job = await metanomeQueue.add(
       `Getting inclusion dependencies for ${this.schemaAndTables}`,
       {
         schemaAndTables: this.schemaAndTables,
         jobType: "ind",
-        config: { MAX_NARY_LEVEL: 2, DETECT_NARY: true },
+        config: Object.assign({ MAX_NARY_LEVEL: 2, DETECT_NARY: true }, config),
       }
     );
     return job.waitUntilFinished(queueEvents);

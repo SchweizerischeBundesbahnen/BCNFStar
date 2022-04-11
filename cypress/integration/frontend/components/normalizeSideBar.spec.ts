@@ -43,16 +43,6 @@ describe("The normalize side bar", () => {
     cy.get(".sbb-expansion-panel-body button").contains("n_regionkey");
   });
 
-  it("does not display invalid Inclusion Dependencies", () => {
-    cy.get("sbb-expansion-panel").contains("Possible Foreign Keys");
-    cy.contains(
-      "r_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
-    ).should("not.exist");
-    cy.contains(
-      "n_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
-    ).should("not.exist");
-  });
-
   it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {
     cy.get(".table-head-title").contains("public.part_partsupp").click();
     cy.contains("s_nationkey->(public.nation_region_denormalized) n_nationkey");

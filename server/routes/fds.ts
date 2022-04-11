@@ -1,3 +1,4 @@
+import { MetanomeConfig } from "@/definitions/IIndexTableEntry";
 import { Request, Response } from "express";
 import Normi from "../metanome/Normi";
 
@@ -9,20 +10,21 @@ export default async function getFDs(
     const schemaAndTable = req.params.name;
     const forceRerun: boolean = !!req.params.forceRerun;
     const normi = new Normi(schemaAndTable);
-    if (forceRerun) {
-      await normi.execute();
+    const executeAndSend = async () => {
+      await normi.execute(req.query as MetanomeConfig);
       res.json(await normi.getResults());
-      return;
-    }
-    try {
-      res.json(await normi.getResults());
-    } catch (err) {
-      // means file not found
-      if (err.code === "ENOENT") {
-        await normi.execute();
+    };
+    if (forceRerun) await executeAndSend();
+    else {
+      try {
         res.json(await normi.getResults());
-      } else {
-        throw err;
+      } catch (err) {
+        // means file not found
+        if (err.code === "ENOENT") {
+          await executeAndSend();
+        } else {
+          throw err;
+        }
       }
     }
   } catch (error) {

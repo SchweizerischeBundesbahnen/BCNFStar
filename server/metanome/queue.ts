@@ -8,11 +8,13 @@ import {
   QueueScheduler,
 } from "bullmq";
 import { exec } from "child_process";
+import { join } from "path";
+import { rm } from "fs/promises";
+
 import { absoluteServerDir } from "../utils/files";
 import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
-import Normi from "./Normi";
 import BINDER from "./BINDER";
-import { rm } from "fs/promises";
+import Normi from "./Normi";
 
 const queueName = "metanome";
 const connection = {
@@ -93,9 +95,12 @@ function getAlgoInstance(data: JobData): MetanomeAlgorithm {
  * @returns a promise that resolves once all folders are deleted
  */
 async function emptyMetanomeDirs(): Promise<any> {
-  const folders = ["metanome/results", "metanome/temp", "metanome/BINDER_temp"];
+  const metanomeFolder = join(absoluteServerDir, "metanome");
+  const folders = ["results", "temp", "BINDER_temp"];
   return Promise.all(
-    folders.map((f) => rm(f, { recursive: true, force: true }))
+    folders.map((f) =>
+      rm(join(metanomeFolder, f), { recursive: true, force: true })
+    )
   );
 }
 
@@ -105,10 +110,15 @@ const worker = new Worker<JobData, void>(
   queueName,
   async (job) => {
     const algo = getAlgoInstance(job.data);
-    if (job.progress < 90) {
+    if (job.progress < 85) {
       job.log("Running metanome... ");
       await emptyMetanomeDirs();
       await executeCommand(algo.command(), job);
+      job.updateProgress(85);
+    }
+    if (job.progress < 90) {
+      job.log("Writing metadata file...");
+      await algo.addToIndexFile();
       job.updateProgress(90);
     }
     if (job.progress < 95) {
