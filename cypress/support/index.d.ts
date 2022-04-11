@@ -14,5 +14,11 @@ declare namespace Cypress {
      * to allow gzipped requests
      */
     visitFrontend(options?: Partial<Cypress.VisitOptions>): Chainable<Element>;
+
+    /**
+     * Selects which tables to use for schema editing, and enters schema editing mode
+     * @todo do programmatically instead of in UI if possible
+     */
+    selectTablesAndGo(): Chainable<Element>;
   }
 }
