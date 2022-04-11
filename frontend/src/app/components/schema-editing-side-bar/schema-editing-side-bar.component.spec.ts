@@ -1,22 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NormalizeSideBarComponent } from './normalize-side-bar.component';
+import { SchemaProcessingSideBarComponent } from './schema-editing-side-bar.component';
 
 import { exampleTable } from 'src/model/schema/exampleTables';
 
-describe('NormalizeSideBarComponent', () => {
-  let component: NormalizeSideBarComponent;
-  let fixture: ComponentFixture<NormalizeSideBarComponent>;
+describe('SchemaProcessingSideBarComponent', () => {
+  let component: SchemaProcessingSideBarComponent;
+  let fixture: ComponentFixture<SchemaProcessingSideBarComponent>;
   let htmlElement: HTMLElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [NormalizeSideBarComponent],
+      declarations: [SchemaProcessingSideBarComponent],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NormalizeSideBarComponent);
+    fixture = TestBed.createComponent(SchemaProcessingSideBarComponent);
     component = fixture.componentInstance;
     component.table = exampleTable();
     fixture.detectChanges();

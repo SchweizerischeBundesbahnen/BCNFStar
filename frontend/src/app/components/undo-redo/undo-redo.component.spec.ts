@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NormalizeUndoRedoComponent } from './normalize-undo-redo.component';
+import { UndoRedoComponent } from './undo-redo.component';
 
-describe('NormalizeUndoRedoComponent', () => {
-  let component: NormalizeUndoRedoComponent;
-  let fixture: ComponentFixture<NormalizeUndoRedoComponent>;
+describe('UndoRedoComponent', () => {
+  let component: UndoRedoComponent;
+  let fixture: ComponentFixture<UndoRedoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [NormalizeUndoRedoComponent],
+      declarations: [UndoRedoComponent],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NormalizeUndoRedoComponent);
+    fixture = TestBed.createComponent(UndoRedoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

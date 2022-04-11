@@ -2,18 +2,18 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { NormalizeComponent } from './normalize.component';
+import { SchemaEditingComponent } from './schema-editing.component';
 
 import { DatabaseService } from 'src/app/database.service';
 import { exampleTable } from 'src/model/schema/exampleTables';
-import { NormalizeSchemaGraphComponent } from 'src/app/components/normalize-schema-graph/normalize-schema-graph.component';
-import { NormalizeSideBarComponent } from 'src/app/components/normalize-side-bar/normalize-side-bar.component';
+import { NormalizeSchemaGraphComponent } from '@/src/app/components/schema-graph/schema-graph.component';
+import { SchemaProcessingSideBarComponent } from '@/src/app/components/schema-editing-side-bar/schema-editing-side-bar.component';
 import { By } from '@angular/platform-browser';
 import Table from 'src/model/schema/Table';
 
-describe('NormalizeComponent', () => {
-  let component: NormalizeComponent;
-  let fixture: ComponentFixture<NormalizeComponent>;
+describe('SchemaEditingComponent', () => {
+  let component: SchemaEditingComponent;
+  let fixture: ComponentFixture<SchemaEditingComponent>;
   let databaseServiceStub: any;
 
   beforeEach(async () => {
@@ -22,9 +22,9 @@ describe('NormalizeComponent', () => {
     };
     await TestBed.configureTestingModule({
       declarations: [
-        NormalizeComponent,
+        SchemaEditingComponent,
         NormalizeSchemaGraphComponent,
-        NormalizeSideBarComponent,
+        SchemaProcessingSideBarComponent,
       ],
       imports: [RouterTestingModule, HttpClientModule],
       providers: [{ provide: DatabaseService, useValue: databaseServiceStub }],
@@ -32,7 +32,7 @@ describe('NormalizeComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NormalizeComponent);
+    fixture = TestBed.createComponent(SchemaEditingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -98,15 +98,15 @@ describe('NormalizeComponent', () => {
 });
 
 function getSchemaGraph(
-  fixture: ComponentFixture<NormalizeComponent>
+  fixture: ComponentFixture<SchemaEditingComponent>
 ): NormalizeSchemaGraphComponent {
   return fixture.debugElement.query(By.directive(NormalizeSchemaGraphComponent))
     .componentInstance;
 }
 
 function getSideBar(
-  fixture: ComponentFixture<NormalizeComponent>,
-  component: NormalizeComponent
+  fixture: ComponentFixture<SchemaEditingComponent>,
+  component: SchemaEditingComponent
 ): NormalizeSideBarComponent {
   let table = [...component.schema.tables][0];
   component.onSelect(table);
