@@ -4,18 +4,9 @@ describe("The normalize side bar", () => {
   beforeEach(() => {
     cy.visitFrontend();
 
-    cy.contains("public").click();
+    cy.selectTablesAndGo();
 
-    cy.contains("nation_region_denormalized").click();
-    // cy.contains("denormalized_data").click();
-    // cy.contains("customer_orders_lineitem_denormalized").click();
-    cy.contains("part_partsupp_supplier_denormalized").click();
-
-    cy.contains("Go").click();
-
-    cy.get(".table-head-title", {
-      timeout: 10 * 60 * 1000,
-    })
+    cy.get(".table-head-title")
       .contains("public.nation_region_denormalized")
       .click({ force: true });
   });
