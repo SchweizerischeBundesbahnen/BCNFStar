@@ -39,6 +39,8 @@ export default abstract class MetanomeAlgorithm {
     return addToIndex({
       tables: this.schemaAndTables,
       algorithm: this.algoClass(),
+      dbmsName: sqlUtils.getDbmsName(),
+      database: process.env.DB_DATABASE,
       fileName: randomUUID() + ".json",
       config: this.config,
       createDate: Date.now().toString(),

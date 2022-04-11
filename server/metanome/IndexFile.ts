@@ -4,6 +4,7 @@ import { absoluteServerDir, initFile } from "../utils/files";
 
 import { Mutex } from "async-mutex";
 import { IIndexFileEntry } from "@/definitions/IIndexTableEntry";
+import { sqlUtils } from "../db";
 
 /** Used to make sure that no two addToIndex/deleteFromIndex calls can happen simultaniously */
 const mutex = new Mutex();
@@ -20,7 +21,12 @@ export async function getIndexContent(): Promise<Array<IIndexFileEntry>> {
   const contentString = await readFile(indexFileLocation, {
     encoding: "utf-8",
   });
-  return JSON.parse(contentString);
+  const entries: Array<IIndexFileEntry> = JSON.parse(contentString);
+  return entries.filter(
+    (entry) =>
+      entry.dbmsName == sqlUtils.getDbmsName() &&
+      entry.database == process.env.DB_DATABASE
+  );
 }
 
 /**
