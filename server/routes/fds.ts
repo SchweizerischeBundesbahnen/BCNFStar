@@ -9,9 +9,13 @@ export default async function getFDs(
   try {
     const schemaAndTable = req.params.name;
     const forceRerun: boolean = !!req.params.forceRerun;
-    const normi = new Normi(schemaAndTable);
+    const config = req.query as MetanomeConfig;
+    delete config["forceRerun"];
+
+    const normi = new Normi(schemaAndTable, config);
+
     const executeAndSend = async () => {
-      await normi.execute(req.query as MetanomeConfig);
+      await normi.execute();
       res.json(await normi.getResults());
     };
     if (forceRerun) await executeAndSend();

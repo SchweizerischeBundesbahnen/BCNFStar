@@ -63,15 +63,13 @@ export default class Normi extends FunctionalDependencyAlgorithm {
     await writeFile(path, result.join("\n"));
   }
 
-  async execute(config: MetanomeConfig): Promise<void> {
-    if (config.memory && typeof config.memory == "string")
-      this.memory = config.memory;
+  async execute(): Promise<void> {
     let job = await metanomeQueue.add(
       `Getting functional dependencies for ${this.schemaAndTable}`,
       {
         schemaAndTables: [this.schemaAndTable],
         jobType: "fd",
-        config: Object.assign({ isHumanInTheLoop: false }, config),
+        config: Object.assign({ isHumanInTheLoop: false }, this.config),
       }
     );
     return job.waitUntilFinished(queueEvents);

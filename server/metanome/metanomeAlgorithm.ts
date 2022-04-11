@@ -4,6 +4,7 @@ import { sqlUtils } from "../db";
 import { rename } from "fs/promises";
 import { createHash, randomUUID } from "crypto";
 import * as _ from "lodash";
+import { totalmem } from "os";
 import { addToIndex, getIndexContent } from "./IndexFile";
 
 export type MetanomeConfig = Record<string, string | number | boolean>;
@@ -11,8 +12,6 @@ export type MetanomeConfig = Record<string, string | number | boolean>;
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 
 export default abstract class MetanomeAlgorithm {
-  public memory = "12g";
-
   public static resultsFolder = join(
     absoluteServerDir,
     "metanome",
@@ -66,7 +65,7 @@ export default abstract class MetanomeAlgorithm {
    * Adds a job to the metanome queue that runs the requested algorithm
    * @returns Promise that resolves once the algorithm execution finishes
    */
-  public abstract execute(config?: MetanomeConfig): Promise<void>;
+  public abstract execute(): Promise<void>;
 
   /**
    * @returns terminal command to execute the algorithm as string
@@ -160,14 +159,31 @@ export default abstract class MetanomeAlgorithm {
   protected abstract originalOutputPath(): string;
 
   /**
-   * @returns location where file shouuld be moved to
+   * @returns a valid java memory string to be put after -xmx
+   * Checks whether config.memory is a valid java memory string
+   * and returns it if it is, otherwise it will use 75% of total
+   * system memory
    */
+  protected memory(): string {
+    const asNum = +this.config.memory;
+    // Memory can be a number bigger than 2MB which is a multiple of 1024
+    if (+asNum && !(asNum % 1024) && asNum >= 2 * 1024 * 1024)
+      return this.config.memory.toString();
+    // or a number with a suffix abbreviation (kilo, mega, giga...)
+    else if (new RegExp("d+[KkMmGgTt]").test(this.config.memory.toString()))
+      return this.config.memory.toString();
+    else return ((totalmem() * 0.75) / 1024).toFixed(0) + "k";
+  }
 
+  /**
+   * @returns config in metanome-readable format
+   */
   protected configString(): string {
     if (!Object.keys(this.config).length) return "";
     return (
       "--algorithm-config " +
       Object.entries(this.config)
+        .filter((item) => item[0] !== "memory")
         .map((item) => `${item[0]}:${item[1]}`)
         .join(",")
     );

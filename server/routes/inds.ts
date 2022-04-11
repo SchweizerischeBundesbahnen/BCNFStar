@@ -8,10 +8,14 @@ export default async function getINDs(
 ): Promise<void> {
   try {
     const schemaAndTables = req.params.tableNames.split(",");
-    const forceRerun: boolean = !!req.params.forceRerun;
-    const binder = new BINDER(schemaAndTables);
+    const forceRerun: boolean = !!req.query.forceRerun;
+    const config = req.query as MetanomeConfig;
+    delete config["forceRerun"];
+
+    const binder = new BINDER(schemaAndTables, config);
+
     const executeAndSend = async () => {
-      await binder.execute(req.query as MetanomeConfig);
+      await binder.execute();
       res.json(await binder.getResults());
     };
     if (forceRerun) await executeAndSend();
