@@ -12,7 +12,7 @@ import { SbbDialog } from '@sbb-esta/angular/dialog';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  @ViewChild(SbbTable) table!: SbbTable<ITableHead>;
+  @ViewChild(SbbTable) table?: SbbTable<ITableHead>;
   @ViewChild('errorDialog') errorDialog!: TemplateRef<any>;
   // public tables: Map<Table, Boolean> = new Map();
   public tableHeads: Map<Table, ITableHead> = new Map();
@@ -112,7 +112,7 @@ export class TableSelectionComponent implements OnInit {
       this.tableColumns = [];
       this.dataSource.data = [];
     }
-    this.table.renderRows();
+    this.table?.renderRows();
   }
 
   public mouseEnter(table: Table) {

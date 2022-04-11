@@ -17,14 +17,14 @@ describe("The app routing", () => {
     cy.contains("Go").click();
     cy.url({ timeout: 10 * 60 * 1000 }).should(
       "contain",
-      Cypress.env("FRONTEND_BASEURL") + "/edit-schema"
+      Cypress.env("FRONTEND_BASEURL") + "/#/edit-schema"
     );
   });
 
   it("renders the table selection component when calling missing url", () => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/wrong/path", {
+    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/wrong/path", {
       failOnStatusCode: false,
     });
-    cy.url().should("contain", Cypress.env("FRONTEND_BASEURL"));
+    cy.url().should("equal", Cypress.env("FRONTEND_BASEURL") + "/#/");
   });
 });
