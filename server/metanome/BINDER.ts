@@ -10,6 +10,20 @@ import { sqlUtils } from "@/db";
 import { splitTableString } from "@/utils/databaseUtils";
 import { DbmsType } from "@/db/SqlUtils";
 
+interface BinderOptions {
+  // whether to detect nary inds at all
+  DETECT_NARY: boolean; //=false
+  // how many columns an  IND might reference
+  MAX_NARY_LEVEL: number; //=-1
+  CLEAN_TEMP: boolean; //=true
+  INPUT_ROW_LIMIT: number; //=-1
+  FILTER_KEY_FOREIGNKEYS: boolean; //false
+  MAX_MEMORY_USAGE_PERCENTAGE: number; //=60
+  TEMP_FOLDER_PATH: string; //= 'BINDER_temp'
+  NUM_BUCKETS_PER_COLUMN: number; //= 10
+  MEMORY_CHECK_FREQUENCY: number; //= 100
+}
+
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
 export default class BINDER extends InclusionDependencyAlgorithm {

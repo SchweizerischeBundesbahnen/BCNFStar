@@ -11,6 +11,7 @@ import BINDER from "./BINDER";
 import Normi from "./Normi";
 // import HyFD from "./HyFD";
 import FAIDA from "./FAIDA";
+import HyFD from "./HyFD";
 
 const queueName = "metanome";
 const connection = {
@@ -71,7 +72,7 @@ function executeCommand(
  * @returns instance of a metanome algorithm built from the job data
  */
 function getAlgoInstance(data: IMetanomeJob): MetanomeAlgorithm {
-  const singleFileAlgos = [Normi];
+  const singleFileAlgos = [Normi, HyFD];
   const multiFileAlgos = [FAIDA, BINDER];
   for (const singleFileAlgo of singleFileAlgos) {
     const algo = new singleFileAlgo(data.schemaAndTables[0], data.config);

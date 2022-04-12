@@ -12,7 +12,18 @@ import { DbmsType } from "@/db/SqlUtils";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
-export default class BINDER extends InclusionDependencyAlgorithm {
+interface FaidaConfig {
+  IGNORE_CONSTANT; //=true
+  VIRTUAL_COLUMN_STORE; //=false
+  HLL_REL_STD_DEV; //=0.01
+  APPROXIMATE_TESTER; //=HLL
+  REUSE_COLUMN_STORE; //=false
+  SAMPLE_GOAL; //=500
+  IGNORE_NULL; //=true
+  APPROXIMATE_TESTER_BYTES; //=32768
+  DETECT_NARY; //=true
+}
+export default class FAIDA extends InclusionDependencyAlgorithm {
   protected override algoJarPath(): string {
     return "FAIDA-1.2-SNAPSHOT.jar";
   }
