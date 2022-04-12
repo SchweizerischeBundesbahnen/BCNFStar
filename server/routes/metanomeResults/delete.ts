@@ -1,22 +1,8 @@
 import { Request, Response } from "express";
 import { rm } from "fs/promises";
 import { join } from "path";
-import { deleteFromIndex, getIndexContent } from "../metanome/IndexFile";
-import MetanomeAlgorithm from "../metanome/metanomeAlgorithm";
-
-export async function getMetanomeResults(req: Request, res: Response) {
-  try {
-    res.json(await getIndexContent());
-  } catch (e) {
-    console.error(e);
-    if (!res.headersSent) {
-      res
-        .status(502)
-        .end("An error ocurred while getting info about metanome results");
-    }
-  }
-}
-
+import { deleteFromIndex } from "@/metanome/IndexFile";
+import MetanomeAlgorithm from "@/metanome/metanomeAlgorithm";
 /**
  * First tries to delete the metanome result identified by its file name (containing an UUID)
  * from the index file. Only if that was successful, also try to delete the actual file

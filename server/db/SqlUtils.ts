@@ -1,5 +1,5 @@
-import IAttribute from "../definitions/IAttribute";
-import IRelationship from "../definitions/IRelationship";
+import IAttribute from "@/definitions/IAttribute";
+import IRelationship from "@/definitions/IRelationship";
 import ITableHead from "@/definitions/ITableHead";
 
 export type SchemaQueryRow = {
@@ -24,6 +24,11 @@ export type PrimaryKeyResult = {
   table_name: string;
   column_name: string;
 };
+
+export enum DbmsType {
+  mssql = "mssql",
+  postgres = "postgres",
+}
 
 export default abstract class SqlUtils {
   abstract init(): void;
@@ -56,7 +61,7 @@ export default abstract class SqlUtils {
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
   public abstract getPrimaryKeys(): Promise<PrimaryKeyResult[]>;
   public abstract getJdbcPath(): string;
-  public abstract getDbmsName(): "mssql" | "postgres";
+  public abstract getDbmsName(): DbmsType;
 
   public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
   public abstract SQL_DROP_TABLE_IF_EXISTS(

@@ -1,15 +1,14 @@
-import { absoluteServerDir, splitlines } from "../utils/files";
+import { absoluteServerDir, splitlines } from "@/utils/files";
 import { join } from "path";
 
-import { metanomeQueue, queueEvents } from "./queue";
 import InclusionDependencyAlgorithm from "./InclusionDependencyAlgorithm";
 import { readFile, writeFile } from "fs/promises";
 import IInclusionDependency, {
   IColumnIdentifier,
 } from "@/definitions/IInclusionDependency";
-import { sqlUtils } from "../db";
-import { splitTableString } from "../utils/databaseUtils";
-import { MetanomeConfig } from "./metanomeAlgorithm";
+import { sqlUtils } from "@/db";
+import { splitTableString } from "@/utils/databaseUtils";
+import { DbmsType } from "@/db/SqlUtils";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
@@ -18,7 +17,7 @@ export default class BINDER extends InclusionDependencyAlgorithm {
     return "BINDERFile.jar";
   }
 
-  protected override algoClass(): string {
+  public override algoClass(): string {
     return "de.metanome.algorithms.binder.BINDERFile";
   }
 
@@ -52,21 +51,6 @@ export default class BINDER extends InclusionDependencyAlgorithm {
       .map((ind) => JSON.stringify(ind));
     await writeFile(path, result.join("\n"));
   }
-
-  public override async execute(): Promise<void> {
-    let job = await metanomeQueue.add(
-      `Getting inclusion dependencies for ${this.schemaAndTables}`,
-      {
-        schemaAndTables: this.schemaAndTables,
-        jobType: "ind",
-        config: Object.assign(
-          { MAX_NARY_LEVEL: 2, DETECT_NARY: true },
-          this.config
-        ),
-      }
-    );
-    return job.waitUntilFinished(queueEvents);
-  }
 }
 
 /**
@@ -82,8 +66,9 @@ function splitTableIdentifier(
   // Depending on the database type, tableIdentifier might contain both schema-
   // amd table name, or just the table name
   let tableWithSchema: string;
-  if (sqlUtils.getDbmsName() == "mssql") tableWithSchema = cId.tableIdentifier;
-  else if (sqlUtils.getDbmsName() == "postgres")
+  if (sqlUtils.getDbmsName() == DbmsType.mssql)
+    tableWithSchema = cId.tableIdentifier;
+  else if (sqlUtils.getDbmsName() == DbmsType.postgres)
     tableWithSchema = tablesWithSchema.find((entry) => {
       const entryTable = splitTableString(entry)[1];
       return cId.tableIdentifier == entryTable;

@@ -1,6 +1,6 @@
 import ITableHead from "@/definitions/ITableHead";
 import { Request, Response } from "express";
-import { sqlUtils } from "../db";
+import { sqlUtils } from "@/db";
 
 export async function getTableHead(req: Request, res: Response): Promise<void> {
   try {

@@ -2,7 +2,7 @@ import Table from '@/src/model/schema/Table';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
-import { IIndexFileEntry } from '@server/definitions/IIndexTableEntry';
+import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 import { DatabaseService } from '../../database.service';
 
@@ -55,7 +55,7 @@ export class MetanomeSettingsComponent {
 
   public getMetanomeConfigurationInformation(result: IIndexFileEntry) {
     let settings = [
-      new Date(+result.createDate * 1000).toLocaleString(),
+      new Date(+result.createDate).toLocaleString(),
       result.algorithm.split('.').slice(-1),
       Object.entries(result.config)
         .join(';')

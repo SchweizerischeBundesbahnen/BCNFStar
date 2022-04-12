@@ -1,13 +1,16 @@
-import { absoluteServerDir } from "../utils/files";
+import { absoluteServerDir } from "@/utils/files";
 import { join } from "path";
-import { sqlUtils } from "../db";
+import { sqlUtils } from "@/db";
 import { rename } from "fs/promises";
 import { createHash, randomUUID } from "crypto";
 import * as _ from "lodash";
 import { totalmem } from "os";
 import { addToIndex, getIndexContent } from "./IndexFile";
-
-export type MetanomeConfig = Record<string, string | number | boolean>;
+import {
+  MetanomeResultType,
+  IIndexFileEntry,
+} from "@/definitions/IIndexFileEntry";
+import { MetanomeConfig } from "@/definitions/IMetanomeJob";
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 
@@ -39,10 +42,11 @@ export default abstract class MetanomeAlgorithm {
       tables: this.schemaAndTables,
       algorithm: this.algoClass(),
       dbmsName: sqlUtils.getDbmsName(),
+      resultType: this.resultType(),
       database: process.env.DB_DATABASE,
       fileName: randomUUID() + ".json",
       config: this.config,
-      createDate: Date.now().toString(),
+      createDate: Date.now(),
     });
   }
 
@@ -51,21 +55,7 @@ export default abstract class MetanomeAlgorithm {
    */
   public abstract processFiles(): Promise<void>;
 
-  /**
-   * Returns the desired metanome results for the
-   * selected table if they exists.
-   * @throws an error that is of form
-   * { code: 'EMOENT' } if no results exist
-   */
-  public abstract getResults(): Promise<any>;
-
-  // FOR USE FROM OUTSIDE QUEUE
-
-  /**
-   * Adds a job to the metanome queue that runs the requested algorithm
-   * @returns Promise that resolves once the algorithm execution finishes
-   */
-  public abstract execute(): Promise<void>;
+  protected abstract resultType(): MetanomeResultType;
 
   /**
    * @returns terminal command to execute the algorithm as string
@@ -109,16 +99,20 @@ export default abstract class MetanomeAlgorithm {
    * this is the final path after all operations
    */
   public async resultPath(): Promise<string> {
+    console.log("getting result path");
     const metadata = await getIndexContent();
-    const entry = metadata.find((entry) => {
+    const entries = metadata.filter((entry) => {
       return (
         _.isEqual(this.schemaAndTables, entry.tables) &&
-        // _.isEqual(this.config, entry.config) &&
+        _.isEqual(this.config, entry.config) &&
         entry.algorithm == this.algoClass()
       );
     });
-    if (!entry) throw { code: "ENOENT" };
-    return join(MetanomeAlgorithm.resultsFolder, entry.fileName);
+    if (!entries.length) throw { code: "ENOENT" };
+
+    // if there are mutliple fitting entries, take the newest one
+    const sorted = entries.sort((e1, e2) => e2.createDate - e1.createDate);
+    return join(MetanomeAlgorithm.resultsFolder, sorted[0].fileName);
   }
   /**
    * Location of the algorithm-specific jar file relative to the metanome folder
@@ -128,7 +122,7 @@ export default abstract class MetanomeAlgorithm {
   /**
    * Location of the main class file of the algorithm in the JAR defined in {@link algoJarPath}
    */
-  protected abstract algoClass(): string;
+  public abstract algoClass(): string;
 
   /**
    * algorithm-specific table key required by the metanome CLI

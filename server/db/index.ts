@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { absoluteServerDir, splitlines } from "../utils/files";
+import { absoluteServerDir, splitlines } from "@/utils/files";
 import MsSqlUtils from "./MsSqlUtils";
 import PostgresSqlUtils from "./PostgresSqlUtils";
 import SqlUtils from "./SqlUtils";
