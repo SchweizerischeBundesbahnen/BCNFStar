@@ -1,5 +1,5 @@
 import Column from './Column';
-import SourceTable from './SourceTable';
+import SourceTableInstance from './SourceTableInstance';
 
 export default class ColumnCombination {
   private _columns: Array<Column> = [];
@@ -36,8 +36,8 @@ export default class ColumnCombination {
     );
   }
 
-  public sourceTable(): SourceTable {
-    let sourceTables = this.sourceTables();
+  public sourceTableInstance(): SourceTableInstance {
+    let sourceTables = this.sourceTableInstances();
     if (sourceTables.length > 1)
       console.warn(
         'Warning: expected only one sourceTable but there are ' +
@@ -46,11 +46,11 @@ export default class ColumnCombination {
     return sourceTables[0];
   }
 
-  public sourceTables(): Array<SourceTable> {
-    let sourceTables = new Array<SourceTable>();
+  public sourceTableInstances(): Array<SourceTableInstance> {
+    let sourceTables = new Array<SourceTableInstance>();
     this._columns.forEach((column) => {
-      if (!sourceTables.includes(column.sourceColumn.table))
-        sourceTables.push(column.sourceColumn.table);
+      if (!sourceTables.includes(column.sourceTableInstance))
+        sourceTables.push(column.sourceTableInstance);
     });
     return sourceTables;
   }

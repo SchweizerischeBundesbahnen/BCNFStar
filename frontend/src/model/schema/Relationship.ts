@@ -77,13 +77,17 @@ export default class Relationship {
   public toIRelationship(): IRelationship {
     return {
       referencing: {
-        name: `${this.referencing().sourceTable().name}`,
-        schemaName: `${this.referencing().sourceTable().schemaName!}`,
+        name: `${this.referencing().sourceTableInstance().table.name}`,
+        schemaName: `${
+          this.referencing().sourceTableInstance().table.schemaName
+        }`,
         attributes: [],
       },
       referenced: {
-        name: `${this.referenced().sourceTable().name}`,
-        schemaName: `${this.referenced().sourceTable().schemaName!}`,
+        name: `${this.referenced().sourceTableInstance().table.name}`,
+        schemaName: `${
+          this.referenced().sourceTableInstance().table.schemaName
+        }`,
         attributes: [],
       },
       columnRelationships: this._referencing.map((element, index) => {

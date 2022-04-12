@@ -141,18 +141,18 @@ export default class Table {
 
   public projectRelationships(table: Table): void {
     // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
-    let neededSourceTables = new Set(table.columns.sourceTables());
+    let neededSourceTables = new Set(table.columns.sourceTableInstances());
     let sourceTables = new Set(this.sources);
     let relationships = new Set(this.relationships);
 
-    let toRemove: Set<SourceTable>;
+    let toRemove: Set<SourceTableInstance>;
     do {
       toRemove = new Set();
       sourceTables.forEach((sourceTable) => {
         let adjacentRelationship = [...relationships].filter(
           (rel) =>
-            rel.referenced().sourceTable() == sourceTable ||
-            rel.referencing().sourceTable() == sourceTable
+            rel.referenced().sourceTableInstance() == sourceTable ||
+            rel.referencing().sourceTableInstance() == sourceTable
         );
         if (
           adjacentRelationship.length == 1 &&

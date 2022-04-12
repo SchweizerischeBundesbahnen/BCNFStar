@@ -6,7 +6,7 @@ export default class Column {
   public name;
 
   public constructor(
-    public sourceTable: SourceTableInstance,
+    public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
     name?: string
   ) {
@@ -14,7 +14,7 @@ export default class Column {
   }
 
   public copy(): Column {
-    return new Column(this.sourceTable, this.sourceColumn, this.name);
+    return new Column(this.sourceTableInstance, this.sourceColumn, this.name);
   }
 
   public get dataType() {
