@@ -158,14 +158,28 @@ export class DatabaseService {
     });
   }
 
-  public async setInputTables(tables: Array<Table>) {
-    const indPromise = this.getINDs(tables);
+  /**
+   * Creates InputSchema for use on edit-schema page with the supplied tables
+   * @param tables used on edit-schema page
+   * @param indFile name of a metanome results file that contains INDs for all the tables
+   * @param fdFiles Record that maps from table.schemaAndName to FD result file name
+   */
+  public async setInputTables(
+    tables: Array<Table>,
+    indFile: string,
+    fdFiles: Record<string, string>
+  ) {
+    const indPromise = this.getMetanomeResult(indFile) as Promise<
+      Array<IInclusionDependency>
+    >;
     const fdPromises: Record<
       string,
       Promise<Array<IFunctionalDependency>>
     > = {};
     for (const table of tables)
-      fdPromises[table.schemaAndName()] = this.getFDs(table);
+      fdPromises[table.schemaAndName()] = this.getMetanomeResult(
+        fdFiles[table.schemaAndName()]
+      ) as Promise<Array<IFunctionalDependency>>;
 
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
@@ -181,22 +195,9 @@ export class DatabaseService {
     this.resolveIPks(this.iPks);
   }
 
-  private getFDs(table: Table): Promise<Array<IFunctionalDependency>> {
+  private getMetanomeResult(fileName: string) {
     return firstValueFrom(
-      this.http.get<Array<IFunctionalDependency>>(
-        `${this.baseUrl}/tables/${table.schemaAndName()}/fds`
-      )
-    );
-  }
-
-  private getINDs(tables: Array<Table>): Promise<Array<IInclusionDependency>> {
-    let tableNamesConcatenation = tables
-      .map((table) => table.schemaAndName())
-      .join(',');
-    return firstValueFrom(
-      this.http.get<Array<IInclusionDependency>>(
-        `${this.baseUrl}/tables/${tableNamesConcatenation}/inds`
-      )
+      this.http.get(`${this.baseUrl}/metanomeResults/${fileName}`)
     );
   }
 
