@@ -1,18 +1,12 @@
 // if UnrecoverableError is not found, make sure to run npm install
-import {
-  Queue,
-  QueueEvents,
-  UnrecoverableError,
-  Worker,
-  Job,
-  QueueScheduler,
-} from "bullmq";
+import { Queue, QueueEvents, UnrecoverableError, Worker, Job } from "bullmq";
 import { exec } from "child_process";
 import { join } from "path";
 import { rm } from "fs/promises";
 
-import { absoluteServerDir } from "../utils/files";
-import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
+import { absoluteServerDir } from "@/utils/files";
+import { IMetanomeJob } from "@/definitions/IMetanomeJob";
+import MetanomeAlgorithm from "./metanomeAlgorithm";
 import BINDER from "./BINDER";
 import Normi from "./Normi";
 // import HyFD from "./HyFD";
@@ -24,22 +18,19 @@ const connection = {
   port: process.env.REDIS_PORT || 6379,
 };
 
-export interface JobData {
-  schemaAndTables: string[];
-  jobType: "ind" | "fd";
-  config: MetanomeConfig;
-}
-
-export const metanomeQueue = new Queue<JobData, void, string>(queueName, {
-  connection,
-  defaultJobOptions: {
-    attempts: 1,
-    backoff: {
-      type: "exponential",
-      delay: 10_000,
+export const metanomeQueue = new Queue<IMetanomeJob, string, string>(
+  queueName,
+  {
+    connection,
+    defaultJobOptions: {
+      attempts: 1,
+      backoff: {
+        type: "exponential",
+        delay: 10_000,
+      },
     },
-  },
-});
+  }
+);
 
 // uncommenting the next line will cause failed metanome jobs to be re-run
 // const queueScheduler = new QueueScheduler(queueName, { connection });
@@ -53,9 +44,9 @@ export const metanomeQueue = new Queue<JobData, void, string>(queueName, {
  */
 function executeCommand(
   command: string,
-  job: Job<JobData, void>
+  job: Job<IMetanomeJob, string>
 ): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     job.log(`Executing command: "${command}"`);
     let process = exec(command, {
       cwd: absoluteServerDir + "/metanome",
@@ -79,16 +70,18 @@ function executeCommand(
  * @param data job data object
  * @returns instance of a metanome algorithm built from the job data
  */
-function getAlgoInstance(data: JobData): MetanomeAlgorithm {
-  if (data.jobType == "fd")
-    return new Normi(data.schemaAndTables[0], data.config);
-  else if (data.jobType == "ind")
-    return new FAIDA(data.schemaAndTables, data.config);
-  // return new BINDER(data.schemaAndTables, data.config);
-  else
-    throw Error(
-      `Unknown job type. Known ones are  'ind' or 'fd': ${data.jobType}`
-    );
+function getAlgoInstance(data: IMetanomeJob): MetanomeAlgorithm {
+  const singleFileAlgos = [Normi];
+  const multiFileAlgos = [FAIDA, BINDER];
+  for (const singleFileAlgo of singleFileAlgos) {
+    const algo = new singleFileAlgo(data.schemaAndTables[0], data.config);
+    if (data.algoClass == algo.algoClass()) return algo;
+  }
+  for (const multiFileAlgo of multiFileAlgos) {
+    const algo = new multiFileAlgo(data.schemaAndTables, data.config);
+    if (data.algoClass == algo.algoClass()) return algo;
+  }
+  throw Error(`Unknown algorithm: ${data.algoClass}`);
 }
 
 /**
@@ -109,7 +102,7 @@ async function emptyMetanomeDirs(): Promise<any> {
 
 export const queueEvents = new QueueEvents(queueName, { connection });
 // types: <type of job.data, type of returnValue>
-const worker = new Worker<JobData, void>(
+const worker = new Worker<IMetanomeJob, string>(
   queueName,
   async (job) => {
     let start: number;
@@ -144,6 +137,8 @@ const worker = new Worker<JobData, void>(
       job.updateProgress(100);
       job.log(`Done after ${Date.now() - start} ms`);
     }
+    const path = await algo.resultPath();
+    return path;
   },
   { connection }
 );

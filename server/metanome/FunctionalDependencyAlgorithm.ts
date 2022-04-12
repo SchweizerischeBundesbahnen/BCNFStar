@@ -1,9 +1,9 @@
 import { join } from "path";
-import { readFile } from "fs/promises";
 
-import MetanomeAlgorithm, { MetanomeConfig } from "./metanomeAlgorithm";
-import { absoluteServerDir, splitlines } from "../utils/files";
-import IFunctionalDependency from "@/definitions/IFunctionalDependency";
+import MetanomeAlgorithm from "./metanomeAlgorithm";
+import { absoluteServerDir } from "@/utils/files";
+import { MetanomeResultType } from "@/definitions/IIndexFileEntry";
+import { MetanomeConfig } from "@/definitions/IMetanomeJob";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
@@ -16,14 +16,11 @@ export default abstract class FunctionalDependencyAlgorithm extends MetanomeAlgo
     super([schemaAndTable], config);
   }
 
-  get schemaAndTable(): string {
-    return this.schemaAndTables[0];
+  protected resultType(): MetanomeResultType {
+    return MetanomeResultType.fd;
   }
 
-  public override async getResults(): Promise<Array<IFunctionalDependency>> {
-    const content = await readFile(await this.resultPath(), {
-      encoding: "utf-8",
-    });
-    return splitlines(content).map((fd) => JSON.parse(fd));
+  get schemaAndTable(): string {
+    return this.schemaAndTables[0];
   }
 }

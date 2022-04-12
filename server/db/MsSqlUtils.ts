@@ -2,11 +2,12 @@ import ITableHead from "@/definitions/ITableHead";
 import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
 import SqlUtils, {
+  DbmsType,
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "../definitions/IAttribute";
+import IAttribute from "@/definitions/IAttribute";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -227,7 +228,7 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
   public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }
-  public getDbmsName(): "mssql" | "postgres" {
-    return "mssql";
+  public getDbmsName(): DbmsType {
+    return DbmsType.mssql;
   }
 }

@@ -1,12 +1,11 @@
 import { join } from "path";
 
-import { absoluteServerDir, splitlines } from "../utils/files";
-import { metanomeQueue, queueEvents } from "./queue";
-import { splitTableString } from "../utils/databaseUtils";
-import { sqlUtils } from "../db";
+import { absoluteServerDir, splitlines } from "@/utils/files";
+import { splitTableString } from "@/utils/databaseUtils";
+import { sqlUtils } from "@/db";
 import FunctionalDependencyAlgorithm from "./FunctionalDependencyAlgorithm";
 import { readFile, writeFile } from "fs/promises";
-import { MetanomeConfig } from "./metanomeAlgorithm";
+import { DbmsType } from "@/db/SqlUtils";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
@@ -19,7 +18,7 @@ export default class Normi extends FunctionalDependencyAlgorithm {
     return "Normalize-1.2-SNAPSHOT.jar";
   }
 
-  protected override algoClass(): string {
+  public override algoClass(): string {
     return "de.metanome.algorithms.normalize.Normi";
   }
 
@@ -31,7 +30,7 @@ export default class Normi extends FunctionalDependencyAlgorithm {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
       OUTPUT_DIR,
-      (sqlUtils.getDbmsName() == "mssql" ? this.schemaAndTable : table) +
+      (sqlUtils.getDbmsName() == DbmsType.mssql ? this.schemaAndTable : table) +
         "-hyfd_extended.txt"
     );
   }
@@ -61,17 +60,5 @@ export default class Normi extends FunctionalDependencyAlgorithm {
       .map((fd) => JSON.stringify(fd));
 
     await writeFile(path, result.join("\n"));
-  }
-
-  async execute(): Promise<void> {
-    let job = await metanomeQueue.add(
-      `Getting functional dependencies for ${this.schemaAndTable}`,
-      {
-        schemaAndTables: [this.schemaAndTable],
-        jobType: "fd",
-        config: Object.assign({ isHumanInTheLoop: false }, this.config),
-      }
-    );
-    return job.waitUntilFinished(queueEvents);
   }
 }

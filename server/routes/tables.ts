@@ -1,6 +1,6 @@
 import ITable from "@/definitions/ITable";
 import { Request, Response } from "express";
-import { sqlUtils } from "../db";
+import { sqlUtils } from "@/db";
 export default async function getTables(
   req: Request,
   res: Response

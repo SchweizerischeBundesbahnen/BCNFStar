@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { DatabaseService } from '../../database.service';
-import { IIndexFileEntry } from '../../../../../server/definitions/IIndexTableEntry';
+import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
