@@ -7,10 +7,6 @@ import { MetanomeConfig } from "@/definitions/IMetanomeJob";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
-export function outputPath(schemaAndTable: string): string {
-  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
-}
-
 export default abstract class FunctionalDependencyAlgorithm extends MetanomeAlgorithm {
   constructor(schemaAndTable: string, config?: MetanomeConfig) {
     super([schemaAndTable], config);
