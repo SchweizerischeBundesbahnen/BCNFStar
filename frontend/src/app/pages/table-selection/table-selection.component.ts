@@ -6,6 +6,8 @@ import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import { Router } from '@angular/router';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { MetanomeSettingsComponent } from '../../components/metanome-settings/metanome-settings.component';
+import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-table-selection',
@@ -86,27 +88,36 @@ export class TableSelectionComponent implements OnInit {
     );
   }
 
-  public selectTables() {
+  public async selectTables() {
     const tables = this.tables.filter((table) =>
       this.selectedTables.get(table)
     );
-    this.dialog.open(MetanomeSettingsComponent, {
+    const dialogRef = this.dialog.open(MetanomeSettingsComponent, {
       data: tables,
     });
-    // this.isLoading = true;
-    // this.dataService
-    //   .setInputTables(tables)
-    //   .then(() => {
-
-    //     this.router.navigate(['/edit-schema']);
-    //   })
-    //   .catch((e) => {
-    //     this.error = e;
-    //     this.dialog.open(this.errorDialog);
-    //   })
-    //   .finally(() => {
-    //     this.isLoading = false;
-    //   });
+    const { values }: { values: Record<string, IIndexFileEntry> } =
+      await firstValueFrom(dialogRef.afterClosed());
+    console.log('nach cloden des Forms', values);
+    let fdResults: Record<string, string> = {};
+    for (let value of Object.entries(values)) {
+      console.log(value);
+      if (value[0] != 'indResult') {
+        fdResults[value[1].tables[0]] = value[1].fileName;
+      }
+    }
+    this.isLoading = true;
+    this.dataService
+      .setInputTables(tables, values['indResult'].fileName, fdResults)
+      .then(() => {
+        this.router.navigate(['/edit-schema']);
+      })
+      .catch((e) => {
+        this.error = e;
+        this.dialog.open(this.errorDialog);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
   }
 
   private getDataSourceAndRenderTable(table: Table) {

@@ -1,6 +1,7 @@
 import Table from '@/src/model/schema/Table';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
@@ -15,15 +16,24 @@ export class MetanomeSettingsComponent {
   public oldMetanomeResults: Array<IIndexFileEntry> = [];
   public useOldMetanomeFdResult: Array<Boolean> = [];
   public useOldMetanomeIndResult = true;
+  public formGroup: FormGroup;
 
   constructor(
     public dialogRef: SbbDialogRef<MetanomeSettingsComponent>,
+    public formBuilder: FormBuilder,
     @Inject(SBB_DIALOG_DATA) public tables: Array<Table>,
     public dataService: DatabaseService,
     private http: HttpClient
   ) {
+    let controlsConfig: Record<string, Array<any>> = {};
+    tables.forEach((table) => {
+      this.useOldMetanomeFdResult.push(true);
+      controlsConfig['fdResult_' + table.schemaAndName()] = [];
+    });
+    controlsConfig['indResult'] = [];
+
+    this.formGroup = formBuilder.group(controlsConfig);
     this.loadOldMetanomeResults();
-    tables.forEach(() => this.useOldMetanomeFdResult.push(true));
   }
 
   public async loadOldMetanomeResults() {
@@ -71,5 +81,11 @@ export class MetanomeSettingsComponent {
 
   public toggleIndResult() {
     this.useOldMetanomeIndResult = !this.useOldMetanomeIndResult;
+  }
+
+  public runMetoname() {
+    console.log(this.formGroup.value);
+    console.log('vor closen des Forms');
+    this.dialogRef.close({ values: this.formGroup.value });
   }
 }
