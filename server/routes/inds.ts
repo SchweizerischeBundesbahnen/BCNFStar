@@ -13,8 +13,8 @@ export default async function getINDs(
     const config = req.query as MetanomeConfig;
     delete config["forceRerun"];
 
-    // const algo = new BINDER(schemaAndTables, config);
-    const algo = new FAIDA(schemaAndTables, config);
+    const algo = new BINDER(schemaAndTables, config);
+    // const algo = new FAIDA(schemaAndTables, config);
 
     const executeAndSend = async () => {
       await algo.execute();

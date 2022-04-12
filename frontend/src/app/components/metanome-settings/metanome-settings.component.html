@@ -1,0 +1,70 @@
+<div sbbDialogTitle>Metanome configuration settings</div>
+<div sbbDialogContent>
+  <h2>Functional Dependencies</h2>
+  <ul>
+    <li *ngFor="let table of tables; let index = index">
+      <div>
+        {{ table.schemaAndName() }}
+      </div>
+      <div>
+        <select
+          placeholder="Old results"
+          *ngIf="useOldMetanomeFdResult[index]; else useNewMetanomeConfig"
+        >
+          <option *ngFor="let result of filteredMetanomeResultsForFd(table)">
+            {{ getMetanomeConfigurationInformation(result) }}
+          </option>
+        </select>
+      </div>
+      <div>
+        <button sbb-button (click)="toggleFdResult(index)">
+          {{
+            useOldMetanomeFdResult[index]
+              ? "Use new configuration"
+              : "Use old metanome result"
+          }}
+        </button>
+      </div>
+    </li>
+  </ul>
+  <h2>Inclusion Dependencies</h2>
+  <ul>
+    <li>
+      <div>
+        {{ getAllTableNames() }}
+      </div>
+      <div>
+        <select
+          placeholder="Old results"
+          *ngIf="useOldMetanomeIndResult; else useNewMetanomeConfig"
+        >
+          <option *ngFor="let result of filteredMetanomeResultsForInd()">
+            {{ getMetanomeConfigurationInformation(result) }}
+          </option>
+        </select>
+      </div>
+      <div>
+        <button sbb-button (click)="toggleIndResult()">
+          {{
+            useOldMetanomeIndResult
+              ? "Use new configuration"
+              : "Use old metanome result"
+          }}
+        </button>
+      </div>
+    </li>
+  </ul>
+</div>
+<div sbbDialogActions>
+  <button sbb-button cdkFocusInitial>Ok</button>
+  <button sbb-secondary-button sbbDialogClose>Cancel</button>
+</div>
+
+<ng-template #useNewMetanomeConfig>
+  <div>
+    <sbb-label>Algorithm</sbb-label>
+    <select placeholder="Algorithm">
+      <option>Option 1</option>
+    </select>
+  </div>
+</ng-template>

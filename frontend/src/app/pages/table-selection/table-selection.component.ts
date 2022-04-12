@@ -5,6 +5,7 @@ import { DatabaseService } from 'src/app/database.service';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import { Router } from '@angular/router';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { MetanomeSettingsComponent } from '../../components/metanome-settings/metanome-settings.component';
 
 @Component({
   selector: 'app-table-selection',
@@ -32,7 +33,8 @@ export class TableSelectionComponent implements OnInit {
   constructor(
     private dataService: DatabaseService,
     public router: Router,
-    public dialog: SbbDialog
+    public dialog: SbbDialog,
+    public metanomeDialog: SbbDialog
   ) {
     this.queueUrl = dataService.baseUrl + '/queue';
   }
@@ -88,19 +90,23 @@ export class TableSelectionComponent implements OnInit {
     const tables = this.tables.filter((table) =>
       this.selectedTables.get(table)
     );
-    this.isLoading = true;
-    this.dataService
-      .setInputTables(tables)
-      .then(() => {
-        this.router.navigate(['/edit-schema']);
-      })
-      .catch((e) => {
-        this.error = e;
-        this.dialog.open(this.errorDialog);
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
+    this.dialog.open(MetanomeSettingsComponent, {
+      data: tables,
+    });
+    // this.isLoading = true;
+    // this.dataService
+    //   .setInputTables(tables)
+    //   .then(() => {
+
+    //     this.router.navigate(['/edit-schema']);
+    //   })
+    //   .catch((e) => {
+    //     this.error = e;
+    //     this.dialog.open(this.errorDialog);
+    //   })
+    //   .finally(() => {
+    //     this.isLoading = false;
+    //   });
   }
 
   private getDataSourceAndRenderTable(table: Table) {

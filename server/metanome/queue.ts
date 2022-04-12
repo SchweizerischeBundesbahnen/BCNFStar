@@ -83,8 +83,8 @@ function getAlgoInstance(data: JobData): MetanomeAlgorithm {
   if (data.jobType == "fd")
     return new Normi(data.schemaAndTables[0], data.config);
   else if (data.jobType == "ind")
-    return new FAIDA(data.schemaAndTables, data.config);
-  // return new BINDER(data.schemaAndTables, data.config);
+    //return new FAIDA(data.schemaAndTables, data.config);
+    return new BINDER(data.schemaAndTables, data.config);
   else
     throw Error(
       `Unknown job type. Known ones are  'ind' or 'fd': ${data.jobType}`

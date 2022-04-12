@@ -26,6 +26,8 @@ import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/nor
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
+import { MetanomeSettingsComponent } from './components/metanome-settings/metanome-settings.component';
+import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,7 @@ import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/
     NormalizeUndoRedoComponent,
     SplitDialogComponent,
     MetanomeResultsViewerComponent,
+    MetanomeSettingsComponent,
   ],
   imports: [
     BrowserModule,
@@ -55,6 +58,7 @@ import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/
     SbbPaginationModule,
     SbbDialogModule,
     SbbTableModule,
+    SbbFormFieldModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
