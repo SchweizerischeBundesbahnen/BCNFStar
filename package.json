@@ -2,7 +2,7 @@
   "name": "bcnfstar",
   "engines": {
     "npm": ">=7",
-    "node": "^16.10 || ^14.15"
+    "node": "^16.10 || ^14.17"
   },
   "scripts": {
     "build": "run-p build:*",
