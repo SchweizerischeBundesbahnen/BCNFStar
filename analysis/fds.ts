@@ -1,4 +1,5 @@
 import { readFile } from "fs/promises";
+import IFunctionalDependency from "../server/definitions/IFunctionalDependency";
 
 // give filename as first argument
 (async function () {
@@ -13,18 +14,13 @@ async function calculateFdStatistics(filename: string) {
   const rhsCounts = {};
   const fds: { lhs: string[]; rhs: string[] }[] = [];
   const fileContent = await readFile(filename, { encoding: "utf-8" });
-  for (const fdString of fileContent.split("\r\n")) {
-    if (!fdString) continue;
-    let [lhsString, rhsString] = fdString.split("] --> ");
-    lhsString = lhsString.substring(1);
-    const lhColumns = lhsString.split(", ");
-    const rhColumns = rhsString.split(", ");
-    fds.push({ lhs: lhColumns, rhs: rhColumns });
-    lhsCounts[lhColumns.length] = lhsCounts[lhColumns.length]
-      ? lhsCounts[lhColumns.length] + 1
+  const content: Array<IFunctionalDependency> = JSON.parse(fileContent);
+  for (const fd of content) {
+    lhsCounts[fd.lhsColumns.length] = lhsCounts[fd.lhsColumns.length]
+      ? lhsCounts[fd.lhsColumns.length] + 1
       : 1;
-    rhsCounts[rhColumns.length] = rhsCounts[rhColumns.length]
-      ? rhsCounts[rhColumns.length] + 1
+    rhsCounts[fd.rhsColumns.length] = rhsCounts[fd.rhsColumns.length]
+      ? rhsCounts[fd.rhsColumns.length] + 1
       : 1;
   }
   console.log("rh");

@@ -1,4 +1,8 @@
-import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
+import SqlUtils, {
+  ForeignKeyResult,
+  PrimaryKeyResult,
+  SchemaQueryRow,
+} from "./SqlUtils";
 import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
@@ -135,6 +139,13 @@ from
     return result.rows;
   }
 
+  public async getPrimaryKeys(): Promise<PrimaryKeyResult[]> {
+    const result = await this.pool.query<PrimaryKeyResult>(
+      this.QUERY_PRIMARY_KEYS
+    );
+    return result.rows;
+  }
+
   public override SQL_CREATE_SCHEMA(schema: string): string {
     return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
   }
@@ -201,7 +212,7 @@ from
   public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
   }
-  public getDbmsName(): string {
+  public getDbmsName(): "mssql" | "postgres" {
     return "postgres";
   }
 }

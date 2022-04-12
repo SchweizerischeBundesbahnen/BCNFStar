@@ -18,6 +18,13 @@ export type ForeignKeyResult = {
   foreign_table_name: string;
   foreign_column_name: string;
 };
+
+export type PrimaryKeyResult = {
+  table_schema: string;
+  table_name: string;
+  column_name: string;
+};
+
 export default abstract class SqlUtils {
   abstract init(): void;
   public abstract getSchema(): Promise<Array<SchemaQueryRow>>;
@@ -36,9 +43,20 @@ export default abstract class SqlUtils {
     table: string
   ): Promise<boolean>;
 
+  protected readonly QUERY_PRIMARY_KEYS: string = `
+    SELECT 
+      ku.TABLE_SCHEMA As table_schema,
+      KU.table_name as table_name,
+      column_name as column_name
+    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC 
+    INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU
+      ON TC.CONSTRAINT_TYPE = 'PRIMARY KEY' 
+      AND TC.CONSTRAINT_NAME = KU.CONSTRAINT_NAME`;
+
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
+  public abstract getPrimaryKeys(): Promise<PrimaryKeyResult[]>;
   public abstract getJdbcPath(): string;
-  public abstract getDbmsName(): string;
+  public abstract getDbmsName(): "mssql" | "postgres";
 
   public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
   public abstract SQL_DROP_TABLE_IF_EXISTS(

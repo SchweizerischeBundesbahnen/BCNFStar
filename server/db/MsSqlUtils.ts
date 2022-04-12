@@ -1,7 +1,11 @@
 import ITableHead from "@/definitions/ITableHead";
 import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
-import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
+import SqlUtils, {
+  ForeignKeyResult,
+  PrimaryKeyResult,
+  SchemaQueryRow,
+} from "./SqlUtils";
 import IAttribute from "../definitions/IAttribute";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
@@ -153,6 +157,11 @@ INNER JOIN sys.columns col2
     return result.recordset;
   }
 
+  public async getPrimaryKeys(): Promise<PrimaryKeyResult[]> {
+    const result = await sql.query<ForeignKeyResult>(this.QUERY_PRIMARY_KEYS);
+    return result.recordset;
+  }
+
   public override SQL_CREATE_SCHEMA(newSchema: string): string {
     return `IF NOT EXISTS ( SELECT  *
       FROM    sys.schemas
@@ -218,7 +227,7 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
   public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }
-  public getDbmsName(): string {
+  public getDbmsName(): "mssql" | "postgres" {
     return "mssql";
   }
 }
