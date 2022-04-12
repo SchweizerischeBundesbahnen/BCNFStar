@@ -16,6 +16,8 @@ export class MetanomeSettingsComponent {
   public oldMetanomeResults: Array<IIndexFileEntry> = [];
   public useOldMetanomeFdResult: Array<Boolean> = [];
   public useOldMetanomeIndResult = true;
+  public selectedFdAlgorithm = '';
+  public selectedIndAlgorithm = '';
   public formGroup: FormGroup;
 
   constructor(
@@ -42,7 +44,6 @@ export class MetanomeSettingsComponent {
         this.dataService.baseUrl + '/metanomeResults'
       )
     );
-    console.log(this.oldMetanomeResults);
   }
 
   public filteredMetanomeResultsForFd(table: Table) {
@@ -81,6 +82,10 @@ export class MetanomeSettingsComponent {
 
   public toggleIndResult() {
     this.useOldMetanomeIndResult = !this.useOldMetanomeIndResult;
+  }
+
+  public chooseFdAlgorithm(value: any) {
+    console.log(value);
   }
 
   public runMetoname() {

@@ -8,20 +8,15 @@
           {{ table.schemaAndName() }}
         </div>
         <div>
-          <sbb-form-field>
-            <sbb-select
-              placeholder="Old results"
-              *ngIf="useOldMetanomeFdResult[index]; else useNewMetanomeConfig"
-              [formControlName]="'fdResult_' + table.schemaAndName()"
-            >
-              <sbb-option
-                *ngFor="let result of filteredMetanomeResultsForFd(table)"
-                [value]="result"
-              >
-                {{ getMetanomeConfigurationInformation(result) }}
-              </sbb-option>
-            </sbb-select>
-          </sbb-form-field>
+          <ng-container
+            [ngTemplateOutlet]="
+              useOldMetanomeFdResult[index]
+                ? useOldMetnomeFdConfig
+                : useNewMetanomeFdConfig
+            "
+            [ngTemplateOutletContext]="{ table: table }"
+          >
+          </ng-container>
         </div>
         <div>
           <button sbb-button (click)="toggleFdResult(index)">
@@ -41,20 +36,14 @@
           {{ getAllTableNames() }}
         </div>
         <div>
-          <sbb-form-field>
-            <sbb-select
-              placeholder="Old results"
-              *ngIf="useOldMetanomeIndResult; else useNewMetanomeConfig"
-              formControlName="indResult"
-            >
-              <sbb-option
-                *ngFor="let result of filteredMetanomeResultsForInd()"
-                [value]="result"
-              >
-                {{ getMetanomeConfigurationInformation(result) }}
-              </sbb-option>
-            </sbb-select>
-          </sbb-form-field>
+          <ng-container
+            [ngTemplateOutlet]="
+              useOldMetanomeIndResult
+                ? useOldMetnomeIndConfig
+                : useNewMetanomeIndConfig
+            "
+          >
+          </ng-container>
         </div>
         <div>
           <button sbb-button (click)="toggleIndResult()">
@@ -74,11 +63,151 @@
   <button sbb-secondary-button sbbDialogClose>Cancel</button>
 </div>
 
-<ng-template #useNewMetanomeConfig>
-  <div>
-    <sbb-label>Algorithm</sbb-label>
-    <sbb-select placeholder="Algorithm">
-      <sbb-option>Option 1</sbb-option>
+<ng-template #useOldMetnomeFdConfig let-table="table" [formGroup]="formGroup">
+  <sbb-form-field>
+    <sbb-select
+      placeholder="Old results"
+      [formControlName]="'fdResult_' + table.schemaAndName()"
+    >
+      <sbb-option
+        *ngFor="let result of filteredMetanomeResultsForFd(table)"
+        [value]="result"
+      >
+        {{ getMetanomeConfigurationInformation(result) }}
+      </sbb-option>
     </sbb-select>
+  </sbb-form-field>
+</ng-template>
+
+<ng-template #useNewMetanomeFdConfig let-table="table" [formGroup]="formGroup">
+  <div>
+    <sbb-form-field>
+      <sbb-label>Algorithm</sbb-label>
+      <sbb-select
+        placeholder="Functional Dependency algorithm"
+        [formControlName]="'fdResult_' + table.schemaAndName()"
+        [(ngModel)]="selectedFdAlgorithm"
+      >
+        <sbb-option value="Normi">Normi</sbb-option>
+        <sbb-option value="HyFd">HyFd</sbb-option>
+      </sbb-select>
+
+      <sbb-checkbox *ngIf="selectedFdAlgorithm === 'Normi'"
+        >isHumanInTheLoop</sbb-checkbox
+      >
+
+      <div *ngIf="selectedFdAlgorithm === 'HyFd'">
+        <sbb-label>INPUT_ROW_LIMIT</sbb-label>
+        <input sbbInput [value]="-1" />
+      </div>
+      <sbb-checkbox *ngIf="selectedFdAlgorithm === 'HyFd'"
+        >ENABLE_MEMORY_GUARDIAN</sbb-checkbox
+      >
+      <sbb-checkbox *ngIf="selectedFdAlgorithm === 'HyFd'"
+        >NULL_EQUALS_NULL</sbb-checkbox
+      >
+      <sbb-checkbox *ngIf="selectedFdAlgorithm === 'HyFd'"
+        >VALIDATE_PARALLEL</sbb-checkbox
+      >
+      <div *ngIf="selectedFdAlgorithm === 'HyFd'">
+        <sbb-label>MAX_DETERMINANT_SIZE</sbb-label>
+        <input sbbInput [value]="-1" />
+      </div>
+    </sbb-form-field>
+  </div>
+</ng-template>
+
+<ng-template #useOldMetnomeIndConfig [formGroup]="formGroup">
+  <sbb-form-field>
+    <sbb-select placeholder="Old results" formControlName="indResult">
+      <sbb-option
+        *ngFor="let result of filteredMetanomeResultsForInd()"
+        [value]="result"
+      >
+        {{ getMetanomeConfigurationInformation(result) }}
+      </sbb-option>
+    </sbb-select>
+  </sbb-form-field>
+</ng-template>
+
+<ng-template #useNewMetanomeIndConfig [formGroup]="formGroup">
+  <div>
+    <sbb-form-field>
+      <sbb-label>Algorithm</sbb-label>
+      <sbb-select
+        placeholder="Functional Dependency algorithm"
+        formControlName="indResult"
+        [(ngModel)]="selectedIndAlgorithm"
+      >
+        <sbb-option value="BINDER">BINDER</sbb-option>
+        <sbb-option value="FAIDA">FAIDA</sbb-option>
+      </sbb-select>
+
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'BINDER'"
+        >DETECT_NARY</sbb-checkbox
+      >
+      <div *ngIf="selectedIndAlgorithm === 'BINDER'">
+        <sbb-label>MAX_NARY_LEVEL</sbb-label>
+        <input sbbInput [value]="-1" />
+      </div>
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'BINDER'"
+        >CLEAN_TEMP</sbb-checkbox
+      >
+      <div *ngIf="selectedIndAlgorithm === 'BINDER'">
+        <sbb-label>INPUT_ROW_LIMIT</sbb-label>
+        <input sbbInput [value]="-1" />
+      </div>
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'BINDER'"
+        >FILTER_KEY_FOREIGNKEYS</sbb-checkbox
+      >
+      <div *ngIf="selectedIndAlgorithm === 'BINDER'">
+        <sbb-label>MAX_MEMORY_USAGE_PERCENTAGE</sbb-label>
+        <input sbbInput [value]="60" />
+      </div>
+      <div *ngIf="selectedIndAlgorithm === 'BINDER'">
+        <sbb-label>TEMP_FOLDER_PATH</sbb-label>
+        <input sbbInput value="BINDER_temp" />
+      </div>
+      <div *ngIf="selectedIndAlgorithm === 'BINDER'">
+        <sbb-label>NUM_BUCKETS_PER_COLUMN</sbb-label>
+        <input sbbInput [value]="10" />
+      </div>
+      <div *ngIf="selectedIndAlgorithm === 'BINDER'">
+        <sbb-label>MEMORY_CHECK_FREQUENCY</sbb-label>
+        <input sbbInput [value]="100" />
+      </div>
+
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'FAIDA'"
+        >IGNORE_CONSTANT</sbb-checkbox
+      >
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'FAIDA'"
+        >VIRTUAL_COLUMN_STORE</sbb-checkbox
+      >
+      <div *ngIf="selectedIndAlgorithm === 'FAIDA'">
+        <sbb-label>HLL_REL_STD_DEV</sbb-label>
+        <input sbbInput [value]="0.01" />
+      </div>
+      <div *ngIf="selectedIndAlgorithm === 'FAIDA'">
+        <sbb-label>APPROXIMATE_TESTER</sbb-label>
+        <input sbbInput value="HLL" />
+      </div>
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'FAIDA'"
+        >REUSE_COLUMN_STORE</sbb-checkbox
+      >
+      <div *ngIf="selectedIndAlgorithm === 'FAIDA'">
+        <sbb-label>SAMPLE_GOAL</sbb-label>
+        <input sbbInput [value]="500" />
+      </div>
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'FAIDA'"
+        >IGNORE_NULL</sbb-checkbox
+      >
+      <div *ngIf="selectedIndAlgorithm === 'FAIDA'">
+        <sbb-label>APPROXIMATE_TESTER_BYTES</sbb-label>
+        <input sbbInput [value]="32768" />
+      </div>
+      <sbb-checkbox *ngIf="selectedIndAlgorithm === 'FAIDA'"
+        >DETECT_NARY</sbb-checkbox
+      >
+    </sbb-form-field>
   </div>
 </ng-template>
