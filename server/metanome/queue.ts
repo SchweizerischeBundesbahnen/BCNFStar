@@ -141,7 +141,7 @@ const worker = new Worker<IMetanomeJob, string>(
     const path = await algo.resultPath();
     return path;
   },
-  { connection }
+  { connection, lockDuration: 10 * 60 * 1000 }
 );
 
 worker.on("error", (err) => {
