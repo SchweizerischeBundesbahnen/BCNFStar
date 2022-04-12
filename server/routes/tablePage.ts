@@ -14,18 +14,6 @@ export async function getTablePage(req: Request, res: Response): Promise<void> {
     const limit: number = +req.query.limit;
     const offset: number = +req.query.offset;
 
-    const query_result_tables = await sqlUtils.getSchema();
-
-    if (
-      !query_result_tables
-        .map((r) => `${r.table_schema}.${r.table_name}`.toLowerCase())
-        .includes(`${schema}.${tablename}`.toLowerCase())
-    ) {
-      console.log(`${schema}.${tablename}`.toLowerCase());
-      res.status(404).json({ error: "Table does not exist" });
-      return;
-    }
-
     const result: ITablePage = await sqlUtils.getTablePage(
       tablename.toString(),
       schema.toString(),

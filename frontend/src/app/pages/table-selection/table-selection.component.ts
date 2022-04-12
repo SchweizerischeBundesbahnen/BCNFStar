@@ -16,7 +16,7 @@ export class TableSelectionComponent implements OnInit {
   @ViewChild(SbbTable) table!: SbbTable<ITablePage>;
   @ViewChild('errorDialog') errorDialog!: TemplateRef<any>;
   // public tables: Map<Table, Boolean> = new Map();
-  public tableHeads: Map<Table, ITablePage> = new Map();
+  public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
   public headLimit = 100;
 
@@ -41,22 +41,32 @@ export class TableSelectionComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    const tableHeadPrommise = this.dataService.loadTableHeads(this.headLimit);
-    const rowCountPromise = this.dataService.loadTableRowCounts();
     this.tables = await this.dataService.loadTables();
+    const rowCountPromise = this.dataService.loadTableRowCounts();
+
+    const tablePagePromises: Record<string, Promise<ITablePage>> = {};
     for (const table of this.tables) {
+      tablePagePromises[table.schemaAndName()] = this.dataService.loadTablePage(
+        table.schemaName,
+        table.name,
+        0,
+        this.headLimit
+      );
+
       this.selectedTables.set(table, false);
       if (!this.tablesInSchema[table.schemaName])
         this.tablesInSchema[table.schemaName] = [];
       this.tablesInSchema[table.schemaName].push(table);
     }
 
-    const tableHeads = await tableHeadPrommise;
-    const rowCounts = await rowCountPromise;
+    const rowCounts: Record<string, number> = await rowCountPromise;
 
     for (const table of this.tables) {
       this.tableRowCounts.set(table, rowCounts[table.schemaAndName()]);
-      this.tableHeads.set(table, tableHeads[table.schemaAndName()]);
+      this.tablePages.set(
+        table,
+        await tablePagePromises[table.schemaAndName()]
+      );
     }
   }
 
@@ -107,7 +117,7 @@ export class TableSelectionComponent implements OnInit {
   }
 
   private getDataSourceAndRenderTable(table: Table) {
-    let hoveredTableHead = this.tableHeads.get(table);
+    let hoveredTableHead = this.tablePages.get(table);
     if (hoveredTableHead) {
       this.tableColumns = hoveredTableHead.attributes;
       this.dataSource.data = hoveredTableHead.rows;

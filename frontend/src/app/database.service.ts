@@ -40,31 +40,19 @@ export class DatabaseService {
     return this.getTables();
   }
 
-  public async loadTableHeads(
-    limit: number
-  ): Promise<Record<string, ITablePage>> {
-    let tableHeads;
-    tableHeads = await firstValueFrom(
-      this.http.get<Record<string, ITablePage>>(
-        `${this.baseUrl}/tables/heads?limit=${limit}`
-      )
-    );
-    return tableHeads;
-  }
-
   public async loadTablePage(
     schema: string,
     table: string,
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    let tableHeads;
-    tableHeads = await firstValueFrom(
+    let tablePages;
+    tablePages = await firstValueFrom(
       this.http.get<ITablePage>(
         `${this.baseUrl}/tables/page?schema=${schema}&table=${table}&offset=${offset}&limit=${limit}`
       )
     );
-    return tableHeads;
+    return tablePages;
   }
 
   public async loadTableRowCounts(): Promise<Record<string, number>> {
