@@ -2,24 +2,18 @@ import { join } from "path";
 
 import { absoluteServerDir, splitlines } from "@/utils/files";
 import { splitTableString } from "@/utils/databaseUtils";
-import { sqlUtils } from "@/db";
 import FunctionalDependencyAlgorithm from "./FunctionalDependencyAlgorithm";
-import { readFile, writeFile } from "fs/promises";
-import { DbmsType } from "@/db/SqlUtils";
+import { createReadStream } from "fs";
+import { createInterface } from "readline";
+import { IHyFD } from "@/definitions/IFunctionalDependency";
 
 interface HyFDConfig {
-  INPUT_ROW_LIMIT; //=-1
+  INPUT_ROW_LIMIT: number; //=-1
   // (assumption): checks if memory is nearly full, and writes to disk if so
-  ENABLE_MEMORY_GUARDIAN; //=true
-  NULL_EQUALS_NULL; //=true
-  VALIDATE_PARALLEL; //=true
-  MAX_DETERMINANT_SIZE; //=-1
-}
-
-const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
-
-export function outputPath(schemaAndTable: string): string {
-  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
+  ENABLE_MEMORY_GUARDIAN: boolean; //=true
+  NULL_EQUALS_NULL: boolean; //=true
+  VALIDATE_PARALLEL: boolean; //=true
+  MAX_DETERMINANT_SIZE: number; //=-1
 }
 
 // everything in here is still nonsense, I just wanted to document the available options
@@ -39,9 +33,10 @@ export default class HyFD extends FunctionalDependencyAlgorithm {
   protected override originalOutputPath(): string {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
-      OUTPUT_DIR,
-      (sqlUtils.getDbmsName() == DbmsType.mssql ? this.schemaAndTable : table) +
-        "-hyfd_extended.txt"
+      absoluteServerDir,
+      "metanome",
+      "results",
+      this.outputFileName() + "_fds"
     );
   }
 
@@ -51,24 +46,14 @@ export default class HyFD extends FunctionalDependencyAlgorithm {
    */
   public override async processFiles(): Promise<void> {
     const path = await this.resultPath();
-    const content = await readFile(path, {
-      encoding: "utf-8",
-    });
-    //  format of fdString: "[c_address, c_anothercol] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
-    const result: Array<string> = splitlines(content)
-      .map((fdString) => {
-        const [lhsString, rhsString] = fdString.split(" --> ");
-        return {
-          lhsColumns: lhsString
-            // remove brackets
-            .slice(1, -1)
-            .split(",")
-            .map((s) => s.trim()),
-          rhsColumns: rhsString.split(",").map((s) => s.trim()),
-        };
-      })
-      .map((fd) => JSON.stringify(fd));
+    const fileStream = createReadStream(path, { encoding: "utf-8" });
 
-    await writeFile(path, result.join("\n"));
+    const lines = createInterface({
+      input: fileStream,
+      crlfDelay: Infinity,
+    });
+    for await (const line of lines) {
+      const fd: IHyFD = JSON.parse(line);
+    }
   }
 }
