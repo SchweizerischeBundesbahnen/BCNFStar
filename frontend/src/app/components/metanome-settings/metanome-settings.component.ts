@@ -201,6 +201,6 @@ export class MetanomeSettingsComponent {
 
   public runMetoname() {
     console.log(this.formGroup.value);
-    // this.dialogRef.close({ values: this.formGroup.value });
+    this.dialogRef.close({ values: this.formGroup.value });
   }
 }

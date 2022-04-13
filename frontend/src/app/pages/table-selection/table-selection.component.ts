@@ -106,7 +106,6 @@ export class TableSelectionComponent implements OnInit {
         this.loadingStatus.set(job.entry, 'error');
       }
     }
-    return Promise.allSettled(jobs.map((j) => j.promise)).catch(() => {});
   }
 
   public async selectTables() {

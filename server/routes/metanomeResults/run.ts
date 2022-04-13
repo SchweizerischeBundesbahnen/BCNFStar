@@ -13,7 +13,7 @@ export async function runMetanome(req: Request, res: Response) {
       const path = await job.waitUntilFinished(queueEvents);
       res.status(200).json({
         message: "Sucess!",
-        filename: basename(path),
+        fileName: basename(path),
       });
     } else {
       console.error("Invalid metanome request");
