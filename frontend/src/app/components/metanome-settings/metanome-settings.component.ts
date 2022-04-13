@@ -9,10 +9,6 @@ import {
 } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 import { DatabaseService } from '../../database.service';
-// import { IHyFDConfig } from '@server/definitions/IHyFD';
-// import { INormiConfig } from '@server/definitions/INormi';
-// import { IBinderConfig } from '@server/definitions/IBinder';
-// import { IFaidaConfig } from '@server/definitions/IFaida';
 import { MetanomeConfig } from '@server/definitions/IMetanomeJob';
 
 @Component({
@@ -140,21 +136,17 @@ export class MetanomeSettingsComponent {
     this.useOldMetanomeIndResult = !this.useOldMetanomeIndResult;
   }
 
-  public changeFdConfig(selectionValue: any, tableName: string) {
-    console.log(selectionValue.value);
-    switch (selectionValue.value.algorithm.split('.').slice(-1)[0]) {
+  public changeFdConfig(algorithm: string, tableName: string) {
+    switch (algorithm.split('.').slice(-1)[0]) {
       case 'Normi': {
         this.selectedFdConfigs[tableName] = this.defaultNormiConfig;
-        this.buildNewFdConfig(selectionValue.value.algorithm, tableName);
         break;
       }
       case 'HyFD': {
         this.selectedFdConfigs[tableName] = this.defaultHyFdConfig;
-        this.buildNewFdConfig(selectionValue.value.algorithm, tableName);
         break;
       }
     }
-    console.log(this.selectedFdConfigs[tableName]);
   }
 
   public changeIndConfig(selectionValue: any) {
@@ -171,7 +163,6 @@ export class MetanomeSettingsComponent {
   }
 
   public buildNewFdConfig(algorithm: string, tableName: string) {
-    // console.log(this.selectedFdConfigs[tableName])
     let newIndexFileEntry: IIndexFileEntry = {
       config: this.selectedFdConfigs[tableName],
       tables: [tableName.slice(4)],
@@ -182,6 +173,7 @@ export class MetanomeSettingsComponent {
       fileName: '',
       createDate: 0,
     };
+    this.formGroup.value[tableName] = newIndexFileEntry;
     return newIndexFileEntry;
   }
 
@@ -200,7 +192,6 @@ export class MetanomeSettingsComponent {
   }
 
   public runMetoname() {
-    console.log(this.formGroup.value);
     this.dialogRef.close({ values: this.formGroup.value });
   }
 }
