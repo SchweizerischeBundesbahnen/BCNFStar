@@ -44,27 +44,23 @@ export class DatabaseService {
     return this.getTables();
   }
 
-  public async loadTablePage(
+  public loadTablePage(
     schema: string,
     table: string,
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    let tablePages;
-    tablePages = await firstValueFrom(
+    return firstValueFrom(
       this.http.get<ITablePage>(
         `${this.baseUrl}/tables/page?schema=${schema}&table=${table}&offset=${offset}&limit=${limit}`
       )
     );
-    return tablePages;
   }
 
-  public async loadTableRowCounts(): Promise<Record<string, number>> {
-    let tableRowCounts;
-    tableRowCounts = await firstValueFrom(
+  public loadTableRowCounts(): Promise<Record<string, number>> {
+    return firstValueFrom(
       this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
     );
-    return tableRowCounts;
   }
 
   private async getTables(): Promise<Array<Table>> {

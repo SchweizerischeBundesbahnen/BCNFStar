@@ -55,6 +55,7 @@
         >
           <sbb-paginator
             (page)="changePage($event)"
+            [pageIndex]="this.page"
             [pageSize]="headLimit"
             [length]="tableRowCounts.get(hoveredTable)"
           >

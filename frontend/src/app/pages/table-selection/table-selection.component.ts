@@ -13,9 +13,8 @@ import { SbbPageEvent } from '@sbb-esta/angular/pagination';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  @ViewChild(SbbTable) table?: SbbTable<ITablePage>;
-  @ViewChild('errorDialog') errorDialog!: TemplateRef<any>;
-  // public tables: Map<Table, Boolean> = new Map();
+  @ViewChild(SbbTable) public table?: SbbTable<ITablePage>;
+  @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
   public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
   public headLimit = 100;
@@ -117,36 +116,31 @@ export class TableSelectionComponent implements OnInit {
       });
   }
 
-  private getDataSourceAndRenderTable(table: Table) {
-    let hoveredTableHead = this.tablePages.get(table);
-    if (hoveredTableHead) {
-      this.tableColumns = hoveredTableHead.attributes;
-      this.dataSource.data = hoveredTableHead.rows;
-    } else {
-      this.tableColumns = [];
-      this.dataSource.data = [];
-    }
-    this.table?.renderRows();
-  }
-
   changePage(evt: SbbPageEvent) {
     this.page = evt.pageIndex;
     this.reloadData();
   }
 
-  public async reloadData() {
-    const result = await this.dataService.loadTablePage(
-      this.hoveredTable!.schemaName,
-      this.hoveredTable!.name,
-      this.page * this.headLimit,
-      this.headLimit
-    );
-    this.tableColumns = result.attributes;
-    this.dataSource.data = result.rows;
+  public mouseEnter(table: Table) {
+    this.page = 0;
+    this.hoveredTable = table;
+    this.reloadData();
   }
 
-  public mouseEnter(table: Table) {
-    this.hoveredTable = table;
-    this.getDataSourceAndRenderTable(table);
+  public async reloadData() {
+    if (!this.hoveredTable) return;
+    const result =
+      this.page === 0
+        ? this.tablePages.get(this.hoveredTable)
+        : await this.dataService.loadTablePage(
+            this.hoveredTable.schemaName,
+            this.hoveredTable.name,
+            this.page * this.headLimit,
+            this.headLimit
+          );
+    if (!result) return;
+    this.tableColumns = result.attributes;
+    this.dataSource.data = result.rows;
+    this.table?.renderRows();
   }
 }
