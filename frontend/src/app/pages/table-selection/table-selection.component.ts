@@ -125,7 +125,7 @@ export class TableSelectionComponent implements OnInit {
       this.tableColumns = [];
       this.dataSource.data = [];
     }
-    this.table.renderRows();
+    this.table?.renderRows();
   }
 
   changePage(evt: SbbPageEvent) {

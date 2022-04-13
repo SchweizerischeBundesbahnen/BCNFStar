@@ -4,18 +4,9 @@ describe("The normalize side bar", () => {
   beforeEach(() => {
     cy.visitFrontend();
 
-    cy.contains("public").click();
+    cy.selectTablesAndGo();
 
-    cy.contains("nation_region_denormalized").click();
-    // cy.contains("denormalized_data").click();
-    // cy.contains("customer_orders_lineitem_denormalized").click();
-    cy.contains("part_partsupp_supplier_denormalized").click();
-
-    cy.contains("Go").click();
-
-    cy.get(".table-head-title", {
-      timeout: 10 * 60 * 1000,
-    })
+    cy.get(".table-head-title")
       .contains("public.nation_region_denormalized")
       .click({ force: true });
   });
@@ -50,16 +41,6 @@ describe("The normalize side bar", () => {
     cy.get(".sbb-expansion-panel-body button").contains("r_comment");
     cy.get(".sbb-expansion-panel-body button").contains("r_name");
     cy.get(".sbb-expansion-panel-body button").contains("n_regionkey");
-  });
-
-  it("does not display invalid Inclusion Dependencies", () => {
-    cy.get("sbb-expansion-panel").contains("Possible Foreign Keys");
-    cy.contains(
-      "r_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
-    ).should("not.exist");
-    cy.contains(
-      "n_regionkey->(public.customer_orders_lineitem_denormalized) c_nationkey"
-    ).should("not.exist");
   });
 
   it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {

@@ -2,7 +2,7 @@ import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import ITablePage from '@server/definitions/ITablePage';
-import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
+import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import {
   IRequestBodyCreateTableSql,
   IRequestBodyDataTransferSql,
@@ -14,9 +14,11 @@ import Relationship from '../model/schema/Relationship';
 import { firstValueFrom } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
+import IPrimaryKey from '@server/definitions/IPrimaryKey';
 import Column from '../model/schema/Column';
-import IInclusionDependency from '@server/definitions/IInclusionDependencies';
+import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IRelationship from '@server/definitions/IRelationship';
+import ColumnCombination from '../model/schema/ColumnCombination';
 
 @Injectable({
   providedIn: 'root',
@@ -31,12 +33,14 @@ export class DatabaseService {
    **/
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   private iFks: Array<IForeignKey> = [];
+  private iPks: Array<IPrimaryKey> = [];
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
 
   public async loadTables(): Promise<Array<Table>> {
     this.iFks = await this.getIFks();
+    this.iPks = await this.getIPks();
     return this.getTables();
   }
 
@@ -69,6 +73,28 @@ export class DatabaseService {
     );
     const tables = iTables.map((iTable) => Table.fromITable(iTable));
     return tables;
+  }
+
+  private getIPks(): Promise<Array<IPrimaryKey>> {
+    return firstValueFrom(
+      this.http.get<Array<IPrimaryKey>>(this.baseUrl + '/pks')
+    );
+  }
+
+  private resolveIPks(pks: Array<IPrimaryKey>) {
+    pks.forEach((fk) => {
+      let table: Table | undefined = [...this.inputSchema!.tables].find(
+        (table) =>
+          table.schemaName == fk.table_schema && table.name == fk.table_name
+      );
+      if (table) {
+        table!.pk = new ColumnCombination(
+          ...table!.columns
+            .asArray()
+            .filter((column) => fk.attributes.includes(column.name))
+        );
+      }
+    });
   }
 
   private getIFks(): Promise<Array<IForeignKey>> {
@@ -137,25 +163,30 @@ export class DatabaseService {
 
   public async setInputTables(tables: Array<Table>) {
     const indPromise = this.getINDs(tables);
-    const fdResults = await Promise.all(tables.map((v) => this.getFDs(v)));
+    const fdPromises: Record<
+      string,
+      Promise<Array<IFunctionalDependency>>
+    > = {};
+    for (const table of tables)
+      fdPromises[table.schemaAndName()] = this.getFDs(table);
 
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
-      const iFDs = fdResults.find(
-        (v) => v.tableName == table.schemaAndName()
-      ) as IFunctionalDependencies;
-      const fds = iFDs.functionalDependencies.map((fds) =>
-        FunctionalDependency.fromString(table, fds)
+      const iFDs = await fdPromises[table.schemaAndName()];
+
+      const fds = iFDs.map((fd) =>
+        FunctionalDependency.fromIFunctionalDependency(table, fd)
       );
       table.setFds(...fds);
     }
     this.resolveInds(await indPromise);
     this.resolveIFks(this.iFks);
+    this.resolveIPks(this.iPks);
   }
 
-  private getFDs(table: Table): Promise<IFunctionalDependencies> {
+  private getFDs(table: Table): Promise<Array<IFunctionalDependency>> {
     return firstValueFrom(
-      this.http.get<IFunctionalDependencies>(
+      this.http.get<Array<IFunctionalDependency>>(
         `${this.baseUrl}/tables/${table.schemaAndName()}/fds`
       )
     );

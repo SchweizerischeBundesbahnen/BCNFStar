@@ -1,3 +1,4 @@
+import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import ColumnCombination from './ColumnCombination';
 import Table from './Table';
 
@@ -16,23 +17,12 @@ export default class FunctionalDependency {
   }
 
   //  "[c_address] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
-  public static fromString(
+  public static fromIFunctionalDependency(
     table: Table,
-    metanomeString: string
+    iFd: IFunctionalDependency
   ): FunctionalDependency {
-    const [lhsString, rhsString] = metanomeString
-      .split('-->')
-      .map((elem) => elem.trim());
-    let rhs: ColumnCombination = table.columns.columnsFromNames(
-      ...rhsString.split(',').map((elem) => elem.trim())
-    );
-    let lhs: ColumnCombination = table.columns.columnsFromNames(
-      ...lhsString
-        .replace('[', '')
-        .replace(']', '')
-        .split(',')
-        .map((elem) => elem.trim())
-    );
+    const lhs = table.columns.columnsFromNames(...iFd.lhsColumns);
+    const rhs = table.columns.columnsFromNames(...iFd.rhsColumns);
 
     return new FunctionalDependency(lhs, rhs);
   }

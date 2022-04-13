@@ -1,11 +1,13 @@
 .DS_Store
 node_modules
 dist
+
+# metanome files
 server/metanome/temp
 server/metanome/BINDER_temp
 server/metanome/results
-server/results
-server/temp
+server/metanome/bcnfstar_results
+
 # local env files
 .env.local
 .env.*.local
@@ -28,6 +30,7 @@ pnpm-debug.log*
 # auto-generated type-checker functions (see ts-auto-guard)
 *.guard.ts
 
+# videos and screenshots of test runs
 cypress/videos
 cypress/screenshots
 # Code coverage reports
