@@ -17,7 +17,8 @@ sbb-select {
 /* set comma between elemnts by adding one before each except the first */
 .cluster-header::before {
     content: ',';
-  }
-  .cluster-header:first-child::before {
+}
+
+.cluster-header:first-child::before {
     content: '';
-  }
+}

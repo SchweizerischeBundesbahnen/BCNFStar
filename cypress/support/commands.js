@@ -51,6 +51,6 @@ Cypress.Commands.add("selectTablesAndGo", { prevSubject: false }, () => {
 
   cy.contains("Go").click();
 
-  // wait for normalize page to load
+  // wait for schema editing page to load
   cy.url({ timeout: 10 * 60 * 1000 }).should("contain", "edit-schema");
 });
