@@ -1,7 +1,7 @@
 import { absoluteServerDir } from "@/utils/files";
 import { join } from "path";
 import { sqlUtils } from "@/db";
-import { rename } from "fs/promises";
+import { rename, copyFile } from "fs/promises";
 import { createHash, randomUUID } from "crypto";
 import * as _ from "lodash";
 import { totalmem } from "os";
@@ -28,6 +28,7 @@ export default abstract class MetanomeAlgorithm {
    */
   public async moveFiles(): Promise<void> {
     return rename(this.originalOutputPath(), await this.resultPath());
+    // return copyFile(this.originalOutputPath(), await this.resultPath());
   }
 
   /**

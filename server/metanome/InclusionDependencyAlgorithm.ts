@@ -15,7 +15,7 @@ export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgor
 
   public async moveFiles(): Promise<void> {
     try {
-      super.moveFiles();
+      await super.moveFiles();
     } catch (e) {
       // no file found, this likey means metanome didn't create a file
       // because there are no results. Therefore, create an empty file
