@@ -9,10 +9,11 @@ import {
 } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 import { DatabaseService } from '../../database.service';
-import { IHyFDConfig } from '@server/definitions/IHyFD';
-import { INormiConfig } from '@server/definitions/INormi';
-import { IBinderConfig } from '@server/definitions/IBinder';
-import { IFaidaConfig } from '@server/definitions/IFaida';
+// import { IHyFDConfig } from '@server/definitions/IHyFD';
+// import { INormiConfig } from '@server/definitions/INormi';
+// import { IBinderConfig } from '@server/definitions/IBinder';
+// import { IFaidaConfig } from '@server/definitions/IFaida';
+import { MetanomeConfig } from '@server/definitions/IMetanomeJob';
 
 @Component({
   selector: 'app-metanome-settings',
@@ -21,13 +22,11 @@ import { IFaidaConfig } from '@server/definitions/IFaida';
 })
 export class MetanomeSettingsComponent {
   public oldMetanomeResults: Array<IIndexFileEntry> = [];
-  public useOldMetanomeFdResult: Array<Boolean> = [];
+  public useOldMetanomeFdResult: Record<string, Boolean> = {};
   public useOldMetanomeIndResult = true;
-  public selectedFdConfigs: Record<string, any> = {};
-  public selectedIndConfig: any = {};
   public formGroup: FormGroup;
 
-  public defaultHyFdConfig: IHyFDConfig = {
+  public defaultHyFdConfig: MetanomeConfig = {
     INPUT_ROW_LIMIT: -1,
     ENABLE_MEMORY_GUARDIAN: true,
     NULL_EQUALS_NULL: true,
@@ -35,11 +34,11 @@ export class MetanomeSettingsComponent {
     MAX_DETERMINANT_SIZE: -1,
   };
 
-  public defaultNormiConfig: INormiConfig = {
+  public defaultNormiConfig: MetanomeConfig = {
     isHumanInTheLoop: false,
   };
 
-  public defaultBinderConfig: IBinderConfig = {
+  public defaultBinderConfig: MetanomeConfig = {
     DETECT_NARY: false,
     MAX_NARY_LEVEL: -1,
     CLEAN_TEMP: true,
@@ -51,7 +50,7 @@ export class MetanomeSettingsComponent {
     MEMORY_CHECK_FREQUENCY: 100,
   };
 
-  public defaultFaidaConfig: IFaidaConfig = {
+  public defaultFaidaConfig: MetanomeConfig = {
     IGNORE_CONSTANT: true,
     VIRTUAL_COLUMN_STORE: false,
     HLL_REL_STD_DEV: 0.01,
@@ -63,6 +62,9 @@ export class MetanomeSettingsComponent {
     DETECT_NARY: true,
   };
 
+  public selectedFdConfigs: Record<string, MetanomeConfig> = {};
+  public selectedIndConfig: MetanomeConfig = this.defaultBinderConfig;
+
   constructor(
     public dialogRef: SbbDialogRef<MetanomeSettingsComponent>,
     public formBuilder: FormBuilder,
@@ -72,12 +74,12 @@ export class MetanomeSettingsComponent {
   ) {
     let controlsConfig: Record<string, Array<any>> = {};
     tables.forEach((table) => {
-      this.useOldMetanomeFdResult.push(true);
-      controlsConfig['fdResult_' + table.schemaAndName()] = [];
-      this.selectedFdConfigs['fdConfig_' + table.schemaAndName()] = {};
+      this.useOldMetanomeFdResult['fds_' + table.schemaAndName()] = true;
+      controlsConfig['fds_' + table.schemaAndName()] = [];
+      this.selectedFdConfigs['fds_' + table.schemaAndName()] =
+        this.defaultNormiConfig;
     });
-    controlsConfig['indResult'] = [];
-
+    controlsConfig['inds'] = [];
     this.formGroup = formBuilder.group(controlsConfig);
     this.loadOldMetanomeResults();
   }
@@ -129,29 +131,34 @@ export class MetanomeSettingsComponent {
     return settings.join(' | ');
   }
 
-  public toggleFdResult(index: number) {
-    this.useOldMetanomeFdResult[index] = !this.useOldMetanomeFdResult[index];
+  public toggleFdResult(tableName: string) {
+    this.useOldMetanomeFdResult[tableName] =
+      !this.useOldMetanomeFdResult[tableName];
   }
 
   public toggleIndResult() {
     this.useOldMetanomeIndResult = !this.useOldMetanomeIndResult;
   }
 
-  public changeFdConfig(selectionValue: any) {
-    switch (selectionValue.value) {
+  public changeFdConfig(selectionValue: any, tableName: string) {
+    console.log(selectionValue.value);
+    switch (selectionValue.value.algorithm.split('.').slice(-1)[0]) {
       case 'Normi': {
-        this.selectedFdConfigs = this.defaultNormiConfig;
+        this.selectedFdConfigs[tableName] = this.defaultNormiConfig;
+        this.buildNewFdConfig(selectionValue.value.algorithm, tableName);
         break;
       }
-      case 'HyFd': {
-        this.selectedFdConfigs = this.defaultHyFdConfig;
+      case 'HyFD': {
+        this.selectedFdConfigs[tableName] = this.defaultHyFdConfig;
+        this.buildNewFdConfig(selectionValue.value.algorithm, tableName);
         break;
       }
     }
+    console.log(this.selectedFdConfigs[tableName]);
   }
 
   public changeIndConfig(selectionValue: any) {
-    switch (selectionValue.value) {
+    switch (selectionValue.value.algorithm.split('.').slice(-1)[0]) {
       case 'BINDER': {
         this.selectedIndConfig = this.defaultBinderConfig;
         break;
@@ -163,9 +170,37 @@ export class MetanomeSettingsComponent {
     }
   }
 
+  public buildNewFdConfig(algorithm: string, tableName: string) {
+    // console.log(this.selectedFdConfigs[tableName])
+    let newIndexFileEntry: IIndexFileEntry = {
+      config: this.selectedFdConfigs[tableName],
+      tables: [tableName.slice(4)],
+      dbmsName: '',
+      database: '',
+      resultType: MetanomeResultType.fd,
+      algorithm: algorithm,
+      fileName: '',
+      createDate: 0,
+    };
+    return newIndexFileEntry;
+  }
+
+  public buildNewIndConfig(algorithm: string) {
+    let newIndexFileEntry: IIndexFileEntry = {
+      tables: this.tables.map((table) => table.name),
+      dbmsName: '',
+      database: '',
+      resultType: MetanomeResultType.fd,
+      algorithm: algorithm,
+      fileName: '',
+      config: this.selectedIndConfig,
+      createDate: 0,
+    };
+    return newIndexFileEntry;
+  }
+
   public runMetoname() {
     console.log(this.formGroup.value);
-    console.log('vor closen des Forms');
-    this.dialogRef.close({ values: this.formGroup.value });
+    // this.dialogRef.close({ values: this.formGroup.value });
   }
 }

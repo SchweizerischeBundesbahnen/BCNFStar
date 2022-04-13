@@ -3,14 +3,14 @@
   <form class="sbb-form-group-vertical" [formGroup]="formGroup">
     <h2>Functional Dependencies</h2>
     <ul>
-      <li *ngFor="let table of tables; let index = index">
+      <li *ngFor="let table of tables">
         <div>
           {{ table.schemaAndName() }}
         </div>
         <div>
           <ng-container
             [ngTemplateOutlet]="
-              useOldMetanomeFdResult[index]
+              useOldMetanomeFdResult['fds_' + table.schemaAndName()]
                 ? useOldMetnomeFdConfig
                 : useNewMetanomeFdConfig
             "
@@ -19,9 +19,12 @@
           </ng-container>
         </div>
         <div>
-          <button sbb-button (click)="toggleFdResult(index)">
+          <button
+            sbb-button
+            (click)="toggleFdResult('fds_' + table.schemaAndName())"
+          >
             {{
-              useOldMetanomeFdResult[index]
+              useOldMetanomeFdResult["fds_" + table.schemaAndName()]
                 ? "Use new configuration"
                 : "Use old metanome result"
             }}
@@ -67,7 +70,7 @@
   <sbb-form-field>
     <sbb-select
       placeholder="Old results"
-      [formControlName]="'fdResult_' + table.schemaAndName()"
+      [formControlName]="'fds_' + table.schemaAndName()"
     >
       <sbb-option
         *ngFor="let result of filteredMetanomeResultsForFd(table)"
@@ -85,28 +88,68 @@
       <sbb-label>Algorithm</sbb-label>
       <sbb-select
         placeholder="Functional Dependency algorithm"
-        [formControlName]="'fdResult_' + table.schemaAndName()"
-        (selectionChange)="changeFdConfig($event)"
+        [formControlName]="'fds_' + table.schemaAndName()"
+        (selectionChange)="
+          changeFdConfig($event, 'fds_' + table.schemaAndName())
+        "
       >
-        <sbb-option value="Normi">Normi</sbb-option>
-        <sbb-option value="HyFd">HyFd</sbb-option>
+        <sbb-option
+          [value]="
+            buildNewFdConfig(
+              'de.metanome.algorithms.normalize.Normi',
+              'fds_' + table.schemaAndName()
+            )
+          "
+          >{{
+            buildNewFdConfig(
+              "de.metanome.algorithms.normalize.Normi",
+              "fds_" + table.schemaAndName()
+            )
+              .algorithm.split(".")
+              .slice(-1)
+          }}</sbb-option
+        >
+        <sbb-option
+          [value]="
+            buildNewFdConfig(
+              'de.metanome.algorithms.hyfd.HyFD',
+              'fds_' + table.schemaAndName()
+            )
+          "
+          >{{
+            buildNewFdConfig(
+              "de.metanome.algorithms.hyfd.HyFD",
+              "fds_" + table.schemaAndName()
+            )
+              .algorithm.split(".")
+              .slice(-1)
+          }}</sbb-option
+        >
       </sbb-select>
       <div
         *ngFor="
-          let entry of selectedFdConfigs['fdConfig_' + table.schemaAndName()]
+          let entry of selectedFdConfigs['fds_' + table.schemaAndName()]
             | keyvalue
         "
       >
         <sbb-checkbox
           *ngIf="isBoolean(entry.value)"
-          [(ngModel)]="entry.value"
+          [(ngModel)]="
+            selectedFdConfigs['fds_' + table.schemaAndName()][entry.key]
+          "
           [ngModelOptions]="{ standalone: true }"
         >
           {{ entry.key }}
         </sbb-checkbox>
         <div *ngIf="!isBoolean(entry.value)">
           <sbb-label>{{ entry.key }}</sbb-label>
-          <input sbbInput [value]="entry.value" />
+          <input
+            sbbInput
+            [(ngModel)]="
+              selectedFdConfigs['fds_' + table.schemaAndName()][entry.key]
+            "
+            [ngModelOptions]="{ standalone: true }"
+          />
         </div>
       </div>
     </sbb-form-field>
@@ -115,7 +158,7 @@
 
 <ng-template #useOldMetnomeIndConfig [formGroup]="formGroup">
   <sbb-form-field>
-    <sbb-select placeholder="Old results" formControlName="indResult">
+    <sbb-select placeholder="Old results" formControlName="inds">
       <sbb-option
         *ngFor="let result of filteredMetanomeResultsForInd()"
         [value]="result"
@@ -132,7 +175,7 @@
       <sbb-label>Algorithm</sbb-label>
       <sbb-select
         placeholder="Functional Dependency algorithm"
-        formControlName="indResult"
+        formControlName="inds"
         (selectionChange)="changeIndConfig($event)"
       >
         <sbb-option value="BINDER">BINDER</sbb-option>

@@ -33,7 +33,7 @@ export class DatabaseService {
    * at http://localhost:80. In production mode, the serving server is assumed
    * to be the BCNFStar express server (found in backend/index.ts)
    **/
-  public baseUrl: string = isDevMode() ? 'http://localhost:8080' : '';
+  public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   private iFks: Array<IForeignKey> = [];
   private iPks: Array<IPrimaryKey> = [];
 
