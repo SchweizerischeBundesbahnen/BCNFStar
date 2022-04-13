@@ -90,7 +90,7 @@
         placeholder="Functional Dependency algorithm"
         [formControlName]="'fds_' + table.schemaAndName()"
         (selectionChange)="
-          changeFdConfig($event, 'fds_' + table.schemaAndName())
+          changeFdConfig($event.value.algorithm, 'fds_' + table.schemaAndName())
         "
       >
         <sbb-option
