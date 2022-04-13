@@ -27,17 +27,17 @@ enum PortSide {
 }
 
 @Component({
-  selector: 'app-normalize-schema-graph',
-  templateUrl: './normalize-schema-graph.component.html',
-  styleUrls: ['./normalize-schema-graph.component.css'],
+  selector: 'app-schema-graph',
+  templateUrl: './schema-graph.component.html',
+  styleUrls: ['./schema-graph.component.css'],
 })
-export class NormalizeSchemaGraphComponent implements AfterContentInit {
-  @Input() schema!: Schema;
-  @Input() selectedTable?: Table;
-  @Input() selectedColumns?: Map<Table, ColumnCombination>;
-  @Input() schemaChanged!: Observable<void>;
-  @Output() selectedTableChange = new EventEmitter<Table>();
-  @Output() joinFk = new EventEmitter<{
+export class SchemaGraphComponent implements AfterContentInit {
+  @Input() public schema!: Schema;
+  @Input() public selectedTable?: Table;
+  @Input() public selectedColumns?: Map<Table, ColumnCombination>;
+  @Input() public schemaChanged!: Observable<void>;
+  @Output() public selectedTableChange = new EventEmitter<Table>();
+  @Output() public joinFk = new EventEmitter<{
     source: Table;
     target: Table;
     relationship: Relationship;
@@ -84,7 +84,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     this.updateGraph();
   }
 
-  updateGraph() {
+  public updateGraph() {
     for (const item of this.graphStorage.keys()) {
       this.graphStorage.get(item)?.jointjsEl.remove();
     }
@@ -111,7 +111,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   // feel intuitive on a range of devices. We just take the transform and override the
   // default panzoom conotroller to move both the graph elements and the associated Angular
   // components
-  addPanzoomHandler() {
+  private addPanzoomHandler() {
     this.panzoomHandler = panzoom(
       document.querySelector('#paper svg') as SVGElement,
       {
@@ -144,7 +144,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     );
   }
 
-  generateElements() {
+  private generateElements() {
     for (const table of this.schema.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
         attrs: { root: { id: '__jointel__' + table.schemaAndName() } },
@@ -221,7 +221,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     linkView.addTools(toolsView);
   }
 
-  generateLinks() {
+  private generateLinks() {
     for (const table of this.schema.tables) {
       for (const fk of this.schema.fksOf(table)) {
         let fkReferenced = fk.relationship.referenced().asArray()[0];
@@ -254,14 +254,20 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
 
   // if you change this, also change graph-element.component.css > .table-head > height
   protected graphElementHeaderHeight: number = 25;
-  generatePortMarkup({ counter, side }: { counter: number; side: PortSide }) {
+  private generatePortMarkup({
+    counter,
+    side,
+  }: {
+    counter: number;
+    side: PortSide;
+  }) {
     const cx = side == PortSide.Left ? 0 : this.elementWidth;
     return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
       this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5)
     }" strokegit ="green" fill="white"/>`;
   }
 
-  generatePorts(jointjsEl: joint.dia.Element, table: Table) {
+  private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
     for (let column of table.columns.inOrder()) {
       let args = { counter, side: PortSide.Left };
@@ -282,19 +288,19 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
     }
   }
 
-  resetView() {
+  public resetView() {
     this.panzoomHandler?.moveTo(0, 0);
     this.panzoomHandler?.zoomAbs(0, 0, 1);
   }
 
-  updateAllBBoxes() {
+  private updateAllBBoxes() {
     for (const item of this.graphStorage.keys()) {
       this.updateBBox(this.graphStorage.get(item)!);
     }
   }
 
   // call this whenever the graph element has moved, this moves the angular component on top of the graph element
-  updateBBox(item: GraphStorageItem) {
+  private updateBBox(item: GraphStorageItem) {
     const bbox = item.jointjsEl.getBBox();
 
     item.style = {

@@ -8,10 +8,10 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./graph-element.component.css'],
 })
 export class GraphElementComponent {
-  @Input() table!: Table;
-  @Input() bbox!: Record<string, string>;
-  @Input() selectedColumns?: ColumnCombination;
-  @Output() selectedTable = new EventEmitter<Table>();
+  @Input() public table!: Table;
+  @Input() public bbox!: Record<string, string>;
+  @Input() public selectedColumns?: ColumnCombination;
+  @Output() public selectedTable = new EventEmitter<Table>();
 
   constructor() {}
 

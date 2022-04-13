@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe("The normalize side bar", () => {
+describe("The schema editing side bar", () => {
   beforeEach(() => {
     cy.visitFrontend();
 
@@ -13,7 +13,7 @@ describe("The normalize side bar", () => {
 
   // ############# Show elements #############
   it("renders", () => {
-    cy.get("app-normalize-side-bar");
+    cy.get("app-schema-editing-side-bar");
   });
 
   it("displays the 'auto normalize this table' button", () => {

@@ -203,7 +203,7 @@ export class DatabaseService {
     );
   }
 
-  getForeignKeySql(
+  public getForeignKeySql(
     referencing: Table,
     relationship: Relationship,
     referenced: Table
@@ -239,7 +239,7 @@ export class DatabaseService {
     );
   }
 
-  getSchemaPreparationSql(
+  public getSchemaPreparationSql(
     schemaName: string,
     tables: Table[]
   ): Promise<{ sql: string }> {
@@ -255,7 +255,7 @@ export class DatabaseService {
     );
   }
 
-  getDataTransferSql(
+  public getDataTransferSql(
     table: Table,
     attributes: Column[]
   ): Promise<{ sql: string }> {
@@ -280,7 +280,7 @@ export class DatabaseService {
     return result;
   }
 
-  getPrimaryKeySql(
+  public getPrimaryKeySql(
     schema: string,
     table: string,
     primaryKey: string[]
@@ -298,7 +298,7 @@ export class DatabaseService {
     );
   }
 
-  getCreateTableSql(table: Table): Promise<{ sql: string }> {
+  public getCreateTableSql(table: Table): Promise<{ sql: string }> {
     const [newSchema, newTable]: string[] = [table.schemaName, table.name];
     let primaryKey: string[] = [];
     if (table.pk) {
