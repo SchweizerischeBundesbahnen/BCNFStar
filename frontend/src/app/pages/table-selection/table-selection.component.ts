@@ -15,10 +15,10 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  @ViewChild(SbbTable) table?: SbbTable<ITableHead>;
-  @ViewChild('errorDialog') errorDialog!: TemplateRef<any>;
+  @ViewChild(SbbTable) public table?: SbbTable<ITableHead>;
+  @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
   @ViewChild('loadingDialog') loadingDialog!: TemplateRef<any>;
-  // public tables: Map<Table, Boolean> = new Map();
+
   public tableHeads: Map<Table, ITableHead> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
   public headLimit = 100;
@@ -35,6 +35,7 @@ export class TableSelectionComponent implements OnInit {
   public tablesInSchema: Record<string, Table[]> = {};
   public error: any;
   public queueUrl: string;
+
   constructor(
     private dataService: DatabaseService,
     public router: Router,

@@ -19,11 +19,11 @@ import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
 
 @Component({
-  selector: 'app-normalize',
-  templateUrl: './normalize.component.html',
-  styleUrls: ['./normalize.component.css'],
+  selector: 'app-schema-editing',
+  templateUrl: './schema-editing.component.html',
+  styleUrls: ['./schema-editing.component.css'],
 })
-export class NormalizeComponent {
+export class SchemaEditingComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
@@ -43,11 +43,11 @@ export class NormalizeComponent {
     // this.schemaChanged.next();
   }
 
-  onSelectColumns(columns: Map<Table, ColumnCombination>) {
+  public onSelectColumns(columns: Map<Table, ColumnCombination>) {
     this.selectedColumns = columns;
   }
 
-  onJoin(event: {
+  public onJoin(event: {
     source: Table;
     target: Table;
     relationship: Relationship;
@@ -80,7 +80,7 @@ export class NormalizeComponent {
     if (fd) this.onSplitFd(value);
   }
 
-  onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
+  public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
     let command = new SplitCommand(
       this.schema,
       this.selectedTable!,
@@ -95,7 +95,7 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onIndToFk(event: TableRelationship): void {
+  public onIndToFk(event: TableRelationship): void {
     let command = new IndToFkCommand(
       this.schema,
       event.relationship,
@@ -107,7 +107,7 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onAutoNormalize(): void {
+  public onAutoNormalize(): void {
     let tables = this.selectedTable
       ? new Array(this.selectedTable)
       : new Array(...this.schema.tables);
@@ -124,24 +124,24 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onChangeTableName(value: { table: Table; newName: string }): void {
+  public onChangeTableName(value: { table: Table; newName: string }): void {
     let command = new TableRenameCommand(value.table, value.newName);
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }
 
-  onUndo() {
+  public onUndo() {
     this.commandProcessor.undo();
     this.schemaChanged.next();
   }
 
-  onRedo() {
+  public onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
   }
 
-  async persistSchema(): Promise<void> {
+  public async persistSchema(): Promise<void> {
     this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
 
     const tables: Table[] = Array.from(this.schema.tables);
