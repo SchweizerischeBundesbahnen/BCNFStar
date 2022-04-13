@@ -10,7 +10,6 @@
             }}</sbb-expansion-panel-header>
             <sbb-checkbox
               (change)="clickSelectAll(item.key)"
-              [disabled]="isLoading"
               [checked]="areAllSelectedIn(item.key)"
               [indeterminate]="
                 !areAllSelectedIn(item.key) && !areZeroSelectedIn(item.key)
@@ -22,7 +21,6 @@
               *ngFor="let table of item.value"
               [ngModel]="selectedTables.get(table)"
               (ngModelChange)="selectedTables.set(table, $event)"
-              [disabled]="isLoading"
               class="table-checkbox"
               (mouseenter)="mouseEnter(table)"
             >
@@ -35,7 +33,7 @@
       <button
         type="button"
         sbb-button
-        [disabled]="!hasSelectedTables() || isLoading"
+        [disabled]="!hasSelectedTables()"
         (click)="selectTables()"
       >
         Go
@@ -82,16 +80,32 @@
   </div>
 </div>
 
-<div *ngIf="isLoading" class="loading-box">
-  <sbb-loading
-    mode="medium"
-    aria-valuetext="Loading, please wait"
-  ></sbb-loading>
+<ng-template #loadingDialog class="loading-box">
   Functional Dependencies and Inclusion Dependencies are currently being
   searched. <br />
   Progress can be monitored
   <a [href]="queueUrl" target="_blank">here</a>
-</div>
+  <ul *ngFor="let item of loadingStatus | keyvalue">
+    <li>
+      {{ item.key.algorithm }} with {{ item.key.tables }}
+      <sbb-loading
+        mode="medium"
+        *ngIf="item.value === 'loading'"
+        aria-valuetext="Loading, please wait"
+      ></sbb-loading>
+      <sbb-icon
+        svgIcon="kom:cross-medium"
+        style="color: red"
+        *ngIf="item.value === 'error'"
+      ></sbb-icon>
+      <sbb-icon
+        svgIcon="kom:tick-medium"
+        style="color: green"
+        *ngIf="item.value === 'done'"
+      ></sbb-icon>
+    </li>
+  </ul>
+</ng-template>
 
 <ng-template #errorDialog>
   <div sbbDialogTitle>Warnuing</div>

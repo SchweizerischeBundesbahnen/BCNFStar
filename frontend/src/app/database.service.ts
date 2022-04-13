@@ -19,6 +19,8 @@ import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IRelationship from '@server/definitions/IRelationship';
 import ColumnCombination from '../model/schema/ColumnCombination';
+import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
+import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +33,7 @@ export class DatabaseService {
    * at http://localhost:80. In production mode, the serving server is assumed
    * to be the BCNFStar express server (found in backend/index.ts)
    **/
-  public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
+  public baseUrl: string = isDevMode() ? 'http://localhost:8080' : '';
   private iFks: Array<IForeignKey> = [];
   private iPks: Array<IPrimaryKey> = [];
 
@@ -193,6 +195,20 @@ export class DatabaseService {
     this.resolveInds(await indPromise);
     this.resolveIFks(this.iFks);
     this.resolveIPks(this.iPks);
+  }
+
+  public async runMetanome(entry: IIndexFileEntry) {
+    const job: IMetanomeJob = {
+      algoClass: entry.algorithm,
+      config: entry.config,
+      schemaAndTables: entry.tables,
+    };
+    return await firstValueFrom(
+      this.http.post<{ message: string; fileName: string }>(
+        `${this.baseUrl}/metanomeResults/`,
+        job
+      )
+    );
   }
 
   private getMetanomeResult(fileName: string) {

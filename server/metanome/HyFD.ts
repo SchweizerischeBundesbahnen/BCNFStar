@@ -5,19 +5,8 @@ import { splitTableString } from "@/utils/databaseUtils";
 import FunctionalDependencyAlgorithm from "./FunctionalDependencyAlgorithm";
 import { createReadStream } from "fs";
 import { createInterface } from "readline";
-import IFunctionalDependency, {
-  IHyFD,
-} from "@/definitions/IFunctionalDependency";
+import { IHyFD } from "@/definitions/IHyFd";
 import { writeFile } from "fs/promises";
-
-interface HyFDConfig {
-  INPUT_ROW_LIMIT: number; //=-1
-  // (assumption): checks if memory is nearly full, and writes to disk if so
-  ENABLE_MEMORY_GUARDIAN: boolean; //=true
-  NULL_EQUALS_NULL: boolean; //=true
-  VALIDATE_PARALLEL: boolean; //=true
-  MAX_DETERMINANT_SIZE: number; //=-1
-}
 
 // everything in here is still nonsense, I just wanted to document the available options
 export default class HyFD extends FunctionalDependencyAlgorithm {

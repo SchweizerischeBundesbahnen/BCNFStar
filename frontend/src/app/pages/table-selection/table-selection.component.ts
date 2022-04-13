@@ -17,10 +17,14 @@ import { firstValueFrom } from 'rxjs';
 export class TableSelectionComponent implements OnInit {
   @ViewChild(SbbTable) table?: SbbTable<ITableHead>;
   @ViewChild('errorDialog') errorDialog!: TemplateRef<any>;
+  @ViewChild('loadingDialog') loadingDialog!: TemplateRef<any>;
   // public tables: Map<Table, Boolean> = new Map();
   public tableHeads: Map<Table, ITableHead> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
   public headLimit = 100;
+
+  public loadingStatus: Map<IIndexFileEntry, 'done' | 'error' | 'loading'> =
+    new Map();
 
   public hoveredTable?: Table;
   public tableColumns: Array<string> = [];
@@ -29,7 +33,6 @@ export class TableSelectionComponent implements OnInit {
   public tables: Array<Table> = [];
   public selectedTables = new Map<Table, Boolean>();
   public tablesInSchema: Record<string, Table[]> = {};
-  public isLoading = false;
   public error: any;
   public queueUrl: string;
   constructor(
@@ -88,6 +91,23 @@ export class TableSelectionComponent implements OnInit {
     );
   }
 
+  public async runMetanome(entries: Array<IIndexFileEntry>) {
+    const jobs = entries.map((entry) => {
+      return { promise: this.dataService.runMetanome(entry), entry };
+    });
+    for (const job of jobs) {
+      this.loadingStatus.set(job.entry, 'loading');
+      try {
+        const result = await job.promise;
+        this.loadingStatus.set(job.entry, 'done');
+        job.entry.fileName = result.fileName;
+      } catch (e) {
+        this.loadingStatus.set(job.entry, 'error');
+      }
+    }
+    return Promise.allSettled(jobs.map((j) => j.promise)).catch(() => {});
+  }
+
   public async selectTables() {
     const tables = this.tables.filter((table) =>
       this.selectedTables.get(table)
@@ -97,27 +117,31 @@ export class TableSelectionComponent implements OnInit {
     });
     const { values }: { values: Record<string, IIndexFileEntry> } =
       await firstValueFrom(dialogRef.afterClosed());
-    console.log('nach cloden des Forms', values);
-    let fdResults: Record<string, string> = {};
-    for (let value of Object.entries(values)) {
-      console.log(value);
-      if (value[0] != 'indResult') {
-        fdResults[value[1].tables[0]] = value[1].fileName;
+
+    const loadingDialog = this.dialog.open(this.loadingDialog);
+
+    try {
+      await this.runMetanome(
+        Object.values(values).filter((entry) => !entry.fileName)
+      );
+      let fdResults: Record<string, string> = {};
+      for (let value of Object.entries(values)) {
+        if (value[0] != 'indResult') {
+          fdResults[value[1].tables[0]] = value[1].fileName;
+        }
       }
+      await this.dataService.setInputTables(
+        tables,
+        values['indResult'].fileName,
+        fdResults
+      );
+      this.router.navigate(['/edit-schema']);
+    } catch (e) {
+      this.error = e;
+      this.dialog.open(this.errorDialog);
+    } finally {
+      loadingDialog.close();
     }
-    this.isLoading = true;
-    this.dataService
-      .setInputTables(tables, values['indResult'].fileName, fdResults)
-      .then(() => {
-        this.router.navigate(['/edit-schema']);
-      })
-      .catch((e) => {
-        this.error = e;
-        this.dialog.open(this.errorDialog);
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
   }
 
   private getDataSourceAndRenderTable(table: Table) {

@@ -7,10 +7,6 @@ import FunctionalDependencyAlgorithm from "./FunctionalDependencyAlgorithm";
 import { readFile, writeFile } from "fs/promises";
 import { DbmsType } from "@/db/SqlUtils";
 
-interface NormiConfig {
-  isHumanInTheLoop: boolean; //=false
-}
-
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
 export function outputPath(schemaAndTable: string): string {
