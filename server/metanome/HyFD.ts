@@ -68,7 +68,7 @@ export default class HyFD extends FunctionalDependencyAlgorithm {
       if (!fdMap[key])
         fdMap[key] = {
           lhsColumns: new Set(lhsColumns),
-          rhsColumns: new Set(lhsColumns),
+          rhsColumns: new Set([]),
         };
 
       fdMap[key].rhsColumns.add(fd.dependant.columnIdentifier);
@@ -81,12 +81,16 @@ export default class HyFD extends FunctionalDependencyAlgorithm {
     let i = 1;
     let somethingChanged = true;
     while (somethingChanged) {
-      console.log("round " + i++);
+      // console.log("round " + i++);
       somethingChanged = false;
       for (const fd of sortedFds) {
         for (const other of sortedFds) {
           if (other == fd) continue;
-          if ([...fd.lhsColumns].every((c) => other.rhsColumns.has(c))) {
+          if (
+            [...fd.lhsColumns].every(
+              (c) => other.rhsColumns.has(c) || other.lhsColumns.has(c)
+            )
+          ) {
             for (const column of fd.rhsColumns) {
               if (!other.rhsColumns.has(column)) {
                 somethingChanged = true;
@@ -98,7 +102,6 @@ export default class HyFD extends FunctionalDependencyAlgorithm {
         }
       }
     }
-    // remove lhs from rhs
     const resultFds: Array<string> = sortedFds.map((fd) => {
       fd.lhsColumns.forEach((c) => fd.rhsColumns.delete(c));
       return JSON.stringify({
