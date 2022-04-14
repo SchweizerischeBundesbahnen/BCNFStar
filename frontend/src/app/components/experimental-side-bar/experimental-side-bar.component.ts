@@ -15,7 +15,7 @@ export class ExperimentalSideBarComponent implements OnInit {
   @Input() table!: Table;
   @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
-  public pageSize: number = 50;
+  public pageSize: number = 20;
   public page: number = 0;
   public rowCount: number = 0;
 
