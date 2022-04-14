@@ -154,7 +154,7 @@ from
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     throw Error("Not implemented Exception");
   }
 

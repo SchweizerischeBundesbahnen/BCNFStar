@@ -166,7 +166,7 @@ export default class MsSqlUtils extends SqlUtils {
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
       throw Error("Columns don't exist in table.");
     }

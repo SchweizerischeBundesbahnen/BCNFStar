@@ -64,7 +64,7 @@ export default abstract class SqlUtils {
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<ITableHead>;
+  ): Promise<ITablePage>;
 
   public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
   public abstract SQL_DROP_TABLE_IF_EXISTS(

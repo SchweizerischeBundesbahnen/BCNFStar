@@ -3,7 +3,7 @@ import Table from '@/src/model/schema/Table';
 import { DatabaseService } from 'src/app/database.service';
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
-import ITableHead from '@server/definitions/ITableHead';
+import ITablePage from '@server/definitions/ITablePage';
 
 @Component({
   selector: 'app-experimental-side-bar',
@@ -12,7 +12,7 @@ import ITableHead from '@server/definitions/ITableHead';
 })
 export class ExperimentalSideBarComponent implements OnInit {
   @Input() table!: Table;
-  @ViewChild(SbbTable) sbbtable?: SbbTable<ITableHead>;
+  @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
   public _lhs = new Array<Column>();
   public _rhs = new Array<Column>();
