@@ -28,10 +28,12 @@ export class MetanomeSettingsComponent {
     NULL_EQUALS_NULL: true,
     VALIDATE_PARALLEL: true,
     MAX_DETERMINANT_SIZE: -1,
+    memory: '',
   };
 
   public defaultNormiConfig: MetanomeConfig = {
     isHumanInTheLoop: false,
+    memory: '',
   };
 
   public defaultBinderConfig: MetanomeConfig = {
@@ -44,6 +46,7 @@ export class MetanomeSettingsComponent {
     TEMP_FOLDER_PATH: 'BINDER_temp',
     NUM_BUCKETS_PER_COLUMN: 10,
     MEMORY_CHECK_FREQUENCY: 100,
+    memory: '',
   };
 
   public defaultFaidaConfig: MetanomeConfig = {
@@ -56,6 +59,7 @@ export class MetanomeSettingsComponent {
     IGNORE_NULL: true,
     APPROXIMATE_TESTER_BYTES: 32768,
     DETECT_NARY: true,
+    memory: '',
   };
 
   public selectedFdConfigs: Record<string, MetanomeConfig> = {};

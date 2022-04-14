@@ -1,4 +1,6 @@
-export interface IBinderConfig {
+import { IMetanomeConfig } from "./IMetanomeConfig";
+
+export interface IBinderConfig extends IMetanomeConfig {
   // whether to detect nary inds at all
   DETECT_NARY: boolean; //=false
   // how many columns an  IND might reference
