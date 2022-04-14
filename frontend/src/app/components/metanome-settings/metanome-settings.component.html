@@ -176,22 +176,40 @@
       <sbb-select
         placeholder="Functional Dependency algorithm"
         formControlName="inds"
-        (selectionChange)="changeIndConfig($event)"
+        (selectionChange)="changeIndConfig($event.value.algorithm)"
       >
-        <sbb-option value="BINDER">BINDER</sbb-option>
-        <sbb-option value="FAIDA">FAIDA</sbb-option>
+        <sbb-option
+          [value]="
+            buildNewIndConfig('de.metanome.algorithms.binder.BINDERFile')
+          "
+        >
+          {{
+            buildNewIndConfig("de.metanome.algorithms.binder.BINDERFile")
+              .algorithm.split(".")
+              .slice(-1)
+          }}
+        </sbb-option>
+        <sbb-option
+          [value]="buildNewIndConfig('de.hpi.mpss2015n.approxind.FAIDA')"
+        >
+          {{
+            buildNewIndConfig("de.hpi.mpss2015n.approxind.FAIDA")
+              .algorithm.split(".")
+              .slice(-1)
+          }}
+        </sbb-option>
       </sbb-select>
       <div *ngFor="let entry of selectedIndConfig | keyvalue">
         <sbb-checkbox
           *ngIf="isBoolean(entry.value)"
-          [(ngModel)]="entry.value"
+          [(ngModel)]="selectedIndConfig[entry.key]"
           [ngModelOptions]="{ standalone: true }"
         >
           {{ entry.key }}
         </sbb-checkbox>
         <div *ngIf="!isBoolean(entry.value)">
           <sbb-label>{{ entry.key }}</sbb-label>
-          <input sbbInput [value]="entry.value" />
+          <input sbbInput [value]="selectedIndConfig[entry.key]" />
         </div>
       </div>
     </sbb-form-field>

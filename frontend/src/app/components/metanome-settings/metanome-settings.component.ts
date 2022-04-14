@@ -147,9 +147,9 @@ export class MetanomeSettingsComponent {
     }
   }
 
-  public changeIndConfig(selectionValue: any) {
-    switch (selectionValue.value.algorithm.split('.').slice(-1)[0]) {
-      case 'BINDER': {
+  public changeIndConfig(algorithm: string) {
+    switch (algorithm.split('.').slice(-1)[0]) {
+      case 'BINDERFile': {
         this.selectedIndConfig = this.defaultBinderConfig;
         break;
       }
@@ -171,16 +171,16 @@ export class MetanomeSettingsComponent {
       fileName: '',
       createDate: 0,
     };
-    this.formGroup.value[tableName] = newIndexFileEntry;
     return newIndexFileEntry;
   }
 
   public buildNewIndConfig(algorithm: string) {
+    console.log(algorithm);
     let newIndexFileEntry: IIndexFileEntry = {
       tables: this.tables.map((table) => table.name),
       dbmsName: '',
       database: '',
-      resultType: MetanomeResultType.fd,
+      resultType: MetanomeResultType.ind,
       algorithm: algorithm,
       fileName: '',
       config: this.selectedIndConfig,
@@ -190,6 +190,7 @@ export class MetanomeSettingsComponent {
   }
 
   public runMetoname() {
+    console.log(this.formGroup.value);
     this.dialogRef.close({ values: this.formGroup.value });
   }
 }
