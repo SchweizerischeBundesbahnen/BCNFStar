@@ -1,7 +1,7 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
-import ITableHead from '@server/definitions/ITableHead';
+import ITablePage from '@server/definitions/ITablePage';
 import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import {
   IRequestBodyCreateTableSql,
@@ -45,24 +45,23 @@ export class DatabaseService {
     return this.getTables();
   }
 
-  public async loadTableHeads(
+  public loadTablePage(
+    schema: string,
+    table: string,
+    offset: number,
     limit: number
-  ): Promise<Record<string, ITableHead>> {
-    let tableHeads;
-    tableHeads = await firstValueFrom(
-      this.http.get<Record<string, ITableHead>>(
-        `${this.baseUrl}/tables/heads?limit=${limit}`
+  ): Promise<ITablePage> {
+    return firstValueFrom(
+      this.http.get<ITablePage>(
+        `${this.baseUrl}/tables/page?schema=${schema}&table=${table}&offset=${offset}&limit=${limit}`
       )
     );
-    return tableHeads;
   }
 
-  public async loadTableRowCounts(): Promise<Record<string, number>> {
-    let tableRowCounts;
-    tableRowCounts = await firstValueFrom(
+  public loadTableRowCounts(): Promise<Record<string, number>> {
+    return firstValueFrom(
       this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
     );
-    return tableRowCounts;
   }
 
   private async getTables(): Promise<Array<Table>> {
@@ -201,7 +200,7 @@ export class DatabaseService {
     );
   }
 
-  getForeignKeySql(
+  public getForeignKeySql(
     referencing: Table,
     relationship: Relationship,
     referenced: Table
@@ -237,7 +236,7 @@ export class DatabaseService {
     );
   }
 
-  getSchemaPreparationSql(
+  public getSchemaPreparationSql(
     schemaName: string,
     tables: Table[]
   ): Promise<{ sql: string }> {
@@ -253,7 +252,7 @@ export class DatabaseService {
     );
   }
 
-  getDataTransferSql(
+  public getDataTransferSql(
     table: Table,
     attributes: Column[]
   ): Promise<{ sql: string }> {
@@ -278,7 +277,7 @@ export class DatabaseService {
     return result;
   }
 
-  getPrimaryKeySql(
+  public getPrimaryKeySql(
     schema: string,
     table: string,
     primaryKey: string[]
@@ -296,11 +295,11 @@ export class DatabaseService {
     );
   }
 
-  async loadViolatingRowsForFD(
+  public async loadViolatingRowsForFD(
     table: Table,
     _lhs: Column[],
     _rhs: Column[]
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     // currently supports only check on "sourceTables".
     if (table.sources.size != 1) throw Error('Not Implemented Exception');
 
@@ -311,11 +310,11 @@ export class DatabaseService {
       rhs: _rhs.map((c) => c.name),
     };
     return firstValueFrom(
-      this.http.post<ITableHead>(`${this.baseUrl}/violatingRows/fd`, data)
+      this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
     );
   }
 
-  getCreateTableSql(table: Table): Promise<{ sql: string }> {
+  public getCreateTableSql(table: Table): Promise<{ sql: string }> {
     const [newSchema, newTable]: string[] = [table.schemaName, table.name];
     let primaryKey: string[] = [];
     if (table.pk) {

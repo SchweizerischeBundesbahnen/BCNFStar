@@ -28,7 +28,7 @@ describe("The table selection page", () => {
     cy.get("button").contains("Go");
   });
 
-  it("renders the normalize page when clicking on the Go button", () => {
+  it("renders the schema editing page when clicking on the Go button", () => {
     cy.selectTablesAndGo();
   });
 });

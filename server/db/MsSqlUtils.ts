@@ -1,4 +1,4 @@
-import ITableHead from "@/definitions/ITableHead";
+import ITablePage from "@/definitions/ITablePage";
 import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
 import SqlUtils, {
@@ -64,15 +64,18 @@ export default class MsSqlUtils extends SqlUtils {
 
     return result.recordset;
   }
-  public async getTableHead(
+  public async getTablePage(
     tablename: string,
     schemaname: string,
+    offset: number,
     limit: number
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
-        `SELECT TOP (${limit}) * FROM [${schemaname}].[${tablename}]`
+        `SELECT * FROM [${schemaname}].[${tablename}] 
+        OFFSET ${offset} ROWS
+        FETCH NEXT ${limit} ROWS ONLY`
       );
       return {
         rows: result.recordset,

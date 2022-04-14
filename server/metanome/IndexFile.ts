@@ -16,17 +16,24 @@ const indexFileLocation = join(
   "index.json"
 );
 
-export async function getIndexContent(): Promise<Array<IIndexFileEntry>> {
+/**
+ * @param getAll if false (delfault) only gets entries for corrent database
+ */
+export async function getIndexContent(
+  getAll: boolean = false
+): Promise<Array<IIndexFileEntry>> {
   await initFile(indexFileLocation, "[]");
   const contentString = await readFile(indexFileLocation, {
     encoding: "utf-8",
   });
   const entries: Array<IIndexFileEntry> = JSON.parse(contentString);
-  return entries.filter(
-    (entry) =>
-      entry.dbmsName == sqlUtils.getDbmsName() &&
-      entry.database == process.env.DB_DATABASE
-  );
+  return getAll
+    ? entries
+    : entries.filter(
+        (entry) =>
+          entry.dbmsName == sqlUtils.getDbmsName() &&
+          entry.database == process.env.DB_DATABASE
+      );
 }
 
 /**
@@ -37,7 +44,7 @@ export async function getIndexContent(): Promise<Array<IIndexFileEntry>> {
  */
 export async function addToIndex(entry: IIndexFileEntry) {
   return mutex.runExclusive<void>(async () => {
-    const content = await getIndexContent();
+    const content = await getIndexContent(true);
     content.push(entry);
     return writeFile(indexFileLocation, JSON.stringify(content));
   });
@@ -55,7 +62,7 @@ export async function addToIndex(entry: IIndexFileEntry) {
  */
 export async function deleteFromIndex(fileName: string): Promise<boolean> {
   return mutex.runExclusive<boolean>(async () => {
-    const content = await getIndexContent();
+    const content = await getIndexContent(true);
     const toBeRemoved = content.find((entry) => entry.fileName == fileName);
     await writeFile(
       indexFileLocation,
