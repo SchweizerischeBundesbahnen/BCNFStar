@@ -26,7 +26,7 @@ import { NormalizeUndoRedoComponent } from './components/normalize-undo-redo/nor
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
-import { ExperimentalSideBarComponent } from './experimental-side-bar/experimental-side-bar.component';
+import { ExperimentalSideBarComponent } from './components/experimental-side-bar/experimental-side-bar.component';
 
 @NgModule({
   declarations: [

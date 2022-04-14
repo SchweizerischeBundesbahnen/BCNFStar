@@ -134,5 +134,13 @@
         Create Foreign Key
       </button>
     </sbb-expansion-panel>
+    <sbb-expansion-panel [expanded]="false">
+      <sbb-expansion-panel-header
+        >Check For Contained Subtable</sbb-expansion-panel-header
+      >
+      <app-experimental-side-bar
+        [table]="this.table"
+      ></app-experimental-side-bar>
+    </sbb-expansion-panel>
   </sbb-accordion>
 </div>

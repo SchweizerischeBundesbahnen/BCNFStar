@@ -1,1 +1,24 @@
-<p>experimental-side-bar works!</p>
+<p>Check if columns:</p>
+<sbb-select [(ngModel)]="this._lhs" multiple placeholder="Left Hand Side">
+  <sbb-option *ngFor="let column of table.columns.asArray()" [value]="column">{{
+    column.name
+  }}</sbb-option>
+</sbb-select>
+<p>define:</p>
+<sbb-select [(ngModel)]="this._rhs" multiple placeholder="Right Hand Side">
+  <sbb-option *ngFor="let column of table.columns.asArray()" [value]="column">{{
+    column.name
+  }}</sbb-option>
+</sbb-select>
+<button sbb-button [disabled]="this.checkNotAllowed()" (click)="checkFd()">
+  Check Functional Dependency
+</button>
+
+<sbb-table-wrapper class="table-wrapper">
+  <table sbb-table [dataSource]="this._dataSource">
+    <sbb-text-column *ngFor="let column of tableColumns" name="{{ column }}">
+    </sbb-text-column>
+    <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
+    <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+  </table>
+</sbb-table-wrapper>
