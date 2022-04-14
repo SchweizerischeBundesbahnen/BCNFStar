@@ -12,9 +12,9 @@ import { SbbDialog } from '@sbb-esta/angular/dialog';
   styleUrls: ['./table-selection.component.css'],
 })
 export class TableSelectionComponent implements OnInit {
-  @ViewChild(SbbTable) table?: SbbTable<ITableHead>;
-  @ViewChild('errorDialog') errorDialog!: TemplateRef<any>;
-  // public tables: Map<Table, Boolean> = new Map();
+  @ViewChild(SbbTable) public table?: SbbTable<ITableHead>;
+  @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
+
   public tableHeads: Map<Table, ITableHead> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
   public headLimit = 100;
@@ -28,6 +28,7 @@ export class TableSelectionComponent implements OnInit {
   public tablesInSchema: Record<string, Table[]> = {};
   public isLoading = false;
   public queueUrl: string;
+
   constructor(
     private dataService: DatabaseService,
     public router: Router,

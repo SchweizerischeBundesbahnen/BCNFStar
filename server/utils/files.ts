@@ -1,4 +1,5 @@
-import { join, parse } from "path";
+import { access, mkdir, writeFile } from "fs/promises";
+import { dirname, join, parse } from "path";
 
 function getAbsoluteServerDir() {
   // if we are compiled javascript, we need to escape one more folder (the 'dist' folder)
@@ -33,4 +34,22 @@ export function splitlines(content: string): Array<string> {
   else lines = content.split("\n");
   if (!lines[lines.length - 1]) lines.pop();
   return lines;
+}
+
+/**
+ * Creates a file and the containing folders if they don't exist
+ * @param path path of the file
+ * @param content content that should be written to the file if it didn't exist
+ */
+export async function initFile(path: string, content: string = "") {
+  try {
+    await access(dirname(path));
+  } catch (e) {
+    await mkdir(dirname(path), { recursive: true });
+  }
+  try {
+    await access(path);
+  } catch (e) {
+    await writeFile(path, content);
+  }
 }
