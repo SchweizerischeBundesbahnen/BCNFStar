@@ -146,6 +146,15 @@ from
     return result.rows;
   }
 
+  public override async getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<ITableHead> {
+    throw Error("Not implemented Exception");
+  }
+
   public override SQL_CREATE_SCHEMA(schema: string): string {
     return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
   }

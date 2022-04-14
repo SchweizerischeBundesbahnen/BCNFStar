@@ -58,6 +58,13 @@ export default abstract class SqlUtils {
   public abstract getJdbcPath(): string;
   public abstract getDbmsName(): "mssql" | "postgres";
 
+  public abstract getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<ITableHead>;
+
   public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
   public abstract SQL_DROP_TABLE_IF_EXISTS(
     newSchema: string,
