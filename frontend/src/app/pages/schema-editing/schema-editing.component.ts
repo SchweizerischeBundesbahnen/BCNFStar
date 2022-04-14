@@ -70,7 +70,7 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  async onClickSplit(fd: FunctionalDependency) {
+  public async onClickSplit(fd: FunctionalDependency) {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
       data: fd,
     });

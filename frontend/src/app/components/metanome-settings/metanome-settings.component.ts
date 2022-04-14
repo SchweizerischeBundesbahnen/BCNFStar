@@ -108,11 +108,9 @@ export class MetanomeSettingsComponent {
     return this.tables.map((table) => table.schemaAndName()).join(', ');
   }
 
+  // still needed?
   public isBoolean(value: any) {
-    if (value.constructor.name == 'Boolean') {
-      return true;
-    }
-    return false;
+    return typeof value == 'boolean';
   }
 
   public getMetanomeConfigurationInformation(result: IIndexFileEntry) {

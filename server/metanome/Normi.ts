@@ -53,8 +53,13 @@ export default class Normi extends FunctionalDependencyAlgorithm {
             // remove brackets
             .slice(1, -1)
             .split(",")
-            .map((s) => s.trim()),
-          rhsColumns: rhsString.split(",").map((s) => s.trim()),
+            .map((s) => s.trim())
+            // remove empty strings if lhs is empty (to create [] instead of [''])
+            .filter((s) => s),
+          rhsColumns: rhsString
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s),
         };
       })
       .map((fd) => JSON.stringify(fd));
