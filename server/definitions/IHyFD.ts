@@ -1,6 +1,7 @@
 import { IColumnCombination, IColumnIdentifier } from "./IInclusionDependency";
+import { IMetanomeConfig } from "./IMetanomeConfig";
 
-export interface IHyFDConfig {
+export interface IHyFDConfig extends IMetanomeConfig {
   INPUT_ROW_LIMIT: number; //=-1
   // (assumption): checks if memory is nearly full, and writes to disk if so
   ENABLE_MEMORY_GUARDIAN: boolean; //=true

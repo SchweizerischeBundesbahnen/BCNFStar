@@ -1,4 +1,6 @@
-export interface IFaidaConfig {
+import { IMetanomeConfig } from "./IMetanomeConfig";
+
+export interface IFaidaConfig extends IMetanomeConfig {
   IGNORE_CONSTANT: boolean; //=true
   VIRTUAL_COLUMN_STORE: boolean; //=false
   HLL_REL_STD_DEV: number; //=0.01
