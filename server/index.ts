@@ -19,6 +19,7 @@ import { getTablePage } from "./routes/tablePage";
 
 import createQueueMonitor from "./queueMonitor";
 import getViolatingRowsForFD from "./routes/violatingRows/fds";
+import getViolatingRowsForFDCount from "./routes/violatingRows/rowCounts";
 import {
   deleteMetanomeResults,
   getMetanomeResults,
@@ -73,6 +74,7 @@ app.post("/persist/dataTransfer", getDataTransferSQL());
 app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
+app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 

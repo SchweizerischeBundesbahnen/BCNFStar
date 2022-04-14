@@ -21,6 +21,8 @@ export interface IRequestBodyFDViolatingRows {
   table: string;
   lhs: Array<string>;
   rhs: Array<string>;
+  offset: number;
+  limit: number;
 }
 
 export interface IRequestBodyForeignKeySql {

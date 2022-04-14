@@ -14,6 +14,14 @@
   Check Functional Dependency
 </button>
 
+<sbb-paginator
+  (page)="changePage($event)"
+  [pageIndex]="this.page"
+  [pageSize]="pageSize"
+  [length]="rowCount"
+>
+</sbb-paginator>
+
 <sbb-table-wrapper class="table-wrapper">
   <table sbb-table [dataSource]="this._dataSource">
     <sbb-text-column *ngFor="let column of tableColumns" name="{{ column }}">

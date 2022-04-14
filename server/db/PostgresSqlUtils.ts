@@ -153,8 +153,19 @@ from
     schema: string,
     table: string,
     lhs: Array<string>,
-    rhs: Array<string>
+    rhs: Array<string>,
+    offset: number,
+    limit: number
   ): Promise<ITablePage> {
+    throw Error("Not implemented Exception");
+  }
+
+  public override async getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<number> {
     throw Error("Not implemented Exception");
   }
 

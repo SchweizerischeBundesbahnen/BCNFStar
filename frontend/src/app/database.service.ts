@@ -298,7 +298,9 @@ export class DatabaseService {
   public async loadViolatingRowsForFD(
     table: Table,
     _lhs: Column[],
-    _rhs: Column[]
+    _rhs: Column[],
+    offset: number,
+    limit: number
   ): Promise<ITablePage> {
     // currently supports only check on "sourceTables".
     if (table.sources.size != 1) throw Error('Not Implemented Exception');
@@ -308,9 +310,32 @@ export class DatabaseService {
       table: [...table.sources][0].name,
       lhs: _lhs.map((c) => c.name),
       rhs: _rhs.map((c) => c.name),
+      offset: offset,
+      limit: limit,
     };
     return firstValueFrom(
       this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
+    );
+  }
+
+  public async loadViolatingRowsForFDCount(
+    table: Table,
+    _lhs: Column[],
+    _rhs: Column[]
+  ): Promise<number> {
+    // currently supports only check on "sourceTables".
+    if (table.sources.size != 1) throw Error('Not Implemented Exception');
+
+    const data: IRequestBodyFDViolatingRows = {
+      schema: [...table.sources][0].schemaName,
+      table: [...table.sources][0].name,
+      lhs: _lhs.map((c) => c.name),
+      rhs: _rhs.map((c) => c.name),
+      offset: 0,
+      limit: 0,
+    };
+    return firstValueFrom(
+      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/fd`, data)
     );
   }
 

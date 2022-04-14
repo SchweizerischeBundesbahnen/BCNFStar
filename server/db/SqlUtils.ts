@@ -63,8 +63,17 @@ export default abstract class SqlUtils {
     schema: string,
     table: string,
     lhs: Array<string>,
-    rhs: Array<string>
+    rhs: Array<string>,
+    offset: number,
+    limit: number
   ): Promise<ITablePage>;
+
+  public abstract getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<number>;
 
   public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
   public abstract SQL_DROP_TABLE_IF_EXISTS(

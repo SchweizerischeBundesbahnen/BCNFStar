@@ -73,7 +73,8 @@ export default class MsSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
-        `SELECT * FROM [${schemaname}].[${tablename}] 
+        `SELECT * FROM [${schemaname}].[${tablename}]
+        ORDER BY (SELECT NULL) 
         OFFSET ${offset} ROWS
         FETCH NEXT ${limit} ROWS ONLY`
       );
@@ -165,7 +166,9 @@ export default class MsSqlUtils extends SqlUtils {
     schema: string,
     table: string,
     lhs: Array<string>,
-    rhs: Array<string>
+    rhs: Array<string>,
+    offset: number,
+    limit: number
   ): Promise<ITablePage> {
     if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
       throw Error("Columns don't exist in table.");
@@ -173,10 +176,13 @@ export default class MsSqlUtils extends SqlUtils {
 
     const result: sql.IResult<any> = await sql.query(
       this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
-        ` ORDER BY ${lhs.join(",")}`
+        ` ORDER BY ${lhs.join(",")}
+          OFFSET ${offset} ROWS
+          FETCH NEXT ${limit} ROWS ONLY
+        `
     );
     return {
-      rows: result.recordset.slice(0, 20),
+      rows: result.recordset,
       attributes: Object.keys(result.recordset.columns),
     };
   }
@@ -215,14 +221,14 @@ WHERE EXISTS (
       throw Error("Columns don't exist in table.");
     }
 
-    const result: sql.IResult<number> = await sql.query(
-      `SELECT COUNT (*) FROM 
+    const result: sql.IResult<any> = await sql.query(
+      `SELECT COUNT (*) as count FROM 
       (
       ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
       ) AS X
       `
     );
-    return result.recordset[0] as number;
+    return result.recordset[0].count;
   }
 
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {

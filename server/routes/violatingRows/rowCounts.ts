@@ -7,28 +7,22 @@ export default async function getViolatingRows(
   res: Response
 ): Promise<void> {
   try {
-    // if(typeof(req.body) != IRequestBodyFDViolatingRows){
-    //   res.status(400).json({error : "Wrong API Arguments"});
-    //   return;
-    // }
-
     const body: IRequestBodyFDViolatingRows =
       req.body as IRequestBodyFDViolatingRows;
 
-    const result = await sqlUtils.getViolatingRowsForFD(
+    const result = await sqlUtils.getViolatingRowsForFDCount(
       body.schema,
       body.table,
       body.lhs,
-      body.rhs,
-      body.offset,
-      body.limit
+      body.rhs
     );
+    console.log(result);
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
     if (!res.headersSent)
       res.status(502).json({
-        error: "Could not get violating rows for functional dependency... ",
+        error: "Could not get row count for functional dependency... ",
       });
   }
 }
