@@ -7,6 +7,7 @@ import {
   IRequestBodyCreateTableSql,
   IRequestBodyDataTransferSql,
   IRequestBodyForeignKeySql,
+  IRequestBodyFDViolatingRows,
 } from '@server/definitions/IBackendAPI';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
@@ -292,6 +293,25 @@ export class DatabaseService {
         `${this.baseUrl}/persist/createPrimaryKey`,
         data
       )
+    );
+  }
+
+  async loadViolatingRowsForFD(
+    table: Table,
+    _lhs: Column[],
+    _rhs: Column[]
+  ): Promise<ITableHead> {
+    // currently supports only check on "sourceTables".
+    if (table.sources.size != 1) throw Error('Not Implemented Exception');
+
+    const data: IRequestBodyFDViolatingRows = {
+      schema: [...table.sources][0].schemaName,
+      table: [...table.sources][0].name,
+      lhs: _lhs.map((c) => c.name),
+      rhs: _rhs.map((c) => c.name),
+    };
+    return firstValueFrom(
+      this.http.post<ITableHead>(`${this.baseUrl}/violatingRows/fd`, data)
     );
   }
 

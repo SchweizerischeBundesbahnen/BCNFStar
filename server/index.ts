@@ -17,6 +17,7 @@ import getDataTransferSQL from "./routes/persist_schema/transferData";
 import getAddPrimaryKeySQL from "./routes/persist_schema/createPrimaryKey";
 import { getTableHead } from "./routes/tableHeads";
 import createQueueMonitor from "./queueMonitor";
+import getViolatingRowsForFD from "./routes/violatingRows/fds";
 import {
   deleteMetanomeResults,
   getMetanomeResults,
@@ -68,6 +69,8 @@ app.post("/persist/createForeignKey", getCreateForeignKeySQL());
 app.post("/persist/schemaPreparation", getSchemaPreparationSQL());
 app.post("/persist/dataTransfer", getDataTransferSQL());
 app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
+
+app.post("/violatingRows/fd", getViolatingRowsForFD);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 

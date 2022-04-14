@@ -16,6 +16,13 @@ export interface IRequestBodyCreateTableSql {
   primaryKey: string[];
 }
 
+export interface IRequestBodyFDViolatingRows {
+  schema: string;
+  table: string;
+  lhs: Array<string>;
+  rhs: Array<string>;
+}
+
 export interface IRequestBodyForeignKeySql {
   name: string;
   relationship: IRelationship;
