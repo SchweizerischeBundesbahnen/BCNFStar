@@ -28,6 +28,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { MetanomeSettingsComponent } from './components/metanome-settings/metanome-settings.component';
 import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
+import { SbbToggleModule } from '@sbb-esta/angular/toggle';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
     SbbDialogModule,
     SbbTableModule,
     SbbFormFieldModule,
+    SbbToggleModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

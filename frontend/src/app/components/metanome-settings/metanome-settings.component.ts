@@ -1,7 +1,7 @@
 import Table from '@/src/model/schema/Table';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 import {
   IIndexFileEntry,
@@ -21,6 +21,11 @@ export class MetanomeSettingsComponent {
   public useOldMetanomeFdResult: Record<string, Boolean> = {};
   public useOldMetanomeIndResult = true;
   public formGroup: FormGroup;
+
+  public selectedFdTab: Array<FormControl> = [
+    new FormControl('existing-result'),
+  ];
+  public selectedIndTab: FormControl = new FormControl('existing-result');
 
   public defaultHyFdConfig: MetanomeConfig = {
     INPUT_ROW_LIMIT: -1,
@@ -62,7 +67,8 @@ export class MetanomeSettingsComponent {
     memory: '',
   };
 
-  public selectedFdConfigs: Record<string, MetanomeConfig> = {};
+  public normiConfigs: Record<string, MetanomeConfig> = {};
+  public hyfdConfigs: Record<string, MetanomeConfig> = {};
   public selectedIndConfig: MetanomeConfig = this.defaultBinderConfig;
 
   constructor(
@@ -76,8 +82,14 @@ export class MetanomeSettingsComponent {
     tables.forEach((table) => {
       this.useOldMetanomeFdResult['fds_' + table.schemaAndName()] = true;
       controlsConfig['fds_' + table.schemaAndName()] = [];
-      this.selectedFdConfigs['fds_' + table.schemaAndName()] =
-        this.defaultNormiConfig;
+      this.normiConfigs['fds_' + table.schemaAndName()] = Object.assign(
+        {},
+        this.defaultNormiConfig
+      );
+      this.hyfdConfigs['fds_' + table.schemaAndName()] = Object.assign(
+        {},
+        this.defaultHyFdConfig
+      );
     });
     controlsConfig['inds'] = [];
     this.formGroup = formBuilder.group(controlsConfig);
@@ -138,18 +150,18 @@ export class MetanomeSettingsComponent {
     this.useOldMetanomeIndResult = !this.useOldMetanomeIndResult;
   }
 
-  public changeFdConfig(algorithm: string, tableName: string) {
-    switch (algorithm.split('.').slice(-1)[0]) {
-      case 'Normi': {
-        this.selectedFdConfigs[tableName] = this.defaultNormiConfig;
-        break;
-      }
-      case 'HyFD': {
-        this.selectedFdConfigs[tableName] = this.defaultHyFdConfig;
-        break;
-      }
-    }
-  }
+  // public changeFdConfig(algorithm: string, tableName: string) {
+  //   switch (algorithm.split('.').slice(-1)[0]) {
+  //     case 'Normi': {
+  //       this.selectedFdConfigs[tableName] = this.defaultNormiConfig;
+  //       break;
+  //     }
+  //     case 'HyFD': {
+  //       this.selectedFdConfigs[tableName] = this.defaultHyFdConfig;
+  //       break;
+  //     }
+  //   }
+  // }
 
   public changeIndConfig(algorithm: string) {
     switch (algorithm.split('.').slice(-1)[0]) {
@@ -164,19 +176,19 @@ export class MetanomeSettingsComponent {
     }
   }
 
-  public buildNewFdConfig(algorithm: string, tableName: string) {
-    let newIndexFileEntry: IIndexFileEntry = {
-      config: this.selectedFdConfigs[tableName],
-      tables: [tableName.slice(4)],
-      dbmsName: '',
-      database: '',
-      resultType: MetanomeResultType.fd,
-      algorithm: algorithm,
-      fileName: '',
-      createDate: 0,
-    };
-    return newIndexFileEntry;
-  }
+  // public buildNewFdConfig(algorithm: string, tableName: string) {
+  //   let newIndexFileEntry: IIndexFileEntry = {
+  //     config: this.selectedFdConfigs[tableName],
+  //     tables: [tableName.slice(4)],
+  //     dbmsName: '',
+  //     database: '',
+  //     resultType: MetanomeResultType.fd,
+  //     algorithm: algorithm,
+  //     fileName: '',
+  //     createDate: 0,
+  //   };
+  //   return newIndexFileEntry;
+  // }
 
   public buildNewIndConfig(algorithm: string) {
     console.log(algorithm);
@@ -195,6 +207,6 @@ export class MetanomeSettingsComponent {
 
   public runMetoname() {
     console.log(this.formGroup.value);
-    this.dialogRef.close({ values: this.formGroup.value });
+    // this.dialogRef.close({ values: this.formGroup.value });
   }
 }

@@ -1,7 +1,7 @@
 <div sbbDialogTitle>Metanome configuration settings</div>
 <div sbbDialogContent>
   <form class="sbb-form-group-vertical" [formGroup]="formGroup">
-    <h2>Functional Dependencies</h2>
+    <!-- <h2>Functional Dependencies</h2>
     <ul>
       <li *ngFor="let table of tables">
         <div>
@@ -58,7 +58,101 @@
           </button>
         </div>
       </li>
-    </ul>
+    </ul> -->
+    <h2>Functional Dependencies</h2>
+    <div *ngFor="let table of tables; let index = index">
+      {{ table.schemaAndName() }}
+      <sbb-toggle [formControl]="selectedFdTab[index]">
+        <sbb-toggle-option label="Use existing result" value="existing-result">
+          <sbb-toggle-details>
+            <sbb-select
+              placeholder="Functional Dependency algorithm"
+              [formControlName]="'fds_' + table.schemaAndName()"
+            >
+              <sbb-option
+                *ngFor="let result of filteredMetanomeResultsForFd(table)"
+                [value]="result"
+              >
+                {{ getMetanomeConfigurationInformation(result) }}
+              </sbb-option>
+            </sbb-select>
+          </sbb-toggle-details>
+        </sbb-toggle-option>
+        <sbb-toggle-option label="Normi" value="normi">
+          <sbb-toggle-details>
+            <div
+              *ngFor="
+                let entry of normiConfigs['fds_' + table.schemaAndName()]
+                  | keyvalue
+              "
+            >
+              <sbb-checkbox
+                *ngIf="isBoolean(entry.value)"
+                [(ngModel)]="
+                  normiConfigs['fds_' + table.schemaAndName()][entry.key]
+                "
+                [ngModelOptions]="{ standalone: true }"
+              >
+                {{ entry.key }}
+              </sbb-checkbox>
+              <div *ngIf="!isBoolean(entry.value)">
+                <sbb-label>{{ entry.key }}</sbb-label>
+                <input
+                  sbbInput
+                  [(ngModel)]="
+                    normiConfigs['fds_' + table.schemaAndName()][entry.key]
+                  "
+                  [ngModelOptions]="{ standalone: true }"
+                />
+              </div>
+            </div>
+          </sbb-toggle-details>
+        </sbb-toggle-option>
+        <sbb-toggle-option label="HyFd" value="hyfd">
+          <sbb-toggle-details>
+            <div
+              *ngFor="
+                let entry of hyfdConfigs['fds_' + table.schemaAndName()]
+                  | keyvalue
+              "
+            >
+              <sbb-checkbox
+                *ngIf="isBoolean(entry.value)"
+                [(ngModel)]="
+                  hyfdConfigs['fds_' + table.schemaAndName()][entry.key]
+                "
+                [ngModelOptions]="{ standalone: true }"
+              >
+                {{ entry.key }}
+              </sbb-checkbox>
+              <div *ngIf="!isBoolean(entry.value)">
+                <sbb-label>{{ entry.key }}</sbb-label>
+                <input
+                  sbbInput
+                  [(ngModel)]="
+                    hyfdConfigs['fds_' + table.schemaAndName()][entry.key]
+                  "
+                  [ngModelOptions]="{ standalone: true }"
+                />
+              </div>
+            </div>
+          </sbb-toggle-details>
+        </sbb-toggle-option>
+      </sbb-toggle>
+    </div>
+    <h2>Inclusion Dependencies</h2>
+    {{ getAllTableNames() }}
+    <sbb-toggle [formControl]="selectedIndTab">
+      <sbb-toggle-option label="Use existing result" value="keine Ahnung">
+        <sbb-toggle-details> toggle 1 </sbb-toggle-details>
+      </sbb-toggle-option>
+      <sbb-toggle-option label="Binder" value="ReturnJourney">
+        <sbb-toggle-details> toggle 2 </sbb-toggle-details>
+      </sbb-toggle-option>
+      <sbb-toggle-option label="FAIDA" value="ReturnJourney">
+        <sbb-toggle-details> toggle 3 </sbb-toggle-details>
+      </sbb-toggle-option>
+    </sbb-toggle>
   </form>
 </div>
 <div sbbDialogActions>
@@ -66,7 +160,7 @@
   <button sbb-secondary-button sbbDialogClose>Cancel</button>
 </div>
 
-<ng-template #useOldMetnomeFdConfig let-table="table" [formGroup]="formGroup">
+<!-- <ng-template #useOldMetnomeFdConfig let-table="table" [formGroup]="formGroup">
   <sbb-form-field>
     <sbb-select
       placeholder="Old results"
@@ -214,4 +308,4 @@
       </div>
     </sbb-form-field>
   </div>
-</ng-template>
+</ng-template> -->
