@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-4">
       <div class="sbb-checkbox-group-vertical">
-        <sbb-accordion multi="true">
+        <sbb-accordion multi="true" style="width: 100%">
           <sbb-expansion-panel *ngFor="let item of tablesInSchema | keyvalue">
             <!-- item.key = schema name, item.value = list of associated table objects -->
             <sbb-expansion-panel-header>{{
@@ -62,16 +62,21 @@
           </sbb-paginator>
 
           <ng-container *ngSwitchCase="1">
-            Displaying {{ hoveredTable.schemaAndName() }} {{ headLimit }} of
-            {{ tableRowCounts.get(hoveredTable) }} rows
+            Displaying {{ headLimit }} of
+            {{ tableRowCounts.get(hoveredTable) }} rows from
+            <span style="font-weight: bold">{{
+              hoveredTable.schemaAndName()
+            }}</span>
           </ng-container>
           <ng-container *ngSwitchCase="2">
-            {{ hoveredTable.schemaAndName() }}
-            {{ tableRowCounts.get(hoveredTable) }} of
-            {{ tableRowCounts.get(hoveredTable) }}
+            Displaying {{ tableRowCounts.get(hoveredTable) }} of
+            {{ tableRowCounts.get(hoveredTable) }} rows from
+            <span style="font-weight: bold">{{
+              hoveredTable.schemaAndName()
+            }}</span>
           </ng-container>
           <ng-container *ngSwitchDefault>
-            {{ hoveredTable.schemaAndName() }}
+            Displaying {{ hoveredTable.schemaAndName() }}
           </ng-container>
         </ng-container>
       </h3>

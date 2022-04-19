@@ -100,7 +100,7 @@ export default class MsSqlUtils extends SqlUtils {
        object_name(object_id) = '${table}' 
        AND (index_id < 2)
        AND object_schema_name(object_id) = '${schema}'`);
-      return queryResult.recordset[0].count;
+      return +queryResult.recordset[0].count;
     } else {
       throw {
         error: "Table or schema does not exist in database",
