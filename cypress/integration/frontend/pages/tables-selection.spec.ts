@@ -29,10 +29,10 @@ describe("The table selection page", () => {
   });
 
   it("shows table row count", () => {
-    cy.contains("part_partsupp_supplier_denormalized ").trigger("mouseenter");
-    cy.contains(
-      "Displaying public.part_partsupp_supplier_denormalized 100 of 800 rows"
-    );
+    cy.contains("customer_orders_lineitem_denormalized").trigger("mouseenter");
+    cy.contains("1 - 20 / 42035");
+    cy.contains("2102").click();
+    cy.contains("42021 - 42035 / 42035");
   });
 
   it("renders the schema editing page when clicking on the Go button", () => {
