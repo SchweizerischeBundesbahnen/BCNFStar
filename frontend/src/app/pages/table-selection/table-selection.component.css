@@ -30,6 +30,11 @@ sbb-checkbox {
   padding-bottom: 5px;
 }
 
+span {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
 .table-checkbox {
   display: block;
 }

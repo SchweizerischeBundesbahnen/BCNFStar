@@ -44,14 +44,7 @@
     <div class="col-8" *ngIf="hoveredTable">
       <h3>
         <ng-container
-          [ngSwitch]="
-            tableRowCounts.get(hoveredTable)! >= headLimit
-              ? 1
-              : tableRowCounts.get(hoveredTable)! >= 0 &&
-                tableRowCounts.get(hoveredTable)! < headLimit
-              ? 2
-              : -1
-          "
+          [ngSwitch]="tableRowCounts.get(hoveredTable)! >= headLimit ? 1 : -1"
         >
           <sbb-paginator
             (page)="changePage($event)"
@@ -62,21 +55,15 @@
           </sbb-paginator>
 
           <ng-container *ngSwitchCase="1">
-            Displaying {{ headLimit }} of
-            {{ tableRowCounts.get(hoveredTable) }} rows from
-            <span style="font-weight: bold">{{
-              hoveredTable.schemaAndName()
-            }}</span>
-          </ng-container>
-          <ng-container *ngSwitchCase="2">
-            Displaying {{ tableRowCounts.get(hoveredTable) }} of
-            {{ tableRowCounts.get(hoveredTable) }} rows from
-            <span style="font-weight: bold">{{
-              hoveredTable.schemaAndName()
-            }}</span>
+            {{ this.headLimit * this.page + 1 }} -
+            {{ this.headLimit * this.page + this.dataSource.data.length }} /
+            {{ tableRowCounts.get(hoveredTable) }} from
+            <span>{{ hoveredTable.schemaAndName() }}</span>
           </ng-container>
           <ng-container *ngSwitchDefault>
-            Displaying {{ hoveredTable.schemaAndName() }}
+            {{ this.headLimit * this.page }} /
+            {{ tableRowCounts.get(hoveredTable) }} from
+            <span>{{ hoveredTable.schemaAndName() }}</span>
           </ng-container>
         </ng-container>
       </h3>
