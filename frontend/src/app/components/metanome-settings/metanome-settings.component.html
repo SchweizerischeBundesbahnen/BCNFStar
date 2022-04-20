@@ -1,74 +1,16 @@
 <div sbbDialogTitle>Metanome configuration settings</div>
 <div sbbDialogContent>
   <form class="sbb-form-group-vertical" [formGroup]="formGroup">
-    <!-- <h2>Functional Dependencies</h2>
-    <ul>
-      <li *ngFor="let table of tables">
-        <div>
-          {{ table.schemaAndName() }}
-        </div>
-        <div>
-          <ng-container
-            [ngTemplateOutlet]="
-              useOldMetanomeFdResult['fds_' + table.schemaAndName()]
-                ? useOldMetnomeFdConfig
-                : useNewMetanomeFdConfig
-            "
-            [ngTemplateOutletContext]="{ table: table }"
-          >
-          </ng-container>
-        </div>
-        <div>
-          <button
-            sbb-button
-            (click)="toggleFdResult('fds_' + table.schemaAndName())"
-          >
-            {{
-              useOldMetanomeFdResult["fds_" + table.schemaAndName()]
-                ? "Use new configuration"
-                : "Use old metanome result"
-            }}
-          </button>
-        </div>
-      </li>
-    </ul>
-    <h2>Inclusion Dependencies</h2>
-    <ul>
-      <li>
-        <div>
-          {{ getAllTableNames() }}
-        </div>
-        <div>
-          <ng-container
-            [ngTemplateOutlet]="
-              useOldMetanomeIndResult
-                ? useOldMetnomeIndConfig
-                : useNewMetanomeIndConfig
-            "
-          >
-          </ng-container>
-        </div>
-        <div>
-          <button sbb-button (click)="toggleIndResult()">
-            {{
-              useOldMetanomeIndResult
-                ? "Use new configuration"
-                : "Use old metanome result"
-            }}
-          </button>
-        </div>
-      </li>
-    </ul> -->
     <h2>Functional Dependencies</h2>
     <div *ngFor="let table of tables; let index = index">
       {{ table.schemaAndName() }}
-      <sbb-toggle [formControl]="selectedFdTab[index]">
+      <sbb-toggle
+        [formControl]="selectedFdTab[index]"
+        (change)="onFdToggleBarChange($event, table)"
+      >
         <sbb-toggle-option label="Use existing result" value="existing-result">
           <sbb-toggle-details>
-            <sbb-select
-              placeholder="Functional Dependency algorithm"
-              [formControlName]="'fds_' + table.schemaAndName()"
-            >
+            <sbb-select [formControlName]="'fds_' + table.schemaAndName()">
               <sbb-option
                 *ngFor="let result of filteredMetanomeResultsForFd(table)"
                 [value]="result"
@@ -80,16 +22,30 @@
         </sbb-toggle-option>
         <sbb-toggle-option label="Normi" value="normi">
           <sbb-toggle-details>
+            <sbb-select
+              [formControlName]="'fds_' + table.schemaAndName()"
+              [value]="normiConfigs['fds_' + table.schemaAndName()]"
+              class="display-non"
+            >
+              <sbb-option
+                [value]="normiConfigs['fds_' + table.schemaAndName()]"
+              >
+                {{ normiConfigs["fds_" + table.schemaAndName()] }}
+              </sbb-option>
+            </sbb-select>
             <div
               *ngFor="
-                let entry of normiConfigs['fds_' + table.schemaAndName()]
-                  | keyvalue
+                let entry of normiConfigs['fds_' + table.schemaAndName()][
+                  'config'
+                ] | keyvalue
               "
             >
               <sbb-checkbox
                 *ngIf="isBoolean(entry.value)"
                 [(ngModel)]="
-                  normiConfigs['fds_' + table.schemaAndName()][entry.key]
+                  normiConfigs['fds_' + table.schemaAndName()]['config'][
+                    entry.key
+                  ]
                 "
                 [ngModelOptions]="{ standalone: true }"
               >
@@ -100,7 +56,9 @@
                 <input
                   sbbInput
                   [(ngModel)]="
-                    normiConfigs['fds_' + table.schemaAndName()][entry.key]
+                    normiConfigs['fds_' + table.schemaAndName()]['config'][
+                      entry.key
+                    ]
                   "
                   [ngModelOptions]="{ standalone: true }"
                 />
@@ -110,16 +68,28 @@
         </sbb-toggle-option>
         <sbb-toggle-option label="HyFd" value="hyfd">
           <sbb-toggle-details>
+            <sbb-select
+              [formControlName]="'fds_' + table.schemaAndName()"
+              [value]="hyfdConfigs['fds_' + table.schemaAndName()]"
+              class="display-non"
+            >
+              <sbb-option [value]="hyfdConfigs['fds_' + table.schemaAndName()]">
+                {{ hyfdConfigs["fds_" + table.schemaAndName()] }}
+              </sbb-option>
+            </sbb-select>
             <div
               *ngFor="
-                let entry of hyfdConfigs['fds_' + table.schemaAndName()]
-                  | keyvalue
+                let entry of hyfdConfigs['fds_' + table.schemaAndName()][
+                  'config'
+                ] | keyvalue
               "
             >
               <sbb-checkbox
                 *ngIf="isBoolean(entry.value)"
                 [(ngModel)]="
-                  hyfdConfigs['fds_' + table.schemaAndName()][entry.key]
+                  hyfdConfigs['fds_' + table.schemaAndName()]['config'][
+                    entry.key
+                  ]
                 "
                 [ngModelOptions]="{ standalone: true }"
               >
@@ -130,7 +100,9 @@
                 <input
                   sbbInput
                   [(ngModel)]="
-                    hyfdConfigs['fds_' + table.schemaAndName()][entry.key]
+                    hyfdConfigs['fds_' + table.schemaAndName()]['config'][
+                      entry.key
+                    ]
                   "
                   [ngModelOptions]="{ standalone: true }"
                 />
@@ -142,15 +114,81 @@
     </div>
     <h2>Inclusion Dependencies</h2>
     {{ getAllTableNames() }}
-    <sbb-toggle [formControl]="selectedIndTab">
-      <sbb-toggle-option label="Use existing result" value="keine Ahnung">
-        <sbb-toggle-details> toggle 1 </sbb-toggle-details>
+    <sbb-toggle
+      [formControl]="selectedIndTab"
+      (change)="onIndToggleBarChange($event)"
+    >
+      <sbb-toggle-option label="Use existing result" value="existing-result">
+        <sbb-toggle-details>
+          <sbb-select formControlName="ind">
+            <sbb-option
+              *ngFor="let result of filteredMetanomeResultsForInd()"
+              [value]="result"
+            >
+              {{ getMetanomeConfigurationInformation(result) }}
+            </sbb-option>
+          </sbb-select>
+        </sbb-toggle-details>
       </sbb-toggle-option>
-      <sbb-toggle-option label="Binder" value="ReturnJourney">
-        <sbb-toggle-details> toggle 2 </sbb-toggle-details>
+      <sbb-toggle-option label="Binder" value="binder">
+        <sbb-toggle-details>
+          <sbb-select
+            [value]="binderConfigs['ind']"
+            formControlName="ind"
+            class="display-non"
+          >
+            <sbb-option [value]="binderConfigs['ind']">
+              {{ binderConfigs["ind"] }}
+            </sbb-option>
+          </sbb-select>
+          <div *ngFor="let entry of binderConfigs['ind']['config'] | keyvalue">
+            <sbb-checkbox
+              *ngIf="isBoolean(entry.value)"
+              [(ngModel)]="binderConfigs['ind']['config'][entry.key]"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              {{ entry.key }}
+            </sbb-checkbox>
+            <div *ngIf="!isBoolean(entry.value)">
+              <sbb-label>{{ entry.key }}</sbb-label>
+              <input
+                sbbInput
+                [(ngModel)]="binderConfigs['ind']['config'][entry.key]"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+        </sbb-toggle-details>
       </sbb-toggle-option>
-      <sbb-toggle-option label="FAIDA" value="ReturnJourney">
-        <sbb-toggle-details> toggle 3 </sbb-toggle-details>
+      <sbb-toggle-option label="FAIDA" value="faida">
+        <sbb-toggle-details>
+          <sbb-select
+            [value]="faidaConfigs['ind']"
+            formControlName="ind"
+            class="display-non"
+          >
+            <sbb-option [value]="faidaConfigs['ind']">
+              {{ faidaConfigs["ind"] }}
+            </sbb-option>
+          </sbb-select>
+          <div *ngFor="let entry of faidaConfigs['ind']['config'] | keyvalue">
+            <sbb-checkbox
+              *ngIf="isBoolean(entry.value)"
+              [(ngModel)]="faidaConfigs['ind']['config'][entry.key]"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              {{ entry.key }}
+            </sbb-checkbox>
+            <div *ngIf="!isBoolean(entry.value)">
+              <sbb-label>{{ entry.key }}</sbb-label>
+              <input
+                sbbInput
+                [(ngModel)]="faidaConfigs['ind']['config'][entry.key]"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+        </sbb-toggle-details>
       </sbb-toggle-option>
     </sbb-toggle>
   </form>
@@ -159,153 +197,3 @@
   <button (click)="runMetoname()" sbb-button cdkFocusInitial>Ok</button>
   <button sbb-secondary-button sbbDialogClose>Cancel</button>
 </div>
-
-<!-- <ng-template #useOldMetnomeFdConfig let-table="table" [formGroup]="formGroup">
-  <sbb-form-field>
-    <sbb-select
-      placeholder="Old results"
-      [formControlName]="'fds_' + table.schemaAndName()"
-    >
-      <sbb-option
-        *ngFor="let result of filteredMetanomeResultsForFd(table)"
-        [value]="result"
-      >
-        {{ getMetanomeConfigurationInformation(result) }}
-      </sbb-option>
-    </sbb-select>
-  </sbb-form-field>
-</ng-template>
-
-<ng-template #useNewMetanomeFdConfig let-table="table" [formGroup]="formGroup">
-  <div>
-    <sbb-form-field>
-      <sbb-label>Algorithm</sbb-label>
-      <sbb-select
-        placeholder="Functional Dependency algorithm"
-        [formControlName]="'fds_' + table.schemaAndName()"
-        (selectionChange)="
-          changeFdConfig($event.value.algorithm, 'fds_' + table.schemaAndName())
-        "
-      >
-        <sbb-option
-          [value]="
-            buildNewFdConfig(
-              'de.metanome.algorithms.normalize.Normi',
-              'fds_' + table.schemaAndName()
-            )
-          "
-          >{{
-            buildNewFdConfig(
-              "de.metanome.algorithms.normalize.Normi",
-              "fds_" + table.schemaAndName()
-            )
-              .algorithm.split(".")
-              .slice(-1)
-          }}</sbb-option
-        >
-        <sbb-option
-          [value]="
-            buildNewFdConfig(
-              'de.metanome.algorithms.hyfd.HyFD',
-              'fds_' + table.schemaAndName()
-            )
-          "
-          >{{
-            buildNewFdConfig(
-              "de.metanome.algorithms.hyfd.HyFD",
-              "fds_" + table.schemaAndName()
-            )
-              .algorithm.split(".")
-              .slice(-1)
-          }}</sbb-option
-        >
-      </sbb-select>
-      <div
-        *ngFor="
-          let entry of selectedFdConfigs['fds_' + table.schemaAndName()]
-            | keyvalue
-        "
-      >
-        <sbb-checkbox
-          *ngIf="isBoolean(entry.value)"
-          [(ngModel)]="
-            selectedFdConfigs['fds_' + table.schemaAndName()][entry.key]
-          "
-          [ngModelOptions]="{ standalone: true }"
-        >
-          {{ entry.key }}
-        </sbb-checkbox>
-        <div *ngIf="!isBoolean(entry.value)">
-          <sbb-label>{{ entry.key }}</sbb-label>
-          <input
-            sbbInput
-            [(ngModel)]="
-              selectedFdConfigs['fds_' + table.schemaAndName()][entry.key]
-            "
-            [ngModelOptions]="{ standalone: true }"
-          />
-        </div>
-      </div>
-    </sbb-form-field>
-  </div>
-</ng-template>
-
-<ng-template #useOldMetnomeIndConfig [formGroup]="formGroup">
-  <sbb-form-field>
-    <sbb-select placeholder="Old results" formControlName="inds">
-      <sbb-option
-        *ngFor="let result of filteredMetanomeResultsForInd()"
-        [value]="result"
-      >
-        {{ getMetanomeConfigurationInformation(result) }}
-      </sbb-option>
-    </sbb-select>
-  </sbb-form-field>
-</ng-template>
-
-<ng-template #useNewMetanomeIndConfig [formGroup]="formGroup">
-  <div>
-    <sbb-form-field>
-      <sbb-label>Algorithm</sbb-label>
-      <sbb-select
-        placeholder="Functional Dependency algorithm"
-        formControlName="inds"
-        (selectionChange)="changeIndConfig($event.value.algorithm)"
-      >
-        <sbb-option
-          [value]="
-            buildNewIndConfig('de.metanome.algorithms.binder.BINDERFile')
-          "
-        >
-          {{
-            buildNewIndConfig("de.metanome.algorithms.binder.BINDERFile")
-              .algorithm.split(".")
-              .slice(-1)
-          }}
-        </sbb-option>
-        <sbb-option
-          [value]="buildNewIndConfig('de.hpi.mpss2015n.approxind.FAIDA')"
-        >
-          {{
-            buildNewIndConfig("de.hpi.mpss2015n.approxind.FAIDA")
-              .algorithm.split(".")
-              .slice(-1)
-          }}
-        </sbb-option>
-      </sbb-select>
-      <div *ngFor="let entry of selectedIndConfig | keyvalue">
-        <sbb-checkbox
-          *ngIf="isBoolean(entry.value)"
-          [(ngModel)]="selectedIndConfig[entry.key]"
-          [ngModelOptions]="{ standalone: true }"
-        >
-          {{ entry.key }}
-        </sbb-checkbox>
-        <div *ngIf="!isBoolean(entry.value)">
-          <sbb-label>{{ entry.key }}</sbb-label>
-          <input sbbInput [value]="selectedIndConfig[entry.key]" />
-        </div>
-      </div>
-    </sbb-form-field>
-  </div>
-</ng-template> -->

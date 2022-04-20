@@ -5,3 +5,7 @@ sbb-form-field, sbb-select {
 sbb-toggle {
     width: 100%;
 }
+
+.display-non {
+    display: none;
+}
