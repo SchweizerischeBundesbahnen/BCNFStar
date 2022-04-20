@@ -126,13 +126,13 @@ export class TableSelectionComponent implements OnInit {
       );
       let fdResults: Record<string, string> = {};
       for (let value of Object.entries(values)) {
-        if (value[0] != 'inds') {
+        if (value[0] != 'ind') {
           fdResults[value[1].tables[0]] = value[1].fileName;
         }
       }
       await this.dataService.setInputTables(
         tables,
-        values['inds'].fileName,
+        values['ind'].fileName,
         fdResults
       );
       this.router.navigate(['/edit-schema']);
