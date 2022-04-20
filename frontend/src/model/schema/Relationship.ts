@@ -1,33 +1,23 @@
 import IRelationship from '@server/definitions/IRelationship';
 import Column from './Column';
 import ColumnCombination from './ColumnCombination';
-import Table from './Table';
+import SourceRelationship from './SourceRelationship';
+import SourceTableInstance from './SourceTableInstance';
 
 export default class Relationship {
   // these arrays are linked, the column in _referencing has the same index as the
   // corresponding column in _referenced
-  public _referencing = new Array<Column>();
-  public _referenced = new Array<Column>();
+  private _referencing = new Array<Column>();
+  private _referenced = new Array<Column>();
 
   /**
    * cached result of the score calculation. Should not be accessed directly
    */
   public _score?: number;
 
-  public static fromTables(
-    referencing: Table,
-    referenced: Table
-  ): Relationship {
-    // TODO optimise
-    let relationship = new Relationship();
-    referencing.columns.asSet().forEach((referencingColumn) => {
-      let correspondingCols = referenced.columns
-        .asArray()
-        .filter((column) => column.equals(referencingColumn));
-      if (correspondingCols.length > 0)
-        relationship.add(referencingColumn, correspondingCols[0]);
-    });
-    return relationship;
+  public constructor(referencing?: Array<Column>, referenced?: Array<Column>) {
+    this._referencing = referencing || new Array();
+    this._referenced = referenced || new Array();
   }
 
   public add(referencingColumn: Column, referencedColumn: Column) {
@@ -35,32 +25,26 @@ export default class Relationship {
     this._referenced.push(referencedColumn);
   }
 
-  public referencing(): ColumnCombination {
+  public get referencing(): ColumnCombination {
     return new ColumnCombination(...this._referencing);
   }
 
-  public referenced(): ColumnCombination {
+  public get referenced(): ColumnCombination {
     return new ColumnCombination(...this._referenced);
   }
 
-  public appliesTo(referencing: Table, referenced: Table) {
-    if (this.referencing().equals(this.referenced())) {
-      return (
-        this.referencing().isSubsetOf(referencing.columns) &&
-        referenced.pk &&
-        this.referenced().equals(referenced.pk!)
-      );
-    } else {
-      return (
-        this.referencing().isSubsetOf(referencing.columns) &&
-        this.referenced().isSubsetOf(referenced.columns)
-      );
+  public sourceRelationship(): SourceRelationship {
+    const sourceRel = new SourceRelationship();
+    for (const i in this._referencing) {
+      sourceRel.referencing.push(this._referencing[i].sourceColumn);
+      sourceRel.referenced.push(this._referenced[i].sourceColumn);
     }
+    return sourceRel;
   }
 
   public referencingToReferencedColumnsIn(cc: ColumnCombination) {
     let newCC = cc.copy();
-    for (let i = 0; i < this._referencing.length; i++) {
+    for (const i in this._referencing) {
       if (newCC.includes(this._referencing[i])) {
         newCC
           .setMinus(new ColumnCombination(this._referencing[i]))
@@ -71,23 +55,30 @@ export default class Relationship {
   }
 
   public toString(): String {
-    return this.referencing().toString() + '->' + this.referenced().toString();
+    return this.referencing.toString() + '->' + this.referenced.toString();
+  }
+
+  public applySourceMapping(
+    mapping: Map<SourceTableInstance, SourceTableInstance>
+  ): Relationship {
+    return new Relationship(
+      this._referencing.map((column) => column.applySourceMapping(mapping)),
+      this._referenced.map((column) => column.applySourceMapping(mapping))
+    );
   }
 
   public toIRelationship(): IRelationship {
     return {
       referencing: {
-        name: `${this.referencing().sourceTableInstance().table.name}`,
+        name: `${this.referencing.sourceTableInstance().table.name}`,
         schemaName: `${
-          this.referencing().sourceTableInstance().table.schemaName
+          this.referencing.sourceTableInstance().table.schemaName
         }`,
         attributes: [],
       },
       referenced: {
-        name: `${this.referenced().sourceTableInstance().table.name}`,
-        schemaName: `${
-          this.referenced().sourceTableInstance().table.schemaName
-        }`,
+        name: `${this.referenced.sourceTableInstance().table.name}`,
+        schemaName: `${this.referenced.sourceTableInstance().table.schemaName}`,
         attributes: [],
       },
       columnRelationships: this._referencing.map((element, index) => {

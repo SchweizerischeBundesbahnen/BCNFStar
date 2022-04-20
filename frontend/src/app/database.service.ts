@@ -19,12 +19,17 @@ import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IRelationship from '@server/definitions/IRelationship';
 import ColumnCombination from '../model/schema/ColumnCombination';
+import SourceColumn from '../model/schema/SourceColumn';
+import SourceRelationship from '../model/schema/SourceRelationship';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatabaseService {
-  public inputSchema?: Schema;
+  public schema?: Schema;
+  /** this is used for looking up existing SourceColumns to cut down on later comparisons and memory */
+  public sourceColumns = new Map<string, SourceColumn>();
+
   /**
    * when using the angular dev server, you need to access another adress
    * for the BCNFStar express server. It is assumed that this server is
@@ -80,7 +85,7 @@ export class DatabaseService {
 
   private resolveIPks(pks: Array<IPrimaryKey>) {
     pks.forEach((fk) => {
-      let table: Table | undefined = [...this.inputSchema!.tables].find(
+      let table: Table | undefined = [...this.schema!.tables].find(
         (table) =>
           table.schemaName == fk.table_schema && table.name == fk.table_name
       );
@@ -102,59 +107,52 @@ export class DatabaseService {
 
   private resolveIFks(fks: Array<IForeignKey>) {
     fks.forEach((fk) => {
-      let referencingTable = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.name == table.fullName
-      );
-      let referencedTable = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.foreignName == table.fullName
-      );
+      let fkRelationship = new SourceRelationship();
+      let numColumns = fk.referencing.length;
+      for (let i = 0; i < numColumns; i++) {
+        let referencingIColumn = fk.referencing[i];
+        let referencingColumn = this.sourceColumns.get(
+          `${referencingIColumn.schemaIdentifier}.${referencingIColumn.tableIdentifier}.${referencingIColumn.columnIdentifier}`
+        );
 
-      if (referencingTable && referencedTable) {
-        let fkColumn = referencingTable.columns.columnFromName(fk.column)!;
-        let pkColumn = referencedTable.columns.columnFromName(
-          fk.foreignColumn
-        )!;
+        let referencedIColumn = fk.referenced[i];
+        let referencedColumn = this.sourceColumns.get(
+          `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
+        );
 
-        let relationship =
-          [...this.inputSchema!.fks].find((rel) =>
-            rel.appliesTo(referencingTable!, referencedTable!)
-          ) || new Relationship();
-        relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.addFk(relationship);
+        // in case the foreign key is not fully contained in the selection of tables
+        if (!referencingColumn || !referencedColumn) return;
+
+        fkRelationship.referencing.push(referencingColumn!);
+        fkRelationship.referenced.push(referencedColumn!);
       }
+      this.schema!.addFk(fkRelationship);
     });
   }
 
   private resolveInds(inds: Array<IInclusionDependency>) {
-    let schemaColumns = new Array<Column>();
-    this.inputSchema!.tables.forEach((table) => {
-      schemaColumns.push(...table.columns.asSet());
-    });
     inds.forEach((ind) => {
-      let indRelationship = new Relationship();
+      let indRelationship = new SourceRelationship();
       let numColumns = ind.dependant.columnIdentifiers.length;
       for (let i = 0; i < numColumns; i++) {
         let dependantIColumn = ind.dependant.columnIdentifiers[i];
-        let dependantColumn = schemaColumns.find(
-          (column) =>
-            dependantIColumn.columnIdentifier == column.sourceColumn.name &&
-            dependantIColumn.schemaIdentifier ==
-              column.sourceColumn.table.schemaName &&
-            dependantIColumn.tableIdentifier == column.sourceColumn.table.name
-        )!;
+        let dependantColumn = this.sourceColumns.get(
+          `${dependantIColumn.schemaIdentifier}.${dependantIColumn.tableIdentifier}.${dependantIColumn.columnIdentifier}`
+        );
 
         let referencedIColumn = ind.referenced.columnIdentifiers[i];
-        let referencedColumn = schemaColumns.find(
-          (column) =>
-            referencedIColumn.columnIdentifier == column.sourceColumn.name &&
-            referencedIColumn.schemaIdentifier ==
-              column.sourceColumn.table.schemaName &&
-            referencedIColumn.tableIdentifier == column.sourceColumn.table.name
-        )!;
+        let referencedColumn = this.sourceColumns.get(
+          `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
+        );
 
-        indRelationship.add(dependantColumn, referencedColumn);
+        if (!dependantColumn || !referencedColumn) {
+          console.error('Column lookup failed');
+        }
+
+        indRelationship.referencing.push(dependantColumn!);
+        indRelationship.referenced.push(referencedColumn!);
       }
-      this.inputSchema!.addInd(indRelationship);
+      this.schema!.addInd(indRelationship);
     });
   }
 
@@ -166,7 +164,18 @@ export class DatabaseService {
     > = {};
     for (const table of tables) fdPromises[table.fullName] = this.getFDs(table);
 
-    this.inputSchema = new Schema(...tables);
+    this.schema = new Schema(...tables);
+    for (const table of tables) {
+      let sourceTable = [...table.sources][0].table;
+      table.columns
+        .asArray()
+        .forEach((column) =>
+          this.sourceColumns.set(
+            `${sourceTable.fullName}.${column.sourceColumn.name}`,
+            column.sourceColumn
+          )
+        );
+    }
     for (const table of tables) {
       const iFDs = await fdPromises[table.fullName];
 

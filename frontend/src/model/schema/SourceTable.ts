@@ -7,4 +7,9 @@ export default class SourceTable {
   public get fullName(): string {
     return this.schemaName + '.' + this.name;
   }
+
+  public equals(other: SourceTable) {
+    if (this == other) return true;
+    return this.name == other.name && this.schemaName == other.schemaName;
+  }
 }

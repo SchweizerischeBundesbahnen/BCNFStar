@@ -96,6 +96,7 @@ export class TableSelectionComponent implements OnInit {
       })
       .catch((e) => {
         this.error = e;
+        console.error(e);
         this.dialog.open(this.errorDialog);
       })
       .finally(() => {

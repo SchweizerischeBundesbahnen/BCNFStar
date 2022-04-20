@@ -37,7 +37,7 @@ describe('Schema', () => {
     let tableB = [...schema.tables].filter(
       (table) => table.name == 'TableB'
     )[0];
-    schema.join(tableA, tableB, [...schema.fks][0]);
+    schema.join(tableA, tableB, schema.fks[0]);
     let expectedColumns = tableA.columns.columnsFromNames('A1', 'A2');
     expectedColumns.union(tableB.columns.copy());
     expect([...schema.tables][0].columns).toEqual(expectedColumns);

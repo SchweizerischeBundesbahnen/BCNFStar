@@ -11,9 +11,9 @@ import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Observable } from 'rxjs';
-import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
+import { TableRelationship } from '@/src/model/types/TableRelationship';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -37,11 +37,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   @Input() selectedColumns?: Map<Table, ColumnCombination>;
   @Input() schemaChanged!: Observable<void>;
   @Output() selectedTableChange = new EventEmitter<Table>();
-  @Output() joinFk = new EventEmitter<{
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }>();
+  @Output() joinFk = new EventEmitter<TableRelationship>();
 
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
@@ -172,16 +168,10 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
 
   private addJoinButton(
     link: joint.shapes.standard.Link,
-    sourceTable: Table,
-    targetTable: Table,
-    relationship: Relationship
+    fk: TableRelationship
   ) {
     let joinTablesOnFks = () => {
-      this.joinFk.emit({
-        source: sourceTable,
-        target: targetTable,
-        relationship: relationship,
-      });
+      this.joinFk.emit(fk);
     };
 
     let joinButton = new joint.linkTools.Button({
@@ -224,8 +214,8 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   generateLinks() {
     for (const table of this.schema.tables) {
       for (const fk of this.schema.fksOf(table)) {
-        let fkReferenced = fk.relationship.referenced().asArray()[0];
-        let fkReferencing = fk.relationship.referencing().asArray()[0];
+        let fkReferenced = fk.relationship.referenced.asArray()[0];
+        let fkReferencing = fk.relationship.referencing.asArray()[0];
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
@@ -247,7 +237,7 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
         });
         this.graphStorage.get(table)?.links.set(fk.referenced, link);
         this.graph.addCell(link);
-        this.addJoinButton(link, table, fk.referenced, fk.relationship);
+        this.addJoinButton(link, fk);
       }
     }
   }

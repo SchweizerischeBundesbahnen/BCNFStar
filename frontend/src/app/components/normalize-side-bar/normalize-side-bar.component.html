@@ -33,11 +33,9 @@
         placeholder="Filter columns"
         [(ngModel)]="_fdClusterFilter"
       >
-        <sbb-option
-          *ngFor="let column of table.columns.asArray()"
-          [value]="column"
-          >{{ column.name }}</sbb-option
-        >
+        <sbb-option *ngFor="let column of table.columns" [value]="column">{{
+          column.name
+        }}</sbb-option>
       </sbb-select>
       <br />
       <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
@@ -109,13 +107,7 @@
           *ngFor="let rel of inds()"
           [value]="rel"
           style="display: block"
-          >{{
-            rel.relationship.referencing().toString() +
-              "->(" +
-              rel.referenced.fullName +
-              ") " +
-              rel.relationship.referenced().toString()
-          }}</sbb-radio-button
+          >{{ rel.toString() }}</sbb-radio-button
         >
       </sbb-radio-group>
       <ng-template #noInds>

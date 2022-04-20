@@ -8,6 +8,7 @@ import { TableRelationship } from '../types/TableRelationship';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
+import SourceRelationship from './SourceRelationship';
 
 export default class Table {
   public name = '';
@@ -16,7 +17,7 @@ export default class Table {
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Set<Relationship>();
-  public sources = new Set<SourceTableInstance>();
+  public sources = new Array<SourceTableInstance>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -31,11 +32,11 @@ export default class Table {
   /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
-  public _fks!: Set<TableRelationship>;
+  public _fks!: Array<TableRelationship>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
-  public _inds!: Array<TableRelationship>;
+  public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
   /**
    * This variable tracks if the cached results fks and inds are still valid
    */
@@ -46,10 +47,9 @@ export default class Table {
   }
 
   public static fromITable(iTable: ITable): Table {
-    let sourceTable = new SourceTable(iTable.name, iTable.schemaName);
-    let sourceTableInstance = new SourceTableInstance(sourceTable);
-    let table = new Table();
-    let columns = table.columns;
+    const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
+    const table = new Table();
+    const sourceTableInstance = table.addSource(sourceTable);
     iTable.attributes.forEach((iAttribute, index) => {
       let sourceColumn = new SourceColumn(
         iAttribute.name,
@@ -58,11 +58,10 @@ export default class Table {
         index,
         iAttribute.nullable
       );
-      columns.add(new Column(sourceTableInstance, sourceColumn));
+      table.columns.add(new Column(sourceTableInstance, sourceColumn));
     });
     table.name = sourceTable.name;
     table.schemaName = sourceTable.schemaName;
-    table.sources.add(sourceTableInstance);
     return table;
   }
 
@@ -80,8 +79,30 @@ export default class Table {
       )
     );
     table.name = tableName;
-    table.sources.add(sourceTableInstance);
+    table.sources.push(sourceTableInstance);
     return table;
+  }
+
+  public addSource(
+    sourceTable: SourceTable,
+    name?: string
+  ): SourceTableInstance {
+    const newSource = new SourceTableInstance(sourceTable, name);
+    const sameAlias = this.sources.filter(
+      (source) => source.baseAlias == newSource.baseAlias
+    );
+    newSource.id = sameAlias.length + 1;
+    if (sameAlias.length == 1) {
+      sameAlias[0].useAlias = true;
+      sameAlias[0].useId = true;
+    }
+    if (sameAlias.length >= 1) {
+      newSource.useAlias = true;
+      newSource.useId = true;
+    }
+
+    this.sources.push(newSource);
+    return newSource;
   }
 
   /**
@@ -117,7 +138,7 @@ export default class Table {
     generatingName?: string
   ): Array<Table> {
     let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
-    fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
+    fd.lhs.asArray().forEach((column) => remaining.columns.add(column.copy()));
     let generating: Table = new Table(this.generatingSchema(fd));
 
     this.projectRelationships(remaining);
@@ -142,7 +163,7 @@ export default class Table {
   public projectRelationships(table: Table): void {
     // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
     let neededSourceTables = new Set(table.columns.sourceTableInstances());
-    let sourceTables = new Set(this.sources);
+    let sourceTables = new Array(...this.sources);
     let relationships = new Set(this.relationships);
 
     let toRemove: Set<SourceTableInstance>;
@@ -151,8 +172,8 @@ export default class Table {
       sourceTables.forEach((sourceTable) => {
         let adjacentRelationship = [...relationships].filter(
           (rel) =>
-            rel.referenced().sourceTableInstance() == sourceTable ||
-            rel.referencing().sourceTableInstance() == sourceTable
+            rel.referenced.sourceTableInstance() == sourceTable ||
+            rel.referencing.sourceTableInstance() == sourceTable
         );
         if (
           adjacentRelationship.length == 1 &&
@@ -162,7 +183,9 @@ export default class Table {
           relationships.delete(adjacentRelationship[0]);
         }
       });
-      toRemove.forEach((table) => sourceTables.delete(table));
+      sourceTables = sourceTables.filter(
+        (sourceTable) => !toRemove.has(sourceTable)
+      );
     } while (toRemove.size > 0);
 
     table.sources = sourceTables;
@@ -183,43 +206,92 @@ export default class Table {
     });
   }
 
-  public join(otherTable: Table, relationship: Relationship): Table {
-    let remaining = relationship.appliesTo(this, otherTable)
-      ? this
-      : otherTable;
-    let generating = relationship.appliesTo(this, otherTable)
-      ? otherTable
-      : this;
+  public join(
+    referenced: Table,
+    relationship: Relationship,
+    name?: string
+  ): Table {
+    let newTable = new Table();
+
+    // source tables
+    this.sources.forEach((sourceTable) => newTable.sources.push(sourceTable));
+
+    const sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
+    referenced.sources.forEach((source) => {
+      const newSource = newTable.addSource(source.table, name);
+      sourceMapping.set(source, newSource);
+    });
 
     // columns
-    let newTable = new Table(
-      generating.columns
-        .copy()
-        .union(remaining.columns)
-        .setMinus(relationship.referencing())
-        .union(relationship.referenced())
+    newTable.columns.add(...this.columns);
+    newTable.columns.add(
+      ...referenced.columns.applySourceMapping(sourceMapping)
     );
+    newTable.columns.delete(...relationship.referencing);
 
     // relationships
     this.relationships.forEach((rel) => newTable.relationships.add(rel));
-    otherTable.relationships.forEach((rel) => newTable.relationships.add(rel));
-    if (!relationship.referenced().equals(relationship.referencing()))
-      newTable.relationships.add(relationship);
+    referenced.relationships.forEach((rel) =>
+      newTable.relationships.add(rel.applySourceMapping(sourceMapping))
+    );
+    if (!relationship.sourceRelationship().isTrivial) {
+      newTable.relationships.add(
+        relationship.applySourceMapping(sourceMapping)
+      );
+    }
 
     // name, pk
-    newTable.name = remaining.name;
-    newTable.pk = remaining.pk
-      ? relationship.referencingToReferencedColumnsIn(remaining.pk)
+    newTable.name = this.name;
+    newTable.pk = this.pk
+      ? relationship
+          .referencingToReferencedColumnsIn(this.pk)
+          .applySourceMapping(sourceMapping)
       : undefined;
-    newTable.schemaName = remaining.schemaName;
-
-    // source tables
-    this.sources.forEach((sourceTable) => newTable.sources.add(sourceTable));
-    otherTable.sources.forEach((sourceTable) =>
-      newTable.sources.add(sourceTable)
-    );
+    newTable.schemaName = this.schemaName;
 
     return newTable;
+  }
+
+  public columnsBySourceTableInstance() {
+    const result = new Map<SourceTableInstance, ColumnCombination>();
+
+    for (const column of this.columns) {
+      if (!result.has(column.sourceTableInstance))
+        result.set(column.sourceTableInstance, new ColumnCombination());
+      result.get(column.sourceTableInstance)!.add(column);
+    }
+    return result;
+  }
+
+  /**
+   *
+   * @param sourceColumns columns to be matched. Must come from the same SourceTable
+   * @returns all sets of columns - each set coming from the same SourceTableInstance - which match the sourceColumns
+   */
+  public columnsEquivalentTo(
+    sourceColumns: Array<SourceColumn>
+  ): Array<Array<Column>> {
+    const result = new Array<Array<Column>>();
+    const sourceTable = sourceColumns[0].table;
+
+    sourceLoop: for (const [
+      sourceTableInstance,
+      columns,
+    ] of this.columnsBySourceTableInstance().entries()) {
+      if (!sourceTableInstance.table.equals(sourceTable)) continue;
+
+      const equivalentColumns = new Array<Column>();
+      for (const sourceColumn of sourceColumns) {
+        let equivalentColumn = columns
+          .asArray()
+          .find((column) => column.sourceColumn.equals(sourceColumn));
+        if (!equivalentColumn) continue sourceLoop;
+        equivalentColumns.push(equivalentColumn);
+      }
+      result.push(equivalentColumns);
+    }
+
+    return result;
   }
 
   public isKeyFd(fd: FunctionalDependency): boolean {

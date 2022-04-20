@@ -3,12 +3,14 @@ import { TableRelationship } from '../types/TableRelationship';
 import FunctionalDependency from './FunctionalDependency';
 import IndScore from './methodObjects/IndScore';
 import Relationship from './Relationship';
+import SourceRelationship from './SourceRelationship';
 import Table from './Table';
+import ColumnCombination from './ColumnCombination';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
-  private _fks = new Set<Relationship>();
-  private _inds = new Set<Relationship>();
+  private _fks = new Array<SourceRelationship>();
+  private _inds = new Array<SourceRelationship>();
 
   public constructor(...tables: Array<Table>) {
     this.add(...tables);
@@ -31,39 +33,39 @@ export default class Schema {
   /**
    * Returns a copy of the set of foreign key relationships
    */
-  public get fks(): Set<Relationship> {
-    return new Set(this._fks);
+  public get fks(): Array<SourceRelationship> {
+    return new Array(...this._fks);
   }
 
-  public set fks(fkRelationships: Set<Relationship>) {
+  public set fks(fkRelationships: Array<SourceRelationship>) {
     this._fks = fkRelationships;
     this.relationshipsValid = false;
   }
 
-  public addFk(fk: Relationship) {
-    this._fks.add(fk);
+  public addFk(fk: SourceRelationship) {
+    this._fks.push(fk);
     this.relationshipsValid = false;
   }
 
-  public deleteFk(fk: Relationship) {
-    this._fks.delete(fk);
+  public deleteFk(fk: SourceRelationship) {
+    this._fks = this._fks.filter((fk1) => fk1 != fk);
     this.relationshipsValid = false;
   }
 
   /**
    * Returns a copy of the set of inclusion dependency relationships
    */
-  public get inds(): Set<Relationship> {
-    return new Set(this._inds);
+  public get inds(): Array<SourceRelationship> {
+    return new Array(...this._inds);
   }
 
-  public set inds(inds: Set<Relationship>) {
+  public set inds(inds: Array<SourceRelationship>) {
     this._inds = inds;
     this.relationshipsValid = false;
   }
 
-  public addInd(ind: Relationship) {
-    this._inds.add(ind);
+  public addInd(ind: SourceRelationship) {
+    this._inds.push(ind);
     this.relationshipsValid = false;
   }
 
@@ -71,12 +73,14 @@ export default class Schema {
     this.tables.forEach((table) => (table._relationshipsValid = valid));
   }
 
-  public fksOf(table: Table): Set<TableRelationship> {
+  public fksOf(table: Table): Array<TableRelationship> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._fks;
   }
 
-  public indsOf(table: Table): Array<TableRelationship> {
+  public indsOf(
+    table: Table
+  ): Map<SourceRelationship, Array<TableRelationship>> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._inds;
   }
@@ -92,39 +96,23 @@ export default class Schema {
    * @param table
    * @returns FKs, where table is on the referencing side
    */
-  private calculateFksOf(table: Table): Set<TableRelationship> {
-    let fks = new Set<TableRelationship>();
-    let possibleFkRelationships = [...this.fks].filter((rel) =>
-      rel.referencing().isSubsetOf(table.columns)
-    );
-    for (let otherTable of this.tables) {
-      if (otherTable == table) continue;
-
-      // intersects. Apply in case of splitting tables
-      let intersect = table.columns.copy().intersect(otherTable.columns);
-      if (
-        intersect.cardinality > 0 &&
-        otherTable.isKey(intersect) // TODO subset
-      ) {
-        fks.add({
-          relationship: Relationship.fromTables(table, otherTable),
-          referenced: otherTable,
+  private calculateFksOf(table: Table): Array<TableRelationship> {
+    let result = [
+      ...this.matchSourceRelationships(table, this.fks).values(),
+    ].flat();
+    for (const otherTable of this.tables) {
+      if (otherTable == table || !otherTable.pk) continue;
+      const pk = otherTable.pk!.asArray();
+      const sourceColumns = pk.map((column) => column.sourceColumn);
+      table.columnsEquivalentTo(sourceColumns).forEach((cc) => {
+        result.push({
+          relationship: new Relationship(cc, pk),
           referencing: table,
+          referenced: otherTable,
         });
-      }
-
-      // fkRelationships
-      possibleFkRelationships
-        .filter((rel) => otherTable.isKey(rel.referenced()))
-        .forEach((relationship) => {
-          fks.add({
-            relationship: relationship,
-            referencing: table,
-            referenced: otherTable,
-          });
-        });
+      });
     }
-    return fks;
+    return result;
   }
 
   /**
@@ -132,36 +120,62 @@ export default class Schema {
    * @returns All INDs where table is referencing,
    * except for the ones that are akready foreign keys
    */
-  private calculateIndsOf(table: Table): Array<TableRelationship> {
-    let inds = new Array<TableRelationship>();
-    let onlyIndRelationships = new Set(this.inds);
-    // TODO: find out why this doesn't delete anythign anymore
-    this.fks.forEach((rel) => onlyIndRelationships.delete(rel));
-    let possibleIndRelationships = [...onlyIndRelationships].filter((rel) =>
-      rel.referencing().isSubsetOf(table.columns)
+  private calculateIndsOf(
+    table: Table
+  ): Map<SourceRelationship, Array<TableRelationship>> {
+    // TODO: fks are sometimes not removed because the objects are not identical // solved?
+    let onlyInds = new Array(...this.inds).filter(
+      (ind) => !this.fks.find((fk) => fk.equals(ind))
     );
-    for (let otherTable of this.tables) {
-      if (otherTable == table) continue;
-      possibleIndRelationships
-        .filter(
-          (rel) =>
-            rel.appliesTo(table, otherTable) &&
-            otherTable.isKey(rel.referenced())
-        )
-        .forEach((rel) => {
-          inds.push({
-            relationship: rel,
-            referenced: otherTable,
-            referencing: table,
+
+    let result = this.matchSourceRelationships(table, onlyInds);
+    for (const rels of result.values()) {
+      rels.sort((ind1, ind2) => {
+        let score1 = new IndScore(ind1.relationship).get();
+        let score2 = new IndScore(ind2.relationship).get();
+        return score2 - score1;
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Finds all valid relationships in the current state of the schema in which the parameter table
+   * is referencing some other table. Uses a list of relationships that apply to the datasource
+   * @param table
+   * @param relationships
+   * @returns
+   */
+  private matchSourceRelationships(
+    table: Table,
+    relationships: Array<SourceRelationship>
+  ): Map<SourceRelationship, Array<TableRelationship>> {
+    let result = new Map<SourceRelationship, Array<TableRelationship>>();
+    for (const rel of relationships) {
+      let ccs = table.columnsEquivalentTo(rel.referencing);
+      if (ccs.length == 0) continue;
+
+      for (const otherTable of this.tables) {
+        if (otherTable == table) continue;
+        let otherCCs = otherTable
+          .columnsEquivalentTo(rel.referenced)
+          .filter((otherCC) =>
+            otherTable.isKey(new ColumnCombination(...otherCC))
+          );
+        if (otherCCs.length == 0) continue;
+        result.set(rel, []);
+        ccs.forEach((cc) => {
+          otherCCs.forEach((otherCC) => {
+            result.get(rel)!.push({
+              relationship: new Relationship(cc, otherCC),
+              referencing: table,
+              referenced: otherTable,
+            });
           });
         });
+      }
     }
-    inds.sort((ind1, ind2) => {
-      let score1 = new IndScore(ind1.relationship).get();
-      let score2 = new IndScore(ind2.relationship).get();
-      return score2 - score1;
-    });
-    return inds;
+    return result;
   }
 
   public splittableFdClustersOf(table: Table): Array<FdCluster> {
@@ -196,7 +210,7 @@ export default class Schema {
 
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
     return [...this.fksOf(table)].every((fk) => {
-      let fkColumns = fk.relationship.referencing();
+      let fkColumns = fk.relationship.referencing;
       return (
         fkColumns.isSubsetOf(table.remainingSchema(fd)) ||
         fkColumns.isSubsetOf(table.generatingSchema(fd))
@@ -237,28 +251,21 @@ export default class Schema {
     return resultingTables;
   }
 
-  public join(table1: Table, table2: Table, relationship: Relationship) {
-    let newTable = table1.join(table2, relationship);
-    this.setFdsFor(newTable, table1, table2, relationship);
+  public join(fk: TableRelationship) {
+    let newTable = fk.referencing.join(fk.referenced, fk.relationship);
+    this.setFdsFor(newTable, fk.referencing, fk.referenced, fk.relationship);
     this.add(newTable);
-    this.delete(table1);
-    this.delete(table2);
+    this.delete(fk.referencing);
+    this.delete(fk.referenced);
     return newTable;
   }
 
   private setFdsFor(
     table: Table,
-    parent1: Table,
-    parent2: Table,
+    referencing: Table,
+    referenced: Table,
     relationship: Relationship
   ) {
-    let referencing = relationship.appliesTo(parent1, parent2)
-      ? parent1
-      : parent2;
-    let referenced = relationship.appliesTo(parent1, parent2)
-      ? parent2
-      : parent1;
-
     // copy parent fds
     referenced.fds.forEach((fd) => {
       table.addFd(fd.lhs.copy(), fd.rhs.copy());
@@ -266,7 +273,7 @@ export default class Schema {
     referencing.fds.forEach((fd) => {
       let newLhs = relationship.referencingToReferencedColumnsIn(fd.lhs);
       let newRhs = relationship.referencingToReferencedColumnsIn(fd.rhs);
-      if (newLhs.isSubsetOf(relationship.referenced())) {
+      if (newLhs.isSubsetOf(relationship.referenced)) {
         let correspondingFd = table.fds.find((fd) => fd.lhs.equals(newLhs));
         if (correspondingFd) correspondingFd.rhs.union(newRhs);
         else table.addFd(newLhs, newRhs);
@@ -276,7 +283,7 @@ export default class Schema {
     });
 
     // extension
-    let fk = relationship.referenced();
+    let fk = relationship.referenced;
     let fkFds = table.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
     table.fds.forEach((fd) => {
       let rhsFkPart = fd.rhs.copy().intersect(fk);

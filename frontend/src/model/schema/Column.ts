@@ -2,15 +2,19 @@ import IAttribute from '@server/definitions/IAttribute';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 
+/**
+ * These objects uniquely identify a column within a table.
+ * Be careful when using them outside the context of a table
+ */
 export default class Column {
-  public name;
-
   public constructor(
     public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
-    name?: string
-  ) {
-    this.name = name ? name : sourceColumn.name;
+    public alias?: string
+  ) {}
+
+  public get name() {
+    return this.alias || this.sourceColumn.name;
   }
 
   public copy(): Column {
@@ -34,12 +38,22 @@ export default class Column {
   }
 
   public equals(other: Column): boolean {
+    if (this == other) return true;
     return (
-      this.sourceColumn.name == other.sourceColumn.name &&
-      this.sourceColumn.table.name == other.sourceColumn.table.name &&
-      this.sourceColumn.table.schemaName == other.sourceColumn.table.schemaName
+      this.sourceTableInstance == other.sourceTableInstance &&
+      this.sourceColumn == other.sourceColumn
     );
   }
+
+  public applySourceMapping(
+    mapping: Map<SourceTableInstance, SourceTableInstance>
+  ): Column {
+    return new Column(
+      mapping.get(this.sourceTableInstance) || this.sourceTableInstance,
+      this.sourceColumn
+    );
+  }
+
   public toIAttribute(): IAttribute {
     return {
       name: this.name,

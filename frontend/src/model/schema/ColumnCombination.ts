@@ -8,8 +8,8 @@ export default class ColumnCombination {
     this.add(...columns);
   }
 
-  public asSet(): Set<Column> {
-    return new Set(this._columns);
+  [Symbol.iterator]() {
+    return this._columns[Symbol.iterator]();
   }
 
   public asArray(): Array<Column> {
@@ -116,5 +116,13 @@ export default class ColumnCombination {
 
   public toString(): string {
     return this.columnNames().join(', ');
+  }
+
+  public applySourceMapping(
+    mapping: Map<SourceTableInstance, SourceTableInstance>
+  ): ColumnCombination {
+    return new ColumnCombination(
+      ...this._columns.map((column) => column.applySourceMapping(mapping))
+    );
   }
 }

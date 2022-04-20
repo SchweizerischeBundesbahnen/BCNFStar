@@ -23,7 +23,7 @@ export class SplitDialogComponent {
     fd.rhs
       .copy()
       .setMinus(fd.lhs)
-      .asSet()
+      .asArray()
       .forEach((column) => {
         this.selectedColumns.set(column, true);
         this.columns.push(column);
