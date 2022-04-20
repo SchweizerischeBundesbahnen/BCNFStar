@@ -34,8 +34,12 @@ export class MetanomeSettingsComponent {
     memory: '',
   };
 
-  public defaultNormiConfig: MetanomeConfig = {
-    isHumanInTheLoop: false,
+  public defaultHyFDExtendedConfig: MetanomeConfig = {
+    INPUT_ROW_LIMIT: -1,
+    ENABLE_MEMORY_GUARDIAN: true,
+    NULL_EQUALS_NULL: true,
+    VALIDATE_PARALLEL: true,
+    MAX_DETERMINANT_SIZE: -1,
     memory: '',
   };
 
@@ -65,7 +69,7 @@ export class MetanomeSettingsComponent {
     memory: '',
   };
 
-  public normiConfigs: Record<string, IIndexFileEntry> = {};
+  public hyfdExtendedConfigs: Record<string, IIndexFileEntry> = {};
   public hyfdConfigs: Record<string, IIndexFileEntry> = {};
   public binderConfigs: Record<string, IIndexFileEntry> = {
     ind: this.createDefaultIndIndexFile(
@@ -91,10 +95,10 @@ export class MetanomeSettingsComponent {
     controlsConfig['ind'] = {};
 
     tables.forEach((table) => {
-      this.normiConfigs['fds_' + table.schemaAndName()] =
+      this.hyfdExtendedConfigs['fds_' + table.schemaAndName()] =
         this.createDefaultFdIndexFile(
-          Object.assign({}, this.defaultNormiConfig),
-          'de.metanome.algorithms.normalize.Normi',
+          Object.assign({}, this.defaultHyFDExtendedConfig),
+          'de.metanome.algorithms.hyfd_extended.HyFDExtended',
           table.schemaAndName()
         );
       this.hyfdConfigs['fds_' + table.schemaAndName()] =
@@ -209,10 +213,10 @@ export class MetanomeSettingsComponent {
             this.filteredMetanomeResultsForFd(table)[0],
         });
         break;
-      case 'normi':
+      case 'hyfd_extended':
         this.formGroup.patchValue({
           ['fds_' + table.schemaAndName()]:
-            this.normiConfigs['fds_' + table.schemaAndName()],
+            this.hyfdExtendedConfigs['fds_' + table.schemaAndName()],
         });
         break;
       case 'hyfd':
