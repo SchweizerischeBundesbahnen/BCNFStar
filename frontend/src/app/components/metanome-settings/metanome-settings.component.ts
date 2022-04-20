@@ -20,9 +20,7 @@ export class MetanomeSettingsComponent {
   public oldMetanomeResults: Array<IIndexFileEntry> = [];
 
   public formGroup: FormGroup;
-  public selectedFdTab: Array<FormControl> = [
-    new FormControl('existing-result'),
-  ];
+  public selectedFdTab: Array<FormControl> = [];
   public selectedIndTab: FormControl = new FormControl('existing-result');
 
   public defaultHyFdConfig: MetanomeConfig = {
@@ -91,11 +89,12 @@ export class MetanomeSettingsComponent {
     controlsConfig['ind'] = {};
 
     tables.forEach((table) => {
+      this.selectedFdTab.push(new FormControl('hyfd_extended'));
       this.normiConfigs['fds_' + table.schemaAndName()] =
         this.createDefaultFdIndexFile(
+          table.schemaAndName(),
           Object.assign({}, this.defaultNormiConfig),
-          'de.metanome.algorithms.normalize.Normi',
-          table.schemaAndName()
+          'de.metanome.algorithms.normalize.Normi'
         );
       this.hyfdConfigs['fds_' + table.schemaAndName()] =
         this.createDefaultIndIndexFile(
@@ -116,23 +115,32 @@ export class MetanomeSettingsComponent {
       )
     ).then((result) => {
       this.oldMetanomeResults = result;
-      this.tables.forEach((table) => {
+      this.tables.forEach((table, index) => {
+        const existingFdResult = this.filteredMetanomeResultsForFd(table)[0];
         this.formGroup.patchValue({
           ['fds_' + table.schemaAndName()]:
-            this.filteredMetanomeResultsForFd(table)[0],
+            existingFdResult ??
+            this.createDefaultFdIndexFile(table.schemaAndName()),
         });
+        this.selectedFdTab[index].setValue(
+          existingFdResult ? 'existing-result' : 'normi'
+        );
       });
+      const existingIndResult = this.filteredMetanomeResultsForInd()[0];
       this.formGroup.patchValue({
-        ind: this.filteredMetanomeResultsForInd()[0],
+        ind: existingIndResult ?? this.createDefaultIndIndexFile(),
       });
+      this.selectedIndTab.setValue(
+        existingIndResult ? 'existing-result' : 'binder'
+      );
       this.formGroup.updateValueAndValidity();
     });
   }
 
   public createDefaultFdIndexFile(
-    config: MetanomeConfig,
-    algorithm: string,
-    tableName: string
+    tableName: string,
+    config: MetanomeConfig = Object.assign({}, this.defaultNormiConfig),
+    algorithm: string = 'de.metanome.algorithms.normalize.Normi'
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
       config,
@@ -148,11 +156,11 @@ export class MetanomeSettingsComponent {
   }
 
   public createDefaultIndIndexFile(
-    config: MetanomeConfig,
-    algorithm: string
+    config: MetanomeConfig = Object.assign({}, this.defaultBinderConfig),
+    algorithm: string = 'de.metanome.algorithms.binder.BINDERFile'
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
-      tables: this.tables.map((table) => table.name),
+      tables: this.tables.map((table) => table.schemaAndName()),
       dbmsName: '',
       database: '',
       resultType: MetanomeResultType.ind,

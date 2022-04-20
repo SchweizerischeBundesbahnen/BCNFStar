@@ -118,6 +118,8 @@ export class TableSelectionComponent implements OnInit {
     const { values }: { values: Record<string, IIndexFileEntry> } =
       await firstValueFrom(dialogRef.afterClosed());
 
+    if (!values) return;
+
     const loadingDialog = this.dialog.open(this.loadingDialog);
 
     try {
@@ -127,6 +129,8 @@ export class TableSelectionComponent implements OnInit {
       let fdResults: Record<string, string> = {};
       for (let value of Object.entries(values)) {
         if (value[0] != 'ind') {
+          console.log(fdResults);
+          console.log(value[1]);
           fdResults[value[1].tables[0]] = value[1].fileName;
         }
       }
