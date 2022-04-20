@@ -45,6 +45,10 @@ span {
   min-height: 400px;
 }
 
+.text-aling-right {
+  text-align: right;
+}
+
 tr {
   white-space: nowrap;
 }
