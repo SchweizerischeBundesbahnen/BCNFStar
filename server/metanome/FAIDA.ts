@@ -22,7 +22,7 @@ export default class FAIDA extends InclusionDependencyAlgorithm {
   }
 
   protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
-    return "INPUT_GENERATOR";
+    return "INPUT_FILES";
   }
 
   protected override originalOutputPath(): string {
