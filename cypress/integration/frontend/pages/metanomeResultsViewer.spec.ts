@@ -20,13 +20,13 @@ describe("The metanoem results page", () => {
   });
   it("contains metanome result rows", () => {
     cy.get("tr").should("have.length.at.least", 3);
-    cy.contains("de.metanome.algorithms.normalize.Normi");
+    cy.contains("de.metanome.algorithms.hyfd_extended.HyFDExtended");
     cy.contains("de.metanome.algorithms.binder.BINDERFile");
     cy.contains("public.part_partsupp_supplier_denormalized");
   });
 
   it("delete metanome results", () => {
-    cy.contains("de.metanome.algorithms.normalize.Normi");
+    cy.contains("de.metanome.algorithms.hyfd_extended.HyFDExtended");
     cy.get("tr")
       .its("length")
       .then((length) => {

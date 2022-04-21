@@ -20,30 +20,30 @@
             </sbb-select>
           </sbb-toggle-details>
         </sbb-toggle-option>
-        <sbb-toggle-option label="Normi" value="normi">
+        <sbb-toggle-option label="HyFD Extended" value="hyfd_extended">
           <sbb-toggle-details>
             <sbb-select
               [formControlName]="'fds_' + table.schemaAndName()"
-              [value]="normiConfigs['fds_' + table.schemaAndName()]"
+              [value]="hyfdExtendedConfigs['fds_' + table.schemaAndName()]"
               class="display-non"
             >
               <sbb-option
-                [value]="normiConfigs['fds_' + table.schemaAndName()]"
+                [value]="hyfdExtendedConfigs['fds_' + table.schemaAndName()]"
               >
-                {{ normiConfigs["fds_" + table.schemaAndName()] }}
+                {{ hyfdExtendedConfigs["fds_" + table.schemaAndName()] }}
               </sbb-option>
             </sbb-select>
             <div
               *ngFor="
-                let entry of normiConfigs['fds_' + table.schemaAndName()][
-                  'config'
-                ] | keyvalue
+                let entry of hyfdExtendedConfigs[
+                  'fds_' + table.schemaAndName()
+                ]['config'] | keyvalue
               "
             >
               <sbb-checkbox
                 *ngIf="isBoolean(entry.value)"
                 [(ngModel)]="
-                  normiConfigs['fds_' + table.schemaAndName()]['config'][
+                  hyfdExtendedConfigs['fds_' + table.schemaAndName()]['config'][
                     entry.key
                   ]
                 "
@@ -56,9 +56,9 @@
                 <input
                   sbbInput
                   [(ngModel)]="
-                    normiConfigs['fds_' + table.schemaAndName()]['config'][
-                      entry.key
-                    ]
+                    hyfdExtendedConfigs['fds_' + table.schemaAndName()][
+                      'config'
+                    ][entry.key]
                   "
                   [ngModelOptions]="{ standalone: true }"
                 />

@@ -8,8 +8,7 @@ import { absoluteServerDir } from "@/utils/files";
 import { IMetanomeJob } from "@/definitions/IMetanomeJob";
 import MetanomeAlgorithm from "./metanomeAlgorithm";
 import BINDER from "./BINDER";
-import Normi from "./Normi";
-// import HyFD from "./HyFD";
+import HyFDExtended from "./HyFDExtended";
 import FAIDA from "./FAIDA";
 import HyFD from "./HyFD";
 
@@ -72,7 +71,7 @@ function executeCommand(
  * @returns instance of a metanome algorithm built from the job data
  */
 function getAlgoInstance(data: IMetanomeJob): MetanomeAlgorithm {
-  const singleFileAlgos = [Normi, HyFD];
+  const singleFileAlgos = [HyFDExtended, HyFD];
   const multiFileAlgos = [FAIDA, BINDER];
   for (const singleFileAlgo of singleFileAlgos) {
     const algo = new singleFileAlgo(data.schemaAndTables[0], data.config);
