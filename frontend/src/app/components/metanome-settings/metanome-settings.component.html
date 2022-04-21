@@ -15,7 +15,7 @@
                 *ngFor="let result of filteredMetanomeResultsForFd(table)"
                 [value]="result"
               >
-                {{ getMetanomeConfigurationInformation(result) }}
+                {{ metanomeConfigInfo(result) }}
               </sbb-option>
             </sbb-select>
           </sbb-toggle-details>
@@ -79,7 +79,7 @@
               *ngFor="let result of filteredMetanomeResultsForInd()"
               [value]="result"
             >
-              {{ getMetanomeConfigurationInformation(result) }}
+              {{ metanomeConfigInfo(result) }}
             </sbb-option>
           </sbb-select>
         </sbb-toggle-details>
