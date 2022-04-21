@@ -56,11 +56,9 @@ export class MetanomeSettingsComponent {
     let controlsConfig: Record<string, any> = {};
     controlsConfig['ind'] = {};
 
-    for (const table of tables) {
-      this.selectedFdTab.push(new FormControl('hyfd'));
-      table; // to make linter happy
-    }
     tables.forEach((table) => {
+      this.selectedFdTab.push(new FormControl('hyfd'));
+
       this.hyfdConfigs['fds_' + table.schemaAndName()] =
         this.createDefaultFdIndexFile(
           table.schemaAndName(),
@@ -81,6 +79,7 @@ export class MetanomeSettingsComponent {
       )
     ).then((result) => {
       this.oldMetanomeResults = result;
+
       this.tables.forEach((table, index) => {
         const existingFdResult = this.filteredMetanomeResultsForFd(table)[0];
         this.formGroup.patchValue({
@@ -92,6 +91,7 @@ export class MetanomeSettingsComponent {
           existingFdResult ? 'existing-result' : 'hyfd'
         );
       });
+
       const existingIndResult = this.filteredMetanomeResultsForInd()[0];
       this.formGroup.patchValue({
         ind: existingIndResult ?? this.createDefaultIndIndexFile(),
@@ -176,7 +176,6 @@ export class MetanomeSettingsComponent {
   }
 
   public onFdToggleBarChange(event: any, table: Table) {
-    // console.log("event", event, 'table', table)
     switch (event.value) {
       case 'existing-result':
         this.formGroup.patchValue({
@@ -216,7 +215,6 @@ export class MetanomeSettingsComponent {
   }
 
   public runMetoname() {
-    console.log(this.formGroup.value);
     this.dialogRef.close({ values: this.formGroup.value });
   }
 }
