@@ -8,7 +8,11 @@
         [formControl]="selectedFdTab[index]"
         (change)="onFdToggleBarChange($event, table)"
       >
-        <sbb-toggle-option label="Use existing result" value="existing-result">
+        <sbb-toggle-option
+          label="Use existing result"
+          value="existing-result"
+          [disabled]="filteredMetanomeResultsForFd(table).length === 0"
+        >
           <sbb-toggle-details>
             <sbb-select [formControlName]="'fds_' + table.schemaAndName()">
               <sbb-option
@@ -72,7 +76,11 @@
       [formControl]="selectedIndTab"
       (change)="onIndToggleBarChange($event)"
     >
-      <sbb-toggle-option label="Use existing result" value="existing-result">
+      <sbb-toggle-option
+        label="Use existing result"
+        value="existing-result"
+        [disabled]="filteredMetanomeResultsForInd().length === 0"
+      >
         <sbb-toggle-details>
           <sbb-select formControlName="ind">
             <sbb-option

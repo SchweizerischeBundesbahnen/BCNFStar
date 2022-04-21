@@ -111,7 +111,7 @@ export class MetanomeSettingsComponent {
             this.createDefaultFdIndexFile(table.schemaAndName()),
         });
         this.selectedFdTab[index].setValue(
-          existingFdResult ? 'existing-result' : 'normi'
+          existingFdResult ? 'existing-result' : 'hyfd'
         );
       });
       const existingIndResult = this.filteredMetanomeResultsForInd()[0];
