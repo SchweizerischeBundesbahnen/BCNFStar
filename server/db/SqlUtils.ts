@@ -1,6 +1,6 @@
 import IAttribute from "@/definitions/IAttribute";
 import IRelationship from "@/definitions/IRelationship";
-import ITableHead from "@/definitions/ITableHead";
+import ITablePage from "@/definitions/ITablePage";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -33,11 +33,12 @@ export enum DbmsType {
 export default abstract class SqlUtils {
   abstract init(): void;
   public abstract getSchema(): Promise<Array<SchemaQueryRow>>;
-  public abstract getTableHead(
+  public abstract getTablePage(
     tablename: string,
     schemaname: string,
+    offset: number,
     limit: number
-  ): Promise<ITableHead>;
+  ): Promise<ITablePage>;
   public abstract getTableRowCount(
     table: string,
     schema: string

@@ -43,14 +43,22 @@
       <h3>
         <ng-container
           [ngSwitch]="
-            tableRowCounts.get(hoveredTable)! >= headLimit
+            tableRowCounts.get(hoveredTable)! >= pageLimit
               ? 1
               : tableRowCounts.get(hoveredTable)! >= 0 &&
-                tableRowCounts.get(hoveredTable)! < headLimit
+                tableRowCounts.get(hoveredTable)! < pageLimit
               ? 2
               : -1
           "
         >
+          <sbb-paginator
+            (page)="changePage($event)"
+            [pageIndex]="this.page"
+            [pageSize]="headLimit"
+            [length]="tableRowCounts.get(hoveredTable)"
+          >
+          </sbb-paginator>
+
           <ng-container *ngSwitchCase="1">
             Displaying {{ hoveredTable.schemaAndName() }} {{ headLimit }} of
             {{ tableRowCounts.get(hoveredTable) }} rows
@@ -108,18 +116,29 @@
 </ng-template>
 
 <ng-template #errorDialog>
-  <div sbbDialogTitle>Warnuing</div>
+  <div sbbDialogTitle>Warning</div>
   <div sbbDialogContent>
-    An error occured while getting required table data from the server:
-    {{ error.toString() }}
+    An error occured while getting required table data from the server. Check
+    the browser's console and the metanome queue for details.
   </div>
 
   <div sbbDialogActions>
-    <a type="button" sbb-button sbbDialogClose [href]="queueUrl" target="_blank"
-      >Investigate Metanome Logs</a
+    <a
+      class="hover-color-white"
+      type="button"
+      sbb-button
+      sbbDialogClose
+      [href]="queueUrl"
+      target="_blank"
+      >Investigate Metanome logs</a
     >
-    <a type="button" sbb-button sbbDialogClose routerLink="/edit-schema"
-      >Edit Schema regardless</a
+    <a
+      class="hover-color-white"
+      type="button"
+      sbb-button
+      sbbDialogClose
+      routerLink="/edit-schema"
+      >Edit schema regardless</a
     >
     <a type="button" sbb-secondary-button sbbDialogClose>Cancel</a>
   </div>

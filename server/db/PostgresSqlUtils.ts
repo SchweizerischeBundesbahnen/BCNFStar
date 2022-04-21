@@ -7,7 +7,7 @@ import SqlUtils, {
 import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
-import ITableHead from "@/definitions/ITableHead";
+import ITablePage from "@/definitions/ITablePage";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -72,15 +72,18 @@ export default class PostgresSqlUtils extends SqlUtils {
     return table_exists.rowCount > 0;
   }
 
-  public async getTableHead(
+  public async getTablePage(
     tablename: string,
     schemaname: string,
+    offset: number,
     limit: number
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} LIMIT ${limit}`
+        `SELECT * FROM ${schemaname}.${tablename} 
+        LIMIT ${limit} 
+        OFFSET ${offset}`
       );
       return {
         rows: query_result.rows,
