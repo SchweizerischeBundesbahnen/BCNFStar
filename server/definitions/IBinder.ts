@@ -13,3 +13,16 @@ export interface IBinderConfig extends IMetanomeConfig {
   NUM_BUCKETS_PER_COLUMN: number; //= 10
   MEMORY_CHECK_FREQUENCY: number; //= 100
 }
+
+export const defaultBinderConfig: IBinderConfig = {
+  DETECT_NARY: false,
+  MAX_NARY_LEVEL: -1,
+  CLEAN_TEMP: true,
+  INPUT_ROW_LIMIT: -1,
+  FILTER_KEY_FOREIGNKEYS: false,
+  MAX_MEMORY_USAGE_PERCENTAGE: 60,
+  TEMP_FOLDER_PATH: "BINDER_temp",
+  NUM_BUCKETS_PER_COLUMN: 10,
+  MEMORY_CHECK_FREQUENCY: 100,
+  memory: "",
+};

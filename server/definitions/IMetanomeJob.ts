@@ -1,7 +1,7 @@
-export type MetanomeConfig = Record<string, string | number | boolean>;
+import { IMetanomeConfig } from "./IMetanomeConfig";
 
 export interface IMetanomeJob {
   schemaAndTables: string[];
   algoClass: string;
-  config: MetanomeConfig;
+  config: IMetanomeConfig;
 }

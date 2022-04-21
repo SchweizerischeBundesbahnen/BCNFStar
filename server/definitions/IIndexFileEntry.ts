@@ -1,4 +1,4 @@
-import { MetanomeConfig } from "./IMetanomeJob";
+import { IMetanomeConfig } from "./IMetanomeConfig";
 
 export enum MetanomeResultType {
   ind = "InclusionDependency",
@@ -12,6 +12,6 @@ export interface IIndexFileEntry {
   resultType: MetanomeResultType;
   algorithm: string;
   fileName: string;
-  config: MetanomeConfig;
+  config: IMetanomeConfig;
   createDate: number;
 }

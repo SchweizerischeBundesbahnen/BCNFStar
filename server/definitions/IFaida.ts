@@ -11,3 +11,16 @@ export interface IFaidaConfig extends IMetanomeConfig {
   APPROXIMATE_TESTER_BYTES: number; //=32768
   DETECT_NARY: boolean; //=true
 }
+
+export const defaultFaidaConfig: IFaidaConfig = {
+  IGNORE_CONSTANT: true,
+  VIRTUAL_COLUMN_STORE: false,
+  HLL_REL_STD_DEV: 0.01,
+  APPROXIMATE_TESTER: "HLL",
+  REUSE_COLUMN_STORE: false,
+  SAMPLE_GOAL: 500,
+  IGNORE_NULL: true,
+  APPROXIMATE_TESTER_BYTES: 32768,
+  DETECT_NARY: true,
+  memory: "",
+};

@@ -10,6 +10,15 @@ export interface IHyFDConfig extends IMetanomeConfig {
   MAX_DETERMINANT_SIZE: number; //=-1
 }
 
+export const defaulHyfdConfig: IHyFDConfig = {
+  INPUT_ROW_LIMIT: -1,
+  ENABLE_MEMORY_GUARDIAN: true,
+  NULL_EQUALS_NULL: true,
+  VALIDATE_PARALLEL: true,
+  MAX_DETERMINANT_SIZE: -1,
+  memory: "",
+};
+
 // FDs as exported by HyFD
 export interface IHyFD {
   type: "FunctionalDependency";

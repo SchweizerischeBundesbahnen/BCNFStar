@@ -2,10 +2,10 @@ import { open } from "fs/promises";
 
 import MetanomeAlgorithm from "./metanomeAlgorithm";
 import { MetanomeResultType } from "@/definitions/IIndexFileEntry";
-import { MetanomeConfig } from "@/definitions/IMetanomeJob";
+import { IMetanomeConfig } from "@/definitions/IMetanomeConfig";
 
 export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgorithm {
-  constructor(tables: string[], config?: MetanomeConfig) {
+  constructor(tables: string[], config?: IMetanomeConfig) {
     super(tables.sort(), config);
   }
 

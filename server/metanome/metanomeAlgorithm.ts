@@ -10,7 +10,7 @@ import {
   MetanomeResultType,
   IIndexFileEntry,
 } from "@/definitions/IIndexFileEntry";
-import { MetanomeConfig } from "@/definitions/IMetanomeJob";
+import { IMetanomeConfig } from "@/definitions/IMetanomeConfig";
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 
@@ -75,9 +75,9 @@ export default abstract class MetanomeAlgorithm {
   // INTERNAL
 
   protected classpath_separator = process.platform === "win32" ? ";" : ":";
-  protected config: MetanomeConfig;
+  protected config: IMetanomeConfig;
   protected schemaAndTables: string[];
-  constructor(tables: string[], config: MetanomeConfig = {}) {
+  constructor(tables: string[], config: IMetanomeConfig = { memory: "" }) {
     this.schemaAndTables = tables;
     this.config = config;
   }

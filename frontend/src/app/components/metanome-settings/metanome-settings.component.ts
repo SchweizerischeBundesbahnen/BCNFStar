@@ -9,7 +9,11 @@ import {
 } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 import { DatabaseService } from '../../database.service';
-import { MetanomeConfig } from '@server/definitions/IMetanomeJob';
+import { defaulHyfdConfig } from '@server/definitions/IHyFD';
+import { defaultBinderConfig } from '@server/definitions/IBinder';
+import { defaultFaidaConfig } from '@server/definitions/IFaida';
+import { IMetanomeConfig } from '@server/definitions/IMetanomeConfig';
+
 @Component({
   selector: 'app-metanome-settings',
   templateUrl: './metanome-settings.component.html',
@@ -22,51 +26,16 @@ export class MetanomeSettingsComponent {
   public selectedFdTab: Array<FormControl> = [];
   public selectedIndTab: FormControl = new FormControl('existing-result');
 
-  public defaulHyfdConfig: MetanomeConfig = {
-    INPUT_ROW_LIMIT: -1,
-    ENABLE_MEMORY_GUARDIAN: true,
-    NULL_EQUALS_NULL: true,
-    VALIDATE_PARALLEL: true,
-    MAX_DETERMINANT_SIZE: -1,
-    memory: '',
-  };
-
-  public defaultBinderConfig: MetanomeConfig = {
-    DETECT_NARY: false,
-    MAX_NARY_LEVEL: -1,
-    CLEAN_TEMP: true,
-    INPUT_ROW_LIMIT: -1,
-    FILTER_KEY_FOREIGNKEYS: false,
-    MAX_MEMORY_USAGE_PERCENTAGE: 60,
-    TEMP_FOLDER_PATH: 'BINDER_temp',
-    NUM_BUCKETS_PER_COLUMN: 10,
-    MEMORY_CHECK_FREQUENCY: 100,
-    memory: '',
-  };
-
-  public defaultFaidaConfig: MetanomeConfig = {
-    IGNORE_CONSTANT: true,
-    VIRTUAL_COLUMN_STORE: false,
-    HLL_REL_STD_DEV: 0.01,
-    APPROXIMATE_TESTER: 'HLL',
-    REUSE_COLUMN_STORE: false,
-    SAMPLE_GOAL: 500,
-    IGNORE_NULL: true,
-    APPROXIMATE_TESTER_BYTES: 32768,
-    DETECT_NARY: true,
-    memory: '',
-  };
-
   public hyfdConfigs: Record<string, IIndexFileEntry> = {};
   public binderConfigs: Record<string, IIndexFileEntry> = {
     ind: this.createDefaultIndIndexFile(
-      Object.assign({}, this.defaultBinderConfig),
+      Object.assign({}, defaultBinderConfig),
       'de.metanome.algorithms.binder.BINDERFile'
     ),
   };
   public faidaConfigs: Record<string, IIndexFileEntry> = {
     ind: this.createDefaultIndIndexFile(
-      Object.assign({}, this.defaultFaidaConfig),
+      Object.assign({}, defaultFaidaConfig),
       'de.hpi.mpss2015n.approxind.FAIDA'
     ),
   };
@@ -89,7 +58,7 @@ export class MetanomeSettingsComponent {
       this.hyfdConfigs['fds_' + table.schemaAndName()] =
         this.createDefaultFdIndexFile(
           table.schemaAndName(),
-          Object.assign({}, this.defaulHyfdConfig),
+          Object.assign({}, defaulHyfdConfig),
           'de.metanome.algorithms.hyfd_extended.HyFDExtended'
         );
       controlsConfig['fds_' + table.schemaAndName()] = {};
@@ -131,7 +100,7 @@ export class MetanomeSettingsComponent {
 
   public createDefaultFdIndexFile(
     tableName: string,
-    config: MetanomeConfig = Object.assign({}, this.defaulHyfdConfig),
+    config: IMetanomeConfig = Object.assign({}, defaulHyfdConfig),
     algorithm: string = 'de.metanome.algorithms.hyfd_extended.HyFDExtended'
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
@@ -148,7 +117,7 @@ export class MetanomeSettingsComponent {
   }
 
   public createDefaultIndIndexFile(
-    config: MetanomeConfig = Object.assign({}, this.defaultBinderConfig),
+    config: IMetanomeConfig = Object.assign({}, defaultBinderConfig),
     algorithm: string = 'de.metanome.algorithms.binder.BINDERFile'
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
