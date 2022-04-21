@@ -81,8 +81,11 @@ export class MetanomeSettingsComponent {
     let controlsConfig: Record<string, any> = {};
     controlsConfig['ind'] = {};
 
-    tables.forEach((table) => {
+    for (const table of tables) {
       this.selectedFdTab.push(new FormControl('hyfd'));
+      table; // to make linter happy
+    }
+    tables.forEach((table) => {
       this.hyfdConfigs['fds_' + table.schemaAndName()] =
         this.createDefaultFdIndexFile(
           table.schemaAndName(),
@@ -121,6 +124,7 @@ export class MetanomeSettingsComponent {
       this.selectedIndTab.setValue(
         existingIndResult ? 'existing-result' : 'binder'
       );
+
       this.formGroup.updateValueAndValidity();
     });
   }
@@ -128,7 +132,7 @@ export class MetanomeSettingsComponent {
   public createDefaultFdIndexFile(
     tableName: string,
     config: MetanomeConfig = Object.assign({}, this.defaulHyfdConfig),
-    algorithm: string = 'de.metanome.algorithms.normalize.Normi'
+    algorithm: string = 'de.metanome.algorithms.hyfd_extended.HyFDExtended'
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
       config,
@@ -184,7 +188,7 @@ export class MetanomeSettingsComponent {
     return typeof value == 'boolean';
   }
 
-  public getMetanomeConfigurationInformation(result: IIndexFileEntry) {
+  public metanomeConfigInfo(result: IIndexFileEntry): String {
     let settings = [
       new Date(+result.createDate).toLocaleString(),
       result.algorithm.split('.').slice(-1),

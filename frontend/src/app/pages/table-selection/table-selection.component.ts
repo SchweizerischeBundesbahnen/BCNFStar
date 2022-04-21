@@ -109,8 +109,9 @@ export class TableSelectionComponent implements OnInit {
     const jobs = entries.map((entry) => {
       return { promise: this.dataService.runMetanome(entry), entry };
     });
+    jobs.forEach((j) => this.loadingStatus.set(j.entry, 'loading'));
+
     for (const job of jobs) {
-      this.loadingStatus.set(job.entry, 'loading');
       try {
         const result = await job.promise;
         this.loadingStatus.set(job.entry, 'done');
