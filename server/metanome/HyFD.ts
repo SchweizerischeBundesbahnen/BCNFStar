@@ -1,21 +1,28 @@
+// for the oldest version using actual HyFD with js fd extender see d8ceac79c3c6dea194ca803650481ee7fcbb956c
+// HyFDExtended is basically just Normi without the actual normalization step with more HyFD settings,
+// or HyFD with fd extension, and was written by us
 import { join } from "path";
 
 import { absoluteServerDir, splitlines } from "@/utils/files";
 import { splitTableString } from "@/utils/databaseUtils";
+import { sqlUtils } from "@/db";
 import FunctionalDependencyAlgorithm from "./FunctionalDependencyAlgorithm";
-import { createReadStream } from "fs";
-import { createInterface } from "readline";
-import { IHyFD } from "@/definitions/IHyFd";
-import { writeFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
+import { DbmsType } from "@/db/SqlUtils";
 
-// everything in here is still nonsense, I just wanted to document the available options
-export default class HyFD extends FunctionalDependencyAlgorithm {
+const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
+
+export function outputPath(schemaAndTable: string): string {
+  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
+}
+
+export default class HyFDExtended extends FunctionalDependencyAlgorithm {
   protected override algoJarPath(): string {
-    return "HyFD-1.2-SNAPSHOT.jar";
+    return "HyFDExtended-1.2-SNAPSHOT.jar";
   }
 
   public override algoClass(): string {
-    return "de.metanome.algorithms.hyfd.HyFD";
+    return "de.metanome.algorithms.hyfd_extended.HyFDExtended";
   }
 
   protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {
@@ -25,10 +32,9 @@ export default class HyFD extends FunctionalDependencyAlgorithm {
   protected override originalOutputPath(): string {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
-      absoluteServerDir,
-      "metanome",
-      "results",
-      this.outputFileName() + "_fds"
+      OUTPUT_DIR,
+      (sqlUtils.getDbmsName() == DbmsType.mssql ? this.schemaAndTable : table) +
+        "-hyfd_extended.txt"
     );
   }
 
@@ -38,66 +44,29 @@ export default class HyFD extends FunctionalDependencyAlgorithm {
    */
   public override async processFiles(): Promise<void> {
     const path = await this.resultPath();
-    const fileStream = createReadStream(path, { encoding: "utf-8" });
-
-    const lines = createInterface({
-      input: fileStream,
-      crlfDelay: Infinity,
+    const content = await readFile(path, {
+      encoding: "utf-8",
     });
-    const fdMap: Record<
-      string,
-      { lhsColumns: Set<string>; rhsColumns: Set<string> }
-    > = {};
-    for await (const line of lines) {
-      const fd: IHyFD = JSON.parse(line);
-      const lhsColumns = fd.determinant.columnIdentifiers.map(
-        (ci) => ci.columnIdentifier
-      );
-      const key = lhsColumns.sort().join();
-      if (!fdMap[key])
-        fdMap[key] = {
-          lhsColumns: new Set(lhsColumns),
-          rhsColumns: new Set([]),
+    //  format of fdString: "[c_address, c_anothercol] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
+    const result: Array<string> = splitlines(content)
+      .map((fdString) => {
+        const [lhsString, rhsString] = fdString.split(" --> ");
+        return {
+          lhsColumns: lhsString
+            // remove brackets
+            .slice(1, -1)
+            .split(",")
+            .map((s) => s.trim())
+            // remove empty strings if lhs is empty (to create [] instead of [''])
+            .filter((s) => s),
+          rhsColumns: rhsString
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s),
         };
+      })
+      .map((fd) => JSON.stringify(fd));
 
-      fdMap[key].rhsColumns.add(fd.dependant.columnIdentifier);
-    }
-
-    // pushing fd extender
-    const sortedFds = Object.values(fdMap).sort(
-      (a, b) => a.lhsColumns.size - b.lhsColumns.size
-    );
-    let i = 1;
-    let somethingChanged = true;
-    while (somethingChanged) {
-      // console.log("round " + i++);
-      somethingChanged = false;
-      for (const fd of sortedFds) {
-        for (const other of sortedFds) {
-          if (other == fd) continue;
-          if (
-            [...fd.lhsColumns].every(
-              (c) => other.rhsColumns.has(c) || other.lhsColumns.has(c)
-            )
-          ) {
-            for (const column of fd.rhsColumns) {
-              if (!other.rhsColumns.has(column)) {
-                somethingChanged = true;
-              }
-              other.rhsColumns.add(column);
-            }
-            fd.rhsColumns.forEach((c) => other.rhsColumns.add(c));
-          }
-        }
-      }
-    }
-    const resultFds: Array<string> = sortedFds.map((fd) => {
-      fd.lhsColumns.forEach((c) => fd.rhsColumns.delete(c));
-      return JSON.stringify({
-        lhsColumns: [...fd.lhsColumns],
-        rhsColumns: [...fd.rhsColumns],
-      });
-    });
-    await writeFile(path, resultFds.join("\n"));
+    await writeFile(path, result.join("\n"));
   }
 }

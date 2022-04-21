@@ -10,7 +10,6 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { DatabaseService } from '../../database.service';
 import { MetanomeConfig } from '@server/definitions/IMetanomeJob';
-
 @Component({
   selector: 'app-metanome-settings',
   templateUrl: './metanome-settings.component.html',
@@ -23,16 +22,7 @@ export class MetanomeSettingsComponent {
   public selectedFdTab: Array<FormControl> = [];
   public selectedIndTab: FormControl = new FormControl('existing-result');
 
-  public defaultHyFdConfig: MetanomeConfig = {
-    INPUT_ROW_LIMIT: -1,
-    ENABLE_MEMORY_GUARDIAN: true,
-    NULL_EQUALS_NULL: true,
-    VALIDATE_PARALLEL: true,
-    MAX_DETERMINANT_SIZE: -1,
-    memory: '',
-  };
-
-  public defaultHyFDExtendedConfig: MetanomeConfig = {
+  public defaulHyfdConfig: MetanomeConfig = {
     INPUT_ROW_LIMIT: -1,
     ENABLE_MEMORY_GUARDIAN: true,
     NULL_EQUALS_NULL: true,
@@ -67,7 +57,6 @@ export class MetanomeSettingsComponent {
     memory: '',
   };
 
-  public hyfdExtendedConfigs: Record<string, IIndexFileEntry> = {};
   public hyfdConfigs: Record<string, IIndexFileEntry> = {};
   public binderConfigs: Record<string, IIndexFileEntry> = {
     ind: this.createDefaultIndIndexFile(
@@ -93,17 +82,12 @@ export class MetanomeSettingsComponent {
     controlsConfig['ind'] = {};
 
     tables.forEach((table) => {
-      this.selectedFdTab.push(new FormControl('hyfd_extended'));
-      this.hyfdExtendedConfigs['fds_' + table.schemaAndName()] =
+      this.selectedFdTab.push(new FormControl('hyfd'));
+      this.hyfdConfigs['fds_' + table.schemaAndName()] =
         this.createDefaultFdIndexFile(
           table.schemaAndName(),
-          Object.assign({}, this.defaultHyFDExtendedConfig),
+          Object.assign({}, this.defaulHyfdConfig),
           'de.metanome.algorithms.hyfd_extended.HyFDExtended'
-        );
-      this.hyfdConfigs['fds_' + table.schemaAndName()] =
-        this.createDefaultIndIndexFile(
-          Object.assign({}, this.defaultHyFdConfig),
-          'de.metanome.algorithms.hyfd.HyFD'
         );
       controlsConfig['fds_' + table.schemaAndName()] = {};
     });
@@ -143,7 +127,7 @@ export class MetanomeSettingsComponent {
 
   public createDefaultFdIndexFile(
     tableName: string,
-    config: MetanomeConfig = Object.assign({}, this.defaultHyFDExtendedConfig),
+    config: MetanomeConfig = Object.assign({}, this.defaulHyfdConfig),
     algorithm: string = 'de.metanome.algorithms.normalize.Normi'
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
@@ -219,12 +203,6 @@ export class MetanomeSettingsComponent {
         this.formGroup.patchValue({
           ['fds_' + table.schemaAndName()]:
             this.filteredMetanomeResultsForFd(table)[0],
-        });
-        break;
-      case 'hyfd_extended':
-        this.formGroup.patchValue({
-          ['fds_' + table.schemaAndName()]:
-            this.hyfdExtendedConfigs['fds_' + table.schemaAndName()],
         });
         break;
       case 'hyfd':

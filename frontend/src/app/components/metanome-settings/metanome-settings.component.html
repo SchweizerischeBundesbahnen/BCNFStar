@@ -20,53 +20,7 @@
             </sbb-select>
           </sbb-toggle-details>
         </sbb-toggle-option>
-        <sbb-toggle-option label="HyFD Extended" value="hyfd_extended">
-          <sbb-toggle-details>
-            <sbb-select
-              [formControlName]="'fds_' + table.schemaAndName()"
-              [value]="hyfdExtendedConfigs['fds_' + table.schemaAndName()]"
-              class="display-non"
-            >
-              <sbb-option
-                [value]="hyfdExtendedConfigs['fds_' + table.schemaAndName()]"
-              >
-                {{ hyfdExtendedConfigs["fds_" + table.schemaAndName()] }}
-              </sbb-option>
-            </sbb-select>
-            <div
-              *ngFor="
-                let entry of hyfdExtendedConfigs[
-                  'fds_' + table.schemaAndName()
-                ]['config'] | keyvalue
-              "
-            >
-              <sbb-checkbox
-                *ngIf="isBoolean(entry.value)"
-                [(ngModel)]="
-                  hyfdExtendedConfigs['fds_' + table.schemaAndName()]['config'][
-                    entry.key
-                  ]
-                "
-                [ngModelOptions]="{ standalone: true }"
-              >
-                {{ entry.key }}
-              </sbb-checkbox>
-              <div *ngIf="!isBoolean(entry.value)">
-                <sbb-label>{{ entry.key }}</sbb-label>
-                <input
-                  sbbInput
-                  [(ngModel)]="
-                    hyfdExtendedConfigs['fds_' + table.schemaAndName()][
-                      'config'
-                    ][entry.key]
-                  "
-                  [ngModelOptions]="{ standalone: true }"
-                />
-              </div>
-            </div>
-          </sbb-toggle-details>
-        </sbb-toggle-option>
-        <sbb-toggle-option label="HyFd" value="hyfd">
+        <sbb-toggle-option label="HyFD" value="hyfd">
           <sbb-toggle-details>
             <sbb-select
               [formControlName]="'fds_' + table.schemaAndName()"

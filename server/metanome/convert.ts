@@ -13,7 +13,7 @@
 import { readdirSync } from "fs";
 import { access, mkdir, rename } from "fs/promises";
 import BINDER from "./BINDER";
-import HyFDExtended from "./HyFDExtended";
+import HyFD from "./HyFD";
 
 (async function () {
   const indFiles = readdirSync("metanome/results").filter((f) =>
@@ -46,7 +46,7 @@ import HyFDExtended from "./HyFDExtended";
   await createFolder("./metanome/fds");
 
   for (let i = 0; i < fdNames.length; i++) {
-    const algo = new HyFDExtended(fdNames[i]);
+    const algo = new HyFD(fdNames[i]);
     await algo.addToIndexFile();
     await rename("metanome/temp/" + fdFiles[i], await algo.resultPath());
     await algo.processFiles();

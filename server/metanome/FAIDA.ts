@@ -14,6 +14,8 @@ const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
 export default class FAIDA extends InclusionDependencyAlgorithm {
   protected override algoJarPath(): string {
+    // this version of FAIDA is slightly altered, it replaces calls to Validate.inclusiveBetween
+    // with self-written assertions (instead of Validate.inclusiveBetween(1,1,x), write assert(x==1))
     return "FAIDA-1.2-SNAPSHOT.jar";
   }
 
