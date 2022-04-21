@@ -13,7 +13,7 @@ import SourceRelationship from './SourceRelationship';
 export default class Table {
   public name = '';
   public schemaName = '';
-  public columns = new ColumnCombination();
+  public columns;
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Set<Relationship>();
@@ -43,7 +43,7 @@ export default class Table {
   public _relationshipsValid = true;
 
   public constructor(columns?: ColumnCombination) {
-    if (columns) this.columns = columns;
+    this.columns = columns || new ColumnCombination();
   }
 
   public static fromITable(iTable: ITable): Table {
@@ -172,8 +172,8 @@ export default class Table {
       sourceTables.forEach((sourceTable) => {
         let adjacentRelationship = [...relationships].filter(
           (rel) =>
-            rel.referenced.sourceTableInstance() == sourceTable ||
-            rel.referencing.sourceTableInstance() == sourceTable
+            rel.referenced[0].sourceTableInstance == sourceTable ||
+            rel.referencing[0].sourceTableInstance == sourceTable
         );
         if (
           adjacentRelationship.length == 1 &&
@@ -255,10 +255,27 @@ export default class Table {
   public columnsBySourceTableInstance() {
     const result = new Map<SourceTableInstance, ColumnCombination>();
 
+    for (const source of this.sources) {
+      result.set(source, new ColumnCombination());
+    }
+
     for (const column of this.columns) {
-      if (!result.has(column.sourceTableInstance))
-        result.set(column.sourceTableInstance, new ColumnCombination());
       result.get(column.sourceTableInstance)!.add(column);
+    }
+    return result;
+  }
+
+  public reducedSourceTableInstances() {
+    const result = new Array<SourceTableInstance>();
+    for (const rel of this.relationships) {
+      const instance = new ColumnCombination(
+        rel.referenced
+      ).sourceTableInstance();
+      if (result.includes(instance)) {
+        console.error('one instance is referenced by multiple relationships');
+        continue;
+      }
+      result.push(instance);
     }
     return result;
   }
@@ -269,19 +286,51 @@ export default class Table {
    * @returns all sets of columns - each set coming from the same SourceTableInstance - which match the sourceColumns
    */
   public columnsEquivalentTo(
-    sourceColumns: Array<SourceColumn>
+    sourceColumns: Array<SourceColumn>,
+    allowReduced: boolean
   ): Array<Array<Column>> {
     const result = new Array<Array<Column>>();
     const sourceTable = sourceColumns[0].table;
 
-    for (const [
-      sourceTableInstance,
-      columns,
-    ] of this.columnsBySourceTableInstance().entries()) {
-      if (!sourceTableInstance.table.equals(sourceTable)) continue;
+    const columnsByInstance = this.columnsBySourceTableInstance();
 
-      const equivalentColumns = columns.columnsEquivalentTo(sourceColumns);
-      if (equivalentColumns) result.push(equivalentColumns);
+    const ambiguous = new Map<Column, Column>();
+    if (allowReduced) {
+      for (const rel of this.relationships) {
+        for (const i in rel.referencing) {
+          columnsByInstance
+            .get(rel.referenced[i].sourceTableInstance)!
+            .add(rel.referenced[i]);
+          ambiguous.set(rel.referenced[i], rel.referencing[i]);
+        }
+      }
+    }
+
+    for (const [sourceTableInstance, columns] of columnsByInstance.entries()) {
+      if (!sourceTableInstance.table.equals(sourceTable)) continue;
+      if (
+        !allowReduced &&
+        this.reducedSourceTableInstances().includes(sourceTableInstance)
+      )
+        continue;
+
+      const equivalentColumns = columns.columnsEquivalentTo(
+        sourceColumns,
+        true
+      );
+      if (!equivalentColumns) continue;
+      if (allowReduced) {
+        const selectedEquivalentColumns = equivalentColumns.map((column) => {
+          if (this.columns.includes(column)) return column;
+          while (ambiguous.has(column)) {
+            column = ambiguous.get(column)!;
+            if (this.columns.includes(column)) return column;
+          }
+          return undefined;
+        });
+        if (selectedEquivalentColumns.some((column) => !column)) continue;
+      }
+      result.push(equivalentColumns);
     }
     return result;
   }

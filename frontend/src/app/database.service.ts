@@ -91,7 +91,7 @@ export class DatabaseService {
       );
       if (table) {
         table!.pk = new ColumnCombination(
-          ...table!.columns
+          table!.columns
             .asArray()
             .filter((column) => fk.attributes.includes(column.name))
         );
@@ -222,9 +222,9 @@ export class DatabaseService {
       columnRelationships: referenced.pk!.inOrder().map((element) => {
         return {
           referencingColumn:
-            relationship._referencing[
-              relationship._referenced.indexOf(
-                relationship._referenced.find((c) => c.equals(element))!
+            relationship.referencing[
+              relationship.referenced.indexOf(
+                relationship.referenced.find((c) => c.equals(element))!
               )
             ].name,
           referencedColumn: element.name,

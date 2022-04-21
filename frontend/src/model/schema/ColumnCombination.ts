@@ -5,8 +5,8 @@ import SourceTableInstance from './SourceTableInstance';
 export default class ColumnCombination {
   private _columns: Array<Column> = [];
 
-  public constructor(...columns: Array<Column>) {
-    this.add(...columns);
+  public constructor(columns?: Array<Column>) {
+    this._columns = columns || new Array();
   }
 
   [Symbol.iterator]() {
@@ -18,12 +18,12 @@ export default class ColumnCombination {
   }
 
   public copy(): ColumnCombination {
-    return new ColumnCombination(...this._columns);
+    return new ColumnCombination(new Array(...this._columns));
   }
 
   public columnsFromNames(...names: Array<string>) {
     return new ColumnCombination(
-      ...this.asArray().filter((column: Column) => names.includes(column.name))
+      this.asArray().filter((column: Column) => names.includes(column.name))
     );
   }
 
@@ -33,7 +33,7 @@ export default class ColumnCombination {
 
   public columnsFromIds(...numbers: Array<number>) {
     return new ColumnCombination(
-      ...this.inOrder().filter((col, i) => numbers.includes(i))
+      this.inOrder().filter((col, i) => numbers.includes(i))
     );
   }
 
@@ -58,7 +58,7 @@ export default class ColumnCombination {
 
   public columnsEquivalentTo(
     sourceColumns: Array<SourceColumn>,
-    findAll = true
+    findAll: boolean
   ) {
     const equivalentColumns = new Array<Column>();
     for (const sourceColumn of sourceColumns) {
@@ -138,7 +138,7 @@ export default class ColumnCombination {
     mapping: Map<SourceTableInstance, SourceTableInstance>
   ): ColumnCombination {
     return new ColumnCombination(
-      ...this._columns.map((column) => column.applySourceMapping(mapping))
+      this._columns.map((column) => column.applySourceMapping(mapping))
     );
   }
 }

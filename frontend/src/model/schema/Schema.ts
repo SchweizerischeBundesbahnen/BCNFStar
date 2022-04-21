@@ -104,7 +104,7 @@ export default class Schema {
       if (otherTable == table || !otherTable.pk) continue;
       const pk = otherTable.pk!.asArray();
       const sourceColumns = pk.map((column) => column.sourceColumn);
-      table.columnsEquivalentTo(sourceColumns).forEach((cc) => {
+      table.columnsEquivalentTo(sourceColumns, true).forEach((cc) => {
         result.push({
           relationship: new Relationship(cc, pk),
           referencing: table,
@@ -123,7 +123,6 @@ export default class Schema {
   private calculateIndsOf(
     table: Table
   ): Map<SourceRelationship, Array<TableRelationship>> {
-    // TODO: fks are sometimes not removed because the objects are not identical // solved?
     let onlyInds = new Array(...this.inds).filter(
       (ind) => !this.fks.find((fk) => fk.equals(ind))
     );
@@ -152,15 +151,15 @@ export default class Schema {
   ): Map<SourceRelationship, Array<TableRelationship>> {
     let result = new Map<SourceRelationship, Array<TableRelationship>>();
     for (const rel of relationships) {
-      let ccs = table.columnsEquivalentTo(rel.referencing);
+      let ccs = table.columnsEquivalentTo(rel.referencing, true);
       if (ccs.length == 0) continue;
 
       for (const otherTable of this.tables) {
         if (otherTable == table) continue;
         let otherCCs = otherTable
-          .columnsEquivalentTo(rel.referenced)
+          .columnsEquivalentTo(rel.referenced, false)
           .filter((otherCC) =>
-            otherTable.isKey(new ColumnCombination(...otherCC))
+            otherTable.isKey(new ColumnCombination(otherCC))
           );
         if (otherCCs.length == 0) continue;
         result.set(rel, []);
@@ -181,22 +180,19 @@ export default class Schema {
   public calculateFdsOf(table: Table) {
     const sources = new Set(
       table.columns.asArray().map((column) => column.sourceTableInstance.table)
-    ); //reference??
+    );
     const fds = Array.from(sources)
       .map((source) => this._fds.get(source)!)
       .flat();
     const columnsByInstance = table.columnsBySourceTableInstance();
     for (const fd of fds) {
-      for (const lhs of table.columnsEquivalentTo(fd.lhs)) {
+      for (const lhs of table.columnsEquivalentTo(fd.lhs, true)) {
         const possibleRhsColumns = columnsByInstance.get(
           lhs[0].sourceTableInstance
         )!;
         const rhs = possibleRhsColumns.columnsEquivalentTo(fd.rhs, false)!;
         if (lhs.length < rhs.length) {
-          table.addFd(
-            new ColumnCombination(...lhs),
-            new ColumnCombination(...rhs)
-          );
+          table.addFd(new ColumnCombination(lhs), new ColumnCombination(rhs));
         }
       }
     }
@@ -249,8 +245,10 @@ export default class Schema {
     return [...this.fksOf(table)].every((fk) => {
       let fkColumns = fk.relationship.referencing;
       return (
-        fkColumns.isSubsetOf(table.remainingSchema(fd)) ||
-        fkColumns.isSubsetOf(table.generatingSchema(fd))
+        new ColumnCombination(fkColumns).isSubsetOf(
+          table.remainingSchema(fd)
+        ) ||
+        new ColumnCombination(fkColumns).isSubsetOf(table.generatingSchema(fd))
       );
     });
   }
@@ -310,7 +308,7 @@ export default class Schema {
     referencing.fds.forEach((fd) => {
       let newLhs = relationship.referencingToReferencedColumnsIn(fd.lhs);
       let newRhs = relationship.referencingToReferencedColumnsIn(fd.rhs);
-      if (newLhs.isSubsetOf(relationship.referenced)) {
+      if (newLhs.isSubsetOf(new ColumnCombination(relationship.referenced))) {
         let correspondingFd = table.fds.find((fd) => fd.lhs.equals(newLhs));
         if (correspondingFd) correspondingFd.rhs.union(newRhs);
         else table.addFd(newLhs, newRhs);
@@ -320,7 +318,7 @@ export default class Schema {
     });
 
     // extension
-    let fk = relationship.referenced;
+    let fk = new ColumnCombination(relationship.referenced);
     let fkFds = table.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
     table.fds.forEach((fd) => {
       let rhsFkPart = fd.rhs.copy().intersect(fk);

@@ -69,8 +69,12 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
       if (!map.has(tableRel.referenced)) {
         map.set(tableRel.referenced, new ColumnCombination());
       }
-      map.get(tableRel.referencing)!.union(tableRel.relationship.referencing);
-      map.get(tableRel.referenced)!.union(tableRel.relationship.referenced);
+      map
+        .get(tableRel.referencing)!
+        .union(new ColumnCombination(tableRel.relationship.referencing));
+      map
+        .get(tableRel.referenced)!
+        .union(new ColumnCombination(tableRel.relationship.referenced));
     }
     this.selectColumns.emit(map);
   }
@@ -92,7 +96,7 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
   }
 
   get fdClusterFilter(): ColumnCombination {
-    return new ColumnCombination(...this._fdClusterFilter);
+    return new ColumnCombination(this._fdClusterFilter);
   }
 
   fdClusters() {

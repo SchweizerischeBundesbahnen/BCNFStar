@@ -25,12 +25,12 @@ export default class Relationship {
     this._referenced.push(referencedColumn);
   }
 
-  public get referencing(): ColumnCombination {
-    return new ColumnCombination(...this._referencing);
+  public get referencing(): Array<Column> {
+    return Array.from(this._referencing);
   }
 
-  public get referenced(): ColumnCombination {
-    return new ColumnCombination(...this._referenced);
+  public get referenced(): Array<Column> {
+    return Array.from(this._referenced);
   }
 
   public sourceRelationship(): SourceRelationship {
@@ -46,9 +46,8 @@ export default class Relationship {
     let newCC = cc.copy();
     for (const i in this._referencing) {
       if (newCC.includes(this._referencing[i])) {
-        newCC
-          .setMinus(new ColumnCombination(this._referencing[i]))
-          .union(new ColumnCombination(this._referenced[i]));
+        newCC.delete(this._referencing[i]);
+        newCC.add(this._referenced[i]);
       }
     }
     return newCC;
@@ -70,15 +69,13 @@ export default class Relationship {
   public toIRelationship(): IRelationship {
     return {
       referencing: {
-        name: `${this.referencing.sourceTableInstance().table.name}`,
-        schemaName: `${
-          this.referencing.sourceTableInstance().table.schemaName
-        }`,
+        name: `${this.referencing[0].sourceTableInstance.table.name}`,
+        schemaName: `${this.referencing[0].sourceTableInstance.table.schemaName}`,
         attributes: [],
       },
       referenced: {
-        name: `${this.referenced.sourceTableInstance().table.name}`,
-        schemaName: `${this.referenced.sourceTableInstance().table.schemaName}`,
+        name: `${this.referenced[0].sourceTableInstance.table.name}`,
+        schemaName: `${this.referenced[0].sourceTableInstance.table.schemaName}`,
         attributes: [],
       },
       columnRelationships: this._referencing.map((element, index) => {
