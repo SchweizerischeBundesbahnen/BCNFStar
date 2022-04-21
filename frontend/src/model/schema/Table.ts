@@ -274,23 +274,15 @@ export default class Table {
     const result = new Array<Array<Column>>();
     const sourceTable = sourceColumns[0].table;
 
-    sourceLoop: for (const [
+    for (const [
       sourceTableInstance,
       columns,
     ] of this.columnsBySourceTableInstance().entries()) {
       if (!sourceTableInstance.table.equals(sourceTable)) continue;
 
-      const equivalentColumns = new Array<Column>();
-      for (const sourceColumn of sourceColumns) {
-        let equivalentColumn = columns
-          .asArray()
-          .find((column) => column.sourceColumn.equals(sourceColumn));
-        if (!equivalentColumn) continue sourceLoop;
-        equivalentColumns.push(equivalentColumn);
-      }
-      result.push(equivalentColumns);
+      const equivalentColumns = columns.columnsEquivalentTo(sourceColumns);
+      if (equivalentColumns) result.push(equivalentColumns);
     }
-
     return result;
   }
 

@@ -6,39 +6,30 @@ import Relationship from './Relationship';
 import SourceRelationship from './SourceRelationship';
 import Table from './Table';
 import ColumnCombination from './ColumnCombination';
+import SourceFunctionalDependency from './SourceFunctionalDependency';
+import SourceTable from './SourceTable';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
   private _fks = new Array<SourceRelationship>();
   private _inds = new Array<SourceRelationship>();
+  private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
 
   public constructor(...tables: Array<Table>) {
-    this.add(...tables);
+    this.addTables(...tables);
   }
 
-  public add(...tables: Array<Table>) {
+  public addTables(...tables: Array<Table>) {
     tables.forEach((table) => {
       this.tables.add(table);
     });
     this.relationshipsValid = false;
   }
 
-  public delete(...tables: Array<Table>) {
+  public deleteTables(...tables: Array<Table>) {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
-    this.relationshipsValid = false;
-  }
-
-  /**
-   * Returns a copy of the set of foreign key relationships
-   */
-  public get fks(): Array<SourceRelationship> {
-    return new Array(...this._fks);
-  }
-
-  public set fks(fkRelationships: Array<SourceRelationship>) {
-    this._fks = fkRelationships;
     this.relationshipsValid = false;
   }
 
@@ -52,21 +43,30 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  /**
-   * Returns a copy of the set of inclusion dependency relationships
-   */
-  public get inds(): Array<SourceRelationship> {
-    return new Array(...this._inds);
-  }
-
-  public set inds(inds: Array<SourceRelationship>) {
-    this._inds = inds;
-    this.relationshipsValid = false;
-  }
-
   public addInd(ind: SourceRelationship) {
     this._inds.push(ind);
     this.relationshipsValid = false;
+  }
+
+  public addFd(fd: SourceFunctionalDependency) {
+    if (!this._fds.has(fd.lhs[0].table)) {
+      this._fds.set(fd.lhs[0].table, new Array());
+    }
+    this._fds.get(fd.lhs[0].table)!.push(fd);
+  }
+
+  /**
+   * Returns a copy of the foreign key relationships
+   */
+  public get fks(): Array<SourceRelationship> {
+    return new Array(...this._fks);
+  }
+
+  /**
+   * Returns a copy of the inclusion dependency relationships
+   */
+  public get inds(): Array<SourceRelationship> {
+    return new Array(...this._inds);
   }
 
   private set relationshipsValid(valid: boolean) {
@@ -178,6 +178,43 @@ export default class Schema {
     return result;
   }
 
+  public calculateFdsOf(table: Table) {
+    const sources = new Set(
+      table.columns.asArray().map((column) => column.sourceTableInstance.table)
+    ); //reference??
+    const fds = Array.from(sources)
+      .map((source) => this._fds.get(source)!)
+      .flat();
+    const columnsByInstance = table.columnsBySourceTableInstance();
+    for (const fd of fds) {
+      for (const lhs of table.columnsEquivalentTo(fd.lhs)) {
+        const possibleRhsColumns = columnsByInstance.get(
+          lhs[0].sourceTableInstance
+        )!;
+        const rhs = possibleRhsColumns.columnsEquivalentTo(fd.rhs, false)!;
+        if (lhs.length < rhs.length) {
+          table.addFd(
+            new ColumnCombination(...lhs),
+            new ColumnCombination(...rhs)
+          );
+        }
+      }
+    }
+  }
+
+  private extend(table: Table, fk: ColumnCombination) {
+    //let fk = relationship.referenced;
+    let fkFds = table.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
+    table.fds.forEach((fd) => {
+      let rhsFkPart = fd.rhs.copy().intersect(fk);
+      fkFds
+        .filter((fkFd) => fkFd.lhs.isSubsetOf(rhsFkPart))
+        .forEach((fkFd) => {
+          fd.rhs.union(fkFd.rhs);
+        });
+    });
+  }
+
   public splittableFdClustersOf(table: Table): Array<FdCluster> {
     if (!table._splittableFdClusters)
       table._splittableFdClusters = this.calculateSplittableFdClustersOf(table);
@@ -231,8 +268,8 @@ export default class Schema {
     generatingName?: string
   ) {
     let tables = table.split(fd, generatingName);
-    this.add(...tables);
-    this.delete(table);
+    this.addTables(...tables);
+    this.deleteTables(table);
     return tables;
   }
 
@@ -254,9 +291,9 @@ export default class Schema {
   public join(fk: TableRelationship) {
     let newTable = fk.referencing.join(fk.referenced, fk.relationship);
     this.setFdsFor(newTable, fk.referencing, fk.referenced, fk.relationship);
-    this.add(newTable);
-    this.delete(fk.referencing);
-    this.delete(fk.referenced);
+    this.addTables(newTable);
+    this.deleteTables(fk.referencing);
+    this.deleteTables(fk.referenced);
     return newTable;
   }
 

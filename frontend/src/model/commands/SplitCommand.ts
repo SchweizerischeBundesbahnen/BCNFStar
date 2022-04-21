@@ -29,12 +29,12 @@ export default class SplitCommand extends Command {
   }
 
   protected override _undo(): void {
-    this.schema.delete(...this.children!);
-    this.schema.add(this.table);
+    this.schema.deleteTables(...this.children!);
+    this.schema.addTables(this.table);
   }
 
   protected override _redo(): void {
-    this.schema.delete(this.table);
-    this.schema.add(...this.children!);
+    this.schema.deleteTables(this.table);
+    this.schema.addTables(...this.children!);
   }
 }

@@ -7,8 +7,8 @@ import SourceTableInstance from './SourceTableInstance';
 export default class Relationship {
   // these arrays are linked, the column in _referencing has the same index as the
   // corresponding column in _referenced
-  private _referencing = new Array<Column>();
-  private _referenced = new Array<Column>();
+  private _referencing: Array<Column>;
+  private _referenced: Array<Column>;
 
   /**
    * cached result of the score calculation. Should not be accessed directly

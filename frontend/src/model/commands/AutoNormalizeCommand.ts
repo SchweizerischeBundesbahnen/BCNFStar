@@ -18,12 +18,12 @@ export default class AutoNormalizeCommand extends Command {
   }
 
   protected override _undo(): void {
-    this.schema.delete(...this.resultingTables!);
-    this.schema.add(...this.tables);
+    this.schema.deleteTables(...this.resultingTables!);
+    this.schema.addTables(...this.tables);
   }
 
   protected override _redo(): void {
-    this.schema.delete(...this.tables);
-    this.schema.add(...this.resultingTables!);
+    this.schema.deleteTables(...this.tables);
+    this.schema.addTables(...this.resultingTables!);
   }
 }

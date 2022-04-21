@@ -15,12 +15,12 @@ export default class JoinCommand extends Command {
   }
 
   protected override _undo(): void {
-    this.schema.delete(this.parent!);
-    this.schema.add(this.fk.referenced, this.fk.referencing);
+    this.schema.deleteTables(this.parent!);
+    this.schema.addTables(this.fk.referenced, this.fk.referencing);
   }
 
   protected override _redo(): void {
-    this.schema.delete(this.fk.referenced, this.fk.referencing);
-    this.schema.add(this.parent!);
+    this.schema.deleteTables(this.fk.referenced, this.fk.referencing);
+    this.schema.addTables(this.parent!);
   }
 }

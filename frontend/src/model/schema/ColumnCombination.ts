@@ -1,4 +1,5 @@
 import Column from './Column';
+import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 
 export default class ColumnCombination {
@@ -53,6 +54,21 @@ export default class ColumnCombination {
         sourceTables.push(column.sourceTableInstance);
     });
     return sourceTables;
+  }
+
+  public columnsEquivalentTo(
+    sourceColumns: Array<SourceColumn>,
+    findAll = true
+  ) {
+    const equivalentColumns = new Array<Column>();
+    for (const sourceColumn of sourceColumns) {
+      let equivalentColumn = this.asArray().find((column) =>
+        column.sourceColumn.equals(sourceColumn)
+      );
+      if (findAll && !equivalentColumn) return undefined;
+      if (equivalentColumn) equivalentColumns.push(equivalentColumn);
+    }
+    return equivalentColumns;
   }
 
   public add(...columns: Array<Column>) {

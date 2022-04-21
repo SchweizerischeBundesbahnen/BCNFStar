@@ -12,7 +12,6 @@ import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
 import { firstValueFrom } from 'rxjs';
-import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
 import IPrimaryKey from '@server/definitions/IPrimaryKey';
 import Column from '../model/schema/Column';
@@ -21,6 +20,7 @@ import IRelationship from '@server/definitions/IRelationship';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import SourceColumn from '../model/schema/SourceColumn';
 import SourceRelationship from '../model/schema/SourceRelationship';
+import SourceFunctionalDependency from '../model/schema/SourceFunctionalDependency';
 
 @Injectable({
   providedIn: 'root',
@@ -156,13 +156,20 @@ export class DatabaseService {
     });
   }
 
+  public resolveFds(fds: Array<IFunctionalDependency>) {
+    for (const fd of fds) {
+      const lhs = fd.lhsColumns.map((name) => this.sourceColumns.get(name)!);
+      const rhs = fd.rhsColumns.map((name) => this.sourceColumns.get(name)!);
+      this.schema!.addFd(new SourceFunctionalDependency(lhs, rhs));
+    }
+    for (const table of this.schema!.tables) {
+      this.schema!.calculateFdsOf(table);
+    }
+  }
+
   public async setInputTables(tables: Array<Table>) {
-    const indPromise = this.getINDs(tables);
-    const fdPromises: Record<
-      string,
-      Promise<Array<IFunctionalDependency>>
-    > = {};
-    for (const table of tables) fdPromises[table.fullName] = this.getFDs(table);
+    const inds = this.getINDs(tables);
+    const fds = Promise.all(tables.map((table) => this.getFDs(table)));
 
     this.schema = new Schema(...tables);
     for (const table of tables) {
@@ -176,15 +183,9 @@ export class DatabaseService {
           )
         );
     }
-    for (const table of tables) {
-      const iFDs = await fdPromises[table.fullName];
 
-      const fds = iFDs.map((fd) =>
-        FunctionalDependency.fromIFunctionalDependency(table, fd)
-      );
-      table.setFds(...fds);
-    }
-    this.resolveInds(await indPromise);
+    this.resolveFds((await fds).flat());
+    this.resolveInds(await inds);
     this.resolveIFks(this.iFks);
     this.resolveIPks(this.iPks);
   }

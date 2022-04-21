@@ -67,7 +67,7 @@ export function exampleSchema(): Schema {
     tableB.columns.columnsFromNames('B1'),
     tableB.columns.columnsFromNames('B4')
   );
-  schema.add(tableA, tableB);
+  schema.addTables(tableA, tableB);
 
   let relAB = new Relationship();
   relAB.add(
