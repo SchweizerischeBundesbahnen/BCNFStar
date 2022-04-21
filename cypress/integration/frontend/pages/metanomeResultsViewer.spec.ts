@@ -1,3 +1,5 @@
+import { hyfdAlgorithmName } from "../../../../server/definitions/IHyFD";
+import { binderAlgorithmName } from "../../../../server/definitions/IBinder";
 /// <reference types="cypress" />
 
 describe("The metanoem results page", () => {
@@ -20,13 +22,13 @@ describe("The metanoem results page", () => {
   });
   it("contains metanome result rows", () => {
     cy.get("tr").should("have.length.at.least", 3);
-    cy.contains("de.metanome.algorithms.hyfd_extended.HyFDExtended");
-    cy.contains("de.metanome.algorithms.binder.BINDERFile");
+    cy.contains(hyfdAlgorithmName);
+    cy.contains(binderAlgorithmName);
     cy.contains("public.part_partsupp_supplier_denormalized");
   });
 
   it("delete metanome results", () => {
-    cy.contains("de.metanome.algorithms.hyfd_extended.HyFDExtended");
+    cy.contains(hyfdAlgorithmName);
     cy.get("tr")
       .its("length")
       .then((length) => {

@@ -9,6 +9,7 @@ import IInclusionDependency, {
 import { sqlUtils } from "@/db";
 import { splitTableString } from "@/utils/databaseUtils";
 import { DbmsType } from "@/db/SqlUtils";
+import { binderAlgorithmName } from "@/definitions/IBinder";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
@@ -18,7 +19,7 @@ export default class BINDER extends InclusionDependencyAlgorithm {
   }
 
   public override algoClass(): string {
-    return "de.metanome.algorithms.binder.BINDERFile";
+    return binderAlgorithmName;
   }
 
   protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {

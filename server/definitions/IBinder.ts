@@ -1,5 +1,7 @@
 import { IMetanomeConfig } from "./IMetanomeConfig";
 
+export const binderAlgorithmName = "de.metanome.algorithms.binder.BINDERFile";
+
 export interface IBinderConfig extends IMetanomeConfig {
   // whether to detect nary inds at all
   DETECT_NARY: boolean; //=false

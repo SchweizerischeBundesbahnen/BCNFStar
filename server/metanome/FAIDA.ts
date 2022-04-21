@@ -9,6 +9,7 @@ import IInclusionDependency, {
 import { sqlUtils } from "@/db";
 import { splitTableString } from "@/utils/databaseUtils";
 import { DbmsType } from "@/db/SqlUtils";
+import { faidaAlgorithmName } from "@/definitions/IFaida";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
@@ -20,7 +21,7 @@ export default class FAIDA extends InclusionDependencyAlgorithm {
   }
 
   public override algoClass(): string {
-    return "de.hpi.mpss2015n.approxind.FAIDA";
+    return faidaAlgorithmName;
   }
 
   protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {

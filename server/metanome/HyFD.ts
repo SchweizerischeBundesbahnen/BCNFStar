@@ -9,6 +9,7 @@ import { sqlUtils } from "@/db";
 import FunctionalDependencyAlgorithm from "./FunctionalDependencyAlgorithm";
 import { readFile, writeFile } from "fs/promises";
 import { DbmsType } from "@/db/SqlUtils";
+import { hyfdAlgorithmName } from "@/definitions/IHyFD";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
@@ -22,7 +23,7 @@ export default class HyFDExtended extends FunctionalDependencyAlgorithm {
   }
 
   public override algoClass(): string {
-    return "de.metanome.algorithms.hyfd_extended.HyFDExtended";
+    return hyfdAlgorithmName;
   }
 
   protected override tableKey(): "INPUT_GENERATOR" | "INPUT_FILES" {

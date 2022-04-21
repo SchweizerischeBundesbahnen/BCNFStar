@@ -1,6 +1,9 @@
 import { IColumnCombination, IColumnIdentifier } from "./IInclusionDependency";
 import { IMetanomeConfig } from "./IMetanomeConfig";
 
+export const hyfdAlgorithmName =
+  "de.metanome.algorithms.hyfd_extended.HyFDExtended";
+
 export interface IHyFDConfig extends IMetanomeConfig {
   INPUT_ROW_LIMIT: number; //=-1
   // (assumption): checks if memory is nearly full, and writes to disk if so

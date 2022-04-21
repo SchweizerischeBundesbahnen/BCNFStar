@@ -9,9 +9,15 @@ import {
 } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 import { DatabaseService } from '../../database.service';
-import { defaulHyfdConfig } from '@server/definitions/IHyFD';
-import { defaultBinderConfig } from '@server/definitions/IBinder';
-import { defaultFaidaConfig } from '@server/definitions/IFaida';
+import { defaulHyfdConfig, hyfdAlgorithmName } from '@server/definitions/IHyFD';
+import {
+  binderAlgorithmName,
+  defaultBinderConfig,
+} from '@server/definitions/IBinder';
+import {
+  defaultFaidaConfig,
+  faidaAlgorithmName,
+} from '@server/definitions/IFaida';
 import { IMetanomeConfig } from '@server/definitions/IMetanomeConfig';
 
 @Component({
@@ -30,13 +36,13 @@ export class MetanomeSettingsComponent {
   public binderConfigs: Record<string, IIndexFileEntry> = {
     ind: this.createDefaultIndIndexFile(
       Object.assign({}, defaultBinderConfig),
-      'de.metanome.algorithms.binder.BINDERFile'
+      binderAlgorithmName
     ),
   };
   public faidaConfigs: Record<string, IIndexFileEntry> = {
     ind: this.createDefaultIndIndexFile(
       Object.assign({}, defaultFaidaConfig),
-      'de.hpi.mpss2015n.approxind.FAIDA'
+      faidaAlgorithmName
     ),
   };
 
@@ -59,7 +65,7 @@ export class MetanomeSettingsComponent {
         this.createDefaultFdIndexFile(
           table.schemaAndName(),
           Object.assign({}, defaulHyfdConfig),
-          'de.metanome.algorithms.hyfd_extended.HyFDExtended'
+          hyfdAlgorithmName
         );
       controlsConfig['fds_' + table.schemaAndName()] = {};
     });
@@ -101,7 +107,7 @@ export class MetanomeSettingsComponent {
   public createDefaultFdIndexFile(
     tableName: string,
     config: IMetanomeConfig = Object.assign({}, defaulHyfdConfig),
-    algorithm: string = 'de.metanome.algorithms.hyfd_extended.HyFDExtended'
+    algorithm: string = hyfdAlgorithmName
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
       config,
@@ -118,7 +124,7 @@ export class MetanomeSettingsComponent {
 
   public createDefaultIndIndexFile(
     config: IMetanomeConfig = Object.assign({}, defaultBinderConfig),
-    algorithm: string = 'de.metanome.algorithms.binder.BINDERFile'
+    algorithm: string = binderAlgorithmName
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
       tables: this.tables.map((table) => table.schemaAndName()),

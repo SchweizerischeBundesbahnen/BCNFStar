@@ -1,5 +1,7 @@
 import { IMetanomeConfig } from "./IMetanomeConfig";
 
+export const faidaAlgorithmName = "de.hpi.mpss2015n.approxind.FAIDA";
+
 export interface IFaidaConfig extends IMetanomeConfig {
   IGNORE_CONSTANT: boolean; //=true
   VIRTUAL_COLUMN_STORE: boolean; //=false
