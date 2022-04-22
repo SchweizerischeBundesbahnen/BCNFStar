@@ -8,6 +8,8 @@ import Table from './Table';
 import ColumnCombination from './ColumnCombination';
 import SourceFunctionalDependency from './SourceFunctionalDependency';
 import SourceTable from './SourceTable';
+import Join from './methodObjects/Join';
+import Split from './methodObjects/Split';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -196,6 +198,8 @@ export default class Schema {
         }
       }
     }
+
+    // TODO: Extension
   }
 
   private extend(table: Table, fk: ColumnCombination) {
@@ -243,12 +247,10 @@ export default class Schema {
 
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
     return [...this.fksOf(table)].every((fk) => {
-      let fkColumns = fk.relationship.referencing;
+      let fkColumns = new ColumnCombination(fk.relationship.referencing);
       return (
-        new ColumnCombination(fkColumns).isSubsetOf(
-          table.remainingSchema(fd)
-        ) ||
-        new ColumnCombination(fkColumns).isSubsetOf(table.generatingSchema(fd))
+        fkColumns.isSubsetOf(table.remainingSchema(fd)) ||
+        fkColumns.isSubsetOf(table.generatingSchema(fd))
       );
     });
   }
@@ -265,10 +267,7 @@ export default class Schema {
     fd: FunctionalDependency,
     generatingName?: string
   ) {
-    let tables = table.split(fd, generatingName);
-    this.addTables(...tables);
-    this.deleteTables(table);
-    return tables;
+    return new Split(this, table, fd, generatingName).newTables;
   }
 
   public autoNormalize(...table: Array<Table>): Array<Table> {
@@ -287,46 +286,6 @@ export default class Schema {
   }
 
   public join(fk: TableRelationship) {
-    let newTable = fk.referencing.join(fk.referenced, fk.relationship);
-    this.setFdsFor(newTable, fk.referencing, fk.referenced, fk.relationship);
-    this.addTables(newTable);
-    this.deleteTables(fk.referencing);
-    this.deleteTables(fk.referenced);
-    return newTable;
-  }
-
-  private setFdsFor(
-    table: Table,
-    referencing: Table,
-    referenced: Table,
-    relationship: Relationship
-  ) {
-    // copy parent fds
-    referenced.fds.forEach((fd) => {
-      table.addFd(fd.lhs.copy(), fd.rhs.copy());
-    });
-    referencing.fds.forEach((fd) => {
-      let newLhs = relationship.referencingToReferencedColumnsIn(fd.lhs);
-      let newRhs = relationship.referencingToReferencedColumnsIn(fd.rhs);
-      if (newLhs.isSubsetOf(new ColumnCombination(relationship.referenced))) {
-        let correspondingFd = table.fds.find((fd) => fd.lhs.equals(newLhs));
-        if (correspondingFd) correspondingFd.rhs.union(newRhs);
-        else table.addFd(newLhs, newRhs);
-      } else {
-        table.addFd(newLhs, newRhs);
-      }
-    });
-
-    // extension
-    let fk = new ColumnCombination(relationship.referenced);
-    let fkFds = table.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
-    table.fds.forEach((fd) => {
-      let rhsFkPart = fd.rhs.copy().intersect(fk);
-      fkFds
-        .filter((fkFd) => fkFd.lhs.isSubsetOf(rhsFkPart))
-        .forEach((fkFd) => {
-          fd.rhs.union(fkFd.rhs);
-        });
-    });
+    return new Join(this, fk).newTable;
   }
 }

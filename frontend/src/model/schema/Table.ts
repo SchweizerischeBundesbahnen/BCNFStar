@@ -16,7 +16,7 @@ export default class Table {
   public columns;
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
-  public relationships = new Set<Relationship>();
+  public relationships = new Array<Relationship>();
   public sources = new Array<SourceTableInstance>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
@@ -28,7 +28,6 @@ export default class Table {
     columns: ColumnCombination;
     fds: Array<FunctionalDependency>;
   }>;
-  /**
   /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
@@ -131,125 +130,6 @@ export default class Table {
 
   public generatingSchema(fd: FunctionalDependency): ColumnCombination {
     return fd.rhs.copy();
-  }
-
-  public split(
-    fd: FunctionalDependency,
-    generatingName?: string
-  ): Array<Table> {
-    let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
-    fd.lhs.asArray().forEach((column) => remaining.columns.add(column.copy()));
-    let generating: Table = new Table(this.generatingSchema(fd));
-
-    this.projectRelationships(remaining);
-    this.projectRelationships(generating);
-
-    this.projectFds(remaining);
-    this.projectFds(generating);
-
-    remaining.pk = this.pk;
-    generating.pk = fd.lhs.copy();
-
-    remaining.schemaName = this.schemaName;
-    remaining.name = this.name;
-
-    generating.schemaName = this.schemaName;
-    generating.name =
-      generatingName || fd.lhs.columnNames().join('_').substring(0, 50);
-
-    return [remaining, generating];
-  }
-
-  public projectRelationships(table: Table): void {
-    // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
-    let neededSourceTables = new Set(table.columns.sourceTableInstances());
-    let sourceTables = new Array(...this.sources);
-    let relationships = new Set(this.relationships);
-
-    let toRemove: Set<SourceTableInstance>;
-    do {
-      toRemove = new Set();
-      sourceTables.forEach((sourceTable) => {
-        let adjacentRelationship = [...relationships].filter(
-          (rel) =>
-            rel.referenced[0].sourceTableInstance == sourceTable ||
-            rel.referencing[0].sourceTableInstance == sourceTable
-        );
-        if (
-          adjacentRelationship.length == 1 &&
-          !neededSourceTables.has(sourceTable)
-        ) {
-          toRemove.add(sourceTable);
-          relationships.delete(adjacentRelationship[0]);
-        }
-      });
-      sourceTables = sourceTables.filter(
-        (sourceTable) => !toRemove.has(sourceTable)
-      );
-    } while (toRemove.size > 0);
-
-    table.sources = sourceTables;
-    table.relationships = relationships;
-  }
-
-  public projectFds(table: Table): void {
-    this.fds.forEach((fd) => {
-      if (fd.lhs.isSubsetOf(table.columns)) {
-        fd = new FunctionalDependency(
-          fd.lhs.copy(),
-          fd.rhs.copy().intersect(table.columns)
-        );
-        if (!fd.isFullyTrivial()) {
-          table.fds.push(fd);
-        }
-      }
-    });
-  }
-
-  public join(
-    referenced: Table,
-    relationship: Relationship,
-    name?: string
-  ): Table {
-    let newTable = new Table();
-
-    // source tables
-    this.sources.forEach((sourceTable) => newTable.sources.push(sourceTable));
-
-    const sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
-    referenced.sources.forEach((source) => {
-      const newSource = newTable.addSource(source.table, name);
-      sourceMapping.set(source, newSource);
-    });
-
-    // columns
-    newTable.columns.add(...this.columns);
-    newTable.columns.add(
-      ...referenced.columns.applySourceMapping(sourceMapping)
-    );
-    newTable.columns.delete(...relationship.referencing);
-
-    // relationships
-    this.relationships.forEach((rel) => newTable.relationships.add(rel));
-    referenced.relationships.forEach((rel) =>
-      newTable.relationships.add(rel.applySourceMapping(sourceMapping))
-    );
-    if (!relationship.sourceRelationship().isTrivial) {
-      newTable.relationships.add(
-        relationship.applySourceMapping(sourceMapping)
-      );
-    }
-
-    // name, pk
-    newTable.name = this.name;
-    newTable.pk = this.pk
-      ? relationship
-          .referencingToReferencedColumnsIn(this.pk)
-          .applySourceMapping(sourceMapping)
-      : undefined;
-    newTable.schemaName = this.schemaName;
-
-    return newTable;
   }
 
   public columnsBySourceTableInstance() {

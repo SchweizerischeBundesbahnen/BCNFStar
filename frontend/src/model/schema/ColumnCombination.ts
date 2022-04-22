@@ -141,4 +141,10 @@ export default class ColumnCombination {
       this._columns.map((column) => column.applySourceMapping(mapping))
     );
   }
+
+  public columnSubstitution(mapping: Map<Column, Column>) {
+    this._columns = this._columns.map(
+      (column) => mapping.get(column) || column
+    );
+  }
 }
