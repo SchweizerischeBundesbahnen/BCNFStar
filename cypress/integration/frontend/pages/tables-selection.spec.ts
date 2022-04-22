@@ -28,7 +28,38 @@ describe("The table selection page", () => {
     cy.get("button").contains("Go");
   });
 
-  it("renders the schema editing page when clicking on the Go button", () => {
+  it("display loading dialog after clicking in Ok Button of Metanome Settings", () => {
+    cy.testLoadingDialog();
+    cy.get('[class="sbb-dialog-title ng-star-inserted"]').contains(
+      "Running Metanome"
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "Functional Dependencies and Inclusion Dependencies are currently being searched."
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains("Progress can be monitored here");
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "de.metanome.algorithms.hyfd_extended.HyFDExtended with public.part_partsupp_supplier_denormalized"
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "de.metanome.algorithms.hyfd_extended.HyFDExtended with public.nation_region_denormalized"
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "de.metanome.algorithms.binder.BINDERFile with public.part_partsupp_supplier_denormalized,public.nation_region_denormalized"
+    );
+  });
+
+  it("renders the schema editing page after  clicking on the Go and Ok button", () => {
     cy.selectTablesAndGo();
+    cy.loadMetanomeConfigAndOk();
   });
 });

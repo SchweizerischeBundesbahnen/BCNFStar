@@ -4,6 +4,7 @@ describe("The schema editing page", () => {
   beforeEach(() => {
     cy.visitFrontend();
     cy.selectTablesAndGo();
+    cy.loadMetanomeConfigAndOk();
   });
 
   it("renders", () => {

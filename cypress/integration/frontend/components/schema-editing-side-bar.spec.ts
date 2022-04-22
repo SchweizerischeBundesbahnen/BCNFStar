@@ -6,6 +6,8 @@ describe("The schema editing side bar", () => {
 
     cy.selectTablesAndGo();
 
+    cy.loadMetanomeConfigAndOk();
+
     cy.get(".table-head-title")
       .contains("public.nation_region_denormalized")
       .click({ force: true });
