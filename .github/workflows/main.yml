@@ -5,6 +5,7 @@ on: [push]
 jobs:
   test-cypress:
     runs-on: self-hosted
+    container: cypress/browsers:node12.18.3-chrome87-ff82
     # Service containers to run with `test-cypress`
     services:
       # Label used to access the service container
