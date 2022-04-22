@@ -51,7 +51,7 @@ jobs:
           build: npm run build
           start: npm run start:coverage
           wait-on: "http://localhost:8080"
-          browser: chrome
+          browser: chromium
         env:
           CYPRESS_FRONTEND_BASEURL: "http://localhost:8080"
           CYPRESS_BACKEND_BASEURL: "http://localhost:8080"
