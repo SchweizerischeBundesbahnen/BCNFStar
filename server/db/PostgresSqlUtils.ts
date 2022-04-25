@@ -100,14 +100,14 @@ export default class PostgresSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
       // from https://stackoverflow.com/questions/7943233/fast-way-to-discover-the-row-count-of-a-table-in-postgresql
-      const rowCountQuery = `SELECT (CASE WHEN c.reltuples < 0 THEN NULL       -- never vacuumed
-          WHEN c.relpages = 0 THEN float8 '0'  -- empty table
-          ELSE c.reltuples / c.relpages END
-          * (pg_catalog.pg_relation_size(c.oid)
-          / pg_catalog.current_setting('block_size')::int)
-          )::bigint AS count
-          FROM   pg_catalog.pg_class c
-          WHERE  c.oid = '${schema}.${table}'::regclass;`;
+      const rowCountQuery = `SELECT (CASE WHEN c.reltuples < 0 THEN NULL -- never vacuumed
+         WHEN c.relpages = 0 THEN float8 '0' -- empty table
+         ELSE c.reltuples / c.relpages END
+         * (pg_catalog.pg_relation_size(c.oid)
+         / pg_catalog.current_setting('block_size')::int)
+         )::bigint AS count
+         FROM   pg_catalog.pg_class c
+         WHERE  c.oid = '${schema}.${table}'::regclass;`;
 
       let queryResult = await this.pool.query(rowCountQuery);
       if (!queryResult.rows[0].count) {
