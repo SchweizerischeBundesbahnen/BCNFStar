@@ -26,6 +26,10 @@ h3 {
   text-align: center;
 }
 
+sbb-accordion {
+  width: 100%;
+}
+
 sbb-checkbox {
   padding-bottom: 5px;
 }
