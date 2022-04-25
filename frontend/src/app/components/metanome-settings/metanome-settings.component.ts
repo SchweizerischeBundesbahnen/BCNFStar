@@ -46,6 +46,11 @@ export class MetanomeSettingsComponent {
     ),
   };
 
+  public configTooltip = {
+    memory:
+      'Java memory string, e.g. 512M or 4G. If empty: 75% of total memory.',
+  };
+
   constructor(
     public dialogRef: SbbDialogRef<MetanomeSettingsComponent>,
     public formBuilder: FormBuilder,

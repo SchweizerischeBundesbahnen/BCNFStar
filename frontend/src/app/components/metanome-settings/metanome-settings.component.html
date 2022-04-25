@@ -107,7 +107,10 @@
       {{ config[configName] }}
     </sbb-option>
   </sbb-select>
-  <div *ngFor="let entry of config[configName]['config'] | keyvalue">
+  <div
+    *ngFor="let entry of config[configName]['config'] | keyvalue"
+    [sbbTooltip]="$any(configTooltip)[$any(entry).key]"
+  >
     <sbb-checkbox
       *ngIf="isBoolean(entry.value)"
       [(ngModel)]="config[configName]['config'][$any(entry).key]"
