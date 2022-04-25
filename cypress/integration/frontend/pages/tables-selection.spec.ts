@@ -30,9 +30,26 @@ describe("The table selection page", () => {
 
   it("shows table row count", () => {
     cy.contains("customer_orders_lineitem_denormalized").trigger("mouseenter");
-    cy.contains("1 - 20 / 42035");
-    cy.contains("2102").click();
-    cy.contains("42021 - 42035 / 42035");
+    cy.contains("1 - 20 / 6005");
+    cy.contains("301").click();
+    cy.contains("6001 - 6005 / 6005");
+    cy.get('button[aria-label="Previous Page"]').click();
+    cy.contains("5981 - 6000 / 6005");
+  });
+  it("shows table content", () => {
+    cy.contains("part_partsupp_supplier_denormalized").trigger("mouseenter");
+    // first is ps_partkey, second ps_suppkey
+    cy.get(".sbb-row")
+      .first()
+      .should("contain.text", "154")
+      .and("contain.text", "5");
+
+    cy.get('button[aria-label="Next Page"]').click();
+
+    cy.get(".sbb-row")
+      .first()
+      .should("contain.text", "58")
+      .should("contain.text", "6");
   });
 
   it("renders the schema editing page when clicking on the Go button", () => {
