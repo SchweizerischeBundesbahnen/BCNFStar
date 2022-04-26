@@ -100,8 +100,6 @@ export default class Split {
     for (const column of columns) {
       mapping.set(column, column.copy());
     }
-    // the next steps are not strictly neccessary because the underlying columns should be equal
-    // but having additional object identity might save some time in comparisons
 
     table.columns.columnSubstitution(mapping);
     table.pk?.columnSubstitution(mapping);

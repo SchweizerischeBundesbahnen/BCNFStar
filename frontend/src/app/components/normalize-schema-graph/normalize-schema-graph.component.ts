@@ -214,8 +214,8 @@ export class NormalizeSchemaGraphComponent implements AfterContentInit {
   generateLinks() {
     for (const table of this.schema.tables) {
       for (const fk of this.schema.fksOf(table)) {
-        let fkReferenced = fk.relationship.referenced.asArray()[0];
-        let fkReferencing = fk.relationship.referencing.asArray()[0];
+        let fkReferenced = fk.relationship.referenced[0];
+        let fkReferencing = fk.relationship.referencing[0];
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,

@@ -146,5 +146,6 @@ export default class ColumnCombination {
     this._columns = this._columns.map(
       (column) => mapping.get(column) || column
     );
+    return this;
   }
 }

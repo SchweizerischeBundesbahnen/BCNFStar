@@ -1,8 +1,6 @@
 import IRelationship from '@server/definitions/IRelationship';
 import Column from './Column';
-import ColumnCombination from './ColumnCombination';
 import SourceRelationship from './SourceRelationship';
-import SourceTableInstance from './SourceTableInstance';
 
 export default class Relationship {
   // these arrays are linked, the column in _referencing has the same index as the
@@ -42,28 +40,8 @@ export default class Relationship {
     return sourceRel;
   }
 
-  public referencingToReferencedColumnsIn(cc: ColumnCombination) {
-    let newCC = cc.copy();
-    for (const i in this._referencing) {
-      if (newCC.includes(this._referencing[i])) {
-        newCC.delete(this._referencing[i]);
-        newCC.add(this._referenced[i]);
-      }
-    }
-    return newCC;
-  }
-
   public toString(): String {
     return this.referencing.toString() + '->' + this.referenced.toString();
-  }
-
-  public applySourceMapping(
-    mapping: Map<SourceTableInstance, SourceTableInstance>
-  ): Relationship {
-    return new Relationship(
-      this._referencing.map((column) => column.applySourceMapping(mapping)),
-      this._referenced.map((column) => column.applySourceMapping(mapping))
-    );
   }
 
   public toIRelationship(): IRelationship {

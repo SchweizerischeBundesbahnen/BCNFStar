@@ -156,20 +156,31 @@ export class DatabaseService {
     });
   }
 
-  public resolveFds(fds: Array<IFunctionalDependency>) {
+  public resolveFds(fds: Array<IFunctionalDependency>, table: Table) {
     for (const fd of fds) {
-      const lhs = fd.lhsColumns.map((name) => this.sourceColumns.get(name)!);
-      const rhs = fd.rhsColumns.map((name) => this.sourceColumns.get(name)!);
+      const lhs = fd.lhsColumns.map(
+        (colName) =>
+          this.sourceColumns.get(
+            `${table.schemaName}.${table.name}.${colName}`
+          )!
+      );
+      const rhs = fd.rhsColumns.map(
+        (colName) =>
+          this.sourceColumns.get(
+            `${table.schemaName}.${table.name}.${colName}`
+          )!
+      );
       this.schema!.addFd(new SourceFunctionalDependency(lhs, rhs));
     }
-    for (const table of this.schema!.tables) {
-      this.schema!.calculateFdsOf(table);
-    }
+    this.schema!.calculateFdsOf(table);
   }
 
   public async setInputTables(tables: Array<Table>) {
     const inds = this.getINDs(tables);
-    const fds = Promise.all(tables.map((table) => this.getFDs(table)));
+    const fds = tables.map(
+      (table) =>
+        [table, this.getFDs(table)] as [Table, Promise<IFunctionalDependency[]>]
+    );
 
     this.schema = new Schema(...tables);
     for (const table of tables) {
@@ -184,7 +195,9 @@ export class DatabaseService {
         );
     }
 
-    this.resolveFds((await fds).flat());
+    for (const [table, tableFds] of fds) {
+      this.resolveFds(await tableFds, table);
+    }
     this.resolveInds(await inds);
     this.resolveIFks(this.iFks);
     this.resolveIPks(this.iPks);
@@ -272,7 +285,7 @@ export class DatabaseService {
         rel.toIRelationship()
       ),
       sourceTables: Array.from(table.sources).map(
-        (table) => `${table.fullName}`
+        (source) => `${source.table.fullName}`
       ),
       attributes: attributes.map((attr) => attr.toIAttribute()),
     };

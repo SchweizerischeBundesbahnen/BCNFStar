@@ -10,6 +10,8 @@ import SourceFunctionalDependency from './SourceFunctionalDependency';
 import SourceTable from './SourceTable';
 import Join from './methodObjects/Join';
 import Split from './methodObjects/Split';
+import SourceTableInstance from './SourceTableInstance';
+import Column from './Column';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -180,39 +182,107 @@ export default class Schema {
   }
 
   public calculateFdsOf(table: Table) {
-    const sources = new Set(
-      table.columns.asArray().map((column) => column.sourceTableInstance.table)
-    );
-    const fds = Array.from(sources)
-      .map((source) => this._fds.get(source)!)
-      .flat();
+    console.log('calc fds for');
+    console.log(table);
+    const fds = new Map<SourceTableInstance, Array<FunctionalDependency>>();
+    table.sources.forEach((source) => fds.set(source, new Array()));
     const columnsByInstance = table.columnsBySourceTableInstance();
-    for (const fd of fds) {
-      for (const lhs of table.columnsEquivalentTo(fd.lhs, true)) {
-        const possibleRhsColumns = columnsByInstance.get(
-          lhs[0].sourceTableInstance
-        )!;
-        const rhs = possibleRhsColumns.columnsEquivalentTo(fd.rhs, false)!;
-        if (lhs.length < rhs.length) {
-          table.addFd(new ColumnCombination(lhs), new ColumnCombination(rhs));
+    for (const source of table.sourcesTopological()) {
+      console.log('inspecting source');
+      console.log(source);
+      const referencingColumns = new ColumnCombination();
+      table.relationships
+        .filter((rel) => rel.referencing[0].sourceTableInstance == source)
+        .forEach((rel) => referencingColumns.add(...rel.referencing));
+      const referencedColumns = new ColumnCombination(
+        table.relationships.find(
+          (rel) => rel.referenced[0].sourceTableInstance == source
+        )?.referenced
+      );
+      const relevantColumns = columnsByInstance
+        .get(source)!
+        .union(referencingColumns)
+        .union(referencedColumns);
+
+      //matching (sourceFd -> Fd) and selection
+      for (const sourceFd of this._fds.get(source.table)!) {
+        const lhs = relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
+        if (!lhs) continue;
+        const rhs = relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;
+        if (lhs.length >= rhs.length) continue;
+        const lhsCC = new ColumnCombination(lhs);
+        const rhsCC = new ColumnCombination(rhs);
+        const existingFd = fds.get(source)!.find((fd) => fd.lhs.equals(lhsCC));
+        if (existingFd) existingFd.rhs.union(rhsCC);
+        else fds.get(source)!.push(new FunctionalDependency(lhsCC, rhsCC));
+      }
+      //extension
+      const fkFds = fds
+        .get(source)!
+        .filter((fd) => fd.lhs.isSubsetOf(referencingColumns));
+      for (const fd of fds.get(source)!) {
+        const extensions = fkFds
+          .filter((fkFd) => fkFd.lhs.isSubsetOf(fd.rhs))
+          .map((fkFd) => fkFd.rhs);
+        extensions.forEach((extension) => fd.rhs.union(extension));
+      }
+
+      //referenced to referencing
+      const nextRelationship = table.relationships.find(
+        (rel) => rel.referenced[0].sourceTableInstance == source
+      );
+      const nextSource = nextRelationship?.referencing[0].sourceTableInstance;
+      const nextRelationshipMap = new Map<Column, Column>();
+      if (nextRelationship)
+        for (const i in nextRelationship.referenced)
+          nextRelationshipMap.set(
+            nextRelationship.referenced[i],
+            nextRelationship.referencing[i]
+          );
+
+      for (const fd of fds.get(source)!) {
+        console.log(fd);
+        if (
+          !fd.lhs
+            .asArray()
+            .every(
+              (column) =>
+                table.columns.includes(column) ||
+                referencedColumns.includes(column)
+            )
+        ) {
+          console.log('not selected or referenced');
+          continue;
+        }
+        fd.rhs = new ColumnCombination(
+          fd.rhs
+            .asArray()
+            .filter(
+              (column) =>
+                table.columns.includes(column) ||
+                referencedColumns.includes(column)
+            )
+        );
+        if (fd.isFullyTrivial()) {
+          console.log('trivial');
+          continue;
+        }
+        if (
+          fd.lhs.asArray().every((column) => table.columns.includes(column)) &&
+          fd.rhs.asArray().every((column) => table.columns.includes(column))
+        ) {
+          console.log('fully baked');
+          table.addFd(fd);
+        } else if (nextRelationship) {
+          console.log('half baked');
+          fd.lhs.columnSubstitution(nextRelationshipMap);
+          fd.rhs.columnSubstitution(nextRelationshipMap);
+          fds.get(nextSource!)!.push(fd);
+        } else {
+          console.log('hä?');
         }
       }
     }
-
-    // TODO: Extension
-  }
-
-  private extend(table: Table, fk: ColumnCombination) {
-    //let fk = relationship.referenced;
-    let fkFds = table.fds.filter((fd) => fd.lhs.isSubsetOf(fk));
-    table.fds.forEach((fd) => {
-      let rhsFkPart = fd.rhs.copy().intersect(fk);
-      fkFds
-        .filter((fkFd) => fkFd.lhs.isSubsetOf(rhsFkPart))
-        .forEach((fkFd) => {
-          fd.rhs.union(fkFd.rhs);
-        });
-    });
   }
 
   public splittableFdClustersOf(table: Table): Array<FdCluster> {

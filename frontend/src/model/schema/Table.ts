@@ -120,8 +120,8 @@ export default class Table {
     this.fds = fds.filter((fd) => !fd.isFullyTrivial()); // needed?
   }
 
-  public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
-    this.fds.push(new FunctionalDependency(lhs, rhs));
+  public addFd(fd: FunctionalDependency) {
+    this.fds.push(fd);
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
@@ -132,6 +132,9 @@ export default class Table {
     return fd.rhs.copy();
   }
 
+  /**
+   * Returns the selected columns of each source of this table
+   */
   public columnsBySourceTableInstance() {
     const result = new Map<SourceTableInstance, ColumnCombination>();
 
@@ -211,6 +214,33 @@ export default class Table {
         if (selectedEquivalentColumns.some((column) => !column)) continue;
       }
       result.push(equivalentColumns);
+    }
+    return result;
+  }
+
+  public sourcesTopological(): Array<SourceTableInstance> {
+    const result = new Array<SourceTableInstance>();
+    const numReferenced = new Map<SourceTableInstance, number>();
+    const referencings = new Map<SourceTableInstance, SourceTableInstance>();
+
+    for (const source of this.sources) {
+      numReferenced.set(source, 0);
+    }
+    for (const rel of this.relationships) {
+      const referencing = rel.referencing[0].sourceTableInstance;
+      const referenced = rel.referenced[0].sourceTableInstance;
+      numReferenced.set(referencing, numReferenced.get(referencing)! + 1);
+      referencings.set(referenced, referencing);
+    }
+    while (numReferenced.size > 0) {
+      const [current] = Array.from(numReferenced.entries()).find(
+        ([, count]) => count == 0
+      )!;
+      result.push(current);
+      numReferenced.delete(current);
+      const referencing = referencings.get(current);
+      if (referencing)
+        numReferenced.set(referencing, numReferenced.get(referencing)! - 1);
     }
     return result;
   }

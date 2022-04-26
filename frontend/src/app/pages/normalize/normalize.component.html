@@ -5,7 +5,8 @@
       <!-- (selected)="onSelect($event)" -->
       <app-normalize-schema-graph
         [schema]="this.schema"
-        [(selectedTable)]="this.selectedTable"
+        [selectedTable]="this.selectedTable"
+        (selectedTableChange)="this.onSelectTable($event)"
         [selectedColumns]="this.selectedColumns"
         [schemaChanged]="this.schemaChanged.asObservable()"
         (joinFk)="onJoin($event)"

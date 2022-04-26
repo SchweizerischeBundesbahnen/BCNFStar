@@ -1,4 +1,5 @@
 import { TableRelationship } from '../../types/TableRelationship';
+import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
 import Schema from '../Schema';
 import SourceTableInstance from '../SourceTableInstance';
@@ -44,22 +45,36 @@ export default class Join {
     // columns
     this.newTable.columns.add(...this.referencing.columns);
     this.newTable.columns.add(
-      ...this.referenced.columns.applySourceMapping(sourceMapping)
+      ...this.referenced.columns
+        .copy()
+        .setMinus(new ColumnCombination(this.relationship.referenced))
+        .applySourceMapping(sourceMapping)
     );
-    this.newTable.columns.delete(...this.relationship.referenced);
+    //this.newTable.columns.delete(...this.relationship.referenced);
 
     // relationships
     this.newTable.relationships.push(...this.referencing.relationships);
     this.newTable.relationships.push(
-      ...this.referenced.relationships.map((rel) =>
-        rel.applySourceMapping(sourceMapping)
+      ...this.referenced.relationships.map(
+        (rel) =>
+          new Relationship(
+            rel.referencing.map((column) =>
+              column.applySourceMapping(sourceMapping)
+            ),
+            rel.referenced.map((column) =>
+              column.applySourceMapping(sourceMapping)
+            )
+          )
       )
     );
-    if (!this.relationship.sourceRelationship().isTrivial) {
-      this.newTable.relationships.push(
-        this.relationship.applySourceMapping(sourceMapping)
-      );
-    }
+    this.newTable.relationships.push(
+      new Relationship(
+        this.relationship.referencing,
+        this.relationship.referenced.map((column) =>
+          column.applySourceMapping(sourceMapping)
+        )
+      )
+    );
 
     // name, pk
     this.newTable.name = this.referencing.name;

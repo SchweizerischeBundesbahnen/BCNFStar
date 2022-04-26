@@ -112,6 +112,11 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
+  onSelectTable(table: Table) {
+    console.log(table.fds);
+    this.selectedTable = table;
+  }
+
   onChangeTableName(value: { table: Table; newName: string }): void {
     let command = new TableRenameCommand(value.table, value.newName);
 
