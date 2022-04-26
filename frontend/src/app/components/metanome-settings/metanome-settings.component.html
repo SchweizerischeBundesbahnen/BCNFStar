@@ -1,22 +1,59 @@
-<div sbbDialogTitle>Metanome configuration settings</div>
-<div sbbDialogContent>
-  <form class="sbb-form-group-vertical" [formGroup]="formGroup">
-    <h2>Functional Dependencies</h2>
-    <div *ngFor="let table of tables; let index = index">
-      {{ table.schemaAndName() }}
+<div class="metanome-settings-dialog">
+  <div sbbDialogTitle>Metanome configuration settings</div>
+  <div sbbDialogContent>
+    <form class="sbb-form-group-vertical" [formGroup]="formGroup">
+      <h2>Functional Dependencies</h2>
+      <div *ngFor="let table of tables; let index = index">
+        {{ table.schemaAndName() }}
+        <sbb-toggle
+          [formControl]="selectedFdTab[index]"
+          (change)="onFdToggleBarChange($event, table)"
+        >
+          <sbb-toggle-option
+            label="Use existing result"
+            value="existing-result"
+            [disabled]="filteredMetanomeResultsForFd(table).length === 0"
+          >
+            <sbb-toggle-details>
+              <sbb-select [formControlName]="'fds_' + table.schemaAndName()">
+                <sbb-option
+                  *ngFor="let result of filteredMetanomeResultsForFd(table)"
+                  [value]="result"
+                >
+                  {{ metanomeConfigInfo(result) }}
+                </sbb-option>
+              </sbb-select>
+            </sbb-toggle-details>
+          </sbb-toggle-option>
+
+          <sbb-toggle-option label="HyFD" value="hyfd">
+            <sbb-toggle-details>
+              <ng-container
+                [ngTemplateOutlet]="configParameters"
+                [ngTemplateOutletContext]="{
+                  config: hyfdConfigs,
+                  configName: 'fds_' + table.schemaAndName()
+                }"
+              ></ng-container>
+            </sbb-toggle-details>
+          </sbb-toggle-option>
+        </sbb-toggle>
+      </div>
+      <h2>Inclusion Dependencies</h2>
+      {{ getAllTableNames() }}
       <sbb-toggle
-        [formControl]="selectedFdTab[index]"
-        (change)="onFdToggleBarChange($event, table)"
+        [formControl]="selectedIndTab"
+        (change)="onIndToggleBarChange($event)"
       >
         <sbb-toggle-option
           label="Use existing result"
           value="existing-result"
-          [disabled]="filteredMetanomeResultsForFd(table).length === 0"
+          [disabled]="filteredMetanomeResultsForInd().length === 0"
         >
           <sbb-toggle-details>
-            <sbb-select [formControlName]="'fds_' + table.schemaAndName()">
+            <sbb-select formControlName="ind">
               <sbb-option
-                *ngFor="let result of filteredMetanomeResultsForFd(table)"
+                *ngFor="let result of filteredMetanomeResultsForInd()"
                 [value]="result"
               >
                 {{ metanomeConfigInfo(result) }}
@@ -25,71 +62,36 @@
           </sbb-toggle-details>
         </sbb-toggle-option>
 
-        <sbb-toggle-option label="HyFD" value="hyfd">
+        <sbb-toggle-option label="Binder" value="binder">
           <sbb-toggle-details>
             <ng-container
               [ngTemplateOutlet]="configParameters"
               [ngTemplateOutletContext]="{
-                config: hyfdConfigs,
-                configName: 'fds_' + table.schemaAndName()
+                config: binderConfigs,
+                configName: 'ind'
+              }"
+            ></ng-container>
+          </sbb-toggle-details>
+        </sbb-toggle-option>
+
+        <sbb-toggle-option label="FAIDA" value="faida">
+          <sbb-toggle-details>
+            <ng-container
+              [ngTemplateOutlet]="configParameters"
+              [ngTemplateOutletContext]="{
+                config: faidaConfigs,
+                configName: 'ind'
               }"
             ></ng-container>
           </sbb-toggle-details>
         </sbb-toggle-option>
       </sbb-toggle>
-    </div>
-    <h2>Inclusion Dependencies</h2>
-    {{ getAllTableNames() }}
-    <sbb-toggle
-      [formControl]="selectedIndTab"
-      (change)="onIndToggleBarChange($event)"
-    >
-      <sbb-toggle-option
-        label="Use existing result"
-        value="existing-result"
-        [disabled]="filteredMetanomeResultsForInd().length === 0"
-      >
-        <sbb-toggle-details>
-          <sbb-select formControlName="ind">
-            <sbb-option
-              *ngFor="let result of filteredMetanomeResultsForInd()"
-              [value]="result"
-            >
-              {{ metanomeConfigInfo(result) }}
-            </sbb-option>
-          </sbb-select>
-        </sbb-toggle-details>
-      </sbb-toggle-option>
-
-      <sbb-toggle-option label="Binder" value="binder">
-        <sbb-toggle-details>
-          <ng-container
-            [ngTemplateOutlet]="configParameters"
-            [ngTemplateOutletContext]="{
-              config: binderConfigs,
-              configName: 'ind'
-            }"
-          ></ng-container>
-        </sbb-toggle-details>
-      </sbb-toggle-option>
-
-      <sbb-toggle-option label="FAIDA" value="faida">
-        <sbb-toggle-details>
-          <ng-container
-            [ngTemplateOutlet]="configParameters"
-            [ngTemplateOutletContext]="{
-              config: faidaConfigs,
-              configName: 'ind'
-            }"
-          ></ng-container>
-        </sbb-toggle-details>
-      </sbb-toggle-option>
-    </sbb-toggle>
-  </form>
-</div>
-<div sbbDialogActions>
-  <button (click)="runMetoname()" sbb-button cdkFocusInitial>Ok</button>
-  <button sbb-secondary-button sbbDialogClose>Cancel</button>
+    </form>
+  </div>
+  <div sbbDialogActions>
+    <button (click)="runMetoname()" sbb-button cdkFocusInitial>Ok</button>
+    <button sbb-secondary-button sbbDialogClose>Cancel</button>
+  </div>
 </div>
 
 <ng-template

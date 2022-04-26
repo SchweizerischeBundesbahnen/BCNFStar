@@ -132,7 +132,7 @@ export class MetanomeSettingsComponent {
     algorithm: string = binderAlgorithmName
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
-      tables: this.tables.map((table) => table.schemaAndName()),
+      tables: this.tables.map((table) => table.schemaAndName()).sort(),
       dbmsName: '',
       database: '',
       resultType: MetanomeResultType.ind,
@@ -145,23 +145,34 @@ export class MetanomeSettingsComponent {
   }
 
   public filteredMetanomeResultsForFd(table: Table) {
-    return this.oldMetanomeResults.filter(
-      (res) =>
-        res.resultType === MetanomeResultType.fd &&
-        res.tables[0] === table.schemaAndName()
-    );
+    return this.oldMetanomeResults
+      .filter(
+        (res) =>
+          res.resultType === MetanomeResultType.fd &&
+          res.tables[0] === table.schemaAndName()
+      )
+      .sort(function (table, otherTable) {
+        return otherTable.createDate - table.createDate;
+      });
   }
 
   public filteredMetanomeResultsForInd() {
-    return this.oldMetanomeResults.filter(
-      (res) =>
-        res.resultType === MetanomeResultType.ind &&
-        this.tables.every((t) => res.tables.includes(t.schemaAndName()))
-    );
+    return this.oldMetanomeResults
+      .filter(
+        (res) =>
+          res.resultType === MetanomeResultType.ind &&
+          this.tables.every((t) => res.tables.includes(t.schemaAndName()))
+      )
+      .sort(function (table, otherTable) {
+        return otherTable.createDate - table.createDate;
+      });
   }
 
   public getAllTableNames() {
-    return this.tables.map((table) => table.schemaAndName()).join(', ');
+    return this.tables
+      .map((table) => table.schemaAndName())
+      .sort()
+      .join(', ');
   }
 
   public isBoolean(value: any) {

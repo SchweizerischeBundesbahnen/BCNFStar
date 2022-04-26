@@ -101,13 +101,9 @@ describe("The table selection page", () => {
     );
     cy.get(
       '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
-    ).contains("de.metanome.algorithms.binder.BINDERFile with");
-    cy.get(
-      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
-    ).contains("public.part_partsupp_supplier_denormalized");
-    cy.get(
-      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
-    ).contains("public.nation_region_denormalized");
+    ).contains(
+      "de.metanome.algorithms.binder.BINDERFile with public.nation_region_denormalized,public.part_partsupp_supplier_denormalized"
+    );
   });
 
   it("renders the schema editing page after  clicking on the Go and Ok button", () => {

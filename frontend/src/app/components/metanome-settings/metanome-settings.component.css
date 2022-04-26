@@ -1,3 +1,11 @@
+.display-non {
+    display: none;
+}
+
+.metanome-settings-dialog {
+    width: 80vw;
+}
+
 sbb-form-field, sbb-select {
     width: 100%;
 }
@@ -6,8 +14,4 @@ sbb-toggle {
     margin-bottom: 10px;
     margin-top: 5px;
     width: 100%;
-}
-
-.display-non {
-    display: none;
 }
