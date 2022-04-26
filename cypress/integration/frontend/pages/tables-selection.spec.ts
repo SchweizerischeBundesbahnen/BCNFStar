@@ -31,7 +31,7 @@ describe("The table selection page", () => {
   it("shows table row count", () => {
     cy.contains("customer_orders_lineitem_denormalized").trigger("mouseenter");
     cy.contains("1 - 20 / 6005");
-    cy.contains("301").click();
+    cy.get("sbb-paginator").contains("301").click();
     cy.contains("6001 - 6005 / 6005");
     cy.get('button[aria-label="Previous Page"]').click();
     cy.contains("5981 - 6000 / 6005");
