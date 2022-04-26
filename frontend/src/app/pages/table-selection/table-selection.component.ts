@@ -95,6 +95,16 @@ export class TableSelectionComponent implements OnInit {
       this.selectedTables.get(table)
     );
   }
+  public isNumeric(columnName: string): boolean {
+    const type = this.hoveredTable?.columns
+      .asArray()
+      .find((c) => c.name == columnName)?.dataType;
+    return (
+      !!type &&
+      (type.toLowerCase().startsWith('numeric') ||
+        type.toLowerCase().startsWith('int'))
+    );
+  }
 
   public selectTables() {
     const tables = this.tables.filter((table) =>

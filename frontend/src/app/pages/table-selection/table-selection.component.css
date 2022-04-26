@@ -26,6 +26,10 @@ h3 {
   text-align: center;
 }
 
+.numeric {
+  text-align: end;
+}
+
 sbb-accordion {
   width: 100%;
 }

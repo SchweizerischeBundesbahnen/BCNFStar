@@ -50,13 +50,20 @@
         </h3>
         <sbb-table-wrapper class="table-wrapper">
           <table sbb-table [dataSource]="dataSource">
-            <sbb-text-column
-              *ngFor="let column of tableColumns"
-              name="{{ column }}"
-            >
-            </sbb-text-column>
             <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
             <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+            <ng-container
+              *ngFor="let column of hoveredTable.columns.columnNames()"
+              [sbbColumnDef]="column"
+            >
+              <th sbb-header-cell *sbbHeaderCellDef>{{ column }}</th>
+              <td
+                [ngClass]="{ numeric: isNumeric(column) }"
+                *sbbCellDef="let element"
+              >
+                {{ element[column] }}
+              </td>
+            </ng-container>
           </table>
         </sbb-table-wrapper>
         <div class="row">

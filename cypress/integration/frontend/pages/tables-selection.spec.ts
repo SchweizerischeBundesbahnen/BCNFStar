@@ -28,6 +28,16 @@ describe("The table selection page", () => {
     cy.get("button").contains("Go");
   });
 
+  it("display content of numeric columns right", () => {
+    cy.contains("nation_region_denormalized").trigger("mouseenter");
+    cy.get("td:contains('6')").should("have.class", "numeric");
+  });
+
+  it("display content of not numeric columns left", () => {
+    cy.contains("nation_region_denormalized").trigger("mouseenter");
+    cy.get("td:contains('FRANCE')").should("not.have.class", "numeric");
+  });
+
   it("shows table row count", () => {
     cy.contains("customer_orders_lineitem_denormalized").trigger("mouseenter");
     cy.contains("1 - 20 / 6005");
@@ -36,6 +46,7 @@ describe("The table selection page", () => {
     cy.get('button[aria-label="Previous Page"]').click();
     cy.contains("5981 - 6000 / 6005");
   });
+
   it("shows table content", () => {
     cy.contains("part_partsupp_supplier_denormalized").trigger("mouseenter");
     // first is ps_partkey, second ps_suppkey
