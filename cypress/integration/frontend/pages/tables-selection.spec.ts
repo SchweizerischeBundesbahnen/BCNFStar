@@ -29,7 +29,20 @@ describe("The table selection page", () => {
   });
 
   it("display loading dialog after clicking in Ok Button of Metanome Settings", () => {
-    cy.testLoadingDialog();
+    cy.selectTablesAndGo();
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').should(
+      "have.length",
+      2
+    );
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
+      .first()
+      .click();
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
+      .last()
+      .click();
+    cy.contains("Binder").click();
+    cy.contains("Ok").click();
+
     cy.get('[class="sbb-dialog-title ng-star-inserted"]').contains(
       "Running Metanome"
     );

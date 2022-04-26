@@ -37,6 +37,18 @@ describe("The metanome settings dialog", () => {
 
   it("displays default configuration parameters", () => {
     // all HyFD and Binder parameters
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').should(
+      "have.length",
+      2
+    );
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
+      .first()
+      .click();
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
+      .last()
+      .click();
+    cy.contains("Binder").click();
+
     cy.get('sbb-checkbox:contains("ENABLE_MEMORY_GUARDIAN")').should(
       "have.length",
       2
@@ -78,9 +90,19 @@ describe("The metanome settings dialog", () => {
   });
 
   it("displays configuration parameters after selecting on faida", () => {
-    cy.get('sbb-toggle-option:contains("FAIDA")').click();
-
     // all HyFD and FAIDA parameters
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').should(
+      "have.length",
+      2
+    );
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
+      .first()
+      .click();
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
+      .last()
+      .click();
+    cy.contains("FAIDA").click();
+
     cy.get('sbb-checkbox:contains("ENABLE_MEMORY_GUARDIAN")').should(
       "have.length",
       2
