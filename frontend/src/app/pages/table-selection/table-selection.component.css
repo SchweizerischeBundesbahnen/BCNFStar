@@ -30,8 +30,17 @@ h3 {
   text-align: end;
 }
 
+sbb-accordion {
+  width: 100%;
+}
+
 sbb-checkbox {
   padding-bottom: 5px;
+}
+
+span {
+  font-size: 1.3em;
+  font-weight: bold;
 }
 
 .table-checkbox {
@@ -42,6 +51,10 @@ sbb-checkbox {
   height: 80vh;
   width: 100%;
   min-height: 400px;
+}
+
+.text-aling-right {
+  text-align: right;
 }
 
 tr {

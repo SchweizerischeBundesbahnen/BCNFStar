@@ -17,7 +17,7 @@ export class TableSelectionComponent implements OnInit {
   @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
   public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
-  public headLimit = 100;
+  public headLimit = 20;
 
   public page: number = 0;
 

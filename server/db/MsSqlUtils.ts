@@ -92,10 +92,15 @@ export default class MsSqlUtils extends SqlUtils {
   ): Promise<number> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
-      const query_result = await sql.query(
-        `SELECT COUNT(*) as count FROM ${schema}.${table}`
-      );
-      return query_result.recordset[0].count;
+      const queryResult = await sql.query(`SELECT
+      count= SUM(st.row_count)
+   FROM
+      sys.dm_db_partition_stats st
+   WHERE
+       object_name(object_id) = '${table}' 
+       AND (index_id < 2)
+       AND object_schema_name(object_id) = '${schema}'`);
+      return +queryResult.recordset[0].count;
     } else {
       throw {
         error: "Table or schema does not exist in database",
