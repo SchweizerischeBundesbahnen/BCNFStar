@@ -47,7 +47,7 @@ export default abstract class MetanomeAlgorithm {
       database: process.env.DB_DATABASE,
       fileName: randomUUID() + ".json",
       config: this.config,
-      createDate: Date.now(),
+      createDate: +Date.now(),
     });
   }
 
@@ -175,13 +175,13 @@ export default abstract class MetanomeAlgorithm {
    * @returns config in metanome-readable format
    */
   protected configString(): string {
-    if (!Object.keys(this.config).length) return "";
+    const entries = Object.entries(this.config).filter(
+      (item) => item[0] !== "memory"
+    );
+    if (!entries.length) return "";
     return (
       "--algorithm-config " +
-      Object.entries(this.config)
-        .filter((item) => item[0] !== "memory")
-        .map((item) => `${item[0]}:${item[1]}`)
-        .join(",")
+      entries.map((item) => `${item[0]}:${item[1]}`).join(",")
     );
   }
 }
