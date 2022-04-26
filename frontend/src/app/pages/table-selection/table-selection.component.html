@@ -42,50 +42,47 @@
       </button>
     </div>
     <div class="col-8" *ngIf="hoveredTable">
-      <h3>
-        <ng-container
-          [ngSwitch]="
-            tableRowCounts.get(hoveredTable)! >= headLimit
-              ? 1
-              : tableRowCounts.get(hoveredTable)! >= 0 &&
-                tableRowCounts.get(hoveredTable)! < headLimit
-              ? 2
-              : -1
-          "
-        >
+      <ng-container
+        [ngSwitch]="tableRowCounts.get(hoveredTable)! >= headLimit ? 1 : -1"
+      >
+        <h3>
+          <span>{{ hoveredTable.schemaAndName() }}</span>
+        </h3>
+        <sbb-table-wrapper class="table-wrapper">
+          <table sbb-table [dataSource]="dataSource">
+            <sbb-text-column
+              *ngFor="let column of tableColumns"
+              name="{{ column }}"
+            >
+            </sbb-text-column>
+            <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
+            <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+          </table>
+        </sbb-table-wrapper>
+        <div class="row">
           <sbb-paginator
             (page)="changePage($event)"
             [pageIndex]="this.page"
             [pageSize]="headLimit"
             [length]="tableRowCounts.get(hoveredTable)"
+            class="col"
           >
           </sbb-paginator>
-
           <ng-container *ngSwitchCase="1">
-            Displaying {{ hoveredTable.schemaAndName() }} {{ headLimit }} of
-            {{ tableRowCounts.get(hoveredTable) }} rows
-          </ng-container>
-          <ng-container *ngSwitchCase="2">
-            {{ hoveredTable.schemaAndName() }}
-            {{ tableRowCounts.get(hoveredTable) }} von
-            {{ tableRowCounts.get(hoveredTable) }}
+            <div class="col text-aling-right">
+              {{ this.headLimit * this.page + 1 }} -
+              {{ this.headLimit * this.page + this.dataSource.data.length }} /
+              {{ tableRowCounts.get(hoveredTable) }}
+            </div>
           </ng-container>
           <ng-container *ngSwitchDefault>
-            {{ hoveredTable.schemaAndName() }}
+            <div class="col text-aling-right">
+              {{ this.headLimit * this.page }} /
+              {{ tableRowCounts.get(hoveredTable) }}
+            </div>
           </ng-container>
-        </ng-container>
-      </h3>
-      <sbb-table-wrapper class="table-wrapper">
-        <table sbb-table [dataSource]="dataSource">
-          <sbb-text-column
-            *ngFor="let column of tableColumns"
-            name="{{ column }}"
-          >
-          </sbb-text-column>
-          <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
-          <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
-        </table>
-      </sbb-table-wrapper>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>
