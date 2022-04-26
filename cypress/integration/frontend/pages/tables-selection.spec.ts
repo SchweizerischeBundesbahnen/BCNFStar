@@ -28,6 +28,16 @@ describe("The table selection page", () => {
     cy.get("button").contains("Go");
   });
 
+  it("display content of numeric columns right", () => {
+    cy.contains("nation_region_denormalized").trigger("mouseenter");
+    cy.get("td:contains('6')").should("have.class", "numeric");
+  });
+
+  it("display content of not numeric columns left", () => {
+    cy.contains("nation_region_denormalized").trigger("mouseenter");
+    cy.get("td:contains('FRANCE')").should("not.have.class", "numeric");
+  });
+
   it("renders the schema editing page when clicking on the Go button", () => {
     cy.selectTablesAndGo();
   });
