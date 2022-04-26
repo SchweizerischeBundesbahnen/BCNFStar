@@ -10,12 +10,12 @@ describe("The metanome settings dialog", () => {
     cy.contains("Metanome configuration settings");
   });
 
-  it.only("displays headings Functional Dependencies and Inclusion Dependencies", () => {
+  it("displays headings Functional Dependencies and Inclusion Dependencies", () => {
     cy.contains("Functional Dependencies");
     cy.contains("Inclusion Dependencies");
   });
 
-  it.only("displays all headings of tabbars", () => {
+  it("displays all headings of tabbars", () => {
     cy.contains("public.nation_region_denormalized");
     cy.contains("public.part_partsupp_supplier_denormalized");
     cy.contains(

@@ -20,7 +20,9 @@ export async function getMetanomeResults(req: Request, res: Response) {
 export async function sendMetanomeResult(res: Response, fileName: string) {
   const path = join(MetanomeAlgorithm.resultsFolder, fileName);
   const fileStream = createReadStream(path, { encoding: "utf-8" });
-
+  fileStream.on("error", () => {
+    res.status(404).json({ message: "File not found!" });
+  });
   const lines = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity,
