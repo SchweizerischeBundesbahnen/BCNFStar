@@ -1,4 +1,4 @@
-import ITableHead from "@/definitions/ITableHead";
+import ITablePage from "@/definitions/ITablePage";
 import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
 import SqlUtils, {
@@ -64,15 +64,18 @@ export default class MsSqlUtils extends SqlUtils {
 
     return result.recordset;
   }
-  public async getTableHead(
+  public async getTablePage(
     tablename: string,
     schemaname: string,
+    offset: number,
     limit: number
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
-        `SELECT TOP (${limit}) * FROM [${schemaname}].[${tablename}]`
+        `SELECT * FROM [${schemaname}].[${tablename}] 
+        OFFSET ${offset} ROWS
+        FETCH NEXT ${limit} ROWS ONLY`
       );
       return {
         rows: result.recordset,
@@ -89,10 +92,15 @@ export default class MsSqlUtils extends SqlUtils {
   ): Promise<number> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
-      const query_result = await sql.query(
-        `SELECT COUNT(*) as count FROM ${schema}.${table}`
-      );
-      return query_result.recordset[0].count;
+      const queryResult = await sql.query(`SELECT
+      count= SUM(st.row_count)
+   FROM
+      sys.dm_db_partition_stats st
+   WHERE
+       object_name(object_id) = '${table}' 
+       AND (index_id < 2)
+       AND object_schema_name(object_id) = '${schema}'`);
+      return +queryResult.recordset[0].count;
     } else {
       throw {
         error: "Table or schema does not exist in database",

@@ -19,11 +19,11 @@ import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
 
 @Component({
-  selector: 'app-normalize',
-  templateUrl: './normalize.component.html',
-  styleUrls: ['./normalize.component.css'],
+  selector: 'app-schema-editing',
+  templateUrl: './schema-editing.component.html',
+  styleUrls: ['./schema-editing.component.css'],
 })
-export class NormalizeComponent {
+export class SchemaEditingComponent {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
@@ -43,11 +43,11 @@ export class NormalizeComponent {
     // this.schemaChanged.next();
   }
 
-  onSelectColumns(columns: Map<Table, ColumnCombination>) {
+  public onSelectColumns(columns: Map<Table, ColumnCombination>) {
     this.selectedColumns = columns;
   }
 
-  onJoin(fk: TableRelationship): void {
+  public onJoin(fk: TableRelationship): void {
     let command = new JoinCommand(this.schema, fk);
 
     command.onDo = () => {
@@ -61,7 +61,7 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onClickSplit(fd: FunctionalDependency): void {
+  public onClickSplit(fd: FunctionalDependency): void {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
       data: fd,
     });
@@ -73,7 +73,7 @@ export class NormalizeComponent {
       });
   }
 
-  onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
+  public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
     let command = new SplitCommand(
       this.schema,
       this.selectedTable!,
@@ -88,14 +88,14 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onIndToFk(event: SourceRelationship): void {
+  public onIndToFk(event: SourceRelationship): void {
     let command = new IndToFkCommand(this.schema, event);
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }
 
-  onAutoNormalize(): void {
+  public onAutoNormalize(): void {
     let tables = this.selectedTable
       ? new Array(this.selectedTable)
       : new Array(...this.schema.tables);
@@ -112,29 +112,29 @@ export class NormalizeComponent {
     this.schemaChanged.next();
   }
 
-  onSelectTable(table: Table) {
+  public onSelectTable(table: Table) {
     console.log(table.fds);
     this.selectedTable = table;
   }
 
-  onChangeTableName(value: { table: Table; newName: string }): void {
+  public onChangeTableName(value: { table: Table; newName: string }): void {
     let command = new TableRenameCommand(value.table, value.newName);
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }
 
-  onUndo() {
+  public onUndo() {
     this.commandProcessor.undo();
     this.schemaChanged.next();
   }
 
-  onRedo() {
+  public onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
   }
 
-  async persistSchema(): Promise<void> {
+  public async persistSchema(): Promise<void> {
     this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
 
     const tables: Table[] = Array.from(this.schema.tables);

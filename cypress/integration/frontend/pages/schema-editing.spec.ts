@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe("The normalize page", () => {
+describe("The schema editing page", () => {
   beforeEach(() => {
     cy.visitFrontend();
     cy.selectTablesAndGo();
@@ -23,8 +23,8 @@ describe("The normalize page", () => {
     cy.get("button").contains("Auto-normalize all tables");
   });
 
-  it("has the normalize schema graph", () => {
-    cy.get("app-normalize-schema-graph");
+  it("has the schema graph", () => {
+    cy.get("app-schema-graph");
   });
 
   it("displays existing primary keys", () => {
@@ -57,11 +57,6 @@ describe("The normalize page", () => {
         "contain",
         "nation_region_denormalized"
       );
-      // cy.get("app-graph-element").should("contain", "denormalized_data");
-      // cy.get("app-graph-element").should(
-      //   "contain",
-      //   "customer_orders_lineitem_denormalized"
-      // );
       cy.get("app-graph-element").should(
         "contain",
         "part_partsupp_supplier_denormalized"

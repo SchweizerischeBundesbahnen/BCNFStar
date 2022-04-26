@@ -6,7 +6,7 @@ import SqlUtils, {
 import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
-import ITableHead from "@/definitions/ITableHead";
+import ITablePage from "@/definitions/ITablePage";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -71,15 +71,18 @@ export default class PostgresSqlUtils extends SqlUtils {
     return table_exists.rowCount > 0;
   }
 
-  public async getTableHead(
+  public async getTablePage(
     tablename: string,
     schemaname: string,
+    offset: number,
     limit: number
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} LIMIT ${limit}`
+        `SELECT * FROM ${schemaname}.${tablename} 
+        LIMIT ${limit} 
+        OFFSET ${offset}`
       );
       return {
         rows: query_result.rows,
@@ -96,10 +99,22 @@ export default class PostgresSqlUtils extends SqlUtils {
   ): Promise<number> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
-      const query_result = await this.pool.query(
-        `SELECT COUNT(*) FROM ${schema}.${table}`
-      );
-      return query_result.rows[0].count;
+      // from https://stackoverflow.com/questions/7943233/fast-way-to-discover-the-row-count-of-a-table-in-postgresql
+      const rowCountQuery = `SELECT (CASE WHEN c.reltuples < 0 THEN NULL -- never vacuumed
+         WHEN c.relpages = 0 THEN float8 '0' -- empty table
+         ELSE c.reltuples / c.relpages END
+         * (pg_catalog.pg_relation_size(c.oid)
+         / pg_catalog.current_setting('block_size')::int)
+         )::bigint AS count
+         FROM   pg_catalog.pg_class c
+         WHERE  c.oid = '${schema}.${table}'::regclass;`;
+
+      let queryResult = await this.pool.query(rowCountQuery);
+      if (!queryResult.rows[0].count) {
+        this.pool.query(`VACUUM ${schema}.${table}`);
+        queryResult = await this.pool.query(rowCountQuery);
+      }
+      return queryResult.rows[0].count;
     } else {
       throw {
         error: "Table or schema does not exist in database",

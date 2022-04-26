@@ -18,32 +18,34 @@ import { FdCluster } from '@/src/model/types/FdCluster';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 
 @Component({
-  selector: 'app-normalize-side-bar',
-  templateUrl: './normalize-side-bar.component.html',
-  styleUrls: ['./normalize-side-bar.component.css'],
+  selector: 'app-schema-editing-side-bar',
+  templateUrl: './schema-editing-side-bar.component.html',
+  styleUrls: ['./schema-editing-side-bar.component.css'],
 })
-export class NormalizeSideBarComponent implements OnInit, OnChanges {
-  @Input() table!: Table;
-  @Input() schema!: Schema;
-  @Output() splitFd = new EventEmitter<FunctionalDependency>();
-  @Output() indToFk = new EventEmitter<SourceRelationship>();
-  @Output() selectColumns = new EventEmitter<Map<Table, ColumnCombination>>();
-  @Output() renameTable = new EventEmitter<{
+export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
+  @Input() public table!: Table;
+  @Input() public schema!: Schema;
+  @Output() public splitFd = new EventEmitter<FunctionalDependency>();
+  @Output() public indToFk = new EventEmitter<SourceRelationship>();
+  @Output() public selectColumns = new EventEmitter<
+    Map<Table, ColumnCombination>
+  >();
+  @Output() public renameTable = new EventEmitter<{
     table: Table;
     newName: string;
   }>();
 
   @ViewChild('indSelection', { read: SbbRadioGroup })
-  indSelectionGroup!: SbbRadioGroup;
+  private indSelectionGroup!: SbbRadioGroup;
 
-  _fdClusterFilter = new Array<Column>();
-  indFilter = new Array<Table>();
+  public _fdClusterFilter = new Array<Column>();
+  public indFilter = new Array<Table>();
 
   public editingName = false;
   public tableName: string = '';
 
-  page: number = 0;
-  pageSize = 5;
+  public page: number = 0;
+  public pageSize = 5;
 
   ngOnInit(): void {
     this.tableName = this.table.name;
@@ -55,12 +57,12 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     this.indFilter = Array.from(this.schema.tables);
   }
 
-  selectedInd(): SourceRelationship | undefined {
+  public selectedInd(): SourceRelationship | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
   }
 
-  emitHighlightedInd(rel: SourceRelationship) {
+  public emitHighlightedInd(rel: SourceRelationship) {
     const map = new Map<Table, ColumnCombination>();
     for (const tableRel of this.schema.indsOf(this.table).get(rel)!) {
       if (!map.has(tableRel.referencing)) {
@@ -78,35 +80,36 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     }
     this.selectColumns.emit(map);
   }
-  emitHighlightedCluster(cluster: FdCluster) {
+  public emitHighlightedCluster(cluster: FdCluster) {
     const map = new Map<Table, ColumnCombination>();
     map.set(this.table, cluster.columns);
     this.selectColumns.emit(map);
   }
 
-  setTableName() {
+  public setTableName() {
     this.renameTable.emit({
       table: this.table,
       newName: this.tableName,
     });
     this.editingName = false;
   }
-  changePage(evt: SbbPageEvent) {
+
+  public changePage(evt: SbbPageEvent) {
     this.page = evt.pageIndex;
   }
 
-  get fdClusterFilter(): ColumnCombination {
+  public get fdClusterFilter(): ColumnCombination {
     return new ColumnCombination(this._fdClusterFilter);
   }
 
-  fdClusters() {
+  public fdClusters() {
     const cc = this.fdClusterFilter;
     return this.schema
       .splittableFdClustersOf(this.table)
       .filter((c) => cc.isSubsetOf(c.columns));
   }
 
-  inds() {
+  public inds() {
     const inds = this.schema.indsOf(this.table);
     return [...inds.keys()].filter((sourceRel) =>
       inds
@@ -115,7 +118,7 @@ export class NormalizeSideBarComponent implements OnInit, OnChanges {
     );
   }
 
-  transformIndToFk(): void {
+  public transformIndToFk(): void {
     const ind = this.selectedInd();
     if (!ind) return;
     this.indToFk.emit(ind);

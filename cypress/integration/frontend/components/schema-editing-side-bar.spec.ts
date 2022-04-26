@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe("The normalize side bar", () => {
+describe("The schema editing side bar", () => {
   beforeEach(() => {
     cy.visitFrontend();
 
@@ -13,7 +13,7 @@ describe("The normalize side bar", () => {
 
   // ############# Show elements #############
   it("renders", () => {
-    cy.get("app-normalize-side-bar");
+    cy.get("app-schema-editing-side-bar");
   });
 
   it("displays the 'auto normalize this table' button", () => {
@@ -45,7 +45,7 @@ describe("The normalize side bar", () => {
 
   it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {
     cy.get(".table-head-title").contains("public.part_partsupp").click();
-    cy.contains("s_nationkey->(public.nation_region_denormalized) n_nationkey");
+    cy.contains("s_nationkey -> n_nationkey");
   });
 
   it("displays the joining button", () => {
