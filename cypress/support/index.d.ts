@@ -27,17 +27,6 @@ declare namespace Cypress {
     selectTablesAndGo(): Chainable<Element>;
 
     /**
-     * Selects which tables to use for schema editing, and enters metanome configutation settings dialog and clicks Ok
-     * The following tables are being selected:
-     * - nation_region_denormalized
-     * - part_partsupp_supplier_denormalized
-     * - denormalized_data
-     *
-     * Note: make sure to always test on the data provided in the sql files in the cypress folder
-     */
-    testLoadingDialog(): Chainable<Element>;
-
-    /**
      * Selects if existing metanome configuration files or new configurations are used, and enters schema editing mode
      * Selects always the default configruations files.
      *

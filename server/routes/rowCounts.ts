@@ -16,7 +16,8 @@ export async function getTableRowCounts(
           .getTableRowCount(row.table_name, row.table_schema)
           .catch((e) =>
             console.error(
-              "Error while getting row count for table: " + complete_name
+              "Error while getting row count for table: " + complete_name,
+              e
             )
           );
       }
