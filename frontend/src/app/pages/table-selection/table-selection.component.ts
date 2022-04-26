@@ -21,8 +21,9 @@ export class TableSelectionComponent implements OnInit {
   @ViewChild('loadingDialog') public loadingDialog!: TemplateRef<any>;
 
   public tablePages: Map<Table, ITablePage> = new Map();
-
   public tableRowCounts: Map<Table, number> = new Map();
+  public headLimit = 20;
+
   public pageLimit = 20;
   public page: number = 0;
 
@@ -102,6 +103,16 @@ export class TableSelectionComponent implements OnInit {
   public areZeroSelectedIn(schema: string) {
     return !this.tablesInSchema[schema].some((table) =>
       this.selectedTables.get(table)
+    );
+  }
+  public isNumeric(columnName: string): boolean {
+    const type = this.hoveredTable?.columns
+      .asArray()
+      .find((c) => c.name == columnName)?.dataType;
+    return (
+      !!type &&
+      (type.toLowerCase().startsWith('numeric') ||
+        type.toLowerCase().startsWith('int'))
     );
   }
 
