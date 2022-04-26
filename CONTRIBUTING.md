@@ -29,6 +29,10 @@ Alternatively, you can use `npm run dev` if you don't want tests to be run
 
 To run the tests as they are being executed in the CI, run `npm run test:prod`.
 
+### Troubleshooting
+
+Something doesn't work? Always try to run `npm install && npm run build` first. This may be required after changes to files in the `server/definitions` folder or to any dependency.
+
 ## Pull Request checklist
 
 Make sure that...
