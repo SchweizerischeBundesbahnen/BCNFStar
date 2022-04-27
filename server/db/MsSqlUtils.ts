@@ -187,30 +187,6 @@ export default class MsSqlUtils extends SqlUtils {
     };
   }
 
-  private violatingRowsForFD_SQL(
-    schema: string,
-    table: string,
-    lhs: Array<string>,
-    rhs: Array<string>
-  ): string {
-    return `
-SELECT ${lhs
-      .map((c) => `${c} as lhs_${c}`)
-      .concat(rhs.map((c) => `${c} as rhs_${c}`))
-      .join(",")}
-FROM ${schema}.${table} AS X
-WHERE EXISTS (
-  SELECT 1 FROM (SELECT ${lhs.join(
-    ","
-  )} FROM ${schema}.${table} GROUP BY ${lhs.join(
-      ","
-    )} HAVING COUNT(1) > 1) AS Y WHERE ${lhs
-      .map((c) => `X.${c} = Y.${c}`)
-      .join(" AND ")}
-  )
-`;
-  }
-
   public async getViolatingRowsForFDCount(
     schema: string,
     table: string,

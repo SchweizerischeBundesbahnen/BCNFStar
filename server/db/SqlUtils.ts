@@ -68,6 +68,29 @@ export default abstract class SqlUtils {
     limit: number
   ): Promise<ITablePage>;
 
+  protected violatingRowsForFD_SQL(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): string {
+    return `
+SELECT ${lhs.concat(rhs).join(",")}
+FROM ${schema}.${table} AS x 
+WHERE EXISTS (
+	SELECT 1 FROM (
+		SELECT ${lhs.join(",")} FROM (
+			SELECT ${[...new Set(lhs.concat(rhs))].join(",")}
+			FROM ${schema}.${table} 
+			GROUP BY ${[...new Set(lhs.concat(rhs))].join(",")}
+		) AS Z  -- removes duplicates
+		GROUP BY ${lhs.join(",")} 
+		HAVING COUNT(1) > 1 -- this is violating the fd, as duplicates are removed but the lhs still occures multiple times -> different rhs
+	) AS Y WHERE ${lhs.map((c) => `X.${c} = Y.${c}`).join(" AND ")}
+) 
+    `;
+  }
+
   public abstract getViolatingRowsForFDCount(
     schema: string,
     table: string,
