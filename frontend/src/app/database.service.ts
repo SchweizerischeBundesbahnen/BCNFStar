@@ -120,8 +120,10 @@ export class DatabaseService {
           [...this.inputSchema!.fks].find((rel) =>
             rel.appliesTo(referencingTable!, referencedTable!)
           ) || new Relationship();
-        relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.addFk(relationship);
+        if (fkColumn && pkColumn) {
+          relationship.add(fkColumn, pkColumn);
+          this.inputSchema!.addFk(relationship);
+        }
       }
     });
   }
@@ -153,9 +155,11 @@ export class DatabaseService {
             referencedIColumn.tableIdentifier == column.source.table.name
         )!;
 
-        indRelationship.add(dependantColumn, referencedColumn);
+        if (dependantColumn && referencedColumn)
+          indRelationship.add(dependantColumn, referencedColumn);
       }
-      this.inputSchema!.addInd(indRelationship);
+      if (indRelationship._referenced.length)
+        this.inputSchema!.addInd(indRelationship);
     });
   }
 
