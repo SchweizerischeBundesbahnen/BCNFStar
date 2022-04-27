@@ -53,10 +53,10 @@ export default class Schema {
   }
 
   public addFd(fd: SourceFunctionalDependency) {
-    if (!this._fds.has(fd.lhs[0].table)) {
-      this._fds.set(fd.lhs[0].table, new Array());
+    if (!this._fds.has(fd.rhs[0].table)) {
+      this._fds.set(fd.rhs[0].table, new Array());
     }
-    this._fds.get(fd.lhs[0].table)!.push(fd);
+    this._fds.get(fd.rhs[0].table)!.push(fd);
   }
 
   /**
