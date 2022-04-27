@@ -139,11 +139,9 @@
       [hidden]="this.table.sources.size !== 1"
     >
       <sbb-expansion-panel-header
-        >Check For Contained Subtable</sbb-expansion-panel-header
+        >Check Contained Subtable</sbb-expansion-panel-header
       >
-      <app-experimental-side-bar
-        [table]="this.table"
-      ></app-experimental-side-bar>
+      <app-check-fd [table]="this.table"></app-check-fd>
     </sbb-expansion-panel>
   </sbb-accordion>
 </div>

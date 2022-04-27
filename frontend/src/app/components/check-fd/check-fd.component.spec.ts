@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ExperimentalSideBarComponent } from './experimental-side-bar.component';
+import { ExperimentalSideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
 
 describe('ExperimentalSideBarComponent', () => {
   let component: ExperimentalSideBarComponent;

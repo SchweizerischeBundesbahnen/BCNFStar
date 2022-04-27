@@ -7,9 +7,9 @@ import ITablePage from '@server/definitions/ITablePage';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 @Component({
-  selector: 'app-experimental-side-bar',
-  templateUrl: './experimental-side-bar.component.html',
-  styleUrls: ['./experimental-side-bar.component.css'],
+  selector: 'app-check-fd',
+  templateUrl: './check-fd.component.html',
+  styleUrls: ['./check-fd.component.css'],
 })
 export class ExperimentalSideBarComponent implements OnInit {
   @Input() table!: Table;
