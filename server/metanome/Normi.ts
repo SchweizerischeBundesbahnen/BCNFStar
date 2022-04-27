@@ -54,6 +54,8 @@ export default class Normi extends FunctionalDependencyAlgorithm {
             // remove brackets
             .slice(1, -1)
             .split(",")
+            // filter out empty columns (occurs if lhs is empty, ie rhs contains constant value)
+            .filter((s) => s)
             .map((s) => s.trim()),
           rhsColumns: rhsString.split(",").map((s) => s.trim()),
         };
