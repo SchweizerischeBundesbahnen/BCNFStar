@@ -75,6 +75,7 @@ export default class MsSqlUtils extends SqlUtils {
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
         `SELECT * FROM [${schemaname}].[${tablename}] 
+        ORDER BY (SELECT NULL) 
         OFFSET ${offset} ROWS
         FETCH NEXT ${limit} ROWS ONLY`
       );
