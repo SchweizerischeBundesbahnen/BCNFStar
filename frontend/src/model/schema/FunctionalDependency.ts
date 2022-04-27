@@ -8,7 +8,7 @@ export default class FunctionalDependency {
   /**
    * cached result of the score calculation. Should not be accessed directly
    */
-  public _fdScore?: number;
+  public _score?: number;
 
   public constructor(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.lhs = lhs;

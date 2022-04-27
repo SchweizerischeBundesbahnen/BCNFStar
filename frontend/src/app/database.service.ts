@@ -104,54 +104,50 @@ export class DatabaseService {
     );
   }
 
-  private resolveIFks(fks: Array<IForeignKey>) {
-    fks.forEach((fk) => {
-      let fkRelationship = new SourceRelationship();
-      let numColumns = fk.referencing.length;
-      for (let i = 0; i < numColumns; i++) {
-        let referencingIColumn = fk.referencing[i];
+  private resolveIFks(iFks: Array<IForeignKey>) {
+    iFks.forEach((iFk) => {
+      let fk = new SourceRelationship();
+      for (const i in iFk.referencing) {
+        let referencingIColumn = iFk.referencing[i];
         let referencingColumn = this.sourceColumns.get(
           `${referencingIColumn.schemaIdentifier}.${referencingIColumn.tableIdentifier}.${referencingIColumn.columnIdentifier}`
         );
 
-        let referencedIColumn = fk.referenced[i];
+        let referencedIColumn = iFk.referenced[i];
         let referencedColumn = this.sourceColumns.get(
           `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
         );
 
         // in case the foreign key is not fully contained in the selection of tables
-        if (!referencingColumn || !referencedColumn) return;
+        if (!referencingColumn || !referencedColumn) continue;
 
-        fkRelationship.referencing.push(referencingColumn!);
-        fkRelationship.referenced.push(referencedColumn!);
+        fk.referencing.push(referencingColumn);
+        fk.referenced.push(referencedColumn);
       }
-      this.schema!.addFk(fkRelationship);
+      this.schema!.addFk(fk);
     });
   }
 
-  private resolveInds(inds: Array<IInclusionDependency>) {
-    inds.forEach((ind) => {
-      let indRelationship = new SourceRelationship();
-      let numColumns = ind.dependant.columnIdentifiers.length;
-      for (let i = 0; i < numColumns; i++) {
-        let dependantIColumn = ind.dependant.columnIdentifiers[i];
+  private resolveInds(iInds: Array<IInclusionDependency>) {
+    iInds.forEach((iInd) => {
+      let ind = new SourceRelationship();
+      for (const i in iInd.dependant.columnIdentifiers) {
+        let dependantIColumn = iInd.dependant.columnIdentifiers[i];
         let dependantColumn = this.sourceColumns.get(
           `${dependantIColumn.schemaIdentifier}.${dependantIColumn.tableIdentifier}.${dependantIColumn.columnIdentifier}`
         );
 
-        let referencedIColumn = ind.referenced.columnIdentifiers[i];
+        let referencedIColumn = iInd.referenced.columnIdentifiers[i];
         let referencedColumn = this.sourceColumns.get(
           `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
         );
 
-        if (!dependantColumn || !referencedColumn) {
-          console.error('Column lookup failed');
-        }
+        if (!dependantColumn || !referencedColumn) continue;
 
-        indRelationship.referencing.push(dependantColumn!);
-        indRelationship.referenced.push(referencedColumn!);
+        ind.referencing.push(dependantColumn!);
+        ind.referenced.push(referencedColumn!);
       }
-      this.schema!.addInd(indRelationship);
+      this.schema!.addInd(ind);
     });
   }
 

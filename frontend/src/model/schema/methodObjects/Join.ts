@@ -50,7 +50,6 @@ export default class Join {
         .setMinus(new ColumnCombination(this.relationship.referenced))
         .applySourceMapping(sourceMapping)
     );
-    //this.newTable.columns.delete(...this.relationship.referenced);
 
     // relationships
     this.newTable.relationships.push(...this.referencing.relationships);
@@ -77,9 +76,8 @@ export default class Join {
     );
 
     // name, pk
-    this.newTable.name = this.referencing.name;
-    this.newTable.schemaName = this.referencing.schemaName;
-
     this.newTable.pk = this.referencing.pk;
+    this.newTable.schemaName = this.referencing.schemaName;
+    this.newTable.name = this.referencing.name;
   }
 }

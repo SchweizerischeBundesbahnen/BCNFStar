@@ -50,7 +50,7 @@ export default class Table {
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
     iTable.attributes.forEach((iAttribute, index) => {
-      let sourceColumn = new SourceColumn(
+      const sourceColumn = new SourceColumn(
         iAttribute.name,
         sourceTable,
         iAttribute.dataType,
@@ -66,19 +66,22 @@ export default class Table {
 
   // should/must not be used in production as important information (datatype and nullable) are missing
   public static fromColumnNames(columnNames: Array<string>, tableName: string) {
-    let sourceTable = new SourceTable(tableName, '');
-    let sourceTableInstance = new SourceTableInstance(sourceTable);
-    let table = new Table();
-    columnNames.forEach((name, i) =>
-      table.columns.add(
-        new Column(
-          sourceTableInstance,
-          new SourceColumn(name, sourceTable, 'unknown data type', i, false)
-        )
-      )
-    );
+    const sourceTable = new SourceTable(tableName, '');
+    const table = new Table();
+    const sourceTableInstance = table.addSource(sourceTable);
+
+    columnNames.forEach((name, i) => {
+      const sourceColumn = new SourceColumn(
+        name,
+        sourceTable,
+        'unknown data type',
+        i,
+        false
+      );
+      table.columns.add(new Column(sourceTableInstance, sourceColumn));
+    });
     table.name = tableName;
-    table.sources.push(sourceTableInstance);
+    table.schemaName = '';
     return table;
   }
 
@@ -135,7 +138,7 @@ export default class Table {
   /**
    * Returns the selected columns of each source of this table
    */
-  public columnsBySourceTableInstance() {
+  public columnsBySource() {
     const result = new Map<SourceTableInstance, ColumnCombination>();
 
     for (const source of this.sources) {
@@ -148,7 +151,10 @@ export default class Table {
     return result;
   }
 
-  public reducedSourceTableInstances() {
+  /**
+   * Returns the sources of which not all rows of the original source table are found in this table
+   */
+  public reducedSources() {
     const result = new Array<SourceTableInstance>();
     for (const rel of this.relationships) {
       const instance = new ColumnCombination(
@@ -164,9 +170,11 @@ export default class Table {
   }
 
   /**
-   *
+   * @returns all sets of columns - each set coming mostly from the same SourceTableInstance - which match the sourceColumns.
+   * Columns from other SourceTableInstances can be included in one match, if the columns have the same values as the
+   * equivalent column from the same SourceTableInstance would have.
    * @param sourceColumns columns to be matched. Must come from the same SourceTable
-   * @returns all sets of columns - each set coming from the same SourceTableInstance - which match the sourceColumns
+   * @param allowReduced do we want matches which come from reduced sources (see reducedSources)
    */
   public columnsEquivalentTo(
     sourceColumns: Array<SourceColumn>,
@@ -175,13 +183,13 @@ export default class Table {
     const result = new Array<Array<Column>>();
     const sourceTable = sourceColumns[0].table;
 
-    const columnsByInstance = this.columnsBySourceTableInstance();
+    const columnsBySource = this.columnsBySource();
 
     const ambiguous = new Map<Column, Column>();
     if (allowReduced) {
       for (const rel of this.relationships) {
         for (const i in rel.referencing) {
-          columnsByInstance
+          columnsBySource
             .get(rel.referenced[i].sourceTableInstance)!
             .add(rel.referenced[i]);
           ambiguous.set(rel.referenced[i], rel.referencing[i]);
@@ -189,12 +197,9 @@ export default class Table {
       }
     }
 
-    for (const [sourceTableInstance, columns] of columnsByInstance.entries()) {
+    for (const [sourceTableInstance, columns] of columnsBySource.entries()) {
       if (!sourceTableInstance.table.equals(sourceTable)) continue;
-      if (
-        !allowReduced &&
-        this.reducedSourceTableInstances().includes(sourceTableInstance)
-      )
+      if (!allowReduced && this.reducedSources().includes(sourceTableInstance))
         continue;
 
       const equivalentColumns = columns.columnsEquivalentTo(
@@ -218,6 +223,9 @@ export default class Table {
     return result;
   }
 
+  /**
+   * returns all sources in an order so that every referenced table comes before their referencing table.
+   */
   public sourcesTopological(): Array<SourceTableInstance> {
     const result = new Array<SourceTableInstance>();
     const numReferenced = new Map<SourceTableInstance, number>();
@@ -233,8 +241,8 @@ export default class Table {
       referencings.set(referenced, referencing);
     }
     while (numReferenced.size > 0) {
-      const [current] = Array.from(numReferenced.entries()).find(
-        ([, count]) => count == 0
+      const current = this.sources.find(
+        (source) => numReferenced.get(source) == 0
       )!;
       result.push(current);
       numReferenced.delete(current);

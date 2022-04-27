@@ -12,10 +12,10 @@ export default class FdScore {
   }
 
   public get(): number {
-    if (!this.fd._fdScore) {
-      this.fd._fdScore = this.calculate();
+    if (!this.fd._score) {
+      this.fd._score = this.calculate();
     }
-    return this.fd._fdScore;
+    return this.fd._score;
   }
 
   public calculate(): number {

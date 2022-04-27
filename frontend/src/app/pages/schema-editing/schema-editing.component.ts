@@ -112,11 +112,6 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onSelectTable(table: Table) {
-    console.log(table.fds);
-    this.selectedTable = table;
-  }
-
   public onChangeTableName(value: { table: Table; newName: string }): void {
     let command = new TableRenameCommand(value.table, value.newName);
 

@@ -82,6 +82,11 @@ export default class Schema {
     return table._fks;
   }
 
+  /**
+   * Returns the inds from the given table to other tables. The inds are contained inside a map
+   * to keep the information which source-ind caused which concrete inds to appear in the current
+   * state of the schema.
+   */
   public indsOf(
     table: Table
   ): Map<SourceRelationship, Array<TableRelationship>> {
@@ -182,14 +187,11 @@ export default class Schema {
   }
 
   public calculateFdsOf(table: Table) {
-    console.log('calc fds for');
-    console.log(table);
     const fds = new Map<SourceTableInstance, Array<FunctionalDependency>>();
     table.sources.forEach((source) => fds.set(source, new Array()));
-    const columnsByInstance = table.columnsBySourceTableInstance();
+    const columnsByInstance = table.columnsBySource();
+
     for (const source of table.sourcesTopological()) {
-      console.log('inspecting source');
-      console.log(source);
       const referencingColumns = new ColumnCombination();
       table.relationships
         .filter((rel) => rel.referencing[0].sourceTableInstance == source)
@@ -337,7 +339,7 @@ export default class Schema {
     fd: FunctionalDependency,
     generatingName?: string
   ) {
-    return new Split(this, table, fd, generatingName).newTables;
+    return new Split(this, table, fd, generatingName).newTables!;
   }
 
   public autoNormalize(...table: Array<Table>): Array<Table> {

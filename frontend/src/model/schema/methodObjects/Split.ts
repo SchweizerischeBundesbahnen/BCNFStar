@@ -7,7 +7,7 @@ import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
 export default class Split {
-  public newTables: [Table, Table];
+  public newTables?: [Table, Table];
 
   public constructor(
     private schema: Schema,
@@ -15,6 +15,13 @@ export default class Split {
     private fd: FunctionalDependency,
     private generatingName?: string
   ) {
+    this.split();
+
+    this.schema.addTables(...this.newTables!);
+    this.schema.deleteTables(this.table);
+  }
+
+  private split() {
     let remaining: Table = new Table(this.table.remainingSchema(this.fd));
     let generating: Table = new Table(this.table.generatingSchema(this.fd));
 
@@ -28,9 +35,9 @@ export default class Split {
     generating.pk = this.fd.lhs.copy();
 
     remaining.schemaName = this.table.schemaName;
-    remaining.name = this.table.name;
-
     generating.schemaName = this.table.schemaName;
+
+    remaining.name = this.table.name;
     generating.name =
       this.generatingName ||
       this.fd.lhs.columnNames().join('_').substring(0, 50);
@@ -38,9 +45,6 @@ export default class Split {
     this.substitute(generating, this.fd.lhs);
 
     this.newTables = [remaining, generating];
-
-    this.schema.addTables(...this.newTables);
-    this.schema.deleteTables(this.table);
   }
 
   /**
@@ -48,7 +52,7 @@ export default class Split {
    * The projection consists of the sources from which columns are selected
    * and the sources which are needed to connect other needed sources in an SQL-Statement.
    */
-  private projectSources(table: Table): void {
+  private projectSources(table: Table) {
     // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
     let columnSources = table.columns.sourceTableInstances();
 
@@ -81,7 +85,7 @@ export default class Split {
     table.relationships = Array.from(neededRelationships);
   }
 
-  private projectFds(table: Table): void {
+  private projectFds(table: Table) {
     this.table.fds.forEach((fd) => {
       if (fd.lhs.isSubsetOf(table.columns)) {
         fd = new FunctionalDependency(

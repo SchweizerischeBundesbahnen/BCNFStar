@@ -102,20 +102,21 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
     return new ColumnCombination(this._fdClusterFilter);
   }
 
-  public fdClusters() {
+  public fdClusters(): Array<FdCluster> {
     const cc = this.fdClusterFilter;
     return this.schema
       .splittableFdClustersOf(this.table)
       .filter((c) => cc.isSubsetOf(c.columns));
   }
 
-  public inds() {
+  public inds(): Array<SourceRelationship> {
     const inds = this.schema.indsOf(this.table);
-    return [...inds.keys()].filter((sourceRel) =>
-      inds
-        .get(sourceRel)!
-        .some((tableRel) => this.indFilter.includes(tableRel.referenced))
-    );
+
+    return Array.from(inds.entries())
+      .filter(([, inds]) =>
+        inds.some((ind) => this.indFilter.includes(ind.referenced))
+      )
+      .map(([sourceInd]) => sourceInd);
   }
 
   public transformIndToFk(): void {
