@@ -110,7 +110,10 @@
     </sbb-option>
   </sbb-select>
   <div
-    *ngFor="let entry of config[configName]['config'] | keyvalue"
+    *ngFor="
+      let entry of config[configName]['config'] | keyvalue;
+      trackBy: trackByFn
+    "
     [sbbTooltip]="$any(configTooltip)[$any(entry).key]"
   >
     <sbb-checkbox

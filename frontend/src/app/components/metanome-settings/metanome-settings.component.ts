@@ -230,6 +230,15 @@ export class MetanomeSettingsComponent {
     this.formGroup.updateValueAndValidity();
   }
 
+  /**
+   * solves problem of writing in input without lost of focus
+   * solution explained in: https://stackoverflow.com/questions/42322968/angular2-dynamic-input-field-lose-focus-when-input-changes
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public trackByFn(key: any, value: any) {
+    return key;
+  }
+
   public runMetoname() {
     this.dialogRef.close({ values: this.formGroup.value });
   }
