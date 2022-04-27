@@ -53,7 +53,7 @@ export class ExperimentalSideBarComponent implements OnInit {
     const result = await this.dataService.loadViolatingRowsForFD(
       this.table,
       this._lhs,
-      this._rhs,
+      this._rhs.filter((c) => !this._lhs.includes(c)), // a column always defines itself
       this.page * this.pageSize,
       this.pageSize
     );

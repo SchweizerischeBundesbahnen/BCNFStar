@@ -1,10 +1,10 @@
-<p>Check if columns:</p>
+<p>Left Hand Side</p>
 <sbb-select [(ngModel)]="this._lhs" multiple placeholder="Left Hand Side">
   <sbb-option *ngFor="let column of table.columns.asArray()" [value]="column">{{
     column.name
   }}</sbb-option>
 </sbb-select>
-<p>define:</p>
+<p>Right Hand Side</p>
 <sbb-select [(ngModel)]="this._rhs" multiple placeholder="Right Hand Side">
   <sbb-option *ngFor="let column of table.columns.asArray()" [value]="column">{{
     column.name
