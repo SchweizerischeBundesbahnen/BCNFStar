@@ -17,7 +17,7 @@ const indexFileLocation = join(
 );
 
 /**
- * @param getAll if false (delfault) only gets entries for corrent database
+ * @param getAll if false (delfault) only gets entries for current database
  */
 export async function getIndexContent(
   getAll: boolean = false
