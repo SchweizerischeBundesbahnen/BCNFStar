@@ -99,10 +99,22 @@ export default class PostgresSqlUtils extends SqlUtils {
   ): Promise<number> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
-      const query_result = await this.pool.query(
-        `SELECT COUNT(*) FROM ${schema}.${table}`
-      );
-      return query_result.rows[0].count;
+      // from https://stackoverflow.com/questions/7943233/fast-way-to-discover-the-row-count-of-a-table-in-postgresql
+      const rowCountQuery = `SELECT (CASE WHEN c.reltuples < 0 THEN NULL -- never vacuumed
+         WHEN c.relpages = 0 THEN float8 '0' -- empty table
+         ELSE c.reltuples / c.relpages END
+         * (pg_catalog.pg_relation_size(c.oid)
+         / pg_catalog.current_setting('block_size')::int)
+         )::bigint AS count
+         FROM   pg_catalog.pg_class c
+         WHERE  c.oid = '${schema}.${table}'::regclass;`;
+
+      let queryResult = await this.pool.query(rowCountQuery);
+      if (!queryResult.rows[0].count) {
+        this.pool.query(`VACUUM ${schema}.${table}`);
+        queryResult = await this.pool.query(rowCountQuery);
+      }
+      return queryResult.rows[0].count;
     } else {
       throw {
         error: "Table or schema does not exist in database",

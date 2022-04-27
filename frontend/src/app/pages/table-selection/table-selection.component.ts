@@ -17,7 +17,7 @@ export class TableSelectionComponent implements OnInit {
   @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
   public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
-  public headLimit = 100;
+  public headLimit = 20;
 
   public page: number = 0;
 
@@ -29,7 +29,6 @@ export class TableSelectionComponent implements OnInit {
   public selectedTables = new Map<Table, Boolean>();
   public tablesInSchema: Record<string, Table[]> = {};
   public isLoading = false;
-  public error: any;
   public queueUrl: string;
 
   constructor(
@@ -96,6 +95,16 @@ export class TableSelectionComponent implements OnInit {
       this.selectedTables.get(table)
     );
   }
+  public isNumeric(columnName: string): boolean {
+    const type = this.hoveredTable?.columns
+      .asArray()
+      .find((c) => c.name == columnName)?.dataType;
+    return (
+      !!type &&
+      (type.toLowerCase().startsWith('numeric') ||
+        type.toLowerCase().startsWith('int'))
+    );
+  }
 
   public selectTables() {
     const tables = this.tables.filter((table) =>
@@ -108,7 +117,7 @@ export class TableSelectionComponent implements OnInit {
         this.router.navigate(['/edit-schema']);
       })
       .catch((e) => {
-        this.error = e;
+        console.error(e);
         this.dialog.open(this.errorDialog);
       })
       .finally(() => {
