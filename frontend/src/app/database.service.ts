@@ -189,7 +189,7 @@ export class DatabaseService {
       const fds = iFDs.map((fd) =>
         FunctionalDependency.fromIFunctionalDependency(table, fd)
       );
-      table.setFds(...fds);
+      table.setFds(fds);
     }
     this.resolveInds(await indPromise);
     this.resolveIFks(this.iFks);

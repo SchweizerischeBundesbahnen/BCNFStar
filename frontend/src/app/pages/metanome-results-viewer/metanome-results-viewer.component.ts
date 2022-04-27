@@ -31,7 +31,6 @@ export class MetanomeResultsViewerComponent {
 
   async deleteEntry(entry: IIndexFileEntry) {
     try {
-      console.log(`${this.url}/${entry.fileName}`);
       await firstValueFrom(this.http.delete(`${this.url}/${entry.fileName}`));
       this.notification.open('Deleted entry');
       await this.reload();

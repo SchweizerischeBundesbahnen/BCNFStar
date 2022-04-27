@@ -97,7 +97,7 @@ export default class Table {
     return this.columns.cardinality;
   }
 
-  public setFds(...fds: Array<FunctionalDependency>) {
+  public setFds(fds: Array<FunctionalDependency>) {
     this.fds = fds;
     this.fds = fds.filter((fd) => !fd.isFullyTrivial()); // needed?
   }

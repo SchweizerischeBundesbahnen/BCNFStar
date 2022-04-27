@@ -154,8 +154,6 @@ export class TableSelectionComponent implements OnInit {
       let fdResults: Record<string, string> = {};
       for (let value of Object.entries(values)) {
         if (value[0] != 'ind') {
-          console.log(fdResults);
-          console.log(value[1]);
           fdResults[value[1].tables[0]] = value[1].fileName;
         }
       }
@@ -167,6 +165,7 @@ export class TableSelectionComponent implements OnInit {
       this.router.navigate(['/edit-schema']);
     } catch (e) {
       this.error = e;
+      console.error(e);
       this.dialog.open(this.errorDialog);
     } finally {
       loadingDialog.close();

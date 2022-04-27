@@ -25,7 +25,7 @@ async function calculateFdStatistics(filename: string) {
     rhsCounts[fd.rhsColumns.length] = rhsCounts[fd.rhsColumns.length]
       ? rhsCounts[fd.rhsColumns.length] + 1
       : 1;
-    // if(fd.rhsColumns.length == 8) console.log(fd)
+    if (fd.rhsColumns.length == 66) console.log(fd);
   }
   console.log("rh");
   console.table(rhsCounts);
