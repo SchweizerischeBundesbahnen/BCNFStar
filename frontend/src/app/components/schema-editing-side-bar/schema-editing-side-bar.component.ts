@@ -16,6 +16,7 @@ import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 import Column from '@/src/model/schema/Column';
 import { FdCluster } from '@/src/model/types/FdCluster';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import IndScore from '@/src/model/schema/methodObjects/IndScore';
 
 @Component({
   selector: 'app-schema-editing-side-bar',
@@ -112,11 +113,21 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
   public inds(): Array<SourceRelationship> {
     const inds = this.schema.indsOf(this.table);
 
-    return Array.from(inds.entries())
-      .filter(([, inds]) =>
-        inds.some((ind) => this.indFilter.includes(ind.referenced))
+    return Array.from(inds.keys())
+      .filter((sourceRel) =>
+        inds
+          .get(sourceRel)!
+          .some((ind) => this.indFilter.includes(ind.referenced))
       )
-      .map(([sourceInd]) => sourceInd);
+      .sort((sourceRel1, sourceRel2) => {
+        const score1 = new IndScore(
+          inds.get(sourceRel1)![0].relationship
+        ).get();
+        const score2 = new IndScore(
+          inds.get(sourceRel2)![0].relationship
+        ).get();
+        return score2 - score1;
+      });
   }
 
   public transformIndToFk(): void {

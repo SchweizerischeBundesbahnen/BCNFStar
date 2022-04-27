@@ -139,8 +139,8 @@ export default class Schema {
     let result = this.matchSourceRelationships(table, onlyInds);
     for (const rels of result.values()) {
       rels.sort((ind1, ind2) => {
-        let score1 = new IndScore(ind1.relationship).get();
-        let score2 = new IndScore(ind2.relationship).get();
+        const score1 = new IndScore(ind1.relationship).get();
+        const score2 = new IndScore(ind2.relationship).get();
         return score2 - score1;
       });
     }
