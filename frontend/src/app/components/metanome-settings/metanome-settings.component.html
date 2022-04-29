@@ -32,7 +32,8 @@
                 [ngTemplateOutlet]="configParameters"
                 [ngTemplateOutletContext]="{
                   config: hyfdConfigs,
-                  configName: 'fds_' + table.schemaAndName()
+                  configName: 'fds_' + table.schemaAndName(),
+                  type: 'hyfd'
                 }"
               ></ng-container>
             </sbb-toggle-details>
@@ -68,7 +69,8 @@
               [ngTemplateOutlet]="configParameters"
               [ngTemplateOutletContext]="{
                 config: binderConfigs,
-                configName: 'ind'
+                configName: 'ind',
+                type: 'hyfd'
               }"
             ></ng-container>
           </sbb-toggle-details>
@@ -89,7 +91,7 @@
     </form>
   </div>
   <div sbbDialogActions>
-    <button (click)="runMetoname()" sbb-button cdkFocusInitial>Ok</button>
+    <button (click)="runMetanome()" sbb-button cdkFocusInitial>Ok</button>
     <button sbb-secondary-button sbbDialogClose>Cancel</button>
   </div>
 </div>
@@ -132,4 +134,11 @@
       />
     </div>
   </div>
+  <button
+    sbb-button
+    *ngIf="configName === 'HyFD'"
+    (click)="applySettingToAllOtherTables(configName)"
+  >
+    Apply this settings to all HyFD Configs
+  </button>
 </ng-template>
