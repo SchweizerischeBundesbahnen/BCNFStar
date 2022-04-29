@@ -230,6 +230,13 @@ export class MetanomeSettingsComponent {
     this.formGroup.updateValueAndValidity();
   }
 
+  public applySettingToAllOtherTables(configName: string) {
+    const changedConfig = this.hyfdConfigs[configName];
+    for (let entryKey of Object.keys(this.hyfdConfigs)) {
+      this.hyfdConfigs[entryKey] = changedConfig;
+    }
+  }
+
   /**
    * solves problem of writing in input without lost of focus
    * solution explained in: https://stackoverflow.com/questions/42322968/angular2-dynamic-input-field-lose-focus-when-input-changes
@@ -239,7 +246,10 @@ export class MetanomeSettingsComponent {
     return key;
   }
 
-  public runMetoname() {
+  public runMetanome() {
+    alert(this.formGroup.value['ind']['config']['MAX_NARY_LEVEL']);
+    //alert(this.formGroup.value['fd_***']["config"]["MAX_DETERMINANT_SIZE"])
+    console.log(this.formGroup.value);
     this.dialogRef.close({ values: this.formGroup.value });
   }
 }
