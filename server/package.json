@@ -46,7 +46,7 @@
       "NODE_ENV": "development"
     },
     "execMap": {
-      "ts": "ts-node"
+      "ts": "npx ts-node"
     }
   }
 }
