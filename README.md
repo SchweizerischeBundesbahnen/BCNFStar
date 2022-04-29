@@ -29,15 +29,6 @@ DB_PASSFILE="~/.pgpass"
 
 Since metanome jobs might take a lot of time and resources, we queue them. This requires running a [Redis](https://redis.io/) instance for storing the queue through server restarts, which can be obtained from many standard pacakge managers on Unix or from a [tarball](https://redis.io/download). On Windows, you can use [this download](https://github.com/zkteco-home/redis-windows). If you host Redis on a different machine or change its config, you may pass REDIS_HOST and REDIS_PORT env variables.
 
-## Development
-
-We recommend to delevop with the following command. This will hot-reload the server and the frontend, and will automatically run tests whenever anything is changed:
-
-```bash
-npm run test:dev
-```
-
-Alternatively, you can use `npm run dev` if you don't want tests to be run
 
 ## Deploying
 
@@ -52,3 +43,7 @@ from the project root, which will build both the server and the frontend. After 
 ```bash
 npm run start
 ```
+
+### Troubleshooting
+
+Something doesn't work? Always try to run `npm install && npm run build` first.
