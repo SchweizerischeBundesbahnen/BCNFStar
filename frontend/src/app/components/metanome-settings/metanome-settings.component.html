@@ -7,7 +7,7 @@
         {{ table.schemaAndName() }}
         <sbb-toggle
           [formControl]="selectedFdTab[index]"
-          (change)="onFdToggleBarChange($event, table)"
+          (change)="setFdConfig(table)"
         >
           <sbb-toggle-option
             label="Use existing result"
@@ -42,10 +42,7 @@
       </div>
       <h2>Inclusion Dependencies</h2>
       {{ getAllTableNames() }}
-      <sbb-toggle
-        [formControl]="selectedIndTab"
-        (change)="onIndToggleBarChange($event)"
-      >
+      <sbb-toggle [formControl]="selectedIndTab" (change)="setIndConfig()">
         <sbb-toggle-option
           label="Use existing result"
           value="existing-result"

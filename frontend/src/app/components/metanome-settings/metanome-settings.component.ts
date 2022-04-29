@@ -30,7 +30,7 @@ export class MetanomeSettingsComponent {
 
   public formGroup: FormGroup;
   public selectedFdTab: Array<FormControl> = [];
-  public selectedIndTab: FormControl = new FormControl('existing-result');
+  public selectedIndTab: FormControl = new FormControl('binder');
 
   public hyfdConfigs: Record<string, IIndexFileEntry> = {};
   public binderConfigs: Record<string, IIndexFileEntry> = {
@@ -87,23 +87,17 @@ export class MetanomeSettingsComponent {
 
       this.tables.forEach((table, index) => {
         const existingFdResult = this.filteredMetanomeResultsForFd(table)[0];
-        this.formGroup.patchValue({
-          ['fds_' + table.schemaAndName()]:
-            existingFdResult ??
-            this.createDefaultFdIndexFile(table.schemaAndName()),
-        });
-        this.selectedFdTab[index].setValue(
-          existingFdResult ? 'existing-result' : 'hyfd'
-        );
+        if (existingFdResult) {
+          this.selectedFdTab[index].setValue('existing-result');
+        }
+        this.setFdConfig(table);
       });
 
       const existingIndResult = this.filteredMetanomeResultsForInd()[0];
-      this.formGroup.patchValue({
-        ind: existingIndResult ?? this.createDefaultIndIndexFile(),
-      });
-      this.selectedIndTab.setValue(
-        existingIndResult ? 'existing-result' : 'binder'
-      );
+      if (existingIndResult) {
+        this.selectedIndTab.setValue('existing-result');
+      }
+      this.setIndConfig();
 
       this.formGroup.updateValueAndValidity();
     });
@@ -191,8 +185,9 @@ export class MetanomeSettingsComponent {
     return settings.join(' | ');
   }
 
-  public onFdToggleBarChange(event: any, table: Table) {
-    switch (event.value) {
+  public setFdConfig(table: Table) {
+    const tab: string = this.selectedFdTab[this.tables.indexOf(table)].value;
+    switch (tab) {
       case 'existing-result':
         this.formGroup.patchValue({
           ['fds_' + table.schemaAndName()]:
@@ -209,8 +204,9 @@ export class MetanomeSettingsComponent {
     this.formGroup.updateValueAndValidity();
   }
 
-  public onIndToggleBarChange(event: any) {
-    switch (event.value) {
+  public setIndConfig() {
+    const tab: string = this.selectedIndTab.value;
+    switch (tab) {
       case 'existing-result':
         this.formGroup.patchValue({
           ind: this.filteredMetanomeResultsForInd()[0],
@@ -247,9 +243,6 @@ export class MetanomeSettingsComponent {
   }
 
   public runMetanome() {
-    alert(this.formGroup.value['ind']['config']['MAX_NARY_LEVEL']);
-    //alert(this.formGroup.value['fd_***']["config"]["MAX_DETERMINANT_SIZE"])
-    console.log(this.formGroup.value);
     this.dialogRef.close({ values: this.formGroup.value });
   }
 }
