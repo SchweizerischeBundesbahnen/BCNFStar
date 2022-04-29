@@ -144,6 +144,8 @@ export class TableSelectionComponent implements OnInit {
 
     if (!values) return;
 
+    this.loadingStatus.clear();
+
     const loadingDialog = this.dialog.open(this.loadingDialog);
 
     try {
