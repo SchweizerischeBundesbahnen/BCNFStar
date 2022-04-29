@@ -189,7 +189,6 @@ from
             : " NULL")
       )
       .join(",");
-    console.log(primaryKey);
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString});`;
   }
 

@@ -9,7 +9,6 @@ import MetanomeAlgorithm from "@/metanome/metanomeAlgorithm";
  */
 export async function deleteMetanomeResults(req: Request, res: Response) {
   try {
-    console.log("deleting");
     const fileName = req.params.fileName;
     const wasDeletedFromIndex = await deleteFromIndex(fileName).catch((e) => {
       console.error(

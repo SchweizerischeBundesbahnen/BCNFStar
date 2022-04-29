@@ -17,7 +17,7 @@ declare namespace Cypress {
     visitFrontend(options?: Partial<Cypress.VisitOptions>): Chainable<Element>;
 
     /**
-     * Selects which tables to use for schema editing, and enters metanome configutation settings dialog
+     * Selects which tables to use for schema editing, and enters metanome configuration settings dialog
      * The following tables are being selected:
      * - nation_region_denormalized
      * - part_partsupp_supplier_denormalized

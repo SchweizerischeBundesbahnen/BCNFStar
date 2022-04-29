@@ -38,11 +38,9 @@ export default class BINDER extends InclusionDependencyAlgorithm {
   public override async processFiles(): Promise<void> {
     const path = await this.resultPath();
     const content = await readFile(path, { encoding: "utf-8" });
-    console.log(this.schemaAndTables);
     const result: Array<string> = splitlines(content)
       .map((line) => {
         let ind: IInclusionDependency = JSON.parse(line);
-        console.log(line);
         ind.dependant.columnIdentifiers.map((cc) =>
           splitTableIdentifier(cc, this.schemaAndTables)
         );

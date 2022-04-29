@@ -201,7 +201,6 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
             : " NULL")
       )
       .join(",");
-    console.log(primaryKey);
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) ${suffix}`;
   }
 

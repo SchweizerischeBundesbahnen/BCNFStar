@@ -9,7 +9,6 @@ export default function getDataTransferSQL(): RequestHandler {
     try {
       const body: IRequestBodyDataTransferSql =
         req.body as IRequestBodyDataTransferSql;
-      console.log(body);
       const sqlStatement: string = sqlUtils.SQL_INSERT_DATA(
         body.attributes,
         body.sourceTables,

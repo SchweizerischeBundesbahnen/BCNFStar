@@ -22,7 +22,6 @@ export class TableSelectionComponent implements OnInit {
 
   public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
-  public headLimit = 20;
 
   public pageLimit = 20;
   public page: number = 0;

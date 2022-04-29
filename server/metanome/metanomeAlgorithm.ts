@@ -100,7 +100,6 @@ export default abstract class MetanomeAlgorithm {
    * this is the final path after all operations
    */
   public async resultPath(): Promise<string> {
-    console.log("getting result path");
     const metadata = await getIndexContent();
     const entries = metadata.filter((entry) => {
       return (
