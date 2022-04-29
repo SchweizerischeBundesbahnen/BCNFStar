@@ -158,15 +158,11 @@ export default abstract class MetanomeAlgorithm {
    */
   protected memory(): string {
     const asNum = +this.config.memory;
+    const asString = this.config.memory.toString().trim().toLowerCase();
     // Memory can be a number bigger than 2MB which is a multiple of 1024
-    if (+asNum && !(asNum % 1024) && asNum >= 2 * 1024 * 1024)
-      return this.config.memory.toString();
+    if (+asNum && !(asNum % 1024) && asNum >= 2 * 1024 * 1024) return asString;
     // or a number with a suffix abbreviation (kilo, mega, giga...)
-    else if (
-      this.config.memory &&
-      new RegExp("d+[KkMmGgTt]").test(this.config.memory.toString())
-    )
-      return this.config.memory.toString();
+    else if (asString && /^\d+[kmgt]$/gm.test(asString)) return asString;
     else return ((totalmem() * 0.75) / 1024).toFixed(0) + "k";
   }
 
