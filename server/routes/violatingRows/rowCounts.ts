@@ -1,4 +1,4 @@
-import { IRequestBodyFDViolatingRows } from "@/definitions/IBackendAPI";
+import IRequestBodyFDViolatingRows from "@/definitions/IRequestBodyFDViolatingRows";
 import { Request, Response } from "express";
 import { sqlUtils } from "../../db";
 

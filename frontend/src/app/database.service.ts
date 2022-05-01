@@ -7,8 +7,8 @@ import {
   IRequestBodyCreateTableSql,
   IRequestBodyDataTransferSql,
   IRequestBodyForeignKeySql,
-  IRequestBodyFDViolatingRows,
 } from '@server/definitions/IBackendAPI';
+import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
