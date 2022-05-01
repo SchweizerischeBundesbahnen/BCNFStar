@@ -1,0 +1,42 @@
+<p>check-ind works!</p>
+<div>
+  <div>
+    <sbb-select
+      [(ngModel)]="this.referencedTable"
+      placeholder="Referenced Table"
+    >
+      <sbb-option *ngFor="let table of this.validTables()" [value]="table">{{
+        table.name
+      }}</sbb-option>
+    </sbb-select>
+  </div>
+  <div *ngIf="this.referencedTable">
+    <sbb-select
+      [(ngModel)]="this.referencingColumn"
+      placeholder="Referencing Column"
+    >
+      <sbb-option
+        *ngFor="let column of referencingTable.columns.asArray()"
+        [value]="column"
+        >{{ column.name }}</sbb-option
+      >
+    </sbb-select>
+    <sbb-select
+      [(ngModel)]="this.referencedColumn"
+      placeholder="Referenced Column"
+    >
+      <sbb-option
+        *ngFor="let column of referencedTable.columns.asArray()"
+        [value]="column"
+        >{{ column.name }}</sbb-option
+      >
+    </sbb-select>
+    <button
+      type="button"
+      (click)="addColumnRelation()"
+      [disabled]="!canAddColumnRelation()"
+    >
+      <sbb-icon svgIcon="kom:tick-small"></sbb-icon>
+    </button>
+  </div>
+</div>
