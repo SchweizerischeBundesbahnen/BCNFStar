@@ -1,4 +1,4 @@
-import { IRequestBodyFDViolatingRows } from "@/definitions/IBackendAPI";
+import IRequestBodyFDViolatingRows from "@/definitions/IRequestBodyFDViolatingRows";
 import { Request, Response } from "express";
 import { sqlUtils } from "../../db";
 
@@ -7,11 +7,6 @@ export default async function getViolatingRows(
   res: Response
 ): Promise<void> {
   try {
-    // if(typeof(req.body) != IRequestBodyFDViolatingRows){
-    //   res.status(400).json({error : "Wrong API Arguments"});
-    //   return;
-    // }
-
     const body: IRequestBodyFDViolatingRows =
       req.body as IRequestBodyFDViolatingRows;
 

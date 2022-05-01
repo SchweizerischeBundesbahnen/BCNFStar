@@ -15,16 +15,6 @@ export interface IRequestBodyCreateTableSql {
   attributes: IAttribute[];
   primaryKey: string[];
 }
-
-export interface IRequestBodyFDViolatingRows {
-  schema: string;
-  table: string;
-  lhs: Array<string>;
-  rhs: Array<string>;
-  offset: number;
-  limit: number;
-}
-
 export interface IRequestBodyForeignKeySql {
   name: string;
   relationship: IRelationship;
