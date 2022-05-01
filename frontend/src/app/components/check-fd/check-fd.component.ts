@@ -1,7 +1,7 @@
 import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
 import { DatabaseService } from 'src/app/database.service';
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import ITablePage from '@server/definitions/ITablePage';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
@@ -11,7 +11,7 @@ import { SbbPageEvent } from '@sbb-esta/angular/pagination';
   templateUrl: './check-fd.component.html',
   styleUrls: ['./check-fd.component.css'],
 })
-export class ExperimentalSideBarComponent implements OnInit {
+export class ExperimentalSideBarComponent {
   @Input() table!: Table;
   @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
@@ -25,10 +25,6 @@ export class ExperimentalSideBarComponent implements OnInit {
   public tableColumns: Array<string> = [];
 
   constructor(public dataService: DatabaseService) {}
-
-  ngOnInit(): void {
-    console.log('init');
-  }
 
   public checkNotAllowed(): boolean {
     return this._lhs.length == 0 || this._rhs.length == 0;
