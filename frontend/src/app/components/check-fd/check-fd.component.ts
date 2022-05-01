@@ -4,6 +4,7 @@ import { DatabaseService } from 'src/app/database.service';
 import { Component, Input } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewComponent } from '../violating-rows-view/violating-rows-view.component';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 
 @Component({
   selector: 'app-check-fd',
@@ -13,8 +14,8 @@ import { ViolatingRowsViewComponent } from '../violating-rows-view/violating-row
 export class ExperimentalSideBarComponent {
   @Input() table!: Table;
 
-  public _lhs = new Array<Column>();
-  public _rhs = new Array<Column>();
+  public _lhs: Array<Column> = new Array<Column>();
+  public _rhs: Column[] = new Array<Column>();
 
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
@@ -32,14 +33,22 @@ export class ExperimentalSideBarComponent {
       this._rhs
     );
 
-    this.dialog.open(ViolatingRowsViewComponent, {
-      data: {
-        table: this.table,
-        dataService: this.dataService,
-        _lhs: this._lhs,
-        _rhs: this._rhs,
-        rowCount: rowCount,
-      },
-    });
+    if (rowCount == 0) {
+      // valid Functional Dependency
+      this.table.addFd(
+        new ColumnCombination(...this._lhs),
+        new ColumnCombination(...this._rhs)
+      );
+    } else {
+      this.dialog.open(ViolatingRowsViewComponent, {
+        data: {
+          table: this.table,
+          dataService: this.dataService,
+          _lhs: this._lhs,
+          _rhs: this._rhs,
+          rowCount: rowCount,
+        },
+      });
+    }
   }
 }
