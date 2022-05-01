@@ -45,7 +45,7 @@ export class ViolatingRowsViewComponent {
     const result = await this.data.dataService.loadViolatingRowsForFD(
       this.data.table,
       this.data._lhs,
-      this.data._rhs.filter((c) => !this.data._lhs.includes(c)), // a column always defines itself
+      this.data._rhs,
       this.page * this.pageSize,
       this.pageSize
     );

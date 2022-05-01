@@ -23,6 +23,9 @@ export class ExperimentalSideBarComponent {
   }
 
   public async checkFd(): Promise<void> {
+    // a column always defines itself,
+    this._rhs = this._rhs.filter((c) => !this._lhs.includes(c));
+
     const rowCount: number = await this.dataService.loadViolatingRowsForFDCount(
       this.table,
       this._lhs,
