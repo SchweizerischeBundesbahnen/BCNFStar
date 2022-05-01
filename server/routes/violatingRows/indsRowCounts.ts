@@ -1,7 +1,4 @@
-import {
-  IRequestBodyFDViolatingRows,
-  IRequestBodyINDViolatingRows,
-} from "../../definitions/IBackendAPI";
+import { IRequestBodyINDViolatingRows } from "../../definitions/IBackendAPI";
 import { Request, Response } from "express";
 import { sqlUtils } from "../../db";
 

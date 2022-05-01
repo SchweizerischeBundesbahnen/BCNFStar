@@ -28,6 +28,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { ExperimentalSideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
 import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
+import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-
     MetanomeResultsViewerComponent,
     ExperimentalSideBarComponent,
     ViolatingRowsViewComponent,
+    CheckIndComponent,
   ],
   imports: [
     BrowserModule,
