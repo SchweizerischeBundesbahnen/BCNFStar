@@ -27,6 +27,7 @@ import { SplitDialogComponent } from './components/split-dialog/split-dialog.com
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { ExperimentalSideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
+import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { ExperimentalSideBarComponent } from '@/src/app/components/check-fd/chec
     SplitDialogComponent,
     MetanomeResultsViewerComponent,
     ExperimentalSideBarComponent,
+    ViolatingRowsViewComponent,
   ],
   imports: [
     BrowserModule,
