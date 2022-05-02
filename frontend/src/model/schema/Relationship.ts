@@ -70,7 +70,7 @@ export default class Relationship {
     return newCC;
   }
 
-  public toString(): String {
+  public toString(): string {
     return this.referencing().toString() + '->' + this.referenced().toString();
   }
 
