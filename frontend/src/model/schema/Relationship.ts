@@ -47,13 +47,13 @@ export default class Relationship {
   public toIRelationship(): IRelationship {
     return {
       referencing: {
-        name: `${this.referencing[0].sourceTableInstance.table.name}`,
-        schemaName: `${this.referencing[0].sourceTableInstance.table.schemaName}`,
+        name: this.referencing[0].sourceTableInstance.table.name,
+        schemaName: this.referencing[0].sourceTableInstance.table.schemaName,
         attributes: [],
       },
       referenced: {
-        name: `${this.referenced[0].sourceTableInstance.table.name}`,
-        schemaName: `${this.referenced[0].sourceTableInstance.table.schemaName}`,
+        name: this.referenced[0].sourceTableInstance.table.name,
+        schemaName: this.referenced[0].sourceTableInstance.table.schemaName,
         attributes: [],
       },
       columnRelationships: this._referencing.map((element, index) => {

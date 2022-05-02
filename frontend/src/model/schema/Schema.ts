@@ -243,7 +243,6 @@ export default class Schema {
           );
 
       for (const fd of fds.get(source)!) {
-        console.log(fd);
         if (
           !fd.lhs
             .asArray()
@@ -252,10 +251,8 @@ export default class Schema {
                 table.columns.includes(column) ||
                 referencedColumns.includes(column)
             )
-        ) {
-          console.log('not selected or referenced');
+        )
           continue;
-        }
         fd.rhs = new ColumnCombination(
           fd.rhs
             .asArray()
@@ -265,23 +262,16 @@ export default class Schema {
                 referencedColumns.includes(column)
             )
         );
-        if (fd.isFullyTrivial()) {
-          console.log('trivial');
-          continue;
-        }
+        if (fd.isFullyTrivial()) continue;
         if (
           fd.lhs.asArray().every((column) => table.columns.includes(column)) &&
           fd.rhs.asArray().every((column) => table.columns.includes(column))
         ) {
-          console.log('fully baked');
           table.addFd(fd);
         } else if (nextRelationship) {
-          console.log('half baked');
           fd.lhs.columnSubstitution(nextRelationshipMap);
           fd.rhs.columnSubstitution(nextRelationshipMap);
           fds.get(nextSource!)!.push(fd);
-        } else {
-          console.log('hä?');
         }
       }
     }

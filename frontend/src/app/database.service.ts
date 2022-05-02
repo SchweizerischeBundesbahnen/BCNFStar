@@ -124,7 +124,7 @@ export class DatabaseService {
         fk.referencing.push(referencingColumn);
         fk.referenced.push(referencedColumn);
       }
-      this.schema!.addFk(fk);
+      if (fk.referencing.length > 0) this.schema!.addFk(fk);
     });
   }
 
@@ -147,7 +147,7 @@ export class DatabaseService {
         ind.referencing.push(dependantColumn!);
         ind.referenced.push(referencedColumn!);
       }
-      this.schema!.addInd(ind);
+      if (ind.referencing.length > 0) this.schema!.addInd(ind);
     });
   }
 

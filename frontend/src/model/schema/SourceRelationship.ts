@@ -13,13 +13,14 @@ export default class SourceRelationship {
     if (!this.referenced[0].table.equals(other.referenced[0].table))
       return false;
     if (this.referencing.length != other.referencing.length) return false;
-    const pairs = [...Array(this.referencing.length).keys()].map(
-      (i) => `${this.referencing[i].name}#${this.referenced[i].name}`
-    );
-    const otherPairs = [...Array(other.referencing.length).keys()].map(
-      (i) => `${other.referencing[i].name}#${other.referenced[i].name}`
-    );
-    return pairs.every((pair) => otherPairs.includes(pair));
+
+    const pairs = this.referencing
+      .map((value, index) => `${value.name}.${this.referenced[index].name}`)
+      .sort();
+    const otherPairs = this.referencing
+      .map((value, index) => `${value.name}.${other.referenced[index].name}`)
+      .sort();
+    return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
   public get isTrivial(): boolean {

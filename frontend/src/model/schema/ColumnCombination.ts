@@ -38,22 +38,22 @@ export default class ColumnCombination {
   }
 
   public sourceTableInstance(): SourceTableInstance {
-    let sourceTables = this.sourceTableInstances();
-    if (sourceTables.length > 1)
+    let sources = this.sourceTableInstances();
+    if (sources.length > 1)
       console.warn(
-        'Warning: expected only one sourceTable but there are ' +
-          sourceTables.length
+        'Warning: expected only one SourceTableInstance but there are ' +
+          sources.length
       );
-    return sourceTables[0];
+    return sources[0];
   }
 
   public sourceTableInstances(): Array<SourceTableInstance> {
-    let sourceTables = new Array<SourceTableInstance>();
+    let sources = new Array<SourceTableInstance>();
     this._columns.forEach((column) => {
-      if (!sourceTables.includes(column.sourceTableInstance))
-        sourceTables.push(column.sourceTableInstance);
+      if (!sources.includes(column.sourceTableInstance))
+        sources.push(column.sourceTableInstance);
     });
-    return sourceTables;
+    return sources;
   }
 
   public columnsEquivalentTo(

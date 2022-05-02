@@ -64,7 +64,9 @@ export default class Table {
     return table;
   }
 
-  // should/must not be used in production as important information (datatype and nullable) are missing
+  /**
+   * This way of creating Table objects should not be used in production as important information (datatype and nullable) are missing
+   */
   public static fromColumnNames(columnNames: Array<string>, tableName: string) {
     const sourceTable = new SourceTable(tableName, '');
     const table = new Table();
@@ -136,9 +138,9 @@ export default class Table {
   }
 
   /**
-   * Returns the selected columns of each source of this table
+   * @returns the selected columns of each source (SourceTableInstance) of this table
    */
-  public columnsBySource() {
+  public columnsBySource(): Map<SourceTableInstance, ColumnCombination> {
     const result = new Map<SourceTableInstance, ColumnCombination>();
 
     for (const source of this.sources) {
@@ -154,7 +156,7 @@ export default class Table {
   /**
    * Returns the sources of which not all rows of the original source table are found in this table
    */
-  public reducedSources() {
+  public reducedSources(): Array<SourceTableInstance> {
     const result = new Array<SourceTableInstance>();
     for (const rel of this.relationships) {
       const instance = new ColumnCombination(
