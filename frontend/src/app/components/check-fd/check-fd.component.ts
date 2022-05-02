@@ -11,7 +11,7 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
   templateUrl: './check-fd.component.html',
   styleUrls: ['./check-fd.component.css'],
 })
-export class ExperimentalSideBarComponent {
+export class CustomFunctionalDependencySideBarComponent {
   @Input() table!: Table;
 
   public _lhs: Array<Column> = new Array<Column>();
