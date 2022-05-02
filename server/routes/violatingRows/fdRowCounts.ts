@@ -16,7 +16,6 @@ export default async function getViolatingRows(
       body.lhs,
       body.rhs
     );
-    console.log(result);
     res.status(200).json(result);
   } catch (error) {
     console.error(error);

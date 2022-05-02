@@ -26,7 +26,7 @@ import { UndoRedoComponent } from './components/undo-redo/undo-redo.component';
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
-import { ExperimentalSideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
+import { CustomFunctionalDependencySideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
 import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
@@ -42,7 +42,7 @@ import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view
     UndoRedoComponent,
     SplitDialogComponent,
     MetanomeResultsViewerComponent,
-    ExperimentalSideBarComponent,
+    CustomFunctionalDependencySideBarComponent,
     ViolatingRowsViewComponent,
     CheckIndComponent,
     ViolatingRowsViewIndsComponent,
