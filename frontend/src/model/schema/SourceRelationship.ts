@@ -33,6 +33,10 @@ export default class SourceRelationship {
   public toString(): string {
     const lhsString = this.referencing.map((col) => col.name).join(', ');
     const rhsString = this.referenced.map((col) => col.name).join(', ');
-    return `${lhsString} -> ${rhsString}`;
+
+    const lhsSourceTable = this.referencing[0].table.fullName;
+    const rhsSourceTable = this.referenced[0].table.fullName;
+
+    return `(${lhsSourceTable}) ${lhsString} -> (${rhsSourceTable}) ${rhsString}`;
   }
 }
