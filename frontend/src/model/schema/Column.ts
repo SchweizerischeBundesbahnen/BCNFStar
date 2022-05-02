@@ -40,8 +40,8 @@ export default class Column {
   public equals(other: Column): boolean {
     if (this == other) return true;
     return (
-      this.sourceTableInstance == other.sourceTableInstance &&
-      this.sourceColumn == other.sourceColumn
+      this.sourceTableInstance.equals(other.sourceTableInstance) &&
+      this.sourceColumn.equals(other.sourceColumn)
     );
   }
 
