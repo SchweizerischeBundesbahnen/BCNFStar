@@ -13,14 +13,9 @@ export default class Relationship {
    */
   public _score?: number;
 
-  public constructor(referencing?: Array<Column>, referenced?: Array<Column>) {
-    this._referencing = referencing || new Array();
-    this._referenced = referenced || new Array();
-  }
-
-  public add(referencingColumn: Column, referencedColumn: Column) {
-    this._referencing.push(referencingColumn);
-    this._referenced.push(referencedColumn);
+  public constructor(referencing: Array<Column>, referenced: Array<Column>) {
+    this._referencing = referencing;
+    this._referenced = referenced;
   }
 
   public get referencing(): Array<Column> {
