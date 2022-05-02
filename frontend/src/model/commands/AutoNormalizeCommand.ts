@@ -3,13 +3,11 @@ import Table from '../schema/Table';
 import Command from './Command';
 
 export default class AutoNormalizeCommand extends Command {
-  schema: Schema;
-  tables: Array<Table>;
-  resultingTables?: Array<Table>;
+  private tables: Array<Table>;
+  private resultingTables?: Array<Table>;
 
-  public constructor(schema: Schema, ...tables: Array<Table>) {
+  public constructor(private schema: Schema, ...tables: Array<Table>) {
     super();
-    this.schema = schema;
     this.tables = tables;
   }
 

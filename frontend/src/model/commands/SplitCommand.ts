@@ -4,23 +4,17 @@ import Table from '../schema/Table';
 import Command from './Command';
 
 export default class SplitCommand extends Command {
-  schema: Schema;
-  table: Table;
-  fd: FunctionalDependency;
   // Name of the newly created table
-  generatingName?: string;
-  children?: Array<Table>;
+  private generatingName?: string;
+  private children?: Array<Table>;
 
   public constructor(
-    schema: Schema,
-    table: Table,
-    fd: FunctionalDependency,
+    private schema: Schema,
+    private table: Table,
+    private fd: FunctionalDependency,
     generatingName?: string
   ) {
     super();
-    this.schema = schema;
-    this.table = table;
-    this.fd = fd;
     this.generatingName = generatingName;
   }
 

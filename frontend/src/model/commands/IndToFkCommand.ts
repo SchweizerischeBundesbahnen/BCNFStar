@@ -4,8 +4,8 @@ import Command from './Command';
 
 export default class IndToFkCommand extends Command {
   public constructor(
-    public schema: Schema,
-    public relationship: SourceRelationship
+    private schema: Schema,
+    private relationship: SourceRelationship
   ) {
     super();
   }
