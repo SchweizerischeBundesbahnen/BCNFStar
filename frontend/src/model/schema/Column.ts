@@ -45,6 +45,10 @@ export default class Column {
     );
   }
 
+  public identifier(): string {
+    return `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`;
+  }
+
   public applySourceMapping(
     mapping: Map<SourceTableInstance, SourceTableInstance>
   ): Column {

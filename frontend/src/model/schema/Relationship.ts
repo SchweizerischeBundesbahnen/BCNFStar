@@ -77,4 +77,35 @@ export default class Relationship {
       }),
     };
   }
+
+  public equals(other: Relationship): boolean {
+    if (this == other) return true;
+    if (
+      !this.referencing[0].sourceTableInstance.table.equals(
+        other.referencing[0].sourceTableInstance.table
+      )
+    )
+      return false;
+    if (
+      !this.referenced[0].sourceTableInstance.table.equals(
+        other.referenced[0].sourceTableInstance.table
+      )
+    )
+      return false;
+    if (this.referencing.length != other.referencing.length) return false;
+
+    const pairs = this.referencing
+      .map(
+        (column, index) =>
+          `${column.identifier()}.${this.referenced[index].identifier()}`
+      )
+      .sort();
+    const otherPairs = this.referencing
+      .map(
+        (column, index) =>
+          `${column.identifier()}.${other.referenced[index].identifier()}`
+      )
+      .sort();
+    return pairs.every((pair, index) => pair == otherPairs[index]);
+  }
 }

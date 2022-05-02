@@ -114,11 +114,20 @@ export default class Schema {
       const pk = otherTable.pk!.asArray();
       const sourceColumns = pk.map((column) => column.sourceColumn);
       table.columnsEquivalentTo(sourceColumns, true).forEach((cc) => {
-        result.push({
+        const fk = {
           relationship: new Relationship(cc, pk),
           referencing: table,
           referenced: otherTable,
-        });
+        };
+        if (
+          !result.some(
+            (other) =>
+              other.relationship.equals(fk.relationship) &&
+              other.referencing == fk.referencing &&
+              other.referenced == fk.referenced
+          )
+        )
+          result.push(fk);
       });
     }
     return result;

@@ -236,10 +236,7 @@ export default class Table {
       if (!allowReduced && this.reducedSources().includes(sourceTableInstance))
         continue;
 
-      const equivalentColumns = columns.columnsEquivalentTo(
-        sourceColumns,
-        true
-      );
+      let equivalentColumns = columns.columnsEquivalentTo(sourceColumns, true);
       if (!equivalentColumns) continue;
       if (allowReduced) {
         const selectedEquivalentColumns = equivalentColumns.map((column) => {
@@ -251,6 +248,7 @@ export default class Table {
           return undefined;
         });
         if (selectedEquivalentColumns.some((column) => !column)) continue;
+        equivalentColumns = selectedEquivalentColumns as Array<Column>;
       }
       result.push(equivalentColumns);
     }

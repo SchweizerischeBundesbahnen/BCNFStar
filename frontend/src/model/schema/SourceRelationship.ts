@@ -15,10 +15,10 @@ export default class SourceRelationship {
     if (this.referencing.length != other.referencing.length) return false;
 
     const pairs = this.referencing
-      .map((value, index) => `${value.name}.${this.referenced[index].name}`)
+      .map((column, index) => `${column.name}.${this.referenced[index].name}`)
       .sort();
     const otherPairs = this.referencing
-      .map((value, index) => `${value.name}.${other.referenced[index].name}`)
+      .map((column, index) => `${column.name}.${other.referenced[index].name}`)
       .sort();
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
