@@ -1,4 +1,3 @@
-<p>check-ind works!</p>
 <div>
   <div>
     <sbb-select
@@ -11,32 +10,43 @@
     </sbb-select>
   </div>
   <div *ngIf="this.referencedTable">
-    <sbb-select
-      [(ngModel)]="this.referencingColumn"
-      placeholder="Referencing Column"
-    >
-      <sbb-option
-        *ngFor="let column of referencingTable.columns.asArray()"
-        [value]="column"
-        >{{ column.name }}</sbb-option
+    <div>
+      <sbb-select
+        [(ngModel)]="this.referencingColumn"
+        placeholder="Referencing Column"
       >
-    </sbb-select>
-    <sbb-select
-      [(ngModel)]="this.referencedColumn"
-      placeholder="Referenced Column"
-    >
-      <sbb-option
-        *ngFor="let column of referencedTable.columns.asArray()"
-        [value]="column"
-        >{{ column.name }}</sbb-option
+        <sbb-option
+          *ngFor="let column of referencingTable.columns.asArray()"
+          [value]="column"
+          >{{ column.name }}
+        </sbb-option>
+      </sbb-select>
+      <sbb-select
+        [(ngModel)]="this.referencedColumn"
+        placeholder="Referenced Column"
       >
-    </sbb-select>
-    <button
-      type="button"
-      (click)="addColumnRelation()"
-      [disabled]="!canAddColumnRelation()"
-    >
-      <sbb-icon svgIcon="kom:tick-small"></sbb-icon>
-    </button>
+        <sbb-option
+          *ngFor="let column of referencedTable.columns.asArray()"
+          [value]="column"
+          >{{ column.name }}
+        </sbb-option>
+      </sbb-select>
+      <button
+        type="button"
+        (click)="addColumnRelation()"
+        [disabled]="!canAddColumnRelation()"
+      >
+        <sbb-icon svgIcon="kom:tick-small"></sbb-icon>
+      </button>
+      <button type="button" (click)="this.removeColumnRelation()">
+        <sbb-icon svgIcon="kom:cross-small"></sbb-icon>
+      </button>
+    </div>
+    <p>{{ this.relationshipString() }}</p>
+    <div>
+      <button type="button" (click)="checkInd()" [disabled]="!canCheckIND()">
+        Check Inclusion Dependency
+      </button>
+    </div>
   </div>
 </div>
