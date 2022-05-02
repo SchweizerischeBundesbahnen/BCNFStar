@@ -16,12 +16,6 @@ export interface IRequestBodyCreateTableSql {
   primaryKey: string[];
 }
 
-export interface IRequestBodyINDViolatingRows {
-  relationship: IRelationship;
-  offset: number;
-  limit: number;
-}
-
 export interface IRequestBodyForeignKeySql {
   name: string;
   relationship: IRelationship;

@@ -1,4 +1,4 @@
-import { IRequestBodyINDViolatingRows } from "../../definitions/IBackendAPI";
+import IRequestBodyINDViolatingRows from "../../definitions/IRequestBodyINDViolatingRows";
 import { Request, Response } from "express";
 import { sqlUtils } from "../../db";
 
@@ -22,7 +22,7 @@ export default async function getViolatingRows(
     console.error(error);
     if (!res.headersSent)
       res.status(502).json({
-        error: "Could not get row count for functional dependency... ",
+        error: "Could not get row count for inclusion dependency... ",
       });
   }
 }

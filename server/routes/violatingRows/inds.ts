@@ -1,5 +1,5 @@
-import { IRequestBodyINDViolatingRows } from "../../definitions/IBackendAPI";
-import { isIRequestBodyINDViolatingRows } from "../../definitions/IBackendAPI.guard";
+import IRequestBodyINDViolatingRows from "../../definitions/IRequestBodyINDViolatingRows";
+import { isIRequestBodyINDViolatingRows } from "../../definitions/IRequestBodyINDViolatingRows.guard";
 import { Request, Response } from "express";
 import { sqlUtils } from "../../db";
 

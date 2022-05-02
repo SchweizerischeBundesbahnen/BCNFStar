@@ -98,10 +98,8 @@ export default abstract class SqlUtils {
     SELECT ${columnRelationships
       .map((cc) => `X.${cc.referencingColumn}`)
       .join(",")}
-    FROM ${referencingTable.schemaName}.${referencingTable.schemaName} AS X
-    LEFT OUTER JOIN ${referencedTable.schemaName}.${
-      referencedTable.schemaName
-    } AS Y 
+    FROM ${referencingTable.schemaName}.${referencingTable.name} AS X
+    LEFT OUTER JOIN ${referencedTable.schemaName}.${referencedTable.name} AS Y 
       ON ${columnRelationships
         .map((cc) => `X.${cc.referencingColumn} = Y.${cc.referencedColumn}`)
         .join(" AND ")}

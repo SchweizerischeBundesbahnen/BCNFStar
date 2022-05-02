@@ -232,18 +232,24 @@ from
     ) {
       throw Error("Columns don't exist in referenced.");
     }
-    throw Error();
-    // const result: sql.IResult<any> = await sql.query(
-    //   this.violatingRowsForSuggestedIND_SQL(referencingTable, referencedTable, columnRelationships) +
-    //     ` ORDER BY ${columnRelationships.map(cc => cc.referencingColumn).join(",")}
-    //       OFFSET ${offset} ROWS
-    //       FETCH NEXT ${limit} ROWS ONLY
-    //     `
-    // );
-    // return {
-    //   rows: result.recordset,
-    //   attributes: Object.keys(result.recordset.columns),
-    // };
+    const query_result = await this.pool.query(
+      `${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}` +
+        `
+        ORDER BY ${columnRelationships
+          .map((cc) => cc.referencingColumn)
+          .join(",")}
+        LIMIT ${limit} 
+        OFFSET ${offset}
+        `
+    );
+    return {
+      rows: query_result.rows,
+      attributes: query_result.fields.map((v) => v.name),
+    };
   }
 
   public async getViolatingRowsForSuggestedINDCount(
@@ -270,15 +276,18 @@ from
       throw Error("Columns don't exist in referenced.");
     }
 
-    throw Error();
-    // const result: sql.IResult<any> = await sql.query(
-    //   `SELECT COUNT (*) as count FROM
-    //   (
-    //   ${this.violatingRowsForSuggestedIND_SQL(referencingTable, referencedTable, columnRelationships)}
-    //   ) AS X
-    //   `
-    // );
-    // return result.recordset[0].count;
+    const count = await this.pool.query<{ count: number }>(
+      `SELECT COUNT (*) as count FROM 
+      (
+        ${this.violatingRowsForSuggestedIND_SQL(
+          referencingTable,
+          referencedTable,
+          columnRelationships
+        )}
+      ) AS X
+      `
+    );
+    return count.rows[0].count;
   }
 
   public async columnsExistInTable(
