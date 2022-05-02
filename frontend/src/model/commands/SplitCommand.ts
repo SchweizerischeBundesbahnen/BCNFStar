@@ -6,11 +6,11 @@ import Command from './Command';
 export default class SplitCommand extends Command {
   // Name of the newly created table
   private generatingName?: string;
-  private children?: Array<Table>;
+  public children?: Array<Table>;
 
   public constructor(
     private schema: Schema,
-    private table: Table,
+    public table: Table,
     private fd: FunctionalDependency,
     generatingName?: string
   ) {
