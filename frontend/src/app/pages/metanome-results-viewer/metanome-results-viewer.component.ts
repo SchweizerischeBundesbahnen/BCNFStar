@@ -31,6 +31,10 @@ export class MetanomeResultsViewerComponent {
     });
   }
 
+  async deleteAllEntries() {
+    this.tableData.forEach((entry) => this.deleteEntry(entry));
+  }
+
   async deleteEntry(entry: IIndexFileEntry) {
     try {
       console.log(`${this.url}/${entry.fileName}`);
