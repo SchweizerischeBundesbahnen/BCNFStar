@@ -15,7 +15,7 @@ export class CustomFunctionalDependencySideBarComponent {
   @Input() table!: Table;
 
   public _lhs: Array<Column> = new Array<Column>();
-  public _rhs: Column[] = new Array<Column>();
+  public _rhs: Array<Column> = new Array<Column>();
 
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
