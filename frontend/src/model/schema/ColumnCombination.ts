@@ -59,13 +59,13 @@ export default class ColumnCombination {
   public columnsEquivalentTo(
     sourceColumns: Array<SourceColumn>,
     findAll: boolean
-  ) {
+  ): Array<Column> | null {
     const equivalentColumns = new Array<Column>();
     for (const sourceColumn of sourceColumns) {
       let equivalentColumn = this.asArray().find((column) =>
         column.sourceColumn.equals(sourceColumn)
       );
-      if (findAll && !equivalentColumn) return undefined;
+      if (findAll && !equivalentColumn) return null;
       if (equivalentColumn) equivalentColumns.push(equivalentColumn);
     }
     return equivalentColumns;
