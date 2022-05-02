@@ -9,6 +9,7 @@ import {
   IRequestBodyForeignKeySql,
 } from '@server/definitions/IBackendAPI';
 import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
+import IRequestBodyINDViolatingRows from '@server/definitions/IRequestBodyINDViolatingRows';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
@@ -336,6 +337,34 @@ export class DatabaseService {
     };
     return firstValueFrom(
       this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/fd`, data)
+    );
+  }
+
+  public async loadViolatingRowsForIND(
+    relationship: Relationship,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    const data: IRequestBodyINDViolatingRows = {
+      relationship: relationship.toIRelationship(),
+      offset: offset,
+      limit: limit,
+    };
+    return firstValueFrom(
+      this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/ind`, data)
+    );
+  }
+
+  public async loadViolatingRowsForINDCount(
+    relationship: Relationship
+  ): Promise<number> {
+    const data: IRequestBodyINDViolatingRows = {
+      relationship: relationship.toIRelationship(),
+      offset: 0,
+      limit: 0,
+    };
+    return firstValueFrom(
+      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/ind`, data)
     );
   }
 
