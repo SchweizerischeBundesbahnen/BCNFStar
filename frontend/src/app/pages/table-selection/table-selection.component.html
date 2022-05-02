@@ -95,17 +95,20 @@
 <ng-template #loadingDialog class="loading-box">
   <div sbbDialogTitle>Running Metanome</div>
   <div sbbDialogContent>
-    Functional Dependencies and Inclusion Dependencies are currently being
-    searched. <br />
-    Progress can be monitored
-    <a [href]="queueUrl" target="_blank">here</a>
-    <ul *ngFor="let item of loadingStatus | keyvalue">
-      <li>
+    <span *ngIf="loadingStatus.length">
+      Functional Dependencies and Inclusion Dependencies are currently being
+      searched. <br />
+      More detailed progress reports including logs can be found
+      <a [href]="queueUrl" target="_blank">here</a>
+    </span>
+
+    <ul>
+      <li *ngFor="let item of loadingStatus | keyvalue">
         {{ item.key.algorithm }} with {{ item.key.tables }}
         <sbb-loading
           mode="inline"
-          *ngIf="item.value === 'loading'"
           aria-valuetext="Loading, please wait"
+          *ngIf="item.value === 'loading'"
         ></sbb-loading>
         <sbb-icon
           svgIcon="kom:cross-medium"
@@ -117,6 +120,13 @@
           style="color: green"
           *ngIf="item.value === 'done'"
         ></sbb-icon>
+      </li>
+      <li>
+        Fetching results
+        <sbb-loading
+          mode="inline"
+          aria-valuetext="Loading, please wait"
+        ></sbb-loading>
       </li>
     </ul>
   </div>
