@@ -33,7 +33,7 @@ export default class FunctionalDependency {
   }
 
   public isFullyTrivial(): boolean {
-    return this.rhs.isSubsetOf(this.lhs);
+    return this.lhs.cardinality >= this.rhs.cardinality;
   }
 
   public toString(): string {

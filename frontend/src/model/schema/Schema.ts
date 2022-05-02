@@ -211,12 +211,16 @@ export default class Schema {
         const lhs = relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
         if (!lhs) continue;
         const rhs = relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;
-        if (lhs.length >= rhs.length) continue;
-        const lhsCC = new ColumnCombination(lhs);
-        const rhsCC = new ColumnCombination(rhs);
-        const existingFd = fds.get(source)!.find((fd) => fd.lhs.equals(lhsCC));
-        if (existingFd) existingFd.rhs.union(rhsCC);
-        else fds.get(source)!.push(new FunctionalDependency(lhsCC, rhsCC));
+        const fd = new FunctionalDependency(
+          new ColumnCombination(lhs),
+          new ColumnCombination(rhs)
+        );
+        if (fd.isFullyTrivial()) continue;
+        const existingFd = fds
+          .get(source)!
+          .find((other) => other.lhs.equals(fd.lhs));
+        if (existingFd) existingFd.rhs.union(fd.rhs);
+        else fds.get(source)!.push(fd);
       }
       //extension
       const fkFds = fds
