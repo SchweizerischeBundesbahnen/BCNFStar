@@ -29,6 +29,7 @@ import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/
 import { ExperimentalSideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
 import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
+import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.comp
     ExperimentalSideBarComponent,
     ViolatingRowsViewComponent,
     CheckIndComponent,
+    ViolatingRowsViewIndsComponent,
   ],
   imports: [
     BrowserModule,
