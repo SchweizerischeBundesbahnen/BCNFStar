@@ -1,6 +1,7 @@
 import IRelationship from '@server/definitions/IRelationship';
 import Column from './Column';
 import SourceRelationship from './SourceRelationship';
+import SourceTableInstance from './SourceTableInstance';
 
 export default class Relationship {
   // these arrays are linked, the column in _referencing has the same index as the
@@ -22,8 +23,16 @@ export default class Relationship {
     return Array.from(this._referencing);
   }
 
+  public set referencing(value: Array<Column>) {
+    this._referencing = value;
+  }
+
   public get referenced(): Array<Column> {
     return Array.from(this._referenced);
+  }
+
+  public set referenced(value: Array<Column>) {
+    this._referenced = value;
   }
 
   public sourceRelationship(): SourceRelationship {
@@ -33,6 +42,15 @@ export default class Relationship {
       sourceRel.referenced.push(this._referenced[i].sourceColumn);
     }
     return sourceRel;
+  }
+
+  public applySourceMapping(
+    mapping: Map<SourceTableInstance, SourceTableInstance>
+  ): Relationship {
+    return new Relationship(
+      this.referencing.map((column) => column.applySourceMapping(mapping)),
+      this.referenced.map((column) => column.applySourceMapping(mapping))
+    );
   }
 
   public toString(): String {

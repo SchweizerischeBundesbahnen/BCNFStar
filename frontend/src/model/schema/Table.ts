@@ -87,6 +87,32 @@ export default class Table {
     return table;
   }
 
+  /**
+   * finds a column in the tables columns which is equal to the given column.
+   * Returns the column itself if no equal column is found.
+   */
+  public findEqualSelectedColumn(column: Column): Column {
+    return (
+      this.columns.asArray().find((other) => other.equals(column)) || column
+    );
+  }
+
+  public establishIdentities() {
+    if (this.pk) {
+      this.pk = new ColumnCombination(
+        this.pk.asArray().map((column) => this.findEqualSelectedColumn(column))
+      );
+    }
+    this.relationships.forEach((relationship) => {
+      relationship.referencing = relationship.referencing.map((column) =>
+        this.findEqualSelectedColumn(column)
+      );
+      relationship.referenced = relationship.referenced.map((column) =>
+        this.findEqualSelectedColumn(column)
+      );
+    });
+  }
+
   public addSource(
     sourceTable: SourceTable,
     name?: string
@@ -169,6 +195,12 @@ export default class Table {
       result.push(instance);
     }
     return result;
+  }
+
+  public isRoot(source: SourceTableInstance) {
+    return !this.relationships.some(
+      (rel) => rel.referenced[0].sourceTableInstance == source
+    );
   }
 
   /**
