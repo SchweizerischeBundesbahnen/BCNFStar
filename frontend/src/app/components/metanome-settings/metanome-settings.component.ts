@@ -227,9 +227,11 @@ export class MetanomeSettingsComponent {
   }
 
   public applySettingToAllOtherTables(configName: string) {
-    const changedConfig = this.hyfdConfigs[configName];
-    for (let entryKey of Object.keys(this.hyfdConfigs)) {
-      this.hyfdConfigs[entryKey] = changedConfig;
+    for (let key of Object.keys(this.hyfdConfigs)) {
+      this.hyfdConfigs[key]['config'] = Object.assign(
+        {},
+        this.hyfdConfigs[configName]['config']
+      );
     }
   }
 

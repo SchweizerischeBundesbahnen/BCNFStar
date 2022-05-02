@@ -32,8 +32,7 @@
                 [ngTemplateOutlet]="configParameters"
                 [ngTemplateOutletContext]="{
                   config: hyfdConfigs,
-                  configName: 'fds_' + table.schemaAndName(),
-                  type: 'hyfd'
+                  configName: 'fds_' + table.schemaAndName()
                 }"
               ></ng-container>
             </sbb-toggle-details>
@@ -66,8 +65,7 @@
               [ngTemplateOutlet]="configParameters"
               [ngTemplateOutletContext]="{
                 config: binderConfigs,
-                configName: 'ind',
-                type: 'hyfd'
+                configName: 'ind'
               }"
             ></ng-container>
           </sbb-toggle-details>
@@ -132,8 +130,9 @@
     </div>
   </div>
   <button
+    class="apply-to-all"
     sbb-button
-    *ngIf="configName === 'HyFD'"
+    *ngIf="configName.substring(0, 3) === 'fds'"
     (click)="applySettingToAllOtherTables(configName)"
   >
     Apply this settings to all HyFD Configs
