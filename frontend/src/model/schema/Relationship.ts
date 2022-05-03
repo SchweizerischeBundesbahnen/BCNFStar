@@ -100,7 +100,7 @@ export default class Relationship {
           `${column.identifier()}.${this.referenced[index].identifier()}`
       )
       .sort();
-    const otherPairs = this.referencing
+    const otherPairs = other.referencing
       .map(
         (column, index) =>
           `${column.identifier()}.${other.referenced[index].identifier()}`

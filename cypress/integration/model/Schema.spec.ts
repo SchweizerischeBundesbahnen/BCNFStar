@@ -1,6 +1,10 @@
 import { exampleSchema } from "../../utils/exampleTables";
 import Schema from "../../../frontend/src/model/schema/Schema";
 import Table from "../../../frontend/src/model/schema/Table";
+import Column from "../../../frontend/src/model/schema/Column";
+import SourceTableInstance from "../../../frontend/src/model/schema/SourceTableInstance";
+import FunctionalDependency from "../../../frontend/src/model/schema/FunctionalDependency";
+import ColumnCombination from "../../../frontend/src/model/schema/ColumnCombination";
 
 describe("Schema", () => {
   let schema: Schema;
@@ -16,9 +20,120 @@ describe("Schema", () => {
     expect(tableA).to.exist;
   });
 
+  it("fds of joined tables contain right fds", () => {
+    const relAC = schema.fksOf(tableA).find((rel) => rel.referenced == tableC)!;
+    let table = schema.join(
+      schema.fksOf(tableA).find((rel) => rel.referenced == tableB)!
+    );
+    table = schema.join(
+      schema
+        .fksOf(table)
+        .find((rel) => rel.relationship.referencing[0].name != "A5")!
+    );
+    relAC.referencing = table;
+    table = schema.join(relAC);
+
+    const colsBySource = table.columnsBySource();
+
+    const a = table.sources[0];
+    const b = table.sources[1];
+    const c1 = table.sources[2];
+    const c2 = table.sources[3];
+
+    const cols = new Map<SourceTableInstance, Map<string, Column>>();
+    table.sources.forEach((source) => cols.set(source, new Map()));
+    table.columns
+      .asArray()
+      .forEach((column) =>
+        cols.get(column.sourceTableInstance)!.set(column.name, column)
+      );
+
+    const aCols = cols.get(a)!;
+    const bCols = cols.get(b)!;
+    const c1Cols = cols.get(c1)!;
+    const c2Cols = cols.get(c2)!;
+
+    const fds = [
+      {
+        lhs: [[a, ["A1"]]],
+        rhs: [
+          [a, ["A2", "A3", "A4", "A5", "A6"]],
+          [b, ["B3"]],
+          [c1, ["C2"]],
+          [c2, ["C2"]],
+        ],
+      },
+      {
+        lhs: [[a, ["A3"]]],
+        rhs: [
+          [a, ["A4"]],
+          [c1, ["C2"]],
+        ],
+      },
+      {
+        lhs: [[a, ["A2", "A3"]]],
+        rhs: [
+          [a, ["A4"]],
+          [b, ["B3"]],
+          [c1, ["C2"]],
+        ],
+      },
+      {
+        lhs: [[b, ["B3"]]],
+        rhs: [
+          [a, ["A3", "A4"]],
+          [c1, ["C2"]],
+        ],
+      },
+      {
+        lhs: [[a, ["A5"]]],
+        rhs: [
+          [a, ["A6"]],
+          [c2, ["C2"]],
+        ],
+      },
+    ];
+
+    for (const Ifd of fds) {
+      const Ilhs = Ifd.lhs;
+      const Irhs = Ifd.rhs;
+      const lhs = new ColumnCombination();
+      for (const ISourceCols of Ilhs) {
+        const source = ISourceCols[0] as SourceTableInstance;
+        const Icols = ISourceCols[1] as Array<string>;
+        lhs.add(...Icols.map((name) => cols.get(source)!.get(name)!));
+      }
+      const rhs = new ColumnCombination();
+      for (const ISourceCols of Irhs) {
+        const source = ISourceCols[0] as SourceTableInstance;
+        const Icols = ISourceCols[1] as Array<string>;
+        rhs.add(...Icols.map((name) => cols.get(source)!.get(name)!));
+      }
+      const fd = new FunctionalDependency(lhs, rhs);
+
+      expect(
+        table.fds.some(
+          (other) => other.lhs.equals(fd.lhs) && other.rhs.equals(fd.rhs)
+        )
+      ).to.be.true;
+    }
+    expect(table.fds.length).to.equal(fds.length);
+
+    expect(
+      table.fds.every((fd) =>
+        fd.lhs.asArray().every((col) => table.columns.asArray().includes(col))
+      )
+    ).to.be.true;
+    expect(
+      table.fds.every((fd) =>
+        fd.rhs.asArray().every((col) => table.columns.asArray().includes(col))
+      )
+    ).to.be.true;
+  });
+
   it("calculates fks of a table correctly", () => {
     let fks = schema.fksOf(tableA);
-    expect(fks.length).to.equal(1);
+    expect(fks.length).to.equal(2);
     let fk = [...fks][0];
     expect(fk.referencing).to.equal(tableA);
     expect(fk.referenced).to.equal(tableB);
@@ -32,23 +147,5 @@ describe("Schema", () => {
     let ind = flatInds[0];
     expect(ind.referencing).to.equal(tableA);
     expect(ind.referenced).to.equal(tableC);
-  });
-
-  it("fds of joined table contain fds of parent tables", () => {
-    let relationship = schema
-      .fksOf(tableA)
-      .find((rel) => rel.referenced == tableB)!;
-    let joinedTable = schema.join(relationship);
-    for (let table of [tableA, tableB]) {
-      table.fds.forEach((requiredFd) => {
-        let requiredLhs = requiredFd.lhs;
-        let requiredRhs = requiredFd.rhs;
-        expect(
-          joinedTable.fds.find(
-            (fd) => requiredLhs.equals(fd.lhs) && requiredRhs.isSubsetOf(fd.rhs)
-          )
-        ).to.exist;
-      });
-    }
   });
 });

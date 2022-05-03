@@ -21,7 +21,7 @@ export default class SourceRelationship {
     const pairs = this.referencing
       .map((column, index) => `${column.name}.${this.referenced[index].name}`)
       .sort();
-    const otherPairs = this.referencing
+    const otherPairs = other.referencing
       .map((column, index) => `${column.name}.${other.referenced[index].name}`)
       .sort();
     return pairs.every((pair, index) => pair == otherPairs[index]);

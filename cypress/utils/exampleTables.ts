@@ -116,49 +116,76 @@ export function CDSchema(): Schema {
 export function exampleSchema(): Schema {
   let schema = new Schema();
 
-  let tableA = Table.fromColumnNames(["A1", "A2", "A3"], "TableA");
+  let tableA = Table.fromColumnNames(
+    ["A1", "A2", "A3", "A4", "A5", "A6"],
+    "TableA"
+  );
   let tableB = Table.fromColumnNames(["B1", "B2", "B3"], "TableB");
-  let tableC = Table.fromColumnNames(["C1", "C2", "C3"], "TableC");
+  let tableC = Table.fromColumnNames(["C1", "C2"], "TableC");
 
   schema.addTables(tableA, tableB, tableC);
 
-  let [a1, a2, a3] = tableA.columns.columnsFromNames("A1", "A2", "A3");
+  let [a1, a2, a3, a4, a5, a6] = tableA.columns.columnsFromNames(
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "A6"
+  );
   let [b1, b2, b3] = tableB.columns.columnsFromNames("B1", "B2", "B3");
-  let [c1, c2, c3] = tableC.columns.columnsFromNames("C1", "C2", "C3");
+  let [c1, c2] = tableC.columns.columnsFromNames("C1", "C2");
 
   tableA.pk = new ColumnCombination([a1]);
-  tableB.pk = new ColumnCombination([b1]);
+  tableB.pk = new ColumnCombination([b1, b2]);
   tableC.pk = new ColumnCombination([c1]);
 
   schema.addFd(
     new SourceFunctionalDependency(
       [a1.sourceColumn],
-      [a2.sourceColumn, a3.sourceColumn]
+      [
+        a2.sourceColumn,
+        a3.sourceColumn,
+        a4.sourceColumn,
+        a5.sourceColumn,
+        a6.sourceColumn,
+      ]
     )
   );
   schema.addFd(
-    new SourceFunctionalDependency([a2.sourceColumn], [a3.sourceColumn])
+    new SourceFunctionalDependency([a3.sourceColumn], [a4.sourceColumn])
   );
+  schema.addFd(
+    new SourceFunctionalDependency([a5.sourceColumn], [a6.sourceColumn])
+  );
+
   schema.addFd(
     new SourceFunctionalDependency(
-      [b1.sourceColumn],
-      [b2.sourceColumn, b3.sourceColumn]
+      [b1.sourceColumn, b2.sourceColumn],
+      [b3.sourceColumn]
     )
   );
   schema.addFd(
-    new SourceFunctionalDependency(
-      [c1.sourceColumn],
-      [c2.sourceColumn, c3.sourceColumn]
-    )
+    new SourceFunctionalDependency([b3.sourceColumn], [b2.sourceColumn])
+  );
+
+  schema.addFd(
+    new SourceFunctionalDependency([c1.sourceColumn], [c2.sourceColumn])
   );
 
   schema.calculateFdsOf(tableA);
   schema.calculateFdsOf(tableB);
   schema.calculateFdsOf(tableC);
 
-  schema.addFk(new SourceRelationship([a2.sourceColumn], [b1.sourceColumn]));
+  schema.addFk(
+    new SourceRelationship(
+      [a2.sourceColumn, a3.sourceColumn],
+      [b1.sourceColumn, b2.sourceColumn]
+    )
+  );
   schema.addFk(new SourceRelationship([b2.sourceColumn], [c1.sourceColumn]));
-  schema.addInd(new SourceRelationship([a3.sourceColumn], [c1.sourceColumn]));
+  schema.addFk(new SourceRelationship([a5.sourceColumn], [c1.sourceColumn]));
+  schema.addInd(new SourceRelationship([a4.sourceColumn], [c1.sourceColumn]));
 
   return schema;
 }
