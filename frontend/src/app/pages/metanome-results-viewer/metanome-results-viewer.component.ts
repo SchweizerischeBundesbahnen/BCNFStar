@@ -31,6 +31,10 @@ export class MetanomeResultsViewerComponent {
     });
   }
 
+  async deleteAllEntries() {
+    await Promise.all(this.tableData.map((entry) => this.deleteEntry(entry)));
+  }
+
   async deleteEntry(entry: IIndexFileEntry) {
     try {
       console.log(`${this.url}/${entry.fileName}`);
