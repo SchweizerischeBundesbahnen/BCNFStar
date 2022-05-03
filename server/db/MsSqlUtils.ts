@@ -270,14 +270,6 @@ export default class MsSqlUtils extends SqlUtils {
       throw Error("Columns don't exist in referenced.");
     }
 
-    console.log(
-      this.violatingRowsForSuggestedIND_SQL(
-        referencingTable,
-        referencedTable,
-        columnRelationships
-      )
-    );
-
     const result: sql.IResult<any> = await sql.query(
       `SELECT COUNT (*) as count FROM 
       (
