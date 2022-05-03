@@ -1,12 +1,9 @@
 /// <reference types="cypress" />
 
-describe("The metanoem results page", () => {
+describe("The metanome results page", () => {
   before(() => {
     cy.visitFrontend();
-    cy.contains("public").click();
-    cy.contains("nation_region_denormalized").click();
-    cy.contains("part_partsupp_supplier_denormalized").click();
-    cy.contains("Go").click();
+    cy.selectTablesAndGo();
   });
 
   beforeEach(() => {
