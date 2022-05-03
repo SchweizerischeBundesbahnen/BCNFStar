@@ -11,26 +11,30 @@
   </div>
   <div *ngIf="this.referencedTable">
     <div>
-      <sbb-select
-        [(ngModel)]="this.referencingColumn"
-        placeholder="Referencing Column"
-      >
-        <sbb-option
-          *ngFor="let column of referencingTable.columns.asArray()"
-          [value]="column"
-          >{{ column.name }}
-        </sbb-option>
-      </sbb-select>
-      <sbb-select
-        [(ngModel)]="this.referencedColumn"
-        placeholder="Referenced Column"
-      >
-        <sbb-option
-          *ngFor="let column of referencedTable.columns.asArray()"
-          [value]="column"
-          >{{ column.name }}
-        </sbb-option>
-      </sbb-select>
+      <div>
+        <sbb-select
+          [(ngModel)]="this.referencingColumn"
+          placeholder="Referencing Column"
+        >
+          <sbb-option
+            *ngFor="let column of referencingTable.columns.asArray()"
+            [value]="column"
+            >{{ column.name }}
+          </sbb-option>
+        </sbb-select>
+      </div>
+      <div>
+        <sbb-select
+          [(ngModel)]="this.referencedColumn"
+          placeholder="Referenced Column"
+        >
+          <sbb-option
+            *ngFor="let column of referencedTable.columns.asArray()"
+            [value]="column"
+            >{{ column.name }}
+          </sbb-option>
+        </sbb-select>
+      </div>
       <button
         type="button"
         (click)="addColumnRelation()"
@@ -44,7 +48,7 @@
     </div>
     <p>{{ this.relationshipString() }}</p>
     <div>
-      <button type="button" (click)="checkInd()" [disabled]="!canCheckIND()">
+      <button sbb-button (click)="checkInd()" [disabled]="!canCheckIND()">
         Check Inclusion Dependency
       </button>
     </div>

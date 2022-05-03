@@ -7,6 +7,7 @@ import { DatabaseService } from '@/src/app/database.service';
 import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../violating-rows-view-inds/violating-rows-view-inds.component';
+import { ViolatingINDRowsDataQuery } from '../../dataquery';
 
 @Component({
   selector: 'app-check-ind',
@@ -51,18 +52,18 @@ export class CheckIndComponent {
   }
 
   public async checkInd(): Promise<void> {
-    console.log(this.relationship);
-    const rowCount: number =
-      await this.dataService.loadViolatingRowsForINDCount(this.relationship);
+    const dataQuery = new ViolatingINDRowsDataQuery(
+      this.dataService,
+      this.relationship
+    );
+    const rowCount: number = await dataQuery.loadRowCount();
 
     if (rowCount == 0) {
       // valid Inclusion Dependency
     } else {
       this.dialog.open(ViolatingRowsViewIndsComponent, {
         data: {
-          relationship: this.relationship,
-          dataService: this.dataService,
-          rowCount: rowCount,
+          dataService: dataQuery,
         },
       });
     }
@@ -71,8 +72,9 @@ export class CheckIndComponent {
   public tableSelected(): boolean {
     return this.referencedTable != undefined;
   }
+
   public validTables(): Array<Table> {
-    return [...this.tables];
+    return [...this.tables].filter((table) => [...table.sources].length == 1);
   }
 
   public canCheckIND(): boolean {
@@ -82,10 +84,12 @@ export class CheckIndComponent {
   public removeColumnRelation(): void {
     this.relationship._referenced = [];
     this.relationship._referencing = [];
+    this.referencingColumn = undefined;
+    this.referencedColumn = undefined;
   }
 
   public relationshipString(): string {
-    if (this.relationship == undefined) return '';
+    if (this.relationship._referenced.length == 0) return '';
     return this.relationship.toString();
   }
 }

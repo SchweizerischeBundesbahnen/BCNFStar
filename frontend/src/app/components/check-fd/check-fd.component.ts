@@ -5,6 +5,7 @@ import { Component, Input } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewComponent } from '../violating-rows-view/violating-rows-view.component';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
+import { ViolatingFDRowsDataQuery } from '../../dataquery';
 
 @Component({
   selector: 'app-check-fd',
@@ -27,11 +28,13 @@ export class CustomFunctionalDependencySideBarComponent {
     // a column always defines itself,
     this._rhs = this._rhs.filter((c) => !this._lhs.includes(c));
 
-    const rowCount: number = await this.dataService.loadViolatingRowsForFDCount(
+    const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
+      this.dataService,
       this.table,
       this._lhs,
       this._rhs
     );
+    const rowCount: number = await dataQuery.loadRowCount();
 
     if (rowCount == 0) {
       // valid Functional Dependency
@@ -42,11 +45,7 @@ export class CustomFunctionalDependencySideBarComponent {
     } else {
       this.dialog.open(ViolatingRowsViewComponent, {
         data: {
-          table: this.table,
-          dataService: this.dataService,
-          _lhs: this._lhs,
-          _rhs: this._rhs,
-          rowCount: rowCount,
+          dataService: dataQuery,
         },
       });
     }
