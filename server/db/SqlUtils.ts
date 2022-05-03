@@ -47,6 +47,8 @@ export default abstract class SqlUtils {
     table: string
   ): Promise<boolean>;
 
+  public abstract UNIVERSAL_DATATYPE(): string;
+
   protected readonly QUERY_PRIMARY_KEYS: string = `
     SELECT 
       ku.TABLE_SCHEMA As table_schema,
@@ -101,7 +103,14 @@ export default abstract class SqlUtils {
     FROM ${referencingTable.schemaName}.${referencingTable.name} AS X
     LEFT OUTER JOIN ${referencedTable.schemaName}.${referencedTable.name} AS Y 
       ON ${columnRelationships
-        .map((cc) => `X.${cc.referencingColumn} = Y.${cc.referencedColumn}`)
+        .map(
+          (cc) =>
+            `CAST(X.${
+              cc.referencingColumn
+            } AS ${this.UNIVERSAL_DATATYPE()}) = CAST(Y.${
+              cc.referencedColumn
+            } AS ${this.UNIVERSAL_DATATYPE()})`
+        )
         .join(" AND ")}
     WHERE Y.${columnRelationships[0].referencedColumn} IS NULL
     `;

@@ -44,6 +44,10 @@ export default class MsSqlUtils extends SqlUtils {
     this.connection = await sql.connect(this.config);
   }
 
+  public UNIVERSAL_DATATYPE(): string {
+    return "varchar(max)";
+  }
+
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
     const result: sql.IResult<SchemaQueryRow> = await sql.query(`SELECT 
       t.name as table_name, 

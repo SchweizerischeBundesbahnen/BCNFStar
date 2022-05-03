@@ -60,6 +60,10 @@ export default class PostgresSqlUtils extends SqlUtils {
     return query_result.rows;
   }
 
+  public UNIVERSAL_DATATYPE(): string {
+    return "text";
+  }
+
   public async tableExistsInSchema(
     schema: string,
     table: string
