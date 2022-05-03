@@ -117,6 +117,7 @@
       *ngIf="isBoolean(entry.value)"
       [(ngModel)]="config[configName]['config'][$any(entry).key]"
       [ngModelOptions]="{ standalone: true }"
+      [class]="$any(entry).key"
     >
       {{ $any(entry).key }}
     </sbb-checkbox>
@@ -126,6 +127,7 @@
         sbbInput
         [(ngModel)]="config[configName]['config'][$any(entry).key]"
         [ngModelOptions]="{ standalone: true }"
+        [class]="$any(entry).key"
       />
     </div>
   </div>

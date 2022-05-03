@@ -69,12 +69,9 @@ describe("The table selection page", () => {
       "have.length",
       2
     );
-    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
-      .first()
-      .click();
-    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
-      .last()
-      .click();
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').click({
+      multiple: true,
+    });
     cy.contains("Binder").click();
     cy.contains("Ok").click();
 
@@ -88,7 +85,7 @@ describe("The table selection page", () => {
     );
     cy.get(
       '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
-    ).contains("Progress can be monitored here");
+    ).contains("Fetching results");
     cy.get(
       '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
     ).contains(
@@ -106,7 +103,7 @@ describe("The table selection page", () => {
     );
   });
 
-  it("renders the schema editing page after  clicking on the Go and Ok button", () => {
+  it("renders the schema editing page after clicking on the Go and Ok button", () => {
     cy.selectTablesAndGo();
     cy.loadMetanomeConfigAndOk();
   });
