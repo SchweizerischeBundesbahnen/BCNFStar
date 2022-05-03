@@ -20,7 +20,7 @@
             {{ item.key }}: {{ item.value }}
           </div>
         </td>
-        <td>{{ entry.createDate | date }}</td>
+        <td class="creation-date">{{ entry.createDate | date: "medium" }}</td>
         <td>
           <button
             class="delete-btn"
