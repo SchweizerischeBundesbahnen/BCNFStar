@@ -99,7 +99,7 @@ export default abstract class SqlUtils {
     return `
     SELECT ${columnRelationships
       .map((cc) => `X.${cc.referencingColumn}`)
-      .join(",")}
+      .join(",")}, COUNT(1) AS Count
     FROM ${referencingTable.schemaName}.${referencingTable.name} AS X
     LEFT OUTER JOIN ${referencedTable.schemaName}.${referencedTable.name} AS Y 
       ON ${columnRelationships
@@ -113,6 +113,9 @@ export default abstract class SqlUtils {
         )
         .join(" AND ")}
     WHERE Y.${columnRelationships[0].referencedColumn} IS NULL
+    GROUP BY ${columnRelationships
+      .map((cc) => `X.${cc.referencingColumn}`)
+      .join(",")}
     `;
   }
 
