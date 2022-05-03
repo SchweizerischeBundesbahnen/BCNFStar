@@ -78,7 +78,7 @@ export class CheckIndComponent {
   }
 
   public canCheckIND(): boolean {
-    return true;
+    return this.relationship._referenced.length != 0;
   }
 
   public removeColumnRelation(): void {
