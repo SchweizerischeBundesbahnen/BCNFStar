@@ -32,7 +32,7 @@ export class MetanomeResultsViewerComponent {
   }
 
   async deleteAllEntries() {
-    this.tableData.forEach((entry) => this.deleteEntry(entry));
+    await Promise.all(this.tableData.map((entry) => this.deleteEntry(entry)));
   }
 
   async deleteEntry(entry: IIndexFileEntry) {
