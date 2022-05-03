@@ -74,7 +74,7 @@ export default class MsSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
-        `SELECT * FROM [${schemaname}].[${tablename}] 
+        `SELECT * FROM [${schemaname}].[${tablename}]
         ORDER BY (SELECT NULL) 
         OFFSET ${offset} ROWS
         FETCH NEXT ${limit} ROWS ONLY`
@@ -110,6 +110,33 @@ export default class MsSqlUtils extends SqlUtils {
     }
   }
 
+  public async columnsExistInTable(
+    schema: string,
+    table: string,
+    columns: Array<string>
+  ): Promise<boolean> {
+    const ps = new sql.PreparedStatement();
+    try {
+      ps.input("schema", sql.NVarChar);
+      ps.input("table", sql.NVarChar);
+
+      await ps.prepare(
+        "select column_name from INFORMATION_SCHEMA.COLUMNS WHERE table_schema = @schema AND table_name = @table"
+      );
+      const result: sql.IResult<string> = await ps.execute({ schema, table });
+      return columns.every((c) =>
+        result.recordset
+          .map((r) => r.toString().toLowerCase())
+          .includes(c.toLowerCase())
+      );
+    } catch (e) {
+      console.log(e);
+      throw Error("Error while checking if table contains columns.");
+    } finally {
+      ps.unprepare();
+    }
+  }
+
   public async tableExistsInSchema(
     schema: string,
     table: string
@@ -139,6 +166,51 @@ export default class MsSqlUtils extends SqlUtils {
     );
     const result = await ps.execute({ schema });
     return result.recordset.length > 0;
+  }
+
+  public override async getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+        ` ORDER BY ${lhs.join(",")}
+          OFFSET ${offset} ROWS
+          FETCH NEXT ${limit} ROWS ONLY
+        `
+    );
+    return {
+      rows: result.recordset,
+      attributes: Object.keys(result.recordset.columns),
+    };
+  }
+
+  public async getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<number> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      `SELECT COUNT (*) as count FROM 
+      (
+      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+      ) AS X
+      `
+    );
+    return result.recordset[0].count;
   }
 
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {

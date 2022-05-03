@@ -29,6 +29,8 @@ import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/
 import { MetanomeSettingsComponent } from './components/metanome-settings/metanome-settings.component';
 import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
 import { SbbToggleModule } from '@sbb-esta/angular/toggle';
+import { CustomFunctionalDependencySideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
+import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +44,8 @@ import { SbbToggleModule } from '@sbb-esta/angular/toggle';
     SplitDialogComponent,
     MetanomeResultsViewerComponent,
     MetanomeSettingsComponent,
+    CustomFunctionalDependencySideBarComponent,
+    ViolatingRowsViewComponent,
   ],
   imports: [
     BrowserModule,
