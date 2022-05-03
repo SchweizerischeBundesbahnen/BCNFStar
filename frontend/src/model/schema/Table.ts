@@ -13,7 +13,7 @@ import SourceRelationship from './SourceRelationship';
 export default class Table {
   public name = '';
   public schemaName = '';
-  public columns;
+  public columns: ColumnCombination;
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Array<Relationship>();

@@ -1,3 +1,6 @@
+import Column from "../../../frontend/src/model/schema/Column";
+import ColumnCombination from "../../../frontend/src/model/schema/ColumnCombination";
+import FunctionalDependency from "../../../frontend/src/model/schema/FunctionalDependency";
 import Table from "../../../frontend/src/model/schema/Table";
 
 describe("FunctionalDependency", () => {
@@ -6,21 +9,24 @@ describe("FunctionalDependency", () => {
   beforeEach(() => {
     table = Table.fromColumnNames(["A", "B", "C", "D"], "table1");
     table.addFd(
-      table.columns.columnsFromNames("A"),
-      table.columns.columnsFromNames("B", "C")
+      new FunctionalDependency(
+        new ColumnCombination(table.columns.columnsFromNames("A")),
+        new ColumnCombination(table.columns.columnsFromNames("B", "C"))
+      )
     );
     table.addFd(
-      table.columns.columnsFromNames("A"),
-      table.columns.columnsFromNames("A")
+      new FunctionalDependency(
+        new ColumnCombination(table.columns.columnsFromNames("A")),
+        new ColumnCombination(table.columns.columnsFromNames("A"))
+      )
     );
   });
 
   it("extends correctly", () => {
     expect(
-      table.fds[0].lhs.equals(table.columns.columnsFromNames("A"))
-    ).to.equals(true);
-    expect(
-      table.fds[0].rhs.equals(table.columns.columnsFromNames("A", "B", "C"))
+      table.fds[0].rhs.equals(
+        new ColumnCombination(table.columns.columnsFromNames("A", "B", "C"))
+      )
     ).to.equal(true);
   });
 

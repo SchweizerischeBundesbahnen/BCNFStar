@@ -2,6 +2,11 @@ import ITable from "../../server/definitions/ITable";
 import Relationship from "../../frontend/src/model/schema/Relationship";
 import Schema from "../../frontend/src/model/schema/Schema";
 import Table from "../../frontend/src/model/schema/Table";
+import FunctionalDependency from "../../frontend/src/model/schema/FunctionalDependency";
+import SourceRelationship from "../../frontend/src/model/schema/SourceRelationship";
+import SourceFunctionalDependency from "../../frontend/src/model/schema/SourceFunctionalDependency";
+import Column from "../../frontend/src/model/schema/Column";
+import ColumnCombination from "../../frontend/src/model/schema/ColumnCombination";
 
 export const exampleITable: Array<ITable> = [
   {
@@ -19,112 +24,141 @@ export const exampleITable: Array<ITable> = [
   },
 ];
 
-export function exampleTableSportartVerein(): Table {
-  const table: Table = Table.fromColumnNames(
+export function sportartVereinTable(): Table {
+  const table = Table.fromColumnNames(
     ["Name", "Sportart", "Verein"],
-    "Example Table"
+    "Sportart_Verein"
   );
   table.addFd(
-    table.columns.columnsFromNames("Name", "Sportart"),
-    table.columns.columnsFromNames("Verein")
+    new FunctionalDependency(
+      new ColumnCombination(table.columns.columnsFromNames("Name", "Sportart")),
+      new ColumnCombination(table.columns.columnsFromNames("Verein"))
+    )
   );
   table.addFd(
-    table.columns.columnsFromNames("Verein"),
-    table.columns.columnsFromNames("Sportart")
+    new FunctionalDependency(
+      new ColumnCombination(table.columns.columnsFromNames("Verein")),
+      new ColumnCombination(table.columns.columnsFromNames("Sportart"))
+    )
   );
   return table;
 }
 
-export function exampleTable(): Table {
-  const table = Table.fromITable(exampleITable[0]);
-
-  let otherSourceTable = Table.fromColumnNames(
-    ["Interpret", "Gründungsjahr"],
-    "Example Table"
-  );
-  otherSourceTable.schemaName = "public";
-  table.columns
-    .setMinus(table.columns.columnsFromNames("Gründungsjahr"))
-    .union(otherSourceTable.columns.columnsFromNames("Gründungsjahr"));
-  table.sources.add(otherSourceTable);
-  let relationship = new Relationship();
-  relationship.add(
-    table.columns.columnFromName("Interpret")!,
-    otherSourceTable.columns.columnFromName("Interpret")!
-  );
-  table.relationships.add(relationship);
-
-  table.addFd(
-    table.columns.columnsFromNames("CD_ID", "Tracknr"),
-    table.columns.columnsFromNames(
+export function CDSchema(): Schema {
+  const schema = new Schema();
+  const cdTracksTable = Table.fromColumnNames(
+    [
+      "CD_ID",
+      "Tracknr",
       "Albumtitel",
       "Interpret",
-      "Gründungsjahr",
       "Erscheinungsjahr",
-      "Titel"
+      "Titel",
+    ],
+    "CD_Tracks"
+  );
+  const interpretTable = Table.fromColumnNames(
+    ["Interpret", "Gründungsjahr"],
+    "Interpret"
+  );
+
+  schema.addTables(cdTracksTable, interpretTable);
+  const fk = new SourceRelationship();
+  fk.referencing.push(
+    cdTracksTable.columns.columnFromName("Interpret").sourceColumn
+  );
+  fk.referenced.push(
+    interpretTable.columns.columnFromName("Interpret").sourceColumn
+  );
+  schema.addFk(fk);
+
+  schema.addFd(
+    new SourceFunctionalDependency(
+      cdTracksTable.columns
+        .columnsFromNames("CD_ID", "Tracknr")
+        .map((col) => col.sourceColumn),
+      cdTracksTable.columns
+        .columnsFromNames(
+          "Albumtitel",
+          "Interpret",
+          "Erscheinungsjahr",
+          "Titel"
+        )
+        .map((col) => col.sourceColumn)
     )
   );
-  table.addFd(
-    table.columns.columnsFromNames("CD_ID"),
-    table.columns.columnsFromNames(
-      "Albumtitel",
-      "Interpret",
-      "Gründungsjahr",
-      "Erscheinungsjahr"
+
+  schema.addFd(
+    new SourceFunctionalDependency(
+      cdTracksTable.columns
+        .columnsFromNames("CD_ID")
+        .map((col) => col.sourceColumn),
+      cdTracksTable.columns
+        .columnsFromNames("Albumtitel", "Interpret", "Erscheinungsjahr")
+        .map((col) => col.sourceColumn)
     )
   );
-  table.addFd(
-    table.columns.columnsFromNames("Interpret"),
-    table.columns.columnsFromNames("Gründungsjahr")
+
+  schema.addFd(
+    new SourceFunctionalDependency(
+      interpretTable.columns
+        .columnsFromNames("Interpret")
+        .map((col) => col.sourceColumn),
+      cdTracksTable.columns
+        .columnsFromNames("Gründungsjahr")
+        .map((col) => col.sourceColumn)
+    )
   );
-  return table;
+
+  return schema;
 }
+
 export function exampleSchema(): Schema {
   let schema = new Schema();
 
   let tableA = Table.fromColumnNames(["A1", "A2", "A3"], "TableA");
   let tableB = Table.fromColumnNames(["B1", "B2", "B3"], "TableB");
   let tableC = Table.fromColumnNames(["C1", "C2", "C3"], "TableC");
-  tableA.pk = tableB.columns.columnsFromNames("A1");
-  tableB.pk = tableB.columns.columnsFromNames("B1");
-  tableC.pk = tableB.columns.columnsFromNames("C1");
-  tableA.addFd(
-    tableA.columns.columnsFromNames("A1"),
-    tableA.columns.columnsFromNames("A2", "A3")
+
+  schema.addTables(tableA, tableB, tableC);
+
+  let [a1, a2, a3] = tableA.columns.columnsFromNames("A1", "A2", "A3");
+  let [b1, b2, b3] = tableB.columns.columnsFromNames("B1", "B2", "B3");
+  let [c1, c2, c3] = tableC.columns.columnsFromNames("C1", "C2", "C3");
+
+  tableA.pk = new ColumnCombination([a1]);
+  tableB.pk = new ColumnCombination([b1]);
+  tableC.pk = new ColumnCombination([c1]);
+
+  schema.addFd(
+    new SourceFunctionalDependency(
+      [a1.sourceColumn],
+      [a2.sourceColumn, a3.sourceColumn]
+    )
   );
-  tableB.addFd(
-    tableB.columns.columnsFromNames("B1"),
-    tableA.columns.columnsFromNames("B2", "B3")
+  schema.addFd(
+    new SourceFunctionalDependency([a2.sourceColumn], [a3.sourceColumn])
   );
-  tableC.addFd(
-    tableC.columns.columnsFromNames("C1"),
-    tableA.columns.columnsFromNames("C2", "C3")
+  schema.addFd(
+    new SourceFunctionalDependency(
+      [b1.sourceColumn],
+      [b2.sourceColumn, b3.sourceColumn]
+    )
   );
-  tableA.addFd(
-    tableA.columns.columnsFromNames("A2"),
-    tableA.columns.columnsFromNames("A3")
+  schema.addFd(
+    new SourceFunctionalDependency(
+      [c1.sourceColumn],
+      [c2.sourceColumn, c3.sourceColumn]
+    )
   );
 
-  schema.add(tableA, tableB, tableC);
+  schema.calculateFdsOf(tableA);
+  schema.calculateFdsOf(tableB);
+  schema.calculateFdsOf(tableC);
 
-  let relAB = new Relationship();
-  relAB.add(
-    tableA.columns.columnFromName("A2")!,
-    tableB.columns.columnFromName("B1")!
-  );
-  let relBC = new Relationship();
-  relBC.add(
-    tableB.columns.columnFromName("B2")!,
-    tableC.columns.columnFromName("C1")!
-  );
-  let relAC = new Relationship();
-  relAC.add(
-    tableA.columns.columnFromName("A3")!,
-    tableC.columns.columnFromName("C1")!
-  );
-  schema.addFk(relAB);
-  schema.addFk(relBC);
-  schema.addInd(relAC);
+  schema.addFk(new SourceRelationship([a2.sourceColumn], [b1.sourceColumn]));
+  schema.addFk(new SourceRelationship([b2.sourceColumn], [c1.sourceColumn]));
+  schema.addInd(new SourceRelationship([a3.sourceColumn], [c1.sourceColumn]));
 
   return schema;
 }

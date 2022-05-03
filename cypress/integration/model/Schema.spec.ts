@@ -13,36 +13,36 @@ describe("Schema", () => {
     tableA = [...schema.tables].find((table) => table.name == "TableA")!;
     tableB = [...schema.tables].find((table) => table.name == "TableB")!;
     tableC = [...schema.tables].find((table) => table.name == "TableC")!;
+    expect(tableA).to.exist;
   });
 
   it("calculates fks of a table correctly", () => {
-    console.log(schema);
     let fks = schema.fksOf(tableA);
-    expect(fks.size).to.equal(1);
+    expect(fks.length).to.equal(1);
     let fk = [...fks][0];
-    expect(fk.referencing).to.deep.equal(tableB);
+    expect(fk.referencing).to.equal(tableA);
+    expect(fk.referenced).to.equal(tableB);
   });
 
   it("calculates inds of a table correctly", () => {
     let inds = schema.indsOf(tableA);
-    expect(inds.length).to.equal(1);
-    let ind = inds[0];
-    expect(ind.referencing).to.deep.equal(tableC);
+    expect([...inds.keys()].length).to.equal(1);
+    const flatInds = Array.from(inds.values()).flat();
+    expect(flatInds.length).to.equal(1);
+    let ind = flatInds[0];
+    expect(ind.referencing).to.equal(tableA);
+    expect(ind.referenced).to.equal(tableC);
   });
 
   it("fds of joined table contain fds of parent tables", () => {
-    let relationship = [...schema.fks].find(
-      (rel) => rel.appliesTo(tableA, tableB) || rel.appliesTo(tableB, tableA)
-    )!;
-    let joinedTable = schema.join(tableA, tableB, relationship);
+    let relationship = schema
+      .fksOf(tableA)
+      .find((rel) => rel.referenced == tableB)!;
+    let joinedTable = schema.join(relationship);
     for (let table of [tableA, tableB]) {
       table.fds.forEach((requiredFd) => {
-        let requiredLhs = relationship.referencingToReferencedColumnsIn(
-          requiredFd.lhs
-        );
-        let requiredRhs = relationship.referencingToReferencedColumnsIn(
-          requiredFd.rhs
-        );
+        let requiredLhs = requiredFd.lhs;
+        let requiredRhs = requiredFd.rhs;
         expect(
           joinedTable.fds.find(
             (fd) => requiredLhs.equals(fd.lhs) && requiredRhs.isSubsetOf(fd.rhs)

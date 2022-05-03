@@ -1,10 +1,14 @@
 import SourceColumn from './SourceColumn';
 
 export default class SourceRelationship {
-  // these arrays are linked, the column in _referencing has the same index as the
-  // corresponding column in _referenced
-  public referencing = new Array<SourceColumn>();
-  public referenced = new Array<SourceColumn>();
+  /**
+   * these arrays are linked, the column in referencing has the same index as the
+   * corresponding column in referenced
+   */
+  public constructor(
+    public referencing = new Array<SourceColumn>(),
+    public referenced = new Array<SourceColumn>()
+  ) {}
 
   public equals(other: SourceRelationship): boolean {
     if (this == other) return true;

@@ -1,16 +1,16 @@
 import Column from "../../../frontend/src/model/schema/Column";
-import ColumnIdentifier from "../../../frontend/src/model/schema/ColumnIdentifier";
-import TableIdentifier from "../../../frontend/src/model/schema/TableIdentifier";
+import SourceColumn from "../../../frontend/src/model/schema/SourceColumn";
+import SourceTable from "../../../frontend/src/model/schema/SourceTable";
+import SourceTableInstance from "../../../frontend/src/model/schema/SourceTableInstance";
 
 describe("Column", () => {
   let columnA: Column;
 
   beforeEach(() => {
+    const sourceTable = new SourceTable("table", "schema");
     columnA = new Column(
-      "A",
-      "int",
-      1,
-      new ColumnIdentifier("CI1", new TableIdentifier("TI1", "public"))
+      new SourceTableInstance(sourceTable),
+      new SourceColumn("A", sourceTable, "int", 1, false)
     );
   });
 
