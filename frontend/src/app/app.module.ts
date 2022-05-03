@@ -30,6 +30,7 @@ import { CustomFunctionalDependencySideBarComponent } from '@/src/app/components
 import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
+import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view
     ViolatingRowsViewComponent,
     CheckIndComponent,
     ViolatingRowsViewIndsComponent,
+    DatabaseTableViewerComponent,
   ],
   imports: [
     BrowserModule,
