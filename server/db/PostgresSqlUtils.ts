@@ -1,8 +1,12 @@
-import SqlUtils, { ForeignKeyResult, SchemaQueryRow } from "./SqlUtils";
+import SqlUtils, {
+  ForeignKeyResult,
+  PrimaryKeyResult,
+  SchemaQueryRow,
+} from "./SqlUtils";
 import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
-import ITableHead from "@/definitions/ITableHead";
+import ITablePage from "@/definitions/ITablePage";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -41,7 +45,11 @@ export default class PostgresSqlUtils extends SqlUtils {
         when data_type='numeric' THEN 'numeric('||numeric_precision||','||numeric_scale||')'
         else data_type
       end as data_type, 
-      table_schema 
+      table_schema,
+      case when 
+      is_nullable = 'NO' then CAST(0 AS BIT) 
+      else CAST(1 AS BIT) 
+      end as is_nullable 
         FROM information_schema.columns 
         WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
         ORDER BY ordinal_position`,
@@ -63,15 +71,18 @@ export default class PostgresSqlUtils extends SqlUtils {
     return table_exists.rowCount > 0;
   }
 
-  public async getTableHead(
+  public async getTablePage(
     tablename: string,
     schemaname: string,
+    offset: number,
     limit: number
-  ): Promise<ITableHead> {
+  ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} LIMIT ${limit}`
+        `SELECT * FROM ${schemaname}.${tablename} 
+        LIMIT ${limit} 
+        OFFSET ${offset}`
       );
       return {
         rows: query_result.rows,
@@ -88,10 +99,22 @@ export default class PostgresSqlUtils extends SqlUtils {
   ): Promise<number> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
-      const query_result = await this.pool.query(
-        `SELECT COUNT(*) FROM ${schema}.${table}`
-      );
-      return query_result.rows[0].count;
+      // from https://stackoverflow.com/questions/7943233/fast-way-to-discover-the-row-count-of-a-table-in-postgresql
+      const rowCountQuery = `SELECT (CASE WHEN c.reltuples < 0 THEN NULL -- never vacuumed
+         WHEN c.relpages = 0 THEN float8 '0' -- empty table
+         ELSE c.reltuples / c.relpages END
+         * (pg_catalog.pg_relation_size(c.oid)
+         / pg_catalog.current_setting('block_size')::int)
+         )::bigint AS count
+         FROM   pg_catalog.pg_class c
+         WHERE  c.oid = '${schema}.${table}'::regclass;`;
+
+      let queryResult = await this.pool.query(rowCountQuery);
+      if (!queryResult.rows[0].count) {
+        this.pool.query(`VACUUM ${schema}.${table}`);
+        queryResult = await this.pool.query(rowCountQuery);
+      }
+      return queryResult.rows[0].count;
     } else {
       throw {
         error: "Table or schema does not exist in database",
@@ -131,6 +154,82 @@ from
     return result.rows;
   }
 
+  public async getPrimaryKeys(): Promise<PrimaryKeyResult[]> {
+    const result = await this.pool.query<PrimaryKeyResult>(
+      this.QUERY_PRIMARY_KEYS
+    );
+    return result.rows;
+  }
+
+  public override async getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const query_result = await this.pool.query(
+      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+        `ORDER BY ${lhs.join(",")}
+        LIMIT ${limit} 
+        OFFSET ${offset}
+        `
+    );
+    return {
+      rows: query_result.rows,
+      attributes: query_result.fields.map((v) => v.name),
+    };
+  }
+
+  public override async getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<number> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+    const count = await this.pool.query<{ count: number }>(
+      `SELECT COUNT (*) as count FROM 
+      (
+      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+      ) AS X
+      `
+    );
+    return count.rows[0].count;
+  }
+
+  public async columnsExistInTable(
+    schema: string,
+    table: string,
+    columns: Array<string>
+  ): Promise<boolean> {
+    try {
+      const queryConfig: QueryConfig = {
+        text: "SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2",
+        name: "columns-in-table",
+        values: [schema, table],
+      };
+      const columnsInTable = await this.pool.query<{ column_name: string }>(
+        queryConfig
+      );
+      return columns.every((c) =>
+        columnsInTable.rows
+          .map((d) => d.column_name.toLowerCase())
+          .includes(c.toLowerCase())
+      );
+    } catch (e) {
+      console.log(e);
+      throw Error("Error while checking if table contains columns.");
+    }
+  }
+
   public override SQL_CREATE_SCHEMA(schema: string): string {
     return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
   }
@@ -153,7 +252,9 @@ from
           attribute.name +
           " " +
           attribute.dataType +
-          (primaryKey.includes(attribute.name) ? " NOT NULL " : " NULL")
+          (primaryKey.includes(attribute.name) || attribute.nullable == false
+            ? " NOT NULL "
+            : " NULL")
       )
       .join(",");
     console.log(primaryKey);
@@ -195,7 +296,7 @@ from
   public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
   }
-  public getDbmsName(): string {
+  public getDbmsName(): "mssql" | "postgres" {
     return "postgres";
   }
 }

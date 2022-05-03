@@ -10,7 +10,8 @@ export class AppComponent {
   title = 'bcnfstar';
   public queueUrl: string;
   public devMode = isDevMode();
-  constructor(private dataService: DatabaseService) {
+
+  constructor(dataService: DatabaseService) {
     this.queueUrl = dataService.baseUrl + '/queue';
   }
 }

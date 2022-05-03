@@ -1,22 +1,25 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
-import ITableHead from '@server/definitions/ITableHead';
-import IFunctionalDependencies from '@server/definitions/IFunctionalDependencies';
+import ITablePage from '@server/definitions/ITablePage';
+import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import {
   IRequestBodyCreateTableSql,
   IRequestBodyDataTransferSql,
   IRequestBodyForeignKeySql,
 } from '@server/definitions/IBackendAPI';
+import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
 import { firstValueFrom } from 'rxjs';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
+import IPrimaryKey from '@server/definitions/IPrimaryKey';
 import Column from '../model/schema/Column';
-import IInclusionDependency from '@server/definitions/IInclusionDependencies';
+import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IRelationship from '@server/definitions/IRelationship';
+import ColumnCombination from '../model/schema/ColumnCombination';
 
 @Injectable({
   providedIn: 'root',
@@ -31,33 +34,34 @@ export class DatabaseService {
    **/
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   private iFks: Array<IForeignKey> = [];
+  private iPks: Array<IPrimaryKey> = [];
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
 
   public async loadTables(): Promise<Array<Table>> {
     this.iFks = await this.getIFks();
+    this.iPks = await this.getIPks();
     return this.getTables();
   }
 
-  public async loadTableHeads(
+  public loadTablePage(
+    schema: string,
+    table: string,
+    offset: number,
     limit: number
-  ): Promise<Record<string, ITableHead>> {
-    let tableHeads;
-    tableHeads = await firstValueFrom(
-      this.http.get<Record<string, ITableHead>>(
-        `${this.baseUrl}/tables/heads?limit=${limit}`
+  ): Promise<ITablePage> {
+    return firstValueFrom(
+      this.http.get<ITablePage>(
+        `${this.baseUrl}/tables/page?schema=${schema}&table=${table}&offset=${offset}&limit=${limit}`
       )
     );
-    return tableHeads;
   }
 
-  public async loadTableRowCounts(): Promise<Record<string, number>> {
-    let tableRowCounts;
-    tableRowCounts = await firstValueFrom(
+  public loadTableRowCounts(): Promise<Record<string, number>> {
+    return firstValueFrom(
       this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
     );
-    return tableRowCounts;
   }
 
   private async getTables(): Promise<Array<Table>> {
@@ -66,6 +70,28 @@ export class DatabaseService {
     );
     const tables = iTables.map((iTable) => Table.fromITable(iTable));
     return tables;
+  }
+
+  private getIPks(): Promise<Array<IPrimaryKey>> {
+    return firstValueFrom(
+      this.http.get<Array<IPrimaryKey>>(this.baseUrl + '/pks')
+    );
+  }
+
+  private resolveIPks(pks: Array<IPrimaryKey>) {
+    pks.forEach((fk) => {
+      let table: Table | undefined = [...this.inputSchema!.tables].find(
+        (table) =>
+          table.schemaName == fk.table_schema && table.name == fk.table_name
+      );
+      if (table) {
+        table!.pk = new ColumnCombination(
+          ...table!.columns
+            .asArray()
+            .filter((column) => fk.attributes.includes(column.name))
+        );
+      }
+    });
   }
 
   private getIFks(): Promise<Array<IForeignKey>> {
@@ -134,25 +160,30 @@ export class DatabaseService {
 
   public async setInputTables(tables: Array<Table>) {
     const indPromise = this.getINDs(tables);
-    const fdResults = await Promise.all(tables.map((v) => this.getFDs(v)));
+    const fdPromises: Record<
+      string,
+      Promise<Array<IFunctionalDependency>>
+    > = {};
+    for (const table of tables)
+      fdPromises[table.schemaAndName()] = this.getFDs(table);
 
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
-      const iFDs = fdResults.find(
-        (v) => v.tableName == table.schemaAndName()
-      ) as IFunctionalDependencies;
-      const fds = iFDs.functionalDependencies.map((fds) =>
-        FunctionalDependency.fromString(table, fds)
+      const iFDs = await fdPromises[table.schemaAndName()];
+
+      const fds = iFDs.map((fd) =>
+        FunctionalDependency.fromIFunctionalDependency(table, fd)
       );
       table.setFds(...fds);
     }
     this.resolveInds(await indPromise);
     this.resolveIFks(this.iFks);
+    this.resolveIPks(this.iPks);
   }
 
-  private getFDs(table: Table): Promise<IFunctionalDependencies> {
+  private getFDs(table: Table): Promise<Array<IFunctionalDependency>> {
     return firstValueFrom(
-      this.http.get<IFunctionalDependencies>(
+      this.http.get<Array<IFunctionalDependency>>(
         `${this.baseUrl}/tables/${table.schemaAndName()}/fds`
       )
     );
@@ -169,7 +200,7 @@ export class DatabaseService {
     );
   }
 
-  getForeignKeySql(
+  public getForeignKeySql(
     referencing: Table,
     relationship: Relationship,
     referenced: Table
@@ -205,7 +236,7 @@ export class DatabaseService {
     );
   }
 
-  getSchemaPreparationSql(
+  public getSchemaPreparationSql(
     schemaName: string,
     tables: Table[]
   ): Promise<{ sql: string }> {
@@ -221,7 +252,7 @@ export class DatabaseService {
     );
   }
 
-  getDataTransferSql(
+  public getDataTransferSql(
     table: Table,
     attributes: Column[]
   ): Promise<{ sql: string }> {
@@ -246,7 +277,7 @@ export class DatabaseService {
     return result;
   }
 
-  getPrimaryKeySql(
+  public getPrimaryKeySql(
     schema: string,
     table: string,
     primaryKey: string[]
@@ -264,7 +295,51 @@ export class DatabaseService {
     );
   }
 
-  getCreateTableSql(table: Table): Promise<{ sql: string }> {
+  public async loadViolatingRowsForFD(
+    table: Table,
+    _lhs: Column[],
+    _rhs: Column[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    // currently supports only check on "sourceTables".
+    if (table.sources.size != 1) throw Error('Not Implemented Exception');
+
+    const data: IRequestBodyFDViolatingRows = {
+      schema: [...table.sources][0].schemaName,
+      table: [...table.sources][0].name,
+      lhs: _lhs.map((c) => c.name),
+      rhs: _rhs.map((c) => c.name),
+      offset: offset,
+      limit: limit,
+    };
+    return firstValueFrom(
+      this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
+    );
+  }
+
+  public async loadViolatingRowsForFDCount(
+    table: Table,
+    _lhs: Column[],
+    _rhs: Column[]
+  ): Promise<number> {
+    // currently supports only check on "sourceTables".
+    if (table.sources.size != 1) throw Error('Not Implemented Exception');
+
+    const data: IRequestBodyFDViolatingRows = {
+      schema: [...table.sources][0].schemaName,
+      table: [...table.sources][0].name,
+      lhs: _lhs.map((c) => c.name),
+      rhs: _rhs.map((c) => c.name),
+      offset: 0,
+      limit: 0,
+    };
+    return firstValueFrom(
+      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/fd`, data)
+    );
+  }
+
+  public getCreateTableSql(table: Table): Promise<{ sql: string }> {
     const [newSchema, newTable]: string[] = [table.schemaName, table.name];
     let primaryKey: string[] = [];
     if (table.pk) {
@@ -273,9 +348,9 @@ export class DatabaseService {
     const data: IRequestBodyCreateTableSql = {
       newSchema: newSchema,
       newTable: newTable,
-      attributes: table.columns.asArray().map((column) => {
-        return { name: column.name, dataType: column.dataType };
-      }),
+      attributes: table.columns
+        .asArray()
+        .map((column) => column.toIAttribute()),
       primaryKey: primaryKey,
     };
     return firstValueFrom(

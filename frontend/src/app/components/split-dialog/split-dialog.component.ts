@@ -10,10 +10,10 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
   styleUrls: ['./split-dialog.component.css'],
 })
 export class SplitDialogComponent {
-  selectedColumns = new Map<Column, Boolean>();
-  columns = new Array<Column>();
+  public selectedColumns = new Map<Column, Boolean>();
+  public columns = new Array<Column>();
 
-  tableName: string;
+  public tableName: string;
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<SplitDialogComponent>,
@@ -31,11 +31,11 @@ export class SplitDialogComponent {
     this.tableName = fd.lhs.columnNames().join('_').substring(0, 50);
   }
 
-  canConfirm() {
+  public canConfirm() {
     return [...this.selectedColumns.values()].some((bool) => bool);
   }
 
-  confirm() {
+  public confirm() {
     let new_rhs = [...this.selectedColumns]
       .filter(([, included]) => included)
       .map(([column]) => column);

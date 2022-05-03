@@ -1,0 +1,51 @@
+.ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.container {
+  position: absolute;
+  /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
+  pointer-events: none;
+  -webkit-user-select: none;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.pk {
+  text-decoration: underline;
+}
+
+.fk {
+  font-style: italic;
+}
+
+.highlighted {
+  font-weight: bold;
+  color: red;
+}
+
+.table-head {
+  background-color: lightgray;
+  /* if you change this, also change graphElementHeaderHeight in schema-graph.component.ts */
+  height: 25px;
+  border-top: solid 3px rgb(18, 54, 131);
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.table-head-title {
+  pointer-events: visibleFill;
+}
+
+.table-body {
+  font-size: 1rem;
+  pointer-events: visibleFill;
+  font-weight: normal;
+}
+
+.table-body:hover {
+  background-color: rgb(197, 194, 194);
+  margin: 0;
+}

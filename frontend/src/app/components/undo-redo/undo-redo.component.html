@@ -1,0 +1,18 @@
+<button
+  type="button"
+  sbb-button
+  id="undo"
+  [disabled]="!this.canUndo"
+  (click)="this.undo.emit()"
+>
+  &lt;
+</button>
+<button
+  type="button"
+  sbb-button
+  id="redo"
+  [disabled]="!this.canRedo"
+  (click)="this.redo.emit()"
+>
+  &gt;
+</button>

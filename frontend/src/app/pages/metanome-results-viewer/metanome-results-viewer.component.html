@@ -1,0 +1,39 @@
+<sbb-table-wrapper>
+  <h1>Metanome results</h1>
+  <table class="sbb-table">
+    <thead>
+      <tr>
+        <th>File name</th>
+        <th>Algorithm</th>
+        <th>Tables</th>
+        <th>Config</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let entry of this.tableData">
+        <td>{{ entry.fileName }}</td>
+        <td>{{ entry.algorithm }}</td>
+        <td>{{ entry.tables.join("\n") }}</td>
+        <td>
+          <div *ngFor="let item of entry.config | keyvalue">
+            {{ item.key }}: {{ item.value }}
+          </div>
+        </td>
+        <td>{{ entry.createDate | date }}</td>
+        <td>
+          <button
+            class="delete-btn"
+            sbb-icon-button
+            (click)="deleteEntry(entry)"
+          >
+            <sbb-icon
+              svgIcon="kom:trash-medium"
+              class="sbb-icon-fit"
+            ></sbb-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</sbb-table-wrapper>

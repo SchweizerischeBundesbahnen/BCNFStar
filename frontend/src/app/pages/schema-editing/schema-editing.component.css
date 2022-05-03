@@ -1,0 +1,21 @@
+.schema-editing-side-bar {
+  overflow-y: scroll;
+  display: block;
+}
+
+.col-4 {
+  /* 97% to leave some room for border and prevnt scrollbar*/
+  height: calc(97vh - var(--sbb-header-lean-height));
+}
+
+.col-8 {
+  height: calc(97vh - var(--sbb-header-lean-height));
+}
+
+.row > * {
+  padding: 0;
+}
+
+.undo-redo {
+  float: right;
+}

@@ -15,7 +15,6 @@ export interface IRequestBodyCreateTableSql {
   attributes: IAttribute[];
   primaryKey: string[];
 }
-
 export interface IRequestBodyForeignKeySql {
   name: string;
   relationship: IRelationship;

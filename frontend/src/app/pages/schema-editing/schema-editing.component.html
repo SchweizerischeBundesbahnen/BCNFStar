@@ -1,0 +1,57 @@
+<div class="container-fluid border">
+  <div class="row border">
+    <div class="col-8 border">
+      <!-- [selectedTable]="this.selectedTable" -->
+      <!-- (selected)="onSelect($event)" -->
+      <app-schema-graph
+        [schema]="this.schema"
+        [(selectedTable)]="this.selectedTable"
+        [selectedColumns]="this.selectedColumns"
+        [schemaChanged]="this.schemaChanged.asObservable()"
+        (joinFk)="onJoin($event)"
+      ></app-schema-graph>
+    </div>
+    <div class="col-4 border schema-editing-side-bar">
+      <button type="button" sbb-button (click)="this.onAutoNormalize()">
+        {{
+          this.selectedTable !== undefined
+            ? "Auto-normalize this table"
+            : "Auto-normalize all tables"
+        }}
+      </button>
+      <app-undo-redo
+        class="undo-redo"
+        [canUndo]="this.commandProcessor.canUndo()"
+        [canRedo]="this.commandProcessor.canRedo()"
+        (undo)="onUndo()"
+        (redo)="onRedo()"
+      ></app-undo-redo>
+
+      <input
+        type="text"
+        sbbInput
+        placeholder="Schema Name"
+        [(ngModel)]="schemaName"
+      />
+
+      <button
+        type="button"
+        sbb-button
+        [disabled]="!this.schemaName"
+        (click)="download()"
+      >
+        Download SQL
+      </button>
+      <app-schema-editing-side-bar
+        class="schema-editing-side-bar"
+        *ngIf="this.selectedTable"
+        [table]="this.selectedTable"
+        [schema]="this.schema"
+        (splitFd)="onClickSplit($event)"
+        (indToFk)="onIndToFk($event)"
+        (selectColumns)="onSelectColumns($event)"
+        (renameTable)="onChangeTableName($event)"
+      ></app-schema-editing-side-bar>
+    </div>
+  </div>
+</div>
