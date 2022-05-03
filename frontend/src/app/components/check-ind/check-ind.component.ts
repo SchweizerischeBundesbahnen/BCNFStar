@@ -1,8 +1,7 @@
 import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
-import { Component, Input, ViewChild } from '@angular/core';
-import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
-import ITablePage from '@server/definitions/ITablePage';
+import { Component, Input } from '@angular/core';
+import { SbbTableDataSource } from '@sbb-esta/angular/table';
 import { DatabaseService } from '@/src/app/database.service';
 import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
@@ -17,10 +16,7 @@ import { ViolatingINDRowsDataQuery } from '../../dataquery';
 export class CheckIndComponent {
   @Input() referencingTable!: Table;
   @Input() tables!: Set<Table>;
-  @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
-  public pageSize: number = 20;
-  public page: number = 0;
   public rowCount: number = 0;
 
   public referencedTable: Table | undefined;
