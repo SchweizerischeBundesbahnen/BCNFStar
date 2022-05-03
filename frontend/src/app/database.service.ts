@@ -13,19 +13,24 @@ import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
 import { firstValueFrom } from 'rxjs';
-import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import IForeignKey from '@server/definitions/IForeignKey';
 import IPrimaryKey from '@server/definitions/IPrimaryKey';
 import Column from '../model/schema/Column';
 import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IRelationship from '@server/definitions/IRelationship';
 import ColumnCombination from '../model/schema/ColumnCombination';
+import SourceColumn from '../model/schema/SourceColumn';
+import SourceRelationship from '../model/schema/SourceRelationship';
+import SourceFunctionalDependency from '../model/schema/SourceFunctionalDependency';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatabaseService {
-  public inputSchema?: Schema;
+  public schema?: Schema;
+  /** this is used for looking up existing SourceColumns to cut down on later comparisons and memory */
+  public sourceColumns = new Map<string, SourceColumn>();
+
   /**
    * when using the angular dev server, you need to access another adress
    * for the BCNFStar express server. It is assumed that this server is
@@ -80,13 +85,13 @@ export class DatabaseService {
 
   private resolveIPks(pks: Array<IPrimaryKey>) {
     pks.forEach((fk) => {
-      let table: Table | undefined = [...this.inputSchema!.tables].find(
+      let table: Table | undefined = [...this.schema!.tables].find(
         (table) =>
           table.schemaName == fk.table_schema && table.name == fk.table_name
       );
       if (table) {
         table!.pk = new ColumnCombination(
-          ...table!.columns
+          table!.columns
             .asArray()
             .filter((column) => fk.attributes.includes(column.name))
         );
@@ -100,83 +105,96 @@ export class DatabaseService {
     );
   }
 
-  private resolveIFks(fks: Array<IForeignKey>) {
-    fks.forEach((fk) => {
-      let referencingTable = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.name == table.schemaAndName()
-      );
-      let referencedTable = [...this.inputSchema!.tables].find(
-        (table: Table) => fk.foreignName == table.schemaAndName()
-      );
+  private resolveIFks(iFks: Array<IForeignKey>) {
+    iFks.forEach((iFk) => {
+      let fk = new SourceRelationship();
+      for (const i in iFk.referencing) {
+        let referencingIColumn = iFk.referencing[i];
+        let referencingColumn = this.sourceColumns.get(
+          `${referencingIColumn.schemaIdentifier}.${referencingIColumn.tableIdentifier}.${referencingIColumn.columnIdentifier}`
+        );
 
-      if (referencingTable && referencedTable) {
-        let fkColumn = referencingTable.columns.columnFromName(fk.column)!;
-        let pkColumn = referencedTable.columns.columnFromName(
-          fk.foreignColumn
-        )!;
+        let referencedIColumn = iFk.referenced[i];
+        let referencedColumn = this.sourceColumns.get(
+          `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
+        );
 
-        let relationship =
-          [...this.inputSchema!.fks].find((rel) =>
-            rel.appliesTo(referencingTable!, referencedTable!)
-          ) || new Relationship();
-        relationship.add(fkColumn, pkColumn);
-        this.inputSchema!.addFk(relationship);
+        // in case the foreign key is not fully contained in the selection of tables
+        if (!referencingColumn || !referencedColumn) continue;
+
+        fk.referencing.push(referencingColumn);
+        fk.referenced.push(referencedColumn);
       }
+      if (fk.referencing.length > 0) this.schema!.addFk(fk);
     });
   }
 
-  private resolveInds(inds: Array<IInclusionDependency>) {
-    let schemaColumns = new Array<Column>();
-    this.inputSchema!.tables.forEach((table) => {
-      schemaColumns.push(...table.columns.asSet());
-    });
-    inds.forEach((ind) => {
-      let indRelationship = new Relationship();
-      let numColumns = ind.dependant.columnIdentifiers.length;
-      for (let i = 0; i < numColumns; i++) {
-        let dependantIColumn = ind.dependant.columnIdentifiers[i];
-        let dependantColumn = schemaColumns.find(
-          (column) =>
-            dependantIColumn.columnIdentifier == column.source.name &&
-            dependantIColumn.schemaIdentifier ==
-              column.source.table.schemaName &&
-            dependantIColumn.tableIdentifier == column.source.table.name
-        )!;
+  private resolveInds(iInds: Array<IInclusionDependency>) {
+    iInds.forEach((iInd) => {
+      let ind = new SourceRelationship();
+      for (const i in iInd.dependant.columnIdentifiers) {
+        let dependantIColumn = iInd.dependant.columnIdentifiers[i];
+        let dependantColumn = this.sourceColumns.get(
+          `${dependantIColumn.schemaIdentifier}.${dependantIColumn.tableIdentifier}.${dependantIColumn.columnIdentifier}`
+        );
 
-        let referencedIColumn = ind.referenced.columnIdentifiers[i];
-        let referencedColumn = schemaColumns.find(
-          (column) =>
-            referencedIColumn.columnIdentifier == column.source.name &&
-            referencedIColumn.schemaIdentifier ==
-              column.source.table.schemaName &&
-            referencedIColumn.tableIdentifier == column.source.table.name
-        )!;
+        let referencedIColumn = iInd.referenced.columnIdentifiers[i];
+        let referencedColumn = this.sourceColumns.get(
+          `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
+        );
 
-        indRelationship.add(dependantColumn, referencedColumn);
+        if (!dependantColumn || !referencedColumn) continue;
+
+        ind.referencing.push(dependantColumn!);
+        ind.referenced.push(referencedColumn!);
       }
-      this.inputSchema!.addInd(indRelationship);
+      if (ind.referencing.length > 0) this.schema!.addInd(ind);
     });
+  }
+
+  public resolveFds(fds: Array<IFunctionalDependency>, table: Table) {
+    for (const fd of fds) {
+      const lhs = fd.lhsColumns.map(
+        (colName) =>
+          this.sourceColumns.get(
+            `${table.schemaName}.${table.name}.${colName}`
+          )!
+      );
+      const rhs = fd.rhsColumns.map(
+        (colName) =>
+          this.sourceColumns.get(
+            `${table.schemaName}.${table.name}.${colName}`
+          )!
+      );
+      this.schema!.addFd(new SourceFunctionalDependency(lhs, rhs));
+    }
+    this.schema!.calculateFdsOf(table);
   }
 
   public async setInputTables(tables: Array<Table>) {
-    const indPromise = this.getINDs(tables);
-    const fdPromises: Record<
-      string,
-      Promise<Array<IFunctionalDependency>>
-    > = {};
-    for (const table of tables)
-      fdPromises[table.schemaAndName()] = this.getFDs(table);
+    const inds = this.getINDs(tables);
+    const fds = tables.map(
+      (table) =>
+        [table, this.getFDs(table)] as [Table, Promise<IFunctionalDependency[]>]
+    );
 
-    this.inputSchema = new Schema(...tables);
+    this.schema = new Schema(...tables);
     for (const table of tables) {
-      const iFDs = await fdPromises[table.schemaAndName()];
-
-      const fds = iFDs.map((fd) =>
-        FunctionalDependency.fromIFunctionalDependency(table, fd)
-      );
-      table.setFds(...fds);
+      let sourceTable = [...table.sources][0].table;
+      table.columns
+        .asArray()
+        .forEach((column) =>
+          this.sourceColumns.set(
+            `${sourceTable.fullName}.${column.sourceColumn.name}`,
+            column.sourceColumn
+          )
+        );
     }
-    this.resolveInds(await indPromise);
+
+    for (const [table, tableFds] of fds) {
+      this.resolveFds(await tableFds, table);
+    }
+    this.resolveInds(await inds);
     this.resolveIFks(this.iFks);
     this.resolveIPks(this.iPks);
   }
@@ -184,14 +202,14 @@ export class DatabaseService {
   private getFDs(table: Table): Promise<Array<IFunctionalDependency>> {
     return firstValueFrom(
       this.http.get<Array<IFunctionalDependency>>(
-        `${this.baseUrl}/tables/${table.schemaAndName()}/fds`
+        `${this.baseUrl}/tables/${table.fullName}/fds`
       )
     );
   }
 
   private getINDs(tables: Array<Table>): Promise<Array<IInclusionDependency>> {
     let tableNamesConcatenation = tables
-      .map((table) => table.schemaAndName())
+      .map((table) => table.fullName)
       .join(',');
     return firstValueFrom(
       this.http.get<Array<IInclusionDependency>>(
@@ -213,9 +231,9 @@ export class DatabaseService {
       columnRelationships: referenced.pk!.inOrder().map((element) => {
         return {
           referencingColumn:
-            relationship._referencing[
-              relationship._referenced.indexOf(
-                relationship._referenced.find((c) => c.equals(element))!
+            relationship.referencing[
+              relationship.referenced.indexOf(
+                relationship.referenced.find((c) => c.equals(element))!
               )
             ].name,
           referencedColumn: element.name,
@@ -263,7 +281,7 @@ export class DatabaseService {
         rel.toIRelationship()
       ),
       sourceTables: Array.from(table.sources).map(
-        (table) => `${table.schemaAndName()}`
+        (source) => `${source.table.fullName}`
       ),
       attributes: attributes.map((attr) => attr.toIAttribute()),
     };
@@ -303,11 +321,11 @@ export class DatabaseService {
     limit: number
   ): Promise<ITablePage> {
     // currently supports only check on "sourceTables".
-    if (table.sources.size != 1) throw Error('Not Implemented Exception');
+    if (table.sources.length != 1) throw Error('Not Implemented Exception');
 
     const data: IRequestBodyFDViolatingRows = {
-      schema: [...table.sources][0].schemaName,
-      table: [...table.sources][0].name,
+      schema: table.sources[0].table.schemaName,
+      table: table.sources[0].table.name,
       lhs: _lhs.map((c) => c.name),
       rhs: _rhs.map((c) => c.name),
       offset: offset,
@@ -324,11 +342,11 @@ export class DatabaseService {
     _rhs: Column[]
   ): Promise<number> {
     // currently supports only check on "sourceTables".
-    if (table.sources.size != 1) throw Error('Not Implemented Exception');
+    if (table.sources.length != 1) throw Error('Not Implemented Exception');
 
     const data: IRequestBodyFDViolatingRows = {
-      schema: [...table.sources][0].schemaName,
-      table: [...table.sources][0].name,
+      schema: table.sources[0].table.schemaName,
+      table: table.sources[0].table.name,
       lhs: _lhs.map((c) => c.name),
       rhs: _rhs.map((c) => c.name),
       offset: 0,

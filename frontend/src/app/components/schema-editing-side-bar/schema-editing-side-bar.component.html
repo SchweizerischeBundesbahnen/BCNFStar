@@ -1,6 +1,6 @@
 <div>
   <h2 *ngIf="!editingName; else editing">
-    {{ table.schemaAndName() }}
+    {{ table.fullName }}
     <sbb-icon svgIcon="kom:pen-small" (click)="editingName = true"></sbb-icon>
   </h2>
   <ng-template #editing>
@@ -33,11 +33,9 @@
         placeholder="Filter columns"
         [(ngModel)]="_fdClusterFilter"
       >
-        <sbb-option
-          *ngFor="let column of table.columns.asArray()"
-          [value]="column"
-          >{{ column.name }}</sbb-option
-        >
+        <sbb-option *ngFor="let column of table.columns" [value]="column">{{
+          column.name
+        }}</sbb-option>
       </sbb-select>
       <br />
       <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
@@ -97,7 +95,7 @@
       >
       <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
         <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
-          table.schemaAndName()
+          table.fullName
         }}</sbb-option>
       </sbb-select>
       <br />
@@ -109,13 +107,7 @@
           *ngFor="let rel of inds()"
           [value]="rel"
           style="display: block"
-          >{{
-            rel.relationship.referencing().toString() +
-              "->(" +
-              rel.referenced.schemaAndName() +
-              ") " +
-              rel.relationship.referenced().toString()
-          }}</sbb-radio-button
+          >{{ rel.toString() }}</sbb-radio-button
         >
       </sbb-radio-group>
       <ng-template #noInds>
@@ -136,7 +128,7 @@
     </sbb-expansion-panel>
     <sbb-expansion-panel
       [expanded]="false"
-      [hidden]="this.table.sources.size !== 1"
+      [hidden]="this.table.sources.length !== 1"
     >
       <sbb-expansion-panel-header
         >Check Contained Subtable</sbb-expansion-panel-header

@@ -11,9 +11,9 @@ import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Observable } from 'rxjs';
-import Relationship from '@/src/model/schema/Relationship';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
+import { TableRelationship } from '@/src/model/types/TableRelationship';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -37,11 +37,7 @@ export class SchemaGraphComponent implements AfterContentInit {
   @Input() public selectedColumns?: Map<Table, ColumnCombination>;
   @Input() public schemaChanged!: Observable<void>;
   @Output() public selectedTableChange = new EventEmitter<Table>();
-  @Output() public joinFk = new EventEmitter<{
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }>();
+  @Output() public joinFk = new EventEmitter<TableRelationship>();
 
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
@@ -147,7 +143,7 @@ export class SchemaGraphComponent implements AfterContentInit {
   private generateElements() {
     for (const table of this.schema.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
-        attrs: { root: { id: '__jointel__' + table.schemaAndName() } },
+        attrs: { root: { id: '__jointel__' + table.fullName } },
       });
       jointjsEl.attr({
         body: {
@@ -172,16 +168,10 @@ export class SchemaGraphComponent implements AfterContentInit {
 
   private addJoinButton(
     link: joint.shapes.standard.Link,
-    sourceTable: Table,
-    targetTable: Table,
-    relationship: Relationship
+    fk: TableRelationship
   ) {
     let joinTablesOnFks = () => {
-      this.joinFk.emit({
-        source: sourceTable,
-        target: targetTable,
-        relationship: relationship,
-      });
+      this.joinFk.emit(fk);
     };
 
     let joinButton = new joint.linkTools.Button({
@@ -224,13 +214,13 @@ export class SchemaGraphComponent implements AfterContentInit {
   private generateLinks() {
     for (const table of this.schema.tables) {
       for (const fk of this.schema.fksOf(table)) {
-        let fkReferenced = fk.relationship.referenced().asArray()[0];
-        let fkReferencing = fk.relationship.referencing().asArray()[0];
+        let fkReferenced = fk.relationship.referenced[0];
+        let fkReferencing = fk.relationship.referencing[0];
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
             port:
-              fkReferencing.source.table.schemaAndName() +
+              fkReferencing.sourceColumn.table.fullName +
               '.' +
               fkReferencing.name +
               '_right',
@@ -238,7 +228,7 @@ export class SchemaGraphComponent implements AfterContentInit {
           target: {
             id: this.graphStorage.get(fk.referenced)?.jointjsEl.id,
             port:
-              fkReferenced.source.table.schemaAndName() +
+              fkReferenced.sourceColumn.table.fullName +
               '.' +
               fkReferenced.name +
               '_left',
@@ -247,7 +237,7 @@ export class SchemaGraphComponent implements AfterContentInit {
         });
         this.graphStorage.get(table)?.links.set(fk.referenced, link);
         this.graph.addCell(link);
-        this.addJoinButton(link, table, fk.referenced, fk.relationship);
+        this.addJoinButton(link, fk);
       }
     }
   }
@@ -272,14 +262,14 @@ export class SchemaGraphComponent implements AfterContentInit {
     for (let column of table.columns.inOrder()) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
-        id: column.source.table.schemaAndName() + '.' + column.name + '_left', // generated if `id` value is not present
+        id: column.sourceColumn.table.fullName + '.' + column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
       args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
-        id: column.source.table.schemaAndName() + '.' + column.name + '_right', // generated if `id` value is not present
+        id: column.sourceColumn.table.fullName + '.' + column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
         args,
         markup: this.generatePortMarkup(args),

@@ -12,10 +12,10 @@ import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
-import Relationship from '@/src/model/schema/Relationship';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
+import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
 
 @Component({
@@ -38,7 +38,7 @@ export class SchemaEditingComponent {
     public dialog: SbbDialog,
     public router: Router
   ) {
-    this.schema = dataService.inputSchema!;
+    this.schema = dataService.schema!;
     if (!this.schema) router.navigate(['']);
     // this.schemaChanged.next();
   }
@@ -47,17 +47,8 @@ export class SchemaEditingComponent {
     this.selectedColumns = columns;
   }
 
-  public onJoin(event: {
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }): void {
-    let command = new JoinCommand(
-      this.schema,
-      event.target,
-      event.source,
-      event.relationship
-    );
+  public onJoin(fk: TableRelationship): void {
+    let command = new JoinCommand(this.schema, fk);
 
     command.onDo = () => {
       this.selectedTable = undefined;
@@ -97,13 +88,8 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onIndToFk(event: TableRelationship): void {
-    let command = new IndToFkCommand(
-      this.schema,
-      event.relationship,
-      event.referencing,
-      event.referenced
-    );
+  public onIndToFk(event: SourceRelationship): void {
+    let command = new IndToFkCommand(this.schema, event);
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();

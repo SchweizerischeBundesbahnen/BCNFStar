@@ -47,7 +47,9 @@ describe("The schema editing side bar", () => {
 
   it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {
     cy.get(".table-head-title").contains("public.part_partsupp").click();
-    cy.contains("s_nationkey->(public.nation_region_denormalized) n_nationkey");
+    cy.contains(
+      "(public.part_partsupp_supplier_denormalized) s_nationkey -> (public.nation_region_denormalized) n_nationkey"
+    );
   });
 
   it("displays the joining button", () => {

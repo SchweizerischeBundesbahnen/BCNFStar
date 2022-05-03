@@ -46,7 +46,7 @@
         [ngSwitch]="tableRowCounts.get(hoveredTable)! >= headLimit ? 1 : -1"
       >
         <h3>
-          <span>{{ hoveredTable.schemaAndName() }}</span>
+          <span>{{ hoveredTable.fullName }}</span>
         </h3>
         <sbb-table-wrapper class="table-wrapper">
           <table sbb-table [dataSource]="dataSource">

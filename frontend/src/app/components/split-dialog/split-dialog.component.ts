@@ -23,7 +23,7 @@ export class SplitDialogComponent {
     fd.rhs
       .copy()
       .setMinus(fd.lhs)
-      .asSet()
+      .asArray()
       .forEach((column) => {
         this.selectedColumns.set(column, true);
         this.columns.push(column);
@@ -41,7 +41,7 @@ export class SplitDialogComponent {
       .map(([column]) => column);
     let new_fd = new FunctionalDependency(
       this.fd.lhs,
-      new ColumnCombination(...new_rhs)
+      new ColumnCombination(new_rhs)
     );
     this.dialogRef.close({ fd: new_fd, name: this.tableName });
   }

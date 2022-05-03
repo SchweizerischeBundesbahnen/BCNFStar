@@ -4,23 +4,17 @@ import Table from '../schema/Table';
 import Command from './Command';
 
 export default class SplitCommand extends Command {
-  schema: Schema;
-  table: Table;
-  fd: FunctionalDependency;
   // Name of the newly created table
-  generatingName?: string;
-  children?: Array<Table>;
+  private generatingName?: string;
+  public children?: Array<Table>;
 
   public constructor(
-    schema: Schema,
-    table: Table,
-    fd: FunctionalDependency,
+    private schema: Schema,
+    public table: Table,
+    private fd: FunctionalDependency,
     generatingName?: string
   ) {
     super();
-    this.schema = schema;
-    this.table = table;
-    this.fd = fd;
     this.generatingName = generatingName;
   }
 
@@ -29,12 +23,12 @@ export default class SplitCommand extends Command {
   }
 
   protected override _undo(): void {
-    this.schema.delete(...this.children!);
-    this.schema.add(this.table);
+    this.schema.deleteTables(...this.children!);
+    this.schema.addTables(this.table);
   }
 
   protected override _redo(): void {
-    this.schema.delete(this.table);
-    this.schema.add(...this.children!);
+    this.schema.deleteTables(this.table);
+    this.schema.addTables(...this.children!);
   }
 }

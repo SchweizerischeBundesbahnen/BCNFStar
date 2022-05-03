@@ -2,14 +2,10 @@ import Table from '../schema/Table';
 import Command from './Command';
 
 export default class TableRenameCommand extends Command {
-  table: Table;
   oldName?: string;
-  newName: string;
 
-  public constructor(table: Table, name: string) {
+  public constructor(private table: Table, private newName: string) {
     super();
-    this.table = table;
-    this.newName = name;
   }
 
   protected override _do(): void {

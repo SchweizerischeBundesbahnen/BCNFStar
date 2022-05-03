@@ -5,17 +5,19 @@ import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
 import { TableRelationship } from '../types/TableRelationship';
-import TableIdentifier from './TableIdentifier';
-import ColumnIdentifier from './ColumnIdentifier';
+import SourceTable from './SourceTable';
+import SourceColumn from './SourceColumn';
+import SourceTableInstance from './SourceTableInstance';
+import SourceRelationship from './SourceRelationship';
 
 export default class Table {
   public name = '';
   public schemaName = '';
-  public columns = new ColumnCombination();
+  public columns;
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
-  public relationships = new Set<Relationship>();
-  public sources = new Set<TableIdentifier>();
+  public relationships = new Array<Relationship>();
+  public sources = new Array<SourceTableInstance>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
@@ -27,70 +29,117 @@ export default class Table {
     fds: Array<FunctionalDependency>;
   }>;
   /**
-  /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
-  public _fks!: Set<TableRelationship>;
+  public _fks!: Array<TableRelationship>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
-  public _inds!: Array<TableRelationship>;
+  public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
   /**
    * This variable tracks if the cached results fks and inds are still valid
    */
   public _relationshipsValid = true;
 
   public constructor(columns?: ColumnCombination) {
-    if (columns) this.columns = columns;
+    this.columns = columns || new ColumnCombination();
   }
 
   public static fromITable(iTable: ITable): Table {
-    let columns = new ColumnCombination();
-    let table = new Table(columns);
-    let tableIdentifier = new TableIdentifier(iTable.name, iTable.schemaName);
+    const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
+    const table = new Table();
+    const sourceTableInstance = table.addSource(sourceTable);
     iTable.attributes.forEach((iAttribute, index) => {
-      let columnIdentifier = new ColumnIdentifier(
+      const sourceColumn = new SourceColumn(
         iAttribute.name,
-        tableIdentifier
+        sourceTable,
+        iAttribute.dataType,
+        index,
+        iAttribute.nullable
       );
-      columns.add(
-        new Column(
-          iAttribute.name,
-          iAttribute.dataType,
-          index,
-          iAttribute.nullable,
-          columnIdentifier
-        )
+      table.columns.add(new Column(sourceTableInstance, sourceColumn));
+    });
+    table.name = sourceTable.name;
+    table.schemaName = sourceTable.schemaName;
+    return table;
+  }
+
+  /**
+   * This way of creating Table objects should not be used in production as important information (datatype and nullable) are missing
+   */
+  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
+    const sourceTable = new SourceTable(tableName, '');
+    const table = new Table();
+    const sourceTableInstance = table.addSource(sourceTable);
+
+    columnNames.forEach((name, i) => {
+      const sourceColumn = new SourceColumn(
+        name,
+        sourceTable,
+        'unknown data type',
+        i,
+        false
+      );
+      table.columns.add(new Column(sourceTableInstance, sourceColumn));
+    });
+    table.name = tableName;
+    table.schemaName = '';
+    return table;
+  }
+
+  /**
+   * finds a column in the tables columns which is equal to the given column.
+   * Returns the column itself if no equal column is found.
+   */
+  public findEqualSelectedColumn(column: Column): Column {
+    return (
+      this.columns.asArray().find((other) => other.equals(column)) || column
+    );
+  }
+
+  public establishIdentities() {
+    if (this.pk) {
+      this.pk = new ColumnCombination(
+        this.pk.asArray().map((column) => this.findEqualSelectedColumn(column))
+      );
+    }
+    this.relationships.forEach((relationship) => {
+      relationship.referencing = relationship.referencing.map((column) =>
+        this.findEqualSelectedColumn(column)
+      );
+      relationship.referenced = relationship.referenced.map((column) =>
+        this.findEqualSelectedColumn(column)
       );
     });
-    table.name = iTable.name;
-    table.schemaName = iTable.schemaName;
-    table.sources.add(tableIdentifier);
-    return table;
   }
 
-  public schemaAndName(): string {
-    return this.schemaName + '.' + this.name;
-  }
-
-  // should/must not be used in production as important information (datatype and nullable) are missing
-  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
-    const table: Table = new Table();
-    table.name = tableName;
-    let tableIdentifier = new TableIdentifier(tableName, '');
-    columnNames.forEach((name, i) =>
-      table.columns.add(
-        new Column(
-          name,
-          'unknown data type',
-          i,
-          false,
-          new ColumnIdentifier(name, tableIdentifier)
-        )
-      )
+  public addSource(
+    sourceTable: SourceTable,
+    name?: string
+  ): SourceTableInstance {
+    const newSource = new SourceTableInstance(sourceTable, name);
+    const sameAlias = this.sources.filter(
+      (source) => source.baseAlias == newSource.baseAlias
     );
-    table.sources.add(table);
-    return table;
+    newSource.id = sameAlias.length + 1;
+    if (sameAlias.length == 1) {
+      sameAlias[0].useAlias = true;
+      sameAlias[0].useId = true;
+    }
+    if (sameAlias.length >= 1) {
+      newSource.useAlias = true;
+      newSource.useId = true;
+    }
+
+    this.sources.push(newSource);
+    return newSource;
+  }
+
+  /**
+   * returns the name of the table in the format "{schemaName}.{tableName}"
+   */
+  public get fullName(): string {
+    return this.schemaName + '.' + this.name;
   }
 
   public get numColumns(): number {
@@ -102,8 +151,8 @@ export default class Table {
     this.fds = fds.filter((fd) => !fd.isFullyTrivial()); // needed?
   }
 
-  public addFd(lhs: ColumnCombination, rhs: ColumnCombination) {
-    this.fds.push(new FunctionalDependency(lhs, rhs));
+  public addFd(fd: FunctionalDependency) {
+    this.fds.push(fd);
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
@@ -114,114 +163,126 @@ export default class Table {
     return fd.rhs.copy();
   }
 
-  public split(
-    fd: FunctionalDependency,
-    generatingName?: string
-  ): Array<Table> {
-    let remaining: Table = new Table(this.remainingSchema(fd).setMinus(fd.lhs));
-    fd.lhs.asSet().forEach((column) => remaining.columns.add(column.copy()));
-    let generating: Table = new Table(this.generatingSchema(fd));
+  /**
+   * @returns the selected columns of each source (SourceTableInstance) of this table
+   */
+  public columnsBySource(): Map<SourceTableInstance, ColumnCombination> {
+    const result = new Map<SourceTableInstance, ColumnCombination>();
 
-    this.projectRelationships(remaining);
-    this.projectRelationships(generating);
+    for (const source of this.sources) {
+      result.set(source, new ColumnCombination());
+    }
 
-    this.projectFds(remaining);
-    this.projectFds(generating);
-
-    remaining.pk = this.pk;
-    generating.pk = fd.lhs.copy();
-
-    remaining.schemaName = this.schemaName;
-    remaining.name = this.name;
-
-    generating.schemaName = this.schemaName;
-    generating.name =
-      generatingName || fd.lhs.columnNames().join('_').substring(0, 50);
-
-    return [remaining, generating];
+    for (const column of this.columns) {
+      result.get(column.sourceTableInstance)!.add(column);
+    }
+    return result;
   }
 
-  public projectRelationships(table: Table): void {
-    // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
-    let neededSourceTables = new Set(table.columns.sourceTables());
-    let sourceTables = new Set(this.sources);
-    let relationships = new Set(this.relationships);
-
-    let toRemove: Set<TableIdentifier>;
-    do {
-      toRemove = new Set();
-      sourceTables.forEach((sourceTable) => {
-        let adjacentRelationship = [...relationships].filter(
-          (rel) =>
-            rel.referenced().sourceTable() == sourceTable ||
-            rel.referencing().sourceTable() == sourceTable
-        );
-        if (
-          adjacentRelationship.length == 1 &&
-          !neededSourceTables.has(sourceTable)
-        ) {
-          toRemove.add(sourceTable);
-          relationships.delete(adjacentRelationship[0]);
-        }
-      });
-      toRemove.forEach((table) => sourceTables.delete(table));
-    } while (toRemove.size > 0);
-
-    table.sources = sourceTables;
-    table.relationships = relationships;
+  /**
+   * Returns the sources of which not all rows of the original source table are found in this table
+   */
+  public reducedSources(): Array<SourceTableInstance> {
+    const result = new Array<SourceTableInstance>();
+    for (const rel of this.relationships) {
+      const instance = new ColumnCombination(
+        rel.referenced
+      ).sourceTableInstance();
+      if (result.includes(instance)) {
+        console.error('one instance is referenced by multiple relationships');
+        continue;
+      }
+      result.push(instance);
+    }
+    return result;
   }
 
-  public projectFds(table: Table): void {
-    this.fds.forEach((fd) => {
-      if (fd.lhs.isSubsetOf(table.columns)) {
-        fd = new FunctionalDependency(
-          fd.lhs.copy(),
-          fd.rhs.copy().intersect(table.columns)
-        );
-        if (!fd.isFullyTrivial()) {
-          table.fds.push(fd);
+  public isRoot(source: SourceTableInstance) {
+    return !this.relationships.some(
+      (rel) => rel.referenced[0].sourceTableInstance == source
+    );
+  }
+
+  /**
+   * @returns all sets of columns - each set coming mostly from the same SourceTableInstance - which match the sourceColumns.
+   * Columns from other SourceTableInstances can be included in one match, if the columns have the same values as the
+   * equivalent column from the same SourceTableInstance would have.
+   * @param sourceColumns columns to be matched. Must come from the same SourceTable
+   * @param allowReduced do we want matches which come from reduced sources (see reducedSources)
+   */
+  public columnsEquivalentTo(
+    sourceColumns: Array<SourceColumn>,
+    allowReduced: boolean
+  ): Array<Array<Column>> {
+    const result = new Array<Array<Column>>();
+    const sourceTable = sourceColumns[0].table;
+
+    const columnsBySource = this.columnsBySource();
+
+    const ambiguous = new Map<Column, Column>();
+    if (allowReduced) {
+      for (const rel of this.relationships) {
+        for (const i in rel.referencing) {
+          columnsBySource
+            .get(rel.referenced[i].sourceTableInstance)!
+            .add(rel.referenced[i]);
+          ambiguous.set(rel.referenced[i], rel.referencing[i]);
         }
       }
-    });
+    }
+
+    for (const [sourceTableInstance, columns] of columnsBySource.entries()) {
+      if (!sourceTableInstance.table.equals(sourceTable)) continue;
+      if (!allowReduced && this.reducedSources().includes(sourceTableInstance))
+        continue;
+
+      let equivalentColumns = columns.columnsEquivalentTo(sourceColumns, true);
+      if (!equivalentColumns) continue;
+      if (allowReduced) {
+        const selectedEquivalentColumns = equivalentColumns.map((column) => {
+          if (this.columns.includes(column)) return column;
+          while (ambiguous.has(column)) {
+            column = ambiguous.get(column)!;
+            if (this.columns.includes(column)) return column;
+          }
+          return undefined;
+        });
+        if (selectedEquivalentColumns.some((column) => !column)) continue;
+        equivalentColumns = selectedEquivalentColumns as Array<Column>;
+      }
+      result.push(equivalentColumns);
+    }
+    return result;
   }
 
-  public join(otherTable: Table, relationship: Relationship): Table {
-    let remaining = relationship.appliesTo(this, otherTable)
-      ? this
-      : otherTable;
-    let generating = relationship.appliesTo(this, otherTable)
-      ? otherTable
-      : this;
+  /**
+   * returns all sources in an order so that every referenced table comes before their referencing table.
+   */
+  public sourcesTopological(): Array<SourceTableInstance> {
+    const result = new Array<SourceTableInstance>();
+    const numReferenced = new Map<SourceTableInstance, number>();
+    const referencings = new Map<SourceTableInstance, SourceTableInstance>();
 
-    // columns
-    let newTable = new Table(
-      generating.columns
-        .copy()
-        .union(remaining.columns)
-        .setMinus(relationship.referencing())
-        .union(relationship.referenced())
-    );
-
-    // relationships
-    this.relationships.forEach((rel) => newTable.relationships.add(rel));
-    otherTable.relationships.forEach((rel) => newTable.relationships.add(rel));
-    if (!relationship.referenced().equals(relationship.referencing()))
-      newTable.relationships.add(relationship);
-
-    // name, pk
-    newTable.name = remaining.name;
-    newTable.pk = remaining.pk
-      ? relationship.referencingToReferencedColumnsIn(remaining.pk)
-      : undefined;
-    newTable.schemaName = remaining.schemaName;
-
-    // source tables
-    this.sources.forEach((sourceTable) => newTable.sources.add(sourceTable));
-    otherTable.sources.forEach((sourceTable) =>
-      newTable.sources.add(sourceTable)
-    );
-
-    return newTable;
+    for (const source of this.sources) {
+      numReferenced.set(source, 0);
+    }
+    for (const rel of this.relationships) {
+      const referencing = rel.referencing[0].sourceTableInstance;
+      const referenced = rel.referenced[0].sourceTableInstance;
+      numReferenced.set(referencing, numReferenced.get(referencing)! + 1);
+      referencings.set(referenced, referencing);
+    }
+    while (numReferenced.size > 0) {
+      const current = this.sources.find(
+        (source) => numReferenced.get(source) == 0
+      )!;
+      result.push(current);
+      numReferenced.delete(current);
+      const referencing = referencings.get(current);
+      if (referencing)
+        numReferenced.set(referencing, numReferenced.get(referencing)! - 1);
+    }
+    return result;
   }
 
   public isKeyFd(fd: FunctionalDependency): boolean {

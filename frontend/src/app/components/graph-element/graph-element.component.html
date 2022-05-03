@@ -1,7 +1,7 @@
 <div class="container px-0" [ngStyle]="bbox">
-  <div class="table-head ellipsis" [sbbTooltip]="table.schemaAndName()">
+  <div class="table-head ellipsis" [sbbTooltip]="table.fullName">
     <span class="table-head-title" (click)="select()">
-      {{ table.schemaAndName() }}
+      {{ table.fullName }}
     </span>
   </div>
   <div
