@@ -2,12 +2,16 @@
 
 describe("The metanome settings dialog", () => {
   beforeEach(() => {
+    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
+    cy.get("tr").should("have.length.at.least", 1);
+    cy.get(".delete-all-btn").click();
     cy.visitFrontend();
     cy.selectTablesAndGo();
   });
 
-  afterEach(() => {
+  after(() => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
+    cy.get("tr").should("have.length.at.least", 1);
     cy.get(".delete-all-btn").click();
   });
 
@@ -394,26 +398,34 @@ describe("The metanome settings dialog", () => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
     cy.get("tr").should("have.length", 4);
 
-    cy.get(
-      "tr:contains('public.part_partsupp_supplier_denormalized')"
-    ).contains("memory: 1G");
-    cy.get(
-      "tr:contains('public.part_partsupp_supplier_denormalized')"
-    ).contains("MAX_DETERMINANT_SIZE: 4");
-
-    cy.get("tr:contains('public.nation_region_denormalized')").contains(
-      "memory: 2G"
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "memory: 1G",
+      { force: true }
     );
-    cy.get("tr:contains('public.nation_region_denormalized')").contains(
-      "NULL_EQUALS_NULL: false"
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "MAX_DETERMINANT_SIZE: 4",
+      { force: true }
+    );
+
+    cy.get("tr:contains('public.nation_region_denormalized')").should(
+      "contain",
+      "memory: 2G",
+      { force: true }
+    );
+    cy.get("tr:contains('public.nation_region_denormalized')").should(
+      "contain",
+      "NULL_EQUALS_NULL: false",
+      { force: true }
     );
 
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
-    ).contains("DETECT_NARY: true");
+    ).should("contain", "DETECT_NARY: true", { force: true });
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
-    ).contains("MAX_NARY_LEVEL: 2");
+    ).should("contain", "MAX_NARY_LEVEL: 2", { force: true });
   });
 
   it("chooses new random configuration settings (HyFD, HyFD, FAIDA) and loads schema editing page", () => {
@@ -435,25 +447,33 @@ describe("The metanome settings dialog", () => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
     cy.get("tr").should("have.length", 4);
 
-    cy.get(
-      "tr:contains('public.part_partsupp_supplier_denormalized')"
-    ).contains("memory: 100M");
-    cy.get(
-      "tr:contains('public.part_partsupp_supplier_denormalized')"
-    ).contains("INPUT_ROW_LIMIT: 3");
-
-    cy.get("tr:contains('public.nation_region_denormalized')").contains(
-      "memory: 200M"
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "memory: 100M",
+      { force: true }
     );
-    cy.get("tr:contains('public.nation_region_denormalized')").contains(
-      "VALIDATE_PARALLEL: false"
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "INPUT_ROW_LIMIT: 3",
+      { force: true }
+    );
+
+    cy.get("tr:contains('public.nation_region_denormalized')").should(
+      "contain",
+      "memory: 200M",
+      { force: true }
+    );
+    cy.get("tr:contains('public.nation_region_denormalized')").should(
+      "contain",
+      "VALIDATE_PARALLEL: false",
+      { force: true }
     );
 
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
-    ).contains("IGNORE_NULL: false");
+    ).should("contain", "IGNORE_NULL: false", { force: true });
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
-    ).contains("SAMPLE_GOAL: 600");
+    ).should("contain", "SAMPLE_GOAL: 600", { force: true });
   });
 });

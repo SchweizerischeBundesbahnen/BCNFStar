@@ -10,6 +10,7 @@ describe("The metanome results page", () => {
 
   beforeEach(() => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
+    cy.get("tr").should("have.length.at.least", 1);
   });
 
   it("renders", () => {
@@ -41,11 +42,11 @@ describe("The metanome results page", () => {
   });
 
   it("delete specific metanome result", () => {
-    cy.get(".delete-btn").should("have.length", 3);
     cy.contains(hyfdAlgorithmName);
     cy.get("tr")
       .its("length")
       .then((length) => {
+        cy.get(".delete-btn").should("have.length", length - 1);
         cy.get(".delete-btn").first().click();
         cy.get("body").should(
           "not.contain",
