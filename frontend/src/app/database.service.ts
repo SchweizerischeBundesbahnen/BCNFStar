@@ -93,7 +93,9 @@ export class DatabaseService {
         table!.pk = new ColumnCombination(
           table!.columns
             .asArray()
-            .filter((column) => fk.attributes.includes(column.name))
+            .filter((column) =>
+              fk.attributes.includes(column.sourceColumn.name)
+            )
         );
       }
     });

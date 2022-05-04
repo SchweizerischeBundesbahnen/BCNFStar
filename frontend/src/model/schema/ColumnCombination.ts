@@ -130,6 +130,10 @@ export default class ColumnCombination {
     return this.inOrder().map((col) => col.name);
   }
 
+  public sourceColumnNames(): Array<string> {
+    return this.inOrder().map((col) => col.sourceColumn.name);
+  }
+
   public toString(): string {
     return this.columnNames().join(', ');
   }

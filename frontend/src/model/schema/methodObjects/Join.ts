@@ -17,7 +17,6 @@ export default class Join {
   public constructor(
     private schema: Schema,
     fk: TableRelationship,
-    private duplicate: boolean,
     private name?: string
   ) {
     this.referencing = fk.referencing;
@@ -25,10 +24,6 @@ export default class Join {
     this.relationship = fk.relationship;
 
     this.join();
-
-    this.schema.addTables(this.newTable);
-    this.schema.deleteTables(this.referencing);
-    if (!this.duplicate) this.schema.deleteTables(this.referenced);
 
     this.schema.calculateFdsOf(this.newTable);
   }
@@ -47,7 +42,6 @@ export default class Join {
     this.newTable.relationships.push(...this.referencing.relationships);
 
     // sources and relationships from referenced table
-
     for (const source of this.referenced.sourcesTopological().reverse()) {
       if (this.referenced.isRoot(source)) {
         if (this.relationship.sourceRelationship().isTrivial) {
@@ -88,13 +82,16 @@ export default class Join {
 
     // columns from referenced table
     this.newTable.columns.add(
-      ...this.referenced.columns
-        .copy()
-        .setMinus(new ColumnCombination(this.relationship.referenced))
-        .applySourceMapping(this.sourceMapping)
+      ...this.referenced.columns.applySourceMapping(this.sourceMapping)
     );
-
     this.newTable.establishIdentities();
+    if (!this.relationship.sourceRelationship().isTrivial) {
+      this.newTable.columns.delete(
+        ...this.relationship.referenced.map((column) =>
+          column.applySourceMapping(this.sourceMapping)
+        )
+      );
+    }
   }
 
   private findEquivalentSource(

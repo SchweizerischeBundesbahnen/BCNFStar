@@ -277,7 +277,6 @@ export default class Schema {
         );
         if (fd.isFullyTrivial()) continue;
         if (
-          fd.lhs.asArray().every((column) => table.columns.includes(column)) &&
           fd.rhs.asArray().every((column) => table.columns.includes(column))
         ) {
           table.addFd(fd);
@@ -342,7 +341,10 @@ export default class Schema {
     fd: FunctionalDependency,
     generatingName?: string
   ) {
-    return new Split(this, table, fd, generatingName).newTables!;
+    const splitObject = new Split(table, fd, generatingName);
+    this.addTables(...splitObject.newTables!);
+    this.deleteTables(table);
+    return splitObject.newTables!;
   }
 
   public autoNormalize(...table: Array<Table>): Array<Table> {
@@ -361,6 +363,10 @@ export default class Schema {
   }
 
   public join(fk: TableRelationship, duplicate: boolean) {
-    return new Join(this, fk, duplicate).newTable;
+    const joinObject = new Join(this, fk);
+    this.addTables(joinObject.newTable);
+    this.deleteTables(fk.referencing);
+    if (!duplicate) this.deleteTables(fk.referenced);
+    return joinObject.newTable;
   }
 }
