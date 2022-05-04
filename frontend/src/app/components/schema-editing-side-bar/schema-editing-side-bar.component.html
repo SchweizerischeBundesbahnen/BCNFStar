@@ -126,5 +126,12 @@
         Create Foreign Key
       </button>
     </sbb-expansion-panel>
+    <sbb-expansion-panel [expanded]="true">
+      <sbb-expansion-panel-header>Union </sbb-expansion-panel-header>
+      <app-union-sidebar
+        [schema]="this.schema"
+        [table]="this.table"
+      ></app-union-sidebar>
+    </sbb-expansion-panel>
   </sbb-accordion>
 </div>

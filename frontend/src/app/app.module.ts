@@ -26,6 +26,8 @@ import { UndoRedoComponent } from './components/undo-redo/undo-redo.component';
 import { SplitDialogComponent } from './components/split-dialog/split-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
+import { UnionSidebarComponent } from './components/union-sidebar/union-sidebar.component';
+import { UnionDialogComponent } from './components/union-dialog/union-dialog.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/
     UndoRedoComponent,
     SplitDialogComponent,
     MetanomeResultsViewerComponent,
+    UnionSidebarComponent,
+    UnionDialogComponent,
   ],
   imports: [
     BrowserModule,
