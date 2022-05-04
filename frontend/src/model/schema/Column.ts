@@ -14,7 +14,10 @@ export default class Column {
   ) {}
 
   public get name() {
-    return this.alias || this.sourceColumn.name;
+    return (
+      this.alias ||
+      `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`
+    );
   }
 
   public copy(): Column {

@@ -277,7 +277,6 @@ export default class Schema {
         );
         if (fd.isFullyTrivial()) continue;
         if (
-          fd.lhs.asArray().every((column) => table.columns.includes(column)) &&
           fd.rhs.asArray().every((column) => table.columns.includes(column))
         ) {
           table.addFd(fd);
