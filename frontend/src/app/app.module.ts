@@ -28,6 +28,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { CustomFunctionalDependencySideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
 import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
+import { JoinDialogComponent } from './components/join-dialog/join-dialog.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-
     GraphElementComponent,
     UndoRedoComponent,
     SplitDialogComponent,
+    JoinDialogComponent,
     MetanomeResultsViewerComponent,
     CustomFunctionalDependencySideBarComponent,
     ViolatingRowsViewComponent,

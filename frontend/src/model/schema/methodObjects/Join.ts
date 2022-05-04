@@ -17,6 +17,7 @@ export default class Join {
   public constructor(
     private schema: Schema,
     fk: TableRelationship,
+    private duplicate: boolean,
     private name?: string
   ) {
     this.referencing = fk.referencing;
@@ -27,7 +28,7 @@ export default class Join {
 
     this.schema.addTables(this.newTable);
     this.schema.deleteTables(this.referencing);
-    this.schema.deleteTables(this.referenced);
+    if (!this.duplicate) this.schema.deleteTables(this.referenced);
 
     this.schema.calculateFdsOf(this.newTable);
   }

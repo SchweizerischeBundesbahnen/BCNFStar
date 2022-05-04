@@ -1,0 +1,14 @@
+<div sbbDialogTitle>Join Options</div>
+<div sbbDialogContent>
+  Name of this join
+  <input type="text" sbbInput [(ngModel)]="name" placeholder="" />
+  <div class="sbb-checkbox-group-vertical">
+    <sbb-checkbox [(ngModel)]="duplicate">
+      Duplicate the referenced table before joining
+    </sbb-checkbox>
+  </div>
+</div>
+<div sbbDialogActions>
+  <button sbb-button (click)="confirm()" cdkFocusInitial>Ok</button>
+  <button sbb-secondary-button sbbDialogClose>Cancel</button>
+</div>

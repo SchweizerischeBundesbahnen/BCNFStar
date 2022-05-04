@@ -360,7 +360,7 @@ export default class Schema {
     return resultingTables;
   }
 
-  public join(fk: TableRelationship) {
-    return new Join(this, fk).newTable;
+  public join(fk: TableRelationship, duplicate: boolean) {
+    return new Join(this, fk, duplicate).newTable;
   }
 }

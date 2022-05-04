@@ -11,12 +11,13 @@ import { Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
-import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
+import SourceRelationship from '@/src/model/schema/SourceRelationship';
 
 @Component({
   selector: 'app-schema-editing',
@@ -47,8 +48,20 @@ export class SchemaEditingComponent {
     this.selectedColumns = columns;
   }
 
-  public onJoin(fk: TableRelationship): void {
-    let command = new JoinCommand(this.schema, fk);
+  public onClickJoin(fk: TableRelationship): void {
+    const dialogRef = this.dialog.open(JoinDialogComponent, {
+      data: fk,
+    });
+
+    dialogRef
+      .afterClosed()
+      .subscribe((value: { duplicate: boolean; name?: string }) => {
+        this.onJoin(fk, value.duplicate);
+      });
+  }
+
+  public onJoin(fk: TableRelationship, duplicate: boolean): void {
+    let command = new JoinCommand(this.schema, fk, duplicate);
 
     command.onDo = () => {
       this.selectedTable = undefined;
