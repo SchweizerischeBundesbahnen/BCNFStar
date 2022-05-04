@@ -8,6 +8,7 @@ import {
   IRequestBodyDataTransferSql,
   IRequestBodyForeignKeySql,
 } from '@server/definitions/IBackendAPI';
+import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import Relationship from '../model/schema/Relationship';
@@ -309,6 +310,50 @@ export class DatabaseService {
         `${this.baseUrl}/persist/createPrimaryKey`,
         data
       )
+    );
+  }
+
+  public async loadViolatingRowsForFD(
+    table: Table,
+    _lhs: Column[],
+    _rhs: Column[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    // currently supports only check on "sourceTables".
+    if (table.sources.length != 1) throw Error('Not Implemented Exception');
+
+    const data: IRequestBodyFDViolatingRows = {
+      schema: table.sources[0].table.schemaName,
+      table: table.sources[0].table.name,
+      lhs: _lhs.map((c) => c.name),
+      rhs: _rhs.map((c) => c.name),
+      offset: offset,
+      limit: limit,
+    };
+    return firstValueFrom(
+      this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
+    );
+  }
+
+  public async loadViolatingRowsForFDCount(
+    table: Table,
+    _lhs: Column[],
+    _rhs: Column[]
+  ): Promise<number> {
+    // currently supports only check on "sourceTables".
+    if (table.sources.length != 1) throw Error('Not Implemented Exception');
+
+    const data: IRequestBodyFDViolatingRows = {
+      schema: table.sources[0].table.schemaName,
+      table: table.sources[0].table.name,
+      lhs: _lhs.map((c) => c.name),
+      rhs: _rhs.map((c) => c.name),
+      offset: 0,
+      limit: 0,
+    };
+    return firstValueFrom(
+      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/fd`, data)
     );
   }
 

@@ -126,5 +126,14 @@
         Create Foreign Key
       </button>
     </sbb-expansion-panel>
+    <sbb-expansion-panel
+      [expanded]="false"
+      [hidden]="this.table.sources.size !== 1"
+    >
+      <sbb-expansion-panel-header
+        >Check Contained Subtable</sbb-expansion-panel-header
+      >
+      <app-check-fd [table]="this.table"></app-check-fd>
+    </sbb-expansion-panel>
   </sbb-accordion>
 </div>
