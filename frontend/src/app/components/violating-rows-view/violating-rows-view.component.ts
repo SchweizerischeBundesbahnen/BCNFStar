@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 import { DataQuery } from '../../dataquery';
 
@@ -7,7 +7,7 @@ import { DataQuery } from '../../dataquery';
   templateUrl: './violating-rows-view.component.html',
   styleUrls: ['./violating-rows-view.component.css'],
 })
-export class ViolatingRowsViewComponent {
+export class ViolatingRowsViewComponent implements OnInit {
   public dataService: DataQuery;
   public rowCount: number = 0;
   constructor(
