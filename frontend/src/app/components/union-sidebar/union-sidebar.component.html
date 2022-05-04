@@ -1,8 +1,12 @@
-<sbb-select placeholder="Select table to union with" [(ngModel)]="otherTable">
-  <sbb-option *ngFor="let table of filteredTables()" [value]="table">{{
-    table.fullName
-  }}</sbb-option>
-</sbb-select>
-<button sbb-button [disabled]="!otherTable" (click)="openDialog()">
-  Match Columns
-</button>
+<div>
+  <sbb-select placeholder="Select table to union with" [(ngModel)]="otherTable">
+    <sbb-option *ngFor="let table of filteredTables()" [value]="table">{{
+      table.fullName
+    }}</sbb-option>
+  </sbb-select>
+</div>
+<div>
+  <button sbb-button [disabled]="!otherTable" (click)="openDialog()">
+    Match Columns
+  </button>
+</div>

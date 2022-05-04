@@ -30,7 +30,7 @@ export class UnionSidebarComponent implements OnInit {
       data: {
         table1: this.table,
         table2: this.otherTable,
-      },
+      }, //panelClass: "union-dialog"
     });
 
     const result = await firstValueFrom(dialogRef.afterClosed());

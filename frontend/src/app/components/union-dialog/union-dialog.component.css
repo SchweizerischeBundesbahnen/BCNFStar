@@ -1,0 +1,19 @@
+select {
+    width: 30px;
+}
+
+.union-dialog {
+    width: 50vw;
+}
+
+.matching-column {
+    text-align-last: left;
+    font-weight: bold;
+    width: 50%;
+}
+
+.select-matching-columns {
+    text-align: right;
+    align-items: stretch;
+    width: 50%;
+}
