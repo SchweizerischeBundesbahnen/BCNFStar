@@ -29,7 +29,6 @@ export class CustomFunctionalDependencySideBarComponent {
     this._rhs = this._rhs.filter((c) => !this._lhs.includes(c));
 
     const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
-      this.dataService,
       this.table,
       this._lhs,
       this._rhs

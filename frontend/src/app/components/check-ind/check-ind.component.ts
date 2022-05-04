@@ -51,10 +51,7 @@ export class CheckIndComponent {
   }
 
   public async checkInd(): Promise<void> {
-    const dataQuery = new ViolatingINDRowsDataQuery(
-      this.dataService,
-      this.relationship
-    );
+    const dataQuery = new ViolatingINDRowsDataQuery(this.relationship);
     const rowCount: number = await dataQuery.loadRowCount();
 
     if (rowCount == 0) {
