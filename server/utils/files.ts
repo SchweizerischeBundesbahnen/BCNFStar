@@ -8,12 +8,10 @@ function getAbsoluteServerDir() {
 }
 export const absoluteServerDir = getAbsoluteServerDir();
 
-export function pathSplit(path: string): string[] {
-  const result = parse(path);
-  return [result["dir"], result["base"]];
-}
-
-export function getStaticDir() {
+/**
+ * @returns Absolute path of the frontend files that shall be served statically
+ */
+export function getStaticDir(): string {
   return join(
     absoluteServerDir,
     "..",
