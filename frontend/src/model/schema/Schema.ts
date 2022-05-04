@@ -77,6 +77,17 @@ export default class Schema {
     this.tables.forEach((table) => (table._relationshipsValid = valid));
   }
 
+  public numReferences(table: Table): number {
+    let count = 0;
+    for (let otherTable of this.tables) {
+      if (otherTable == table) continue;
+      count += this.fksOf(otherTable).filter(
+        (fk) => fk.referenced == table
+      ).length;
+    }
+    return count;
+  }
+
   public fksOf(table: Table): Array<TableRelationship> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._fks;

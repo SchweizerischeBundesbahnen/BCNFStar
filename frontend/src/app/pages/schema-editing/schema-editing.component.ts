@@ -50,7 +50,7 @@ export class SchemaEditingComponent {
 
   public onClickJoin(fk: TableRelationship): void {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
-      data: fk,
+      data: { fk: fk, schema: this.schema },
     });
 
     dialogRef
