@@ -5,54 +5,80 @@
   </h3>
   <div>
     <sbb-select
+      style="width: 100%"
+      (ngModelChange)="this.onTableSelected($event)"
       [(ngModel)]="this.referencedTable"
       placeholder="Referenced Table"
     >
       <sbb-option *ngFor="let table of this.validTables()" [value]="table">{{
-        table.name
+        table.schemaAndName()
       }}</sbb-option>
     </sbb-select>
   </div>
   <div *ngIf="this.referencedTable">
-    <div>
-      <div>
-        <sbb-select
-          [(ngModel)]="this.referencingColumn"
-          placeholder="Referencing Column"
+    <div *ngFor="let refColumn of this.referencingColumns(); index as i">
+      <div class="d-flex align-items-center">
+        <input
+          disabled="true"
+          style="width: 40%"
+          sbbInput
+          [value]="refColumn.name"
+        />
+        <input
+          disabled="true"
+          style="width: 40%"
+          sbbInput
+          [value]="this.referencedColumns()[i].name"
+        />
+        <button
+          style="width: 20%"
+          type="button"
+          (click)="this.removeColumnRelation(i)"
         >
-          <sbb-option
-            *ngFor="let column of referencingTable.columns.asArray()"
-            [value]="column"
-            >{{ column.name }}
-          </sbb-option>
-        </sbb-select>
+          <sbb-icon svgIcon="kom:cross-small"></sbb-icon>
+        </button>
       </div>
-      <div>
-        <sbb-select
-          [(ngModel)]="this.referencedColumn"
-          placeholder="Referenced Column"
-        >
-          <sbb-option
-            *ngFor="let column of referencedTable.columns.asArray()"
-            [value]="column"
-            >{{ column.name }}
-          </sbb-option>
-        </sbb-select>
-      </div>
+    </div>
+    <div class="d-flex align-items-center">
+      <sbb-select
+        style="width: 40%"
+        [(ngModel)]="this.referencingColumn"
+        placeholder="Referencing Column"
+      >
+        <sbb-option
+          *ngFor="let column of this.validReferencingColumns()"
+          [value]="column"
+          >{{ column.name }}
+        </sbb-option>
+      </sbb-select>
+      <sbb-select
+        style="width: 40%"
+        [(ngModel)]="this.referencedColumn"
+        placeholder="Referenced Column"
+      >
+        <sbb-option
+          *ngFor="let column of this.validReferencedColumns()"
+          [value]="column"
+          >{{ column.name }}
+        </sbb-option>
+      </sbb-select>
+
       <button
+        style="width: 20%"
         type="button"
         (click)="addColumnRelation()"
         [disabled]="!canAddColumnRelation()"
       >
-        <sbb-icon svgIcon="kom:tick-small"></sbb-icon>
-      </button>
-      <button type="button" (click)="this.removeColumnRelation()">
-        <sbb-icon svgIcon="kom:cross-small"></sbb-icon>
+        <sbb-icon svgIcon="kom:plus-small"></sbb-icon>
       </button>
     </div>
-    <p>{{ this.relationshipString() }}</p>
     <div>
-      <button sbb-button (click)="checkInd()" [disabled]="!canCheckIND()">
+      <button
+        style="width: 100%"
+        sbb-button
+        (click)="checkInd()"
+        [disabled]="!canCheckIND()"
+      >
         Check Inclusion Dependency
       </button>
     </div>

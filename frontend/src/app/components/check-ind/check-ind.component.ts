@@ -30,11 +30,6 @@ export class CheckIndComponent {
 
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
-  public addColumnRelation(): void {
-    this.relationship._referencing.push(this.referencingColumn!);
-    this.relationship._referenced.push(this.referencedColumn!);
-  }
-
   public canAddColumnRelation(): boolean {
     if (
       this.referencingColumn == undefined ||
@@ -45,6 +40,14 @@ export class CheckIndComponent {
       this.relationship._referencing.includes(this.referencingColumn!) ||
       this.relationship._referenced.includes(this.referencedColumn)
     );
+  }
+
+  public addColumnRelation(): void {
+    this.referencedColumns().push(this.referencedColumn!);
+    this.referencingColumns().push(this.referencingColumn!);
+
+    this.referencedColumn = undefined;
+    this.referencingColumn = undefined;
   }
 
   public async checkInd(): Promise<void> {
@@ -65,6 +68,13 @@ export class CheckIndComponent {
     }
   }
 
+  public onTableSelected(table: Table) {
+    if (table.schemaAndName() != this.referencedTable?.schemaAndName()) {
+      this.relationship._referenced = [];
+      this.relationship._referencing = [];
+    }
+  }
+
   public tableSelected(): boolean {
     return this.referencedTable != undefined;
   }
@@ -74,18 +84,31 @@ export class CheckIndComponent {
   }
 
   public canCheckIND(): boolean {
-    return this.relationship._referenced.length != 0;
+    return this.referencingColumns().length != 0;
   }
 
-  public removeColumnRelation(): void {
-    this.relationship._referenced = [];
-    this.relationship._referencing = [];
-    this.referencingColumn = undefined;
-    this.referencedColumn = undefined;
+  public removeColumnRelation(index: number): void {
+    this.referencingColumns().splice(index, 1);
+    this.referencedColumns().splice(index, 1);
   }
 
-  public relationshipString(): string {
-    if (this.relationship._referenced.length == 0) return '';
-    return this.relationship.toString();
+  public referencingColumns(): Array<Column> {
+    return this.relationship._referencing;
+  }
+
+  public referencedColumns(): Array<Column> {
+    return this.relationship._referenced;
+  }
+
+  public validReferencingColumns(): Array<Column> {
+    return this.referencingTable.columns
+      .asArray()
+      .filter((c) => !this.referencingColumns().includes(c));
+  }
+
+  public validReferencedColumns(): Array<Column> {
+    return this.referencedTable!.columns.asArray().filter(
+      (c) => !this.referencedColumns().includes(c)
+    );
   }
 }
