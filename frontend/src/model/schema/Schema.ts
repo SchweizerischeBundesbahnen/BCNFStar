@@ -362,8 +362,8 @@ export default class Schema {
     return resultingTables;
   }
 
-  public join(fk: TableRelationship, duplicate: boolean) {
-    const joinObject = new Join(this, fk);
+  public join(fk: TableRelationship, duplicate: boolean, name?: string) {
+    const joinObject = new Join(this, fk, name);
     this.addTables(joinObject.newTable);
     this.deleteTables(fk.referencing);
     if (!duplicate) this.deleteTables(fk.referenced);

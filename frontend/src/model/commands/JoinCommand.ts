@@ -9,13 +9,14 @@ export default class JoinCommand extends Command {
   public constructor(
     private schema: Schema,
     private fk: TableRelationship,
-    private duplicate: boolean
+    private duplicate: boolean,
+    private name?: string
   ) {
     super();
   }
 
   protected override _do(): void {
-    this.parent = this.schema.join(this.fk, this.duplicate);
+    this.parent = this.schema.join(this.fk, this.duplicate, this.name);
   }
 
   protected override _undo(): void {

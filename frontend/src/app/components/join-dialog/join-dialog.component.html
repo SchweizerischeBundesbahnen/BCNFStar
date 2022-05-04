@@ -1,10 +1,10 @@
 <div sbbDialogTitle>Join Options</div>
 <div sbbDialogContent>
-  Name of this join
+  Name of this join (optional)
   <input type="text" sbbInput [(ngModel)]="name" placeholder="" />
   <div class="sbb-checkbox-group-vertical">
     <sbb-checkbox [(ngModel)]="duplicate">
-      Duplicate the referenced table before joining
+      Duplicate {{ fk.referenced.name }} before joining
     </sbb-checkbox>
   </div>
 </div>
