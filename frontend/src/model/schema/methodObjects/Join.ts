@@ -25,10 +25,6 @@ export default class Join {
 
     this.join();
 
-    this.schema.addTables(this.newTable);
-    this.schema.deleteTables(this.referencing);
-    this.schema.deleteTables(this.referenced);
-
     this.schema.calculateFdsOf(this.newTable);
   }
 
