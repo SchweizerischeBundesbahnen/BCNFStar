@@ -53,7 +53,7 @@
             <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
             <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
             <ng-container
-              *ngFor="let column of hoveredTable.columns.columnNames()"
+              *ngFor="let column of hoveredTable.columns.sourceColumnNames()"
               [sbbColumnDef]="column"
             >
               <th sbb-header-cell *sbbHeaderCellDef>{{ column }}</th>

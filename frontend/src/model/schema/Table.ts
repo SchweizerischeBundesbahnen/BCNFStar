@@ -327,7 +327,7 @@ export default class Table {
     return this._violatingFds;
   }
 
-  public toString(): string {
+  public toTestString(): string {
     let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');
     return str;

@@ -2,7 +2,6 @@ import Column from '../Column';
 import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Relationship from '../Relationship';
-import Schema from '../Schema';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
@@ -10,15 +9,11 @@ export default class Split {
   public newTables?: [Table, Table];
 
   public constructor(
-    private schema: Schema,
     private table: Table,
     private fd: FunctionalDependency,
     private generatingName?: string
   ) {
     this.split();
-
-    this.schema.addTables(...this.newTables!);
-    this.schema.deleteTables(this.table);
   }
 
   private split() {
