@@ -57,7 +57,7 @@ export default class Table {
         index,
         iAttribute.nullable
       );
-      table.columns.add(new Column(sourceTableInstance, sourceColumn));
+      table.addColumns(new Column(sourceTableInstance, sourceColumn));
     });
     table.name = sourceTable.name;
     table.schemaName = sourceTable.schemaName;
@@ -80,7 +80,7 @@ export default class Table {
         i,
         false
       );
-      table.columns.add(new Column(sourceTableInstance, sourceColumn));
+      table.addColumns(new Column(sourceTableInstance, sourceColumn));
     });
     table.name = tableName;
     table.schemaName = '';
@@ -111,6 +111,32 @@ export default class Table {
         this.findEqualSelectedColumn(column)
       );
     });
+  }
+
+  public checkColumnNameDuplicates() {
+    const checked = new Set<Column>();
+    for (const column of this.columns) {
+      if (checked.has(column)) continue;
+      const sameName = this.columns
+        .asArray()
+        .filter((other) => other.sourceColumn.name == column.sourceColumn.name);
+      if (sameName.length > 1)
+        sameName.forEach(
+          (equivColumn) => (equivColumn.includeSourceName = true)
+        );
+      else column.includeSourceName = false;
+      sameName.forEach((column) => checked.add(column));
+    }
+  }
+
+  public addColumns(...columns: Array<Column>) {
+    this.columns.add(...columns);
+    this.checkColumnNameDuplicates();
+  }
+
+  public removeColumns(...columns: Array<Column>) {
+    this.columns.delete(...columns);
+    this.checkColumnNameDuplicates();
   }
 
   public addSource(
@@ -156,11 +182,11 @@ export default class Table {
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
-    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs);
+    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).deepCopy();
   }
 
   public generatingSchema(fd: FunctionalDependency): ColumnCombination {
-    return fd.rhs.copy();
+    return fd.rhs.deepCopy();
   }
 
   /**

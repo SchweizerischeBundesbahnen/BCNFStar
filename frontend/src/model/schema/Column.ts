@@ -7,6 +7,8 @@ import SourceTableInstance from './SourceTableInstance';
  * Be careful when using them outside the context of a table
  */
 export default class Column {
+  public includeSourceName = false;
+
   public constructor(
     public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
@@ -14,14 +16,16 @@ export default class Column {
   ) {}
 
   public get name() {
-    return (
-      this.alias ||
-      `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`
-    );
+    if (this.alias) return this.alias;
+    let name = '';
+    if (this.includeSourceName)
+      name += `${this.sourceTableInstance.identifier}.`;
+    name += this.sourceColumn.name;
+    return name;
   }
 
   public copy(): Column {
-    return new Column(this.sourceTableInstance, this.sourceColumn, this.name);
+    return new Column(this.sourceTableInstance, this.sourceColumn, this.alias);
   }
 
   public get dataType() {
