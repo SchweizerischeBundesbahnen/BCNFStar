@@ -53,6 +53,7 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
+    console.log(this.table);
     this.editingName = false;
     this._fdClusterFilter = [];
     this.indFilter = Array.from(this.schema.tables);

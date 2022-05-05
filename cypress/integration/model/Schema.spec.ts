@@ -45,7 +45,9 @@ describe("Schema", () => {
     table.columns
       .asArray()
       .forEach((column) =>
-        cols.get(column.sourceTableInstance)!.set(column.name, column)
+        cols
+          .get(column.sourceTableInstance)!
+          .set(column.sourceColumn.name, column)
       );
 
     const aCols = cols.get(a)!;

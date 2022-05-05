@@ -21,6 +21,10 @@ export default class ColumnCombination {
     return new ColumnCombination(new Array(...this._columns));
   }
 
+  public deepCopy(): ColumnCombination {
+    return new ColumnCombination(this._columns.map((column) => column.copy()));
+  }
+
   public columnsFromNames(...names: Array<string>) {
     return names.map((name) => this.columnFromName(name));
   }

@@ -32,6 +32,10 @@ export default class SourceTableInstance {
     return alias;
   }
 
+  public get identifier() {
+    return this.useAlias ? this.alias : this.table.name;
+  }
+
   public get defaultName() {
     return this.table.name;
   }
