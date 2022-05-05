@@ -19,7 +19,10 @@ import { getTablePage } from "./routes/tablePage";
 
 import createQueueMonitor from "./queueMonitor";
 import getViolatingRowsForFD from "./routes/violatingRows/fds";
-import getViolatingRowsForFDCount from "./routes/violatingRows/rowCounts";
+import getViolatingRowsForFDCount from "./routes/violatingRows/fdRowCounts";
+import getViolatingRowsForSuggestedIND from "./routes/violatingRows/inds";
+import getViolatingRowsForSuggestedINDCount from "./routes/violatingRows/indsRowCounts";
+
 import {
   deleteMetanomeResults,
   getMetanomeResults,
@@ -75,6 +78,9 @@ app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
 app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
+
+app.post("/violatingRows/rowcount/ind", getViolatingRowsForSuggestedINDCount);
+app.post("/violatingRows/ind", getViolatingRowsForSuggestedIND);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 
