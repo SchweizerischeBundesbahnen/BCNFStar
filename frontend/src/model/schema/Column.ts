@@ -19,13 +19,13 @@ export default class Column {
     if (this.alias) return this.alias;
     let name = '';
     if (this.includeSourceName)
-      name += `${this.sourceTableInstance.identifier}`;
+      name += `${this.sourceTableInstance.identifier}.`;
     name += this.sourceColumn.name;
     return name;
   }
 
   public copy(): Column {
-    return new Column(this.sourceTableInstance, this.sourceColumn, this.name);
+    return new Column(this.sourceTableInstance, this.sourceColumn, this.alias);
   }
 
   public get dataType() {
