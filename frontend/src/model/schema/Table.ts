@@ -57,7 +57,7 @@ export default class Table {
         index,
         iAttribute.nullable
       );
-      table.columns.add(new Column(sourceTableInstance, sourceColumn));
+      table.addColumn(new Column(sourceTableInstance, sourceColumn));
     });
     table.name = sourceTable.name;
     table.schemaName = sourceTable.schemaName;
@@ -80,7 +80,7 @@ export default class Table {
         i,
         false
       );
-      table.columns.add(new Column(sourceTableInstance, sourceColumn));
+      table.addColumn(new Column(sourceTableInstance, sourceColumn));
     });
     table.name = tableName;
     table.schemaName = '';
@@ -111,6 +111,20 @@ export default class Table {
         this.findEqualSelectedColumn(column)
       );
     });
+  }
+
+  public addColumn(column: Column) {
+    const sameName = this.columns
+      .asArray()
+      .filter((other) => other.sourceColumn.name == column.sourceColumn.name);
+    sameName.forEach((col) => (col.includeSourceName = true));
+
+    this.columns.add(column);
+    if (sameName.length > 0) column.includeSourceName = true;
+  }
+
+  public addColumns(columns: Array<Column>) {
+    columns.forEach((column) => this.addColumn(column));
   }
 
   public addSource(

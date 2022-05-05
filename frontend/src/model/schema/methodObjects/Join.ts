@@ -38,7 +38,7 @@ export default class Join {
     this.referencing.sources.forEach((sourceTable) =>
       this.newTable.sources.push(sourceTable)
     );
-    this.newTable.columns.add(...this.referencing.columns);
+    this.newTable.addColumns(this.referencing.columns.asArray());
     this.newTable.relationships.push(...this.referencing.relationships);
 
     // sources and relationships from referenced table
@@ -81,8 +81,8 @@ export default class Join {
     }
 
     // columns from referenced table
-    this.newTable.columns.add(
-      ...this.referenced.columns.applySourceMapping(this.sourceMapping)
+    this.newTable.addColumns(
+      this.referenced.columns.applySourceMapping(this.sourceMapping).asArray()
     );
     this.newTable.establishIdentities();
     if (!this.relationship.sourceRelationship().isTrivial) {
