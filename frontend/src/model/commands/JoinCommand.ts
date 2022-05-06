@@ -1,3 +1,4 @@
+import Join from '../schema/methodObjects/Join';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
 import { TableRelationship } from '../types/TableRelationship';
@@ -16,7 +17,8 @@ export default class JoinCommand extends Command {
   }
 
   protected override _do(): void {
-    this.parent = this.schema.join(this.fk, this.duplicate, this.name);
+    this.parent = new Join(this.schema, this.fk, this.name).newTable;
+    this._redo();
   }
 
   protected override _undo(): void {

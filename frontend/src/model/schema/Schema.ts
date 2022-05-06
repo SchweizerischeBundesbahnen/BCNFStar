@@ -8,7 +8,6 @@ import Table from './Table';
 import ColumnCombination from './ColumnCombination';
 import SourceFunctionalDependency from './SourceFunctionalDependency';
 import SourceTable from './SourceTable';
-import Join from './methodObjects/Join';
 import Split from './methodObjects/Split';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
@@ -340,44 +339,19 @@ export default class Schema {
     });
   }
 
-  /**
-   *
-   * @param table Table to split
-   * @param fd Functional Dependency to split on
-   * @param generatingName Name to give to the newly created table
-   * @returns the resulting tables
-   */
-  public split(
-    table: Table,
-    fd: FunctionalDependency,
-    generatingName?: string
-  ) {
-    const splitObject = new Split(table, fd, generatingName);
-    this.addTables(...splitObject.newTables!);
-    this.deleteTables(table);
-    return splitObject.newTables!;
-  }
-
   public autoNormalize(...table: Array<Table>): Array<Table> {
     let queue = new Array(...table);
     let resultingTables = new Array<Table>();
     while (queue.length > 0) {
       let current = queue.shift()!;
       if (this.splittableFdsOf(current).length > 0) {
-        let children = this.split(current, this.splittableFdsOf(current)[0]);
+        let children = new Split(current, this.splittableFdsOf(current)[0])
+          .newTables!;
         queue.push(...children);
       } else {
         resultingTables.push(current);
       }
     }
     return resultingTables;
-  }
-
-  public join(fk: TableRelationship, duplicate: boolean, name?: string) {
-    const joinObject = new Join(this, fk, name);
-    this.addTables(joinObject.newTable);
-    this.deleteTables(fk.referencing);
-    if (!duplicate) this.deleteTables(fk.referenced);
-    return joinObject.newTable;
   }
 }

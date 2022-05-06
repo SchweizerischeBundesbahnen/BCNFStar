@@ -13,6 +13,7 @@ export default class AutoNormalizeCommand extends Command {
 
   protected override _do(): void {
     this.resultingTables = this.schema.autoNormalize(...this.tables);
+    this._redo();
   }
 
   protected override _undo(): void {
