@@ -1,5 +1,6 @@
 import { hyfdAlgorithmName } from "../../../../server/definitions/IHyFD";
 import { binderAlgorithmName } from "../../../../server/definitions/IBinder";
+import { faidaAlgorithmName } from "../../../../server/definitions/IFaida";
 /// <reference types="cypress" />
 
 describe("The metanome results page", () => {
@@ -26,7 +27,7 @@ describe("The metanome results page", () => {
   it("contains metanome result rows", () => {
     cy.get("tr").should("have.length.at.least", 3);
     cy.contains(hyfdAlgorithmName);
-    cy.contains(binderAlgorithmName);
+    cy.contains(faidaAlgorithmName);
     cy.contains("public.part_partsupp_supplier_denormalized");
   });
 
