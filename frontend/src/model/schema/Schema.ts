@@ -81,7 +81,19 @@ export default class Schema {
     return this.referencesOf(table).length == 0;
   }
 
+  public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
+    const result = new Array<Array<TableRelationship>>();
+    for (const rel of this.referencesOf(table)) {
+      const routes = this.routesFromFactTo(rel.referencing);
+      routes.forEach((route) => route.push(rel));
+      result.push(...routes);
+    }
+    if (result.length == 0) result.push(new Array<TableRelationship>());
+    return result;
+  }
+
   public referencesOf(table: Table): Array<TableRelationship> {
+    //könnte noch gecached werden
     const result = new Array<TableRelationship>();
     for (const other of this.tables) {
       if (other == table) continue;
