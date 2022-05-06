@@ -42,6 +42,11 @@
       >
         Download SQL
       </button>
+      <app-save-schema-editing
+        [schema]="this.schema"
+        [commandProcessor]="this.commandProcessor"
+      >
+      </app-save-schema-editing>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
         *ngIf="this.selectedTable"

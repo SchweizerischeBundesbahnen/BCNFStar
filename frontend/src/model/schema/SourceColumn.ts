@@ -9,6 +9,16 @@ export default class SourceColumn {
     public nullable: boolean
   ) {}
 
+  public toJSON() {
+    return {
+      name: this.name,
+      table: this.table,
+      dataType: this.dataType,
+      ordinalPosition: this.ordinalPosition,
+      nullable: this.nullable,
+    };
+  }
+
   public equals(other: SourceColumn): boolean {
     if (this == other) return true;
     return this.name == other.name && this.table.equals(other.table);

@@ -18,6 +18,27 @@ export default class Schema {
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
 
+  public toJSON() {
+    let parsedMapArray = Array<{
+      key: SourceTable;
+      value: Array<SourceFunctionalDependency>;
+    }>();
+    this._fds.forEach(
+      (value: Array<SourceFunctionalDependency>, key: SourceTable) => {
+        parsedMapArray.push({
+          key: key,
+          value: value,
+        });
+      }
+    );
+    return {
+      tables: Array.from(this.tables),
+      _fks: this.fks,
+      _inds: this.inds,
+      _fds: parsedMapArray,
+    };
+  }
+
   public constructor(...tables: Array<Table>) {
     this.addTables(...tables);
   }

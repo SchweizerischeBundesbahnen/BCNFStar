@@ -37,6 +37,7 @@ import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 
 export let InjectorInstance: Injector;
+import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ export let InjectorInstance: Injector;
     CheckIndComponent,
     ViolatingRowsViewIndsComponent,
     DatabaseTableViewerComponent,
+    SaveSchemaEditingComponent,
   ],
   imports: [
     BrowserModule,

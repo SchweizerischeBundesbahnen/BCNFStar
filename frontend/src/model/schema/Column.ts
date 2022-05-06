@@ -15,6 +15,14 @@ export default class Column {
     public alias?: string
   ) {}
 
+  public toJSON() {
+    return {
+      sourceTableInstance: this.sourceTableInstance,
+      sourceColumn: this.sourceColumn,
+      alias: this.alias,
+    };
+  }
+
   public get name() {
     if (this.alias) return this.alias;
     let name = '';

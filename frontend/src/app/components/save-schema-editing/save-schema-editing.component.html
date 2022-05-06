@@ -1,0 +1,19 @@
+<input type="text" sbbInput placeholder="Filename" [(ngModel)]="filename" />
+
+<button
+  type="button"
+  sbb-button
+  [disabled]="!this.filename"
+  (click)="saveEditedSchema()"
+>
+  Save current schema state
+</button>
+
+<button
+  type="button"
+  sbb-button
+  [disabled]="!this.filename"
+  (click)="getSchema()"
+>
+  Get Schema Stata
+</button>

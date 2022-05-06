@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@types/node": "^16.11.11",
+    "superjson": "^1.9.1",
     "ts-auto-guard": "^1.0.0-alpha.29",
     "typescript": "~4.4.4"
   }
