@@ -4,8 +4,12 @@ import { binderAlgorithmName } from "../../../../server/definitions/IBinder";
 
 describe("The metanome results page", () => {
   before(() => {
+    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
+    cy.get("tr").should("have.length.at.least", 1);
+    cy.get(".delete-all-btn").click();
     cy.visitFrontend();
     cy.selectTablesAndGo();
+    cy.loadMetanomeConfigAndOk();
   });
 
   beforeEach(() => {
