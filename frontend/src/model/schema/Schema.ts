@@ -77,6 +77,21 @@ export default class Schema {
     this.tables.forEach((table) => (table._relationshipsValid = valid));
   }
 
+  public isFact(table: Table): boolean {
+    return this.referencesOf(table).length == 0;
+  }
+
+  public referencesOf(table: Table): Array<TableRelationship> {
+    const result = new Array<TableRelationship>();
+    for (const other of this.tables) {
+      if (other == table) continue;
+      result.push(
+        ...this.fksOf(other).filter((rel) => rel.referenced == table)
+      );
+    }
+    return result;
+  }
+
   public fksOf(table: Table): Array<TableRelationship> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._fks;

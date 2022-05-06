@@ -12,6 +12,14 @@
   z-index: 2;
 }
 
+.fact {
+  color: red
+}
+
+.dimension {
+  color: green
+}
+
 .pk {
   text-decoration: underline;
 }
