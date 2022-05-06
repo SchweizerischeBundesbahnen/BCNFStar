@@ -55,17 +55,36 @@ export class SchemaEditingComponent {
 
     dialogRef
       .afterClosed()
-      .subscribe((value: { duplicate: boolean; name?: string }) => {
-        if (value) this.onJoin(fk, value.duplicate, value.name);
-      });
+      .subscribe(
+        (value: {
+          duplicate: boolean;
+          newTableName?: string;
+          sourceName?: string;
+        }) => {
+          if (value)
+            this.onJoin(
+              fk,
+              value.duplicate,
+              value.newTableName,
+              value.sourceName
+            );
+        }
+      );
   }
 
   public onJoin(
     fk: TableRelationship,
     duplicate: boolean,
-    name?: string
+    newName?: string,
+    sourceName?: string
   ): void {
-    let command = new JoinCommand(this.schema, fk, duplicate, name);
+    let command = new JoinCommand(
+      this.schema,
+      fk,
+      duplicate,
+      newName,
+      sourceName
+    );
 
     command.onDo = () => {
       this.selectedTable = undefined;

@@ -11,13 +11,15 @@ export default class JoinCommand extends Command {
     private schema: Schema,
     private fk: TableRelationship,
     private duplicate: boolean,
-    private name?: string
+    private newTableName?: string,
+    private sourceName?: string
   ) {
     super();
   }
 
   protected override _do(): void {
-    this.parent = new Join(this.schema, this.fk, this.name).newTable;
+    this.parent = new Join(this.schema, this.fk, this.sourceName).newTable;
+    if (this.newTableName) this.parent.name = this.newTableName;
     this._redo();
   }
 

@@ -10,7 +10,8 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 })
 export class JoinDialogComponent {
   public duplicate: boolean;
-  public name?: string;
+  public newTableName?: string;
+  public sourceName?: string;
   public fk: TableRelationship;
 
   constructor(
@@ -24,6 +25,10 @@ export class JoinDialogComponent {
   }
 
   public confirm() {
-    this.dialogRef.close({ duplicate: this.duplicate, name: this.name });
+    this.dialogRef.close({
+      duplicate: this.duplicate,
+      newTableName: this.newTableName,
+      sourceName: this.sourceName,
+    });
   }
 }
