@@ -28,6 +28,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { CustomFunctionalDependencySideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
 import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
+import { JoinDialogComponent } from './components/join-dialog/join-dialog.component';
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
@@ -44,6 +45,7 @@ export let InjectorInstance: Injector;
     GraphElementComponent,
     UndoRedoComponent,
     SplitDialogComponent,
+    JoinDialogComponent,
     MetanomeResultsViewerComponent,
     CustomFunctionalDependencySideBarComponent,
     ViolatingRowsViewComponent,
