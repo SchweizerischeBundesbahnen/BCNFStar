@@ -1,6 +1,9 @@
 import IAttribute from "@/definitions/IAttribute";
-import IRelationship from "@/definitions/IRelationship";
+import IRelationship, {
+  IColumnRelationship,
+} from "@/definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
+import ITable from "@/definitions/ITable";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -49,6 +52,8 @@ export default abstract class SqlUtils {
     table: string
   ): Promise<boolean>;
 
+  public abstract UNIVERSAL_DATATYPE(): string;
+
   protected readonly QUERY_PRIMARY_KEYS: string = `
     SELECT 
       ku.TABLE_SCHEMA As table_schema,
@@ -72,6 +77,52 @@ export default abstract class SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage>;
+
+  public abstract getViolatingRowsForSuggestedINDCount(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): Promise<number>;
+
+  public abstract getViolatingRowsForSuggestedIND(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage>;
+
+  /**
+   * Because of the LEFT OUTER JOIN and the WHERE-Clause only those rows from the referencing table are selected, which are missing
+   * in the referenced table and are therefore violating the Inclusion-Dependency.
+   */
+  protected violatingRowsForSuggestedIND_SQL(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): string {
+    return `
+    SELECT ${columnRelationships
+      .map((cc) => `X.${cc.referencingColumn}`)
+      .join(",")}, COUNT(1) AS Count
+    FROM ${referencingTable.schemaName}.${referencingTable.name} AS X
+    LEFT OUTER JOIN ${referencedTable.schemaName}.${referencedTable.name} AS Y 
+      ON ${columnRelationships
+        .map(
+          (cc) =>
+            `CAST(X.${
+              cc.referencingColumn
+            } AS ${this.UNIVERSAL_DATATYPE()}) = CAST(Y.${
+              cc.referencedColumn
+            } AS ${this.UNIVERSAL_DATATYPE()})`
+        )
+        .join(" AND ")}
+    WHERE Y.${columnRelationships[0].referencedColumn} IS NULL
+    GROUP BY ${columnRelationships
+      .map((cc) => `X.${cc.referencingColumn}`)
+      .join(",")}
+    `;
+  }
 
   protected violatingRowsForFD_SQL(
     schema: string,
