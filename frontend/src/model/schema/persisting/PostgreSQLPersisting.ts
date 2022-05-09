@@ -4,7 +4,7 @@ import SourceTable from '../SourceTable';
 import Table from '../Table';
 import SQLPersisting from './SQLPersisting';
 
-export default class PoststgresSQLPersisting extends SQLPersisting {
+export default class PostgreSQLPersisting extends SQLPersisting {
   public schemaPreparation(schema: Schema): string {
     let Sql: string = '';
     Sql += `CREATE SCHEMA IF NOT EXISTS "${schema.name!}";` + '\n';
@@ -79,11 +79,4 @@ export default class PoststgresSQLPersisting extends SQLPersisting {
   public columnIdentifier(column: Column): string {
     return `"${column.sourceTableInstance.identifier}"."${column.sourceColumn.name}"`;
   }
-  //     ADD CONSTRAINT ${constraintName}
-  //     FOREIGN KEY (${this.generateColumnString(referencingColumns)})
-  //     REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
-  //       referencedColumns
-  //     )});
-  // `;
-  //   }
 }

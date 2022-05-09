@@ -17,7 +17,7 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
-import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgresSQLPersisting';
+import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersisting';
 import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 
