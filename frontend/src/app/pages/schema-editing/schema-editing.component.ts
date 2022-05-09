@@ -31,7 +31,6 @@ export class SchemaEditingComponent implements OnInit {
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
   public schemaName: string = '';
-  public sql: PersistSchemaSql = new PersistSchemaSql();
   public selectedColumns?: Map<Table, ColumnCombination>;
   public schemaChanged: Subject<void> = new Subject();
 
@@ -151,52 +150,7 @@ export class SchemaEditingComponent implements OnInit {
   public persistSchema(): string {
     this.schema.name = this.schemaName;
     this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
-
     return this.persisting!.createSQL(this.schema);
-
-    // const tables: Table[] = Array.from(this.schema.tables);
-
-    // console.log('Requesting SQL-Generation (Prepare Schema Statements)');
-    // const res = await this.dataService.getSchemaPreparationSql(
-    //   this.schemaName,
-    //   tables
-    // );
-    // this.sql.databasePreparation += '\n' + res.sql + '\n';
-
-    // console.log('Requesting SQL-Generation (Create Table Statements)');
-    // for (const table of this.schema.tables) {
-    //   const createTableSql = await this.dataService.getCreateTableSql(table);
-    //   this.sql.createTableStatements += '\n' + createTableSql.sql + '\n';
-    //   const dataTransferSql = await this.dataService.getDataTransferSql(
-    //     table,
-    //     table.columns.asArray()
-    //   );
-    //   this.sql.dataTransferStatements += '\n' + dataTransferSql.sql + '\n';
-
-    //   if (table.pk) {
-    //     const pk = await this.dataService.getPrimaryKeySql(
-    //       table.schemaName,
-    //       table.name,
-    //       table.pk!.columnNames()
-    //     );
-    //     this.sql.primaryKeyConstraints += '\n' + pk.sql + '\n';
-    //   }
-
-    //   for (const fk of this.schema.fksOf(table)) {
-    //     const fkSql = await this.dataService.getForeignKeySql(
-    //       fk.referencing,
-    //       fk.relationship,
-    //       fk.referenced
-    //     );
-    //     this.sql.foreignKeyConstraints += '\n' + fkSql.sql + '\n';
-    //   }
-    // }
-
-    // console.log('Requesting SQL-Generation (Primary Keys)');
-
-    // console.log('Requesting SQL-Generation (Foreign Keys)');
-
-    // console.log('Finished! ' + this.schemaName);
   }
 
   async download(): Promise<void> {
@@ -208,32 +162,5 @@ export class SchemaEditingComponent implements OnInit {
       }
     );
     saveAs(file);
-  }
-}
-
-class PersistSchemaSql {
-  public databasePreparation: string = '';
-  public createTableStatements: string = '';
-  public dataTransferStatements: string = '';
-  public primaryKeyConstraints: string = '';
-  public foreignKeyConstraints: string = '';
-  public to_string(): string {
-    return (
-      '/* SCHEMA PREPARATION: */\n' +
-      this.databasePreparation! +
-      '\n' +
-      '/* SCHEMA CREATION: */\n' +
-      this.createTableStatements! +
-      '\n' +
-      '/* DATA TRANSER: */\n' +
-      this.dataTransferStatements! +
-      '\n' +
-      '/* PRIMARY KEYS: */\n' +
-      this.primaryKeyConstraints! +
-      '\n' +
-      '/* FOREIGN KEYS: */\n' +
-      this.foreignKeyConstraints! +
-      '\n'
-    );
   }
 }
