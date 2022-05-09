@@ -17,6 +17,8 @@ import getDataTransferSQL from "./routes/persist_schema/transferData";
 import getAddPrimaryKeySQL from "./routes/persist_schema/createPrimaryKey";
 import { getTablePage } from "./routes/tablePage";
 
+import { getDbmsName } from "./routes/dbserver";
+
 import createQueueMonitor from "./queueMonitor";
 import getViolatingRowsForFD from "./routes/violatingRows/fds";
 import getViolatingRowsForFDCount from "./routes/violatingRows/fdRowCounts";
@@ -69,6 +71,8 @@ app.get("/tables/:name/fds", getFDs);
 app.get("/tables/:tableNames/inds", getINDs);
 app.get("/metanomeResults", getMetanomeResults);
 app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
+
+app.get("/persist/dbmsname", getDbmsName);
 
 app.post("/persist/createTable", getCreateTableSQL());
 app.post("/persist/createForeignKey", getCreateForeignKeySQL());
