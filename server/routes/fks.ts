@@ -1,4 +1,4 @@
-import { sqlUtils } from "../db";
+import { sqlUtils } from "@/db";
 import IForeignKey from "@/definitions/IForeignKey";
 import { Request, Response } from "express";
 

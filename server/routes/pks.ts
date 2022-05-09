@@ -1,4 +1,4 @@
-import { sqlUtils } from "../db";
+import { sqlUtils } from "@/db";
 import IPrimaryKey from "@/definitions/IPrimaryKey";
 import { Request, Response } from "express";
 

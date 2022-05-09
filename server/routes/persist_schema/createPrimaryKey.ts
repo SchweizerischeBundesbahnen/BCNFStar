@@ -1,5 +1,5 @@
 import { Request, Response, RequestHandler } from "express";
-import { sqlUtils } from "../../db";
+import { sqlUtils } from "@/db";
 
 export default function getAddPrimaryKeySQL(): RequestHandler {
   async function createPrimaryKey(req: Request, res: Response): Promise<void> {
