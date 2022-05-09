@@ -27,6 +27,10 @@ export class DirectDimensionDialogComponent {
     this.table = data.table;
   }
 
+  public canConfirm(): boolean {
+    return this.routeSelectionGroup?.value;
+  }
+
   public confirm() {
     this.dialogRef.close({
       route: this.routeSelectionGroup.value,

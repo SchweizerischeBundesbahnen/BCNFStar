@@ -10,6 +10,13 @@
   </sbb-radio-group>
 </div>
 <div sbbDialogActions>
-  <button sbb-button (click)="confirm()" cdkFocusInitial>Ok</button>
+  <button
+    sbb-button
+    [disabled]="!canConfirm()"
+    (click)="confirm()"
+    cdkFocusInitial
+  >
+    Ok
+  </button>
   <button sbb-secondary-button sbbDialogClose>Cancel</button>
 </div>
