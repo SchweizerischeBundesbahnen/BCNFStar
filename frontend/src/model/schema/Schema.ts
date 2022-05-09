@@ -8,7 +8,6 @@ import Table from './Table';
 import ColumnCombination from './ColumnCombination';
 import SourceFunctionalDependency from './SourceFunctionalDependency';
 import SourceTable from './SourceTable';
-import Join from './methodObjects/Join';
 import Split from './methodObjects/Split';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
@@ -75,6 +74,17 @@ export default class Schema {
 
   private set relationshipsValid(valid: boolean) {
     this.tables.forEach((table) => (table._relationshipsValid = valid));
+  }
+
+  public numReferences(table: Table): number {
+    let count = 0;
+    for (let otherTable of this.tables) {
+      if (otherTable == table) continue;
+      count += this.fksOf(otherTable).filter(
+        (fk) => fk.referenced == table
+      ).length;
+    }
+    return count;
   }
 
   public fksOf(table: Table): Array<TableRelationship> {
@@ -180,7 +190,7 @@ export default class Schema {
             otherTable.isKey(new ColumnCombination(otherCC))
           );
         if (otherCCs.length == 0) continue;
-        result.set(rel, []);
+        if (!result.has(rel)) result.set(rel, []);
         ccs.forEach((cc) => {
           otherCCs.forEach((otherCC) => {
             result.get(rel)!.push({
@@ -329,44 +339,19 @@ export default class Schema {
     });
   }
 
-  /**
-   *
-   * @param table Table to split
-   * @param fd Functional Dependency to split on
-   * @param generatingName Name to give to the newly created table
-   * @returns the resulting tables
-   */
-  public split(
-    table: Table,
-    fd: FunctionalDependency,
-    generatingName?: string
-  ) {
-    const splitObject = new Split(table, fd, generatingName);
-    this.addTables(...splitObject.newTables!);
-    this.deleteTables(table);
-    return splitObject.newTables!;
-  }
-
   public autoNormalize(...table: Array<Table>): Array<Table> {
     let queue = new Array(...table);
     let resultingTables = new Array<Table>();
     while (queue.length > 0) {
       let current = queue.shift()!;
       if (this.splittableFdsOf(current).length > 0) {
-        let children = this.split(current, this.splittableFdsOf(current)[0]);
+        let children = new Split(current, this.splittableFdsOf(current)[0])
+          .newTables;
         queue.push(...children);
       } else {
         resultingTables.push(current);
       }
     }
     return resultingTables;
-  }
-
-  public join(fk: TableRelationship) {
-    const joinObject = new Join(this, fk);
-    this.addTables(joinObject.newTable);
-    this.deleteTables(fk.referencing);
-    this.deleteTables(fk.referenced);
-    return joinObject.newTable;
   }
 }
