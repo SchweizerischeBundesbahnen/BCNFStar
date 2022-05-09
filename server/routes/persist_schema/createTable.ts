@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { EOL } from "os";
-import { sqlUtils } from "../../db";
+import { sqlUtils } from "@/db";
 import { IRequestBodyCreateTableSql } from "@/definitions/IBackendAPI";
 
 export default function getCreateTableStatement(): RequestHandler {

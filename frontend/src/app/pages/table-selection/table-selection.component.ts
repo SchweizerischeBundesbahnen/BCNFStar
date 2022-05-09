@@ -5,6 +5,9 @@ import { DatabaseService } from 'src/app/database.service';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import { Router } from '@angular/router';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { MetanomeSettingsComponent } from '../../components/metanome-settings/metanome-settings.component';
+import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
+import { firstValueFrom } from 'rxjs';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 @Component({
@@ -15,11 +18,16 @@ import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 export class TableSelectionComponent implements OnInit {
   @ViewChild(SbbTable) public table?: SbbTable<ITablePage>;
   @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
+  @ViewChild('loadingDialog') public loadingDialog!: TemplateRef<any>;
+
   public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
-  public headLimit = 20;
 
+  public pageLimit = 20;
   public page: number = 0;
+
+  public loadingStatus: Map<IIndexFileEntry, 'done' | 'error' | 'loading'> =
+    new Map();
 
   public hoveredTable?: Table;
   public tableColumns: Array<string> = [];
@@ -28,13 +36,14 @@ export class TableSelectionComponent implements OnInit {
   public tables: Array<Table> = [];
   public selectedTables = new Map<Table, Boolean>();
   public tablesInSchema: Record<string, Table[]> = {};
-  public isLoading = false;
+  public error: any;
   public queueUrl: string;
 
   constructor(
     private dataService: DatabaseService,
     public router: Router,
-    public dialog: SbbDialog
+    public dialog: SbbDialog,
+    public metanomeDialog: SbbDialog
   ) {
     this.queueUrl = dataService.baseUrl + '/queue';
   }
@@ -49,7 +58,7 @@ export class TableSelectionComponent implements OnInit {
         table.schemaName,
         table.name,
         0,
-        this.headLimit
+        this.pageLimit
       );
 
       this.selectedTables.set(table, false);
@@ -103,23 +112,62 @@ export class TableSelectionComponent implements OnInit {
     );
   }
 
-  public selectTables() {
+  public async runMetanome(entries: Array<IIndexFileEntry>) {
+    const jobs = entries.map((entry) => {
+      return { promise: this.dataService.runMetanome(entry), entry };
+    });
+    jobs.forEach((j) => this.loadingStatus.set(j.entry, 'loading'));
+
+    for (const job of jobs) {
+      try {
+        const result = await job.promise;
+        this.loadingStatus.set(job.entry, 'done');
+        job.entry.fileName = result.fileName;
+      } catch (e) {
+        this.loadingStatus.set(job.entry, 'error');
+      }
+    }
+  }
+
+  public async selectTables() {
     const tables = this.tables.filter((table) =>
       this.selectedTables.get(table)
     );
-    this.isLoading = true;
-    this.dataService
-      .setInputTables(tables)
-      .then(() => {
-        this.router.navigate(['/edit-schema']);
-      })
-      .catch((e) => {
-        console.error(e);
-        this.dialog.open(this.errorDialog);
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
+    const dialogRef = this.dialog.open(MetanomeSettingsComponent, {
+      data: tables,
+    });
+    const { values }: { values: Record<string, IIndexFileEntry> } =
+      await firstValueFrom(dialogRef.afterClosed());
+
+    if (!values) return;
+
+    this.loadingStatus.clear();
+
+    const loadingDialog = this.dialog.open(this.loadingDialog);
+
+    try {
+      await this.runMetanome(
+        Object.values(values).filter((entry) => !entry.fileName)
+      );
+      let fdResults: Record<string, string> = {};
+      for (let value of Object.entries(values)) {
+        if (value[0] != 'ind') {
+          fdResults[value[1].tables[0]] = value[1].fileName;
+        }
+      }
+      await this.dataService.setInputTables(
+        tables,
+        values['ind'].fileName,
+        fdResults
+      );
+      this.router.navigate(['/edit-schema']);
+    } catch (e) {
+      this.error = e;
+      console.error(e);
+      this.dialog.open(this.errorDialog);
+    } finally {
+      loadingDialog.close();
+    }
   }
 
   changePage(evt: SbbPageEvent) {
@@ -141,8 +189,8 @@ export class TableSelectionComponent implements OnInit {
         : await this.dataService.loadTablePage(
             this.hoveredTable.schemaName,
             this.hoveredTable.name,
-            this.page * this.headLimit,
-            this.headLimit
+            this.page * this.pageLimit,
+            this.pageLimit
           );
     if (!result) return;
     this.tableColumns = result.attributes;

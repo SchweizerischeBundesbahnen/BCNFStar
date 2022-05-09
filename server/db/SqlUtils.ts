@@ -1,7 +1,7 @@
-import IAttribute from "../definitions/IAttribute";
+import IAttribute from "@/definitions/IAttribute";
 import IRelationship, {
   IColumnRelationship,
-} from "../definitions/IRelationship";
+} from "@/definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
 
@@ -27,6 +27,11 @@ export type PrimaryKeyResult = {
   table_name: string;
   column_name: string;
 };
+
+export enum DbmsType {
+  mssql = "mssql",
+  postgres = "postgres",
+}
 
 export default abstract class SqlUtils {
   abstract init(): void;
@@ -62,7 +67,7 @@ export default abstract class SqlUtils {
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
   public abstract getPrimaryKeys(): Promise<PrimaryKeyResult[]>;
   public abstract getJdbcPath(): string;
-  public abstract getDbmsName(): "mssql" | "postgres";
+  public abstract getDbmsName(): DbmsType;
 
   public abstract getViolatingRowsForFD(
     schema: string,

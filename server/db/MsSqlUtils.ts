@@ -2,11 +2,12 @@ import ITablePage from "@/definitions/ITablePage";
 import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
 import SqlUtils, {
+  DbmsType,
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "../definitions/IAttribute";
+import IAttribute from "@/definitions/IAttribute";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
 
@@ -364,7 +365,6 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
             : " NULL")
       )
       .join(",");
-    console.log(primaryKey);
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) ${suffix}`;
   }
 
@@ -400,7 +400,7 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
   public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }
-  public getDbmsName(): "mssql" | "postgres" {
-    return "mssql";
+  public getDbmsName(): DbmsType {
+    return DbmsType.mssql;
   }
 }

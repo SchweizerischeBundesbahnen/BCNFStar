@@ -10,7 +10,6 @@
             }}</sbb-expansion-panel-header>
             <sbb-checkbox
               (change)="clickSelectAll(item.key)"
-              [disabled]="isLoading"
               [checked]="areAllSelectedIn(item.key)"
               [indeterminate]="
                 !areAllSelectedIn(item.key) && !areZeroSelectedIn(item.key)
@@ -22,7 +21,6 @@
               *ngFor="let table of item.value"
               [ngModel]="selectedTables.get(table)"
               (ngModelChange)="selectedTables.set(table, $event)"
-              [disabled]="isLoading"
               class="table-checkbox"
               (mouseenter)="mouseEnter(table)"
             >
@@ -35,7 +33,7 @@
       <button
         type="button"
         sbb-button
-        [disabled]="!hasSelectedTables() || isLoading"
+        [disabled]="!hasSelectedTables()"
         (click)="selectTables()"
       >
         Go
@@ -43,7 +41,7 @@
     </div>
     <div class="col-8" *ngIf="hoveredTable">
       <ng-container
-        [ngSwitch]="tableRowCounts.get(hoveredTable)! >= headLimit ? 1 : -1"
+        [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"
       >
         <h3>
           <span>{{ hoveredTable.fullName }}</span>
@@ -70,21 +68,21 @@
           <sbb-paginator
             (page)="changePage($event)"
             [pageIndex]="this.page"
-            [pageSize]="headLimit"
+            [pageSize]="pageLimit"
             [length]="tableRowCounts.get(hoveredTable)"
             class="col"
           >
           </sbb-paginator>
           <ng-container *ngSwitchCase="1">
             <div class="col text-aling-right">
-              {{ this.headLimit * this.page + 1 }} -
-              {{ this.headLimit * this.page + this.dataSource.data.length }} /
+              {{ this.pageLimit * this.page + 1 }} -
+              {{ this.pageLimit * this.page + this.dataSource.data.length }} /
               {{ tableRowCounts.get(hoveredTable) }}
             </div>
           </ng-container>
           <ng-container *ngSwitchDefault>
             <div class="col text-aling-right">
-              {{ this.headLimit * this.page }} /
+              {{ this.pageLimit * this.page }} /
               {{ tableRowCounts.get(hoveredTable) }}
             </div>
           </ng-container>
@@ -94,16 +92,45 @@
   </div>
 </div>
 
-<div *ngIf="isLoading" class="loading-box">
-  <sbb-loading
-    mode="medium"
-    aria-valuetext="Loading, please wait"
-  ></sbb-loading>
-  Functional Dependencies and Inclusion Dependencies are currently being
-  searched. <br />
-  Progress can be monitored
-  <a [href]="queueUrl" target="_blank">here</a>
-</div>
+<ng-template #loadingDialog class="loading-box">
+  <div sbbDialogTitle>Running Metanome</div>
+  <div sbbDialogContent>
+    <span *ngIf="loadingStatus.size">
+      Functional Dependencies and Inclusion Dependencies are currently being
+      searched. <br />
+      More detailed progress reports including logs can be found
+      <a [href]="queueUrl" target="_blank">here</a>
+    </span>
+
+    <ul>
+      <li *ngFor="let item of loadingStatus | keyvalue">
+        {{ item.key.algorithm }} with {{ item.key.tables }}
+        <sbb-loading
+          mode="inline"
+          aria-valuetext="Loading, please wait"
+          *ngIf="item.value === 'loading'"
+        ></sbb-loading>
+        <sbb-icon
+          svgIcon="kom:cross-medium"
+          style="color: red"
+          *ngIf="item.value === 'error'"
+        ></sbb-icon>
+        <sbb-icon
+          svgIcon="kom:tick-medium"
+          style="color: green"
+          *ngIf="item.value === 'done'"
+        ></sbb-icon>
+      </li>
+      <li>
+        Fetching results
+        <sbb-loading
+          mode="inline"
+          aria-valuetext="Loading, please wait"
+        ></sbb-loading>
+      </li>
+    </ul>
+  </div>
+</ng-template>
 
 <ng-template #errorDialog>
   <div sbbDialogTitle>Warning</div>
@@ -119,6 +146,7 @@
       sbb-button
       sbbDialogClose
       [href]="queueUrl"
+      target="_blank"
       >Investigate Metanome logs</a
     >
     <a

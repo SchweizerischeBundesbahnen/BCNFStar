@@ -1,5 +1,5 @@
 import { Request, Response, RequestHandler } from "express";
-import { sqlUtils } from "../../db";
+import { sqlUtils } from "@/db";
 import { IRequestBodyDataTransferSql } from "@/definitions/IBackendAPI";
 
 export default function getDataTransferSQL(): RequestHandler {
@@ -7,7 +7,6 @@ export default function getDataTransferSQL(): RequestHandler {
     try {
       const body: IRequestBodyDataTransferSql =
         req.body as IRequestBodyDataTransferSql;
-      console.log(body);
       const sqlStatement: string = sqlUtils.SQL_INSERT_DATA(
         body.attributes,
         body.sourceTables,
