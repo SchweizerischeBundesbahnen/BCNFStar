@@ -62,6 +62,12 @@ export class DatabaseService {
     );
   }
 
+  public async getDmbsName(): Promise<string> {
+    return firstValueFrom(
+      this.http.get<string>(`${this.baseUrl}/persist/dbmsname`)
+    );
+  }
+
   public loadTableRowCounts(): Promise<Record<string, number>> {
     return firstValueFrom(
       this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)

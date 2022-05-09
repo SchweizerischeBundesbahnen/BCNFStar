@@ -1,6 +1,6 @@
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as saveAs from 'file-saver';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
@@ -17,14 +17,16 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
-import PoststgresSQLPersisting from '@/src/model/schema/persisting/PostgresSQLPersisting';
+import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgresSQLPersisting';
+import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
+import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 
 @Component({
   selector: 'app-schema-editing',
   templateUrl: './schema-editing.component.html',
   styleUrls: ['./schema-editing.component.css'],
 })
-export class SchemaEditingComponent {
+export class SchemaEditingComponent implements OnInit {
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
@@ -32,6 +34,8 @@ export class SchemaEditingComponent {
   public sql: PersistSchemaSql = new PersistSchemaSql();
   public selectedColumns?: Map<Table, ColumnCombination>;
   public schemaChanged: Subject<void> = new Subject();
+
+  public persisting: SQLPersisting | undefined;
 
   constructor(
     public dataService: DatabaseService,
@@ -42,6 +46,9 @@ export class SchemaEditingComponent {
     this.schema = dataService.schema!;
     if (!this.schema) router.navigate(['']);
     // this.schemaChanged.next();
+  }
+  async ngOnInit(): Promise<void> {
+    this.persisting = await this.initPersisting();
   }
 
   public onSelectColumns(columns: Map<Table, ColumnCombination>) {
@@ -130,12 +137,22 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public async persistSchema(): Promise<void> {
+  public async initPersisting(): Promise<SQLPersisting> {
+    const dbmsName: string = await this.dataService.getDmbsName();
+
+    if (dbmsName == 'postgres') {
+      return new PostgreSQLPersisting();
+    } else if (dbmsName == 'mssql') {
+      return new SqlServerPersisting();
+    }
+    throw Error('Unknown Dbms-Server');
+  }
+
+  public persistSchema(): string {
     this.schema.name = this.schemaName;
     this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
 
-    const persisting = new PoststgresSQLPersisting();
-    console.log(persisting.createSQL(this.schema));
+    return this.persisting!.createSQL(this.schema);
 
     // const tables: Table[] = Array.from(this.schema.tables);
 
@@ -183,9 +200,8 @@ export class SchemaEditingComponent {
   }
 
   async download(): Promise<void> {
-    await this.persistSchema();
     const file: File = new File(
-      [this.sql.to_string()],
+      [this.persistSchema()],
       this.schemaName + '.sql',
       {
         type: 'text/plain;charset=utf-8',
