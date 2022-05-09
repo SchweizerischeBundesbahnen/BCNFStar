@@ -34,16 +34,12 @@ export default abstract class SQLPersisting {
   }
 
   public foreignKeySql(fk: TableRelationship): string {
-    return (
-      `ALTER TABLE ${fk.referencing.fullName}` +
-      `ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}` +
-      `FOREIGN KEY (${this.generateColumnString(
-        fk.relationship.referencing
-      )})` +
-      `REFERENCES ${fk.referenced.fullName} (${this.generateColumnString(
-        fk.relationship.referenced
-      )});`
-    );
+    return `ALTER TABLE ${fk.referencing.fullName} 
+      ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
+      FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
+      REFERENCES ${fk.referenced.fullName} (${this.generateColumnString(
+      fk.relationship.referenced
+    )});`;
   }
 
   public foreignKeys(schema: Schema): string {

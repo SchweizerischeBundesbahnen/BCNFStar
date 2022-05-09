@@ -12,10 +12,12 @@ export default class SqlServerPersisting extends SQLPersisting {
 IF NOT EXISTS ( SELECT  *
 FROM sys.schemas
 WHERE name = N'${schema.name!}' )
-EXEC('CREATE SCHEMA [${schema.name!}]'); GO 
+EXEC('CREATE SCHEMA [${schema.name!}]'); 
+GO 
 ` + '\n';
     for (const table of schema.tables) {
-      Sql += `DROP TABLE IF EXISTS ${this.tableIdentifier(table)};` + ' GO \n';
+      Sql +=
+        `DROP TABLE IF EXISTS ${this.tableIdentifier(table)};` + '\n GO \n';
     }
     return Sql;
   }
