@@ -25,6 +25,11 @@ export type PrimaryKeyResult = {
   column_name: string;
 };
 
+export enum DbmsType {
+  mssql = "mssql",
+  postgres = "postgres",
+}
+
 export default abstract class SqlUtils {
   abstract init(): void;
   public abstract getSchema(): Promise<Array<SchemaQueryRow>>;
@@ -59,7 +64,7 @@ export default abstract class SqlUtils {
   public abstract getForeignKeys(): Promise<ForeignKeyResult[]>;
   public abstract getPrimaryKeys(): Promise<PrimaryKeyResult[]>;
   public abstract getJdbcPath(): string;
-  public abstract getDbmsName(): "mssql" | "postgres";
+  public abstract getDbmsName(): DbmsType;
 
   public abstract getViolatingRowsForFD(
     schema: string,

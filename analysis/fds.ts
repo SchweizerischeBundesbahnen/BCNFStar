@@ -1,5 +1,6 @@
 import { readFile } from "fs/promises";
 import IFunctionalDependency from "../server/definitions/IFunctionalDependency";
+import { splitlines } from "../server/utils/files";
 
 // give filename as first argument
 (async function () {
@@ -14,7 +15,9 @@ async function calculateFdStatistics(filename: string) {
   const rhsCounts = {};
   const fds: { lhs: string[]; rhs: string[] }[] = [];
   const fileContent = await readFile(filename, { encoding: "utf-8" });
-  const content: Array<IFunctionalDependency> = JSON.parse(fileContent);
+  const content: Array<IFunctionalDependency> = splitlines(fileContent).map(
+    (l) => JSON.parse(l)
+  );
   for (const fd of content) {
     lhsCounts[fd.lhsColumns.length] = lhsCounts[fd.lhsColumns.length]
       ? lhsCounts[fd.lhsColumns.length] + 1
@@ -27,5 +30,4 @@ async function calculateFdStatistics(filename: string) {
   console.table(rhsCounts);
   console.log("lh");
   console.table(lhsCounts);
-  // console.log(fds.filter(v => v.rhs.length == 31))
 }

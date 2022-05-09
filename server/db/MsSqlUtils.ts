@@ -1,6 +1,7 @@
 import ITablePage from "@/definitions/ITablePage";
 import sql from "mssql";
 import SqlUtils, {
+  DbmsType,
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
@@ -335,7 +336,7 @@ INNER JOIN sys.columns col2
   public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }
-  public getDbmsName(): "mssql" | "postgres" {
-    return "mssql";
+  public getDbmsName(): DbmsType {
+    return DbmsType.mssql;
   }
 }

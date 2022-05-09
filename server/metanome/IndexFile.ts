@@ -1,10 +1,10 @@
 import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
-import { absoluteServerDir, initFile } from "../utils/files";
+import { absoluteServerDir, initFile } from "@/utils/files";
 
 import { Mutex } from "async-mutex";
-import { IIndexFileEntry } from "@/definitions/IIndexTableEntry";
-import { sqlUtils } from "../db";
+import { IIndexFileEntry } from "@/definitions/IIndexFileEntry";
+import { sqlUtils } from "@/db";
 
 /** Used to make sure that no two addToIndex/deleteFromIndex calls can happen simultaniously */
 const mutex = new Mutex();
@@ -17,7 +17,7 @@ const indexFileLocation = join(
 );
 
 /**
- * @param getAll if false (delfault) only gets entries for corrent database
+ * @param getAll if false (delfault) only gets entries for current database
  */
 export async function getIndexContent(
   getAll: boolean = false

@@ -7,7 +7,7 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
-import { Subject } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
@@ -68,16 +68,14 @@ export class SchemaEditingComponent implements OnInit {
     this.schemaChanged.next();
   }
 
-  public onClickSplit(fd: FunctionalDependency): void {
+  public async onClickSplit(fd: FunctionalDependency) {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
       data: fd,
     });
 
-    dialogRef
-      .afterClosed()
-      .subscribe((value: { fd: FunctionalDependency; name?: string }) => {
-        if (fd) this.onSplitFd(value);
-      });
+    const value: { fd: FunctionalDependency; name?: string } =
+      await firstValueFrom(dialogRef.afterClosed());
+    if (fd) this.onSplitFd(value);
   }
 
   public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {

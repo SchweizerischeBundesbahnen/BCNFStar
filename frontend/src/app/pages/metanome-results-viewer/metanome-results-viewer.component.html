@@ -17,23 +17,23 @@
   <table class="sbb-table">
     <thead>
       <tr>
-        <th>File name</th>
-        <th>Algorithm</th>
-        <th>Tables</th>
         <th>Config</th>
+        <th>Algorithm</th>
+        <th>File name</th>
+        <th>Tables</th>
         <th>Date</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let entry of this.tableData">
-        <td>{{ entry.fileName }}</td>
-        <td>{{ entry.algorithm }}</td>
-        <td>{{ entry.tables.join("\n") }}</td>
         <td>
           <div *ngFor="let item of entry.config | keyvalue">
             {{ item.key }}: {{ item.value }}
           </div>
         </td>
+        <td>{{ entry.algorithm }}</td>
+        <td>{{ entry.fileName }}</td>
+        <td>{{ entry.tables.join("\n") }}</td>
         <td class="creation-date">{{ entry.createDate | date: "medium" }}</td>
         <td>
           <button

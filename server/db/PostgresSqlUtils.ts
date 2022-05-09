@@ -1,4 +1,5 @@
 import SqlUtils, {
+  DbmsType,
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
@@ -321,7 +322,7 @@ from
   public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
   }
-  public getDbmsName(): "mssql" | "postgres" {
-    return "postgres";
+  public getDbmsName(): DbmsType {
+    return DbmsType.postgres;
   }
 }

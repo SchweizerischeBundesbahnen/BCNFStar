@@ -4,12 +4,12 @@ export interface IColumnIdentifier {
   schemaIdentifier?: string;
 }
 
-interface IColumnCombination {
+export interface IColumnCombination {
   columnIdentifiers: Array<IColumnIdentifier>;
 }
 
 export default interface IInclusionDependency {
-  type: string;
+  type: "InclusionDependency";
   dependant: IColumnCombination;
   referenced: IColumnCombination;
 }

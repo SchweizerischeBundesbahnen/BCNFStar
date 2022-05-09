@@ -50,7 +50,11 @@ Cypress.Commands.add("selectTablesAndGo", { prevSubject: false }, () => {
   cy.contains("part_partsupp_supplier_denormalized").click();
 
   cy.contains("Go").click();
+});
 
-  // wait for schema editing page to load
-  cy.url({ timeout: 10 * 60 * 1000 }).should("contain", "edit-schema");
+Cypress.Commands.add("loadMetanomeConfigAndOk", { prevSubject: false }, () => {
+  cy.contains("Ok").click();
+
+  // wait for normalize page to load
+  cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
 });

@@ -2,8 +2,6 @@ import express from "express";
 import expressStaticGzip from "express-static-gzip";
 import getTablesFunction from "./routes/tables";
 import { getTableRowCounts } from "./routes/rowCounts";
-import getFDs from "./routes/fds";
-import getINDs from "./routes/inds";
 import { getStaticDir } from "./utils/files";
 import morgan from "morgan";
 import cors, { CorsOptions } from "cors";
@@ -21,8 +19,10 @@ import getViolatingRowsForSuggestedINDCount from "./routes/violatingRows/indsRow
 
 import {
   deleteMetanomeResults,
+  getMetanomeIndex,
   getMetanomeResults,
-} from "./routes/metanomeResults";
+} from "./routes/metanomeResults/";
+import { runMetanome } from "./routes/metanomeResults/run";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -61,10 +61,10 @@ app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
 
 // Metanome
-app.get("/tables/:name/fds", getFDs);
-app.get("/tables/:tableNames/inds", getINDs);
-app.get("/metanomeResults", getMetanomeResults);
+app.get("/metanomeResults", getMetanomeIndex);
+app.get("/metanomeResults/:fileName", getMetanomeResults);
 app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
+app.post("/metanomeResults", runMetanome);
 
 app.get("/persist/dbmsname", getDbmsName);
 
