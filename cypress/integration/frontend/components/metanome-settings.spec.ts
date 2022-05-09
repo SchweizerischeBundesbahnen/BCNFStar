@@ -384,10 +384,10 @@ describe("The metanome settings dialog", () => {
     cy.contains("Binder").click();
 
     cy.get(".memory").first().clear().type("1G");
-    cy.get(".MAX_DETERMINANT_SIZE").first().clear().type("4");
+    cy.get(".NULL_EQUALS_NULL").first().click();
 
     cy.get(".memory").eq(1).clear().type("2G");
-    cy.get(".NULL_EQUALS_NULL").eq(1).click();
+    cy.get(".MAX_DETERMINANT_SIZE").eq(1).clear().type("4");
 
     cy.get(".DETECT_NARY").first().click();
     cy.get(".MAX_NARY_LEVEL").first().clear().type("2");
@@ -398,25 +398,25 @@ describe("The metanome settings dialog", () => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
     cy.get("tr").should("have.length", 4);
 
-    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
-      "contain",
-      "memory: 1G",
-      { force: true }
-    );
-    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
-      "contain",
-      "MAX_DETERMINANT_SIZE: 4",
-      { force: true }
-    );
-
     cy.get("tr:contains('public.nation_region_denormalized')").should(
       "contain",
-      "memory: 2G",
+      "memory: 1G",
       { force: true }
     );
     cy.get("tr:contains('public.nation_region_denormalized')").should(
       "contain",
       "NULL_EQUALS_NULL: false",
+      { force: true }
+    );
+
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "memory: 2G",
+      { force: true }
+    );
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "MAX_DETERMINANT_SIZE: 4",
       { force: true }
     );
 
@@ -432,11 +432,11 @@ describe("The metanome settings dialog", () => {
     cy.get("sbb-toggle-option:contains('HyFD')").click({ multiple: true });
     cy.contains("FAIDA").click();
 
-    cy.get(".memory").first().clear().type("100M");
-    cy.get(".INPUT_ROW_LIMIT").first().clear().type("3");
+    cy.get(".memory").first().clear().type("200M");
+    cy.get(".VALIDATE_PARALLEL").first().click();
 
-    cy.get(".memory").eq(1).clear().type("200M");
-    cy.get(".VALIDATE_PARALLEL").eq(1).click();
+    cy.get(".memory").eq(1).clear().type("100M");
+    cy.get(".INPUT_ROW_LIMIT").eq(1).clear().type("3");
 
     cy.get(".IGNORE_NULL").first().click();
     cy.get(".SAMPLE_GOAL").first().clear().type("600");
@@ -447,17 +447,6 @@ describe("The metanome settings dialog", () => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
     cy.get("tr").should("have.length", 4);
 
-    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
-      "contain",
-      "memory: 100M",
-      { force: true }
-    );
-    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
-      "contain",
-      "INPUT_ROW_LIMIT: 3",
-      { force: true }
-    );
-
     cy.get("tr:contains('public.nation_region_denormalized')").should(
       "contain",
       "memory: 200M",
@@ -466,6 +455,17 @@ describe("The metanome settings dialog", () => {
     cy.get("tr:contains('public.nation_region_denormalized')").should(
       "contain",
       "VALIDATE_PARALLEL: false",
+      { force: true }
+    );
+
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "memory: 100M",
+      { force: true }
+    );
+    cy.get("tr:contains('public.part_partsupp_supplier_denormalized')").should(
+      "contain",
+      "INPUT_ROW_LIMIT: 3",
       { force: true }
     );
 

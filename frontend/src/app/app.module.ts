@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
@@ -31,6 +31,11 @@ import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
 import { SbbToggleModule } from '@sbb-esta/angular/toggle';
 import { CustomFunctionalDependencySideBarComponent } from '@/src/app/components/check-fd/check-fd.component';
 import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-view/violating-rows-view.component';
+import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
+import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
+import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
+
+export let InjectorInstance: Injector;
 
 @NgModule({
   declarations: [
@@ -46,6 +51,9 @@ import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-
     MetanomeSettingsComponent,
     CustomFunctionalDependencySideBarComponent,
     ViolatingRowsViewComponent,
+    CheckIndComponent,
+    ViolatingRowsViewIndsComponent,
+    DatabaseTableViewerComponent,
   ],
   imports: [
     BrowserModule,
@@ -73,4 +81,8 @@ import { ViolatingRowsViewComponent } from '@/src/app/components/violating-rows-
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private injector: Injector) {
+    InjectorInstance = this.injector;
+  }
+}

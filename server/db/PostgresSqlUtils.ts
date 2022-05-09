@@ -8,6 +8,8 @@ import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
 import ITablePage from "@/definitions/ITablePage";
+import ITable from "@/definitions/ITable";
+import { IColumnRelationship } from "@/definitions/IRelationship";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -57,6 +59,10 @@ export default class PostgresSqlUtils extends SqlUtils {
       []
     );
     return query_result.rows;
+  }
+
+  public UNIVERSAL_DATATYPE(): string {
+    return "text";
   }
 
   public async tableExistsInSchema(
@@ -200,6 +206,89 @@ from
       `SELECT COUNT (*) as count FROM 
       (
       ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+      ) AS X
+      `
+    );
+    return count.rows[0].count;
+  }
+
+  public async getViolatingRowsForSuggestedIND(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+    const query_result = await this.pool.query(
+      `${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}` +
+        `
+        ORDER BY ${columnRelationships
+          .map((cc) => cc.referencingColumn)
+          .join(",")}
+        LIMIT ${limit} 
+        OFFSET ${offset}
+        `
+    );
+    return {
+      rows: query_result.rows,
+      attributes: query_result.fields.map((v) => v.name),
+    };
+  }
+
+  public async getViolatingRowsForSuggestedINDCount(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): Promise<number> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+
+    const count = await this.pool.query<{ count: number }>(
+      `SELECT COUNT (*) as count FROM 
+      (
+        ${this.violatingRowsForSuggestedIND_SQL(
+          referencingTable,
+          referencedTable,
+          columnRelationships
+        )}
       ) AS X
       `
     );

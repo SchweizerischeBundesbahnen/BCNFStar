@@ -58,6 +58,9 @@ export class MetanomeSettingsComponent {
     public dataService: DatabaseService,
     private http: HttpClient
   ) {
+    this.tables.sort((table, anotherTable) =>
+      table.schemaAndName() <= anotherTable.schemaAndName() ? -1 : 1
+    );
     let controlsConfig: Record<string, any> = {};
     controlsConfig['ind'] = {};
 
