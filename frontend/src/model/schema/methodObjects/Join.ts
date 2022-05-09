@@ -12,7 +12,7 @@ export default class Join {
   private referenced: Table;
   private relationship: Relationship;
 
-  private sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
+  public sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
 
   public constructor(
     private schema: Schema,
