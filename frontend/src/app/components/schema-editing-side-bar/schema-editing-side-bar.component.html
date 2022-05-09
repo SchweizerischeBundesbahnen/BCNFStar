@@ -93,6 +93,14 @@
       <sbb-expansion-panel-header
         >Possible Foreign Keys</sbb-expansion-panel-header
       >
+      <button
+        type="button"
+        sbb-button
+        [disabled]="schema.isFact(table)"
+        (click)="makeDirectDimension()"
+      >
+        Direct Dimension
+      </button>
       <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
         <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
           table.fullName

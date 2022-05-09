@@ -18,6 +18,7 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand';
 
 @Component({
   selector: 'app-schema-editing',
@@ -151,6 +152,12 @@ export class SchemaEditingComponent {
   public onChangeTableName(value: { table: Table; newName: string }): void {
     let command = new TableRenameCommand(value.table, value.newName);
 
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onDirectDimension(route: Array<TableRelationship>) {
+    let command = new DirectDimensionCommand(this.schema, route);
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }

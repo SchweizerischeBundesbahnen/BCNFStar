@@ -40,12 +40,12 @@ export default class DirectDimensionCommand extends Command {
   }
 
   protected override _undo(): void {
-    this.schema.deleteTables(this.oldTable);
-    this.schema.addTables(this.newTable!);
+    this.schema.deleteTables(this.newTable!);
+    this.schema.addTables(this.oldTable);
   }
 
   protected override _redo(): void {
-    this.schema.deleteTables(this.newTable!);
-    this.schema.addTables(this.oldTable);
+    this.schema.deleteTables(this.oldTable);
+    this.schema.addTables(this.newTable!);
   }
 }
