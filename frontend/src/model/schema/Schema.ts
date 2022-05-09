@@ -346,7 +346,7 @@ export default class Schema {
       let current = queue.shift()!;
       if (this.splittableFdsOf(current).length > 0) {
         let children = new Split(current, this.splittableFdsOf(current)[0])
-          .newTables!;
+          .newTables;
         queue.push(...children);
       } else {
         resultingTables.push(current);

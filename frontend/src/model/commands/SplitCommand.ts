@@ -24,7 +24,7 @@ export default class SplitCommand extends Command {
       this.table,
       this.fd,
       this.generatingName
-    ).newTables!;
+    ).newTables;
     this._redo();
   }
 
