@@ -50,7 +50,7 @@ export default abstract class SQLPersisting {
     return `
 ALTER TABLE ${this.tableIdentifier(
       fk.referenced
-    )} ADD UNIQUE (${this.generateColumnString(fk.relationship.referenced)}) 
+    )} ADD UNIQUE (${this.generateColumnString(fk.relationship.referenced)});
 `;
   }
 
