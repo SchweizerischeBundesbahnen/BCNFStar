@@ -33,6 +33,27 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
+  public foreignKeys(schema: Schema): string {
+    let Sql: string = '';
+
+    for (const referencingTable of schema.tables) {
+      for (const fk of schema.fksOf(referencingTable)) {
+        Sql += this.uniqueConstraint(fk);
+        Sql += this.foreignKeySql(fk);
+      }
+    }
+
+    return Sql;
+  }
+
+  public uniqueConstraint(fk: TableRelationship): string {
+    return `
+ALTER TABLE ${this.tableIdentifier(
+      fk.referenced
+    )} ADD UNIQUE (${this.generateColumnString(fk.relationship.referenced)}) 
+`;
+  }
+
   public foreignKeySql(fk: TableRelationship): string {
     return `ALTER TABLE ${fk.referencing.fullName} 
       ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
@@ -40,18 +61,6 @@ export default abstract class SQLPersisting {
       REFERENCES ${fk.referenced.fullName} (${this.generateColumnString(
       fk.relationship.referenced
     )});`;
-  }
-
-  public foreignKeys(schema: Schema): string {
-    let Sql: string = '';
-
-    for (const referencingTable of schema.tables) {
-      for (const fk of schema.fksOf(referencingTable)) {
-        Sql += this.foreignKeySql(fk);
-      }
-    }
-
-    return Sql;
   }
 
   public primaryKeys(tables: Table[]): string {
