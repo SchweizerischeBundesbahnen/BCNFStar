@@ -97,7 +97,7 @@
         type="button"
         sbb-button
         [disabled]="schema.isFact(table)"
-        (click)="makeDirectDimension()"
+        (click)="directDimension.emit(table)"
       >
         Direct Dimension
       </button>

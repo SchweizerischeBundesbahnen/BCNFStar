@@ -18,6 +18,7 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import { DirectDimensionDialogComponent } from '../../components/direct-dimension-dialog/direct-dimension-dialog.component';
 import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand';
 
 @Component({
@@ -154,6 +155,18 @@ export class SchemaEditingComponent {
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();
+  }
+
+  public onClickDirectDimension(table: Table): void {
+    const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
+      data: { table: table, schema: this.schema },
+    });
+
+    dialogRef
+      .afterClosed()
+      .subscribe((value: { route: Array<TableRelationship> }) => {
+        if (value) this.onDirectDimension(value.route);
+      });
   }
 
   public onDirectDimension(route: Array<TableRelationship>) {

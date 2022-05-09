@@ -17,7 +17,6 @@ import Column from '@/src/model/schema/Column';
 import { FdCluster } from '@/src/model/types/FdCluster';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import IndScore from '@/src/model/schema/methodObjects/IndScore';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
 
 @Component({
   selector: 'app-schema-editing-side-bar',
@@ -36,9 +35,7 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
     table: Table;
     newName: string;
   }>();
-  @Output() public directDimension = new EventEmitter<
-    Array<TableRelationship>
-  >();
+  @Output() public directDimension = new EventEmitter<Table>();
 
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
@@ -61,11 +58,6 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
     this.editingName = false;
     this._fdClusterFilter = [];
     this.indFilter = Array.from(this.schema.tables);
-  }
-
-  public makeDirectDimension() {
-    const route = this.schema.routesFromFactTo(this.table)[0];
-    if (route.length > 1) this.directDimension.emit(route);
   }
 
   public selectedInd(): SourceRelationship | undefined {

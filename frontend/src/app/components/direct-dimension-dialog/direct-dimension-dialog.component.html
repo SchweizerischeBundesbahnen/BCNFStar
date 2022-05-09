@@ -1,0 +1,15 @@
+<div sbbDialogTitle>Dimension Options</div>
+<div sbbDialogContent>
+  <sbb-radio-group #routeSelection>
+    <sbb-radio-button
+      *ngFor="let route of routes"
+      [value]="route"
+      style="display: block"
+      >{{ route[0].referenced.name }}</sbb-radio-button
+    >
+  </sbb-radio-group>
+</div>
+<div sbbDialogActions>
+  <button sbb-button (click)="confirm()" cdkFocusInitial>Ok</button>
+  <button sbb-secondary-button sbbDialogClose>Cancel</button>
+</div>
