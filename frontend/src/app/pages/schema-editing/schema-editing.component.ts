@@ -17,6 +17,7 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
+import PoststgresSQLPersisting from '@/src/model/schema/persisting/PostgresSQLPersisting';
 
 @Component({
   selector: 'app-schema-editing',
@@ -130,51 +131,55 @@ export class SchemaEditingComponent {
   }
 
   public async persistSchema(): Promise<void> {
+    this.schema.name = this.schemaName;
     this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
 
-    const tables: Table[] = Array.from(this.schema.tables);
+    const persisting = new PoststgresSQLPersisting();
+    console.log(persisting.createSQL(this.schema));
 
-    console.log('Requesting SQL-Generation (Prepare Schema Statements)');
-    const res = await this.dataService.getSchemaPreparationSql(
-      this.schemaName,
-      tables
-    );
-    this.sql.databasePreparation += '\n' + res.sql + '\n';
+    // const tables: Table[] = Array.from(this.schema.tables);
 
-    console.log('Requesting SQL-Generation (Create Table Statements)');
-    for (const table of this.schema.tables) {
-      const createTableSql = await this.dataService.getCreateTableSql(table);
-      this.sql.createTableStatements += '\n' + createTableSql.sql + '\n';
-      const dataTransferSql = await this.dataService.getDataTransferSql(
-        table,
-        table.columns.asArray()
-      );
-      this.sql.dataTransferStatements += '\n' + dataTransferSql.sql + '\n';
+    // console.log('Requesting SQL-Generation (Prepare Schema Statements)');
+    // const res = await this.dataService.getSchemaPreparationSql(
+    //   this.schemaName,
+    //   tables
+    // );
+    // this.sql.databasePreparation += '\n' + res.sql + '\n';
 
-      if (table.pk) {
-        const pk = await this.dataService.getPrimaryKeySql(
-          table.schemaName,
-          table.name,
-          table.pk!.columnNames()
-        );
-        this.sql.primaryKeyConstraints += '\n' + pk.sql + '\n';
-      }
+    // console.log('Requesting SQL-Generation (Create Table Statements)');
+    // for (const table of this.schema.tables) {
+    //   const createTableSql = await this.dataService.getCreateTableSql(table);
+    //   this.sql.createTableStatements += '\n' + createTableSql.sql + '\n';
+    //   const dataTransferSql = await this.dataService.getDataTransferSql(
+    //     table,
+    //     table.columns.asArray()
+    //   );
+    //   this.sql.dataTransferStatements += '\n' + dataTransferSql.sql + '\n';
 
-      for (const fk of this.schema.fksOf(table)) {
-        const fkSql = await this.dataService.getForeignKeySql(
-          fk.referencing,
-          fk.relationship,
-          fk.referenced
-        );
-        this.sql.foreignKeyConstraints += '\n' + fkSql.sql + '\n';
-      }
-    }
+    //   if (table.pk) {
+    //     const pk = await this.dataService.getPrimaryKeySql(
+    //       table.schemaName,
+    //       table.name,
+    //       table.pk!.columnNames()
+    //     );
+    //     this.sql.primaryKeyConstraints += '\n' + pk.sql + '\n';
+    //   }
 
-    console.log('Requesting SQL-Generation (Primary Keys)');
+    //   for (const fk of this.schema.fksOf(table)) {
+    //     const fkSql = await this.dataService.getForeignKeySql(
+    //       fk.referencing,
+    //       fk.relationship,
+    //       fk.referenced
+    //     );
+    //     this.sql.foreignKeyConstraints += '\n' + fkSql.sql + '\n';
+    //   }
+    // }
 
-    console.log('Requesting SQL-Generation (Foreign Keys)');
+    // console.log('Requesting SQL-Generation (Primary Keys)');
 
-    console.log('Finished! ' + this.schemaName);
+    // console.log('Requesting SQL-Generation (Foreign Keys)');
+
+    // console.log('Finished! ' + this.schemaName);
   }
 
   async download(): Promise<void> {
