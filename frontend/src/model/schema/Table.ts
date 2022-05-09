@@ -42,19 +42,6 @@ export default class Table {
   public _relationshipsValid = true;
 
   public toJSON() {
-    let parsedMapInds = new Array<{
-      key: SourceRelationship;
-      value: Array<TableRelationship>;
-    }>();
-    this._inds.forEach(
-      (value: Array<TableRelationship>, key: SourceRelationship) => {
-        parsedMapInds.push({
-          key: key,
-          value: value,
-        });
-      }
-    );
-    // console.log("Test", parsedMapInds.map(t => t.value.map(v => v.referencing)));
     return {
       name: this.name,
       schemaName: this.schemaName,
@@ -63,12 +50,6 @@ export default class Table {
       fds: this.fds,
       relationships: this.relationships,
       sources: this.sources,
-      _violatingFds: this._violatingFds,
-      _keys: this._keys,
-      _splittableFdClusters: this._splittableFdClusters,
-      _fks: this._fks,
-      _inds: this._inds,
-      _relationshipsValid: this._relationshipsValid,
     };
   }
 

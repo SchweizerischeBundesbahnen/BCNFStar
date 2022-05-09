@@ -38,6 +38,7 @@ import { DatabaseTableViewerComponent } from './components/database-table-viewer
 
 export let InjectorInstance: Injector;
 import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
+import { LoadSavedSchemaComponent } from './pages/load-saved-schema/load-saved-schema.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { SaveSchemaEditingComponent } from './components/save-schema-editing/sav
     ViolatingRowsViewIndsComponent,
     DatabaseTableViewerComponent,
     SaveSchemaEditingComponent,
+    LoadSavedSchemaComponent,
   ],
   imports: [
     BrowserModule,
