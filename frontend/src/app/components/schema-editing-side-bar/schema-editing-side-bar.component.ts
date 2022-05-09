@@ -35,7 +35,6 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
     table: Table;
     newName: string;
   }>();
-  @Output() public directDimension = new EventEmitter<Table>();
 
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;

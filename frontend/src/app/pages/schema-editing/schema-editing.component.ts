@@ -157,7 +157,7 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onClickDirectDimension(table: Table): void {
+  public onClickMakeDirectDimension(table: Table): void {
     const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
       data: { table: table, schema: this.schema },
     });
@@ -165,11 +165,11 @@ export class SchemaEditingComponent {
     dialogRef
       .afterClosed()
       .subscribe((value: { route: Array<TableRelationship> }) => {
-        if (value) this.onDirectDimension(value.route);
+        if (value) this.onMakeDirectDimension(value.route);
       });
   }
 
-  public onDirectDimension(route: Array<TableRelationship>) {
+  public onMakeDirectDimension(route: Array<TableRelationship>) {
     let command = new DirectDimensionCommand(this.schema, route);
     this.commandProcessor.do(command);
     this.schemaChanged.next();

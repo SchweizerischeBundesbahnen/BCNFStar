@@ -23,7 +23,7 @@ export class DirectDimensionDialogComponent {
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA) data: { table: Table; schema: Schema }
   ) {
-    this.routes = data.schema.routesFromFactTo(data.table);
+    this.routes = data.schema.filteredRoutesFromFactTo(data.table);
     this.table = data.table;
   }
 

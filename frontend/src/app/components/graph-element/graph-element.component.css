@@ -3,6 +3,12 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
+.extra-button {
+  position: absolute;
+  pointer-events: auto !important;
+}
+
 .container {
   position: absolute;
   /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/

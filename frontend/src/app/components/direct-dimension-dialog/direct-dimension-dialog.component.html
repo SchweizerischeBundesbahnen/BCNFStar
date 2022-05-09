@@ -5,8 +5,10 @@
       *ngFor="let route of routes"
       [value]="route"
       style="display: block"
-      >{{ route[0].referenced.name }}</sbb-radio-button
-    >
+      ><span *ngFor="let rel of route"
+        >{{ rel.relationship.sourceRelationship().toString() }}<br /></span
+      ><br />
+    </sbb-radio-button>
   </sbb-radio-group>
 </div>
 <div sbbDialogActions>

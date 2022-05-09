@@ -80,6 +80,12 @@ export default class Schema {
     return this.referencesOf(table).length == 0;
   }
 
+  public filteredRoutesFromFactTo(
+    table: Table
+  ): Array<Array<TableRelationship>> {
+    return this.routesFromFactTo(table).filter((route) => route.length > 1);
+  }
+
   public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
     for (const rel of this.referencesOf(table)) {
