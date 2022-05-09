@@ -1,6 +1,6 @@
 import { IRequestBodyForeignKeySql } from "@/definitions/IBackendAPI";
 import { Request, Response, RequestHandler } from "express";
-import { sqlUtils } from "../../db";
+import { sqlUtils } from "@/db";
 
 export default function getCreateForeignKey(): RequestHandler {
   async function createForeignKey(req: Request, res: Response): Promise<void> {
