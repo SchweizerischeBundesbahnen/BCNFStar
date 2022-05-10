@@ -38,12 +38,61 @@ export default abstract class SQLPersisting {
 
     for (const referencingTable of schema.tables) {
       for (const fk of schema.fksOf(referencingTable)) {
-        Sql += this.uniqueConstraint(fk);
-        Sql += this.foreignKeySql(fk);
+        if (fk.referenced.implementsSurrogateKey()) {
+          Sql += this.addSkColumnToReferencingSql(fk);
+          Sql += this.updateSurrogateKeySql(fk);
+          Sql += this.foreignSurrogateKeySql(fk);
+        } else {
+          Sql += this.uniqueConstraint(fk);
+          Sql += this.foreignKeySql(fk);
+        }
       }
     }
-
+    console.log(Sql);
     return Sql;
+  }
+
+  // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
+  public addSkColumnToReferencingSql(fk: TableRelationship): string {
+    return `ALTER TABLE  ${this.tableIdentifier(fk.referencing)}  ADD FK_${
+      fk.referenced.surrogateKey
+    } INT;
+    GO
+    `;
+  }
+
+  public updateSurrogateKeySql(fk: TableRelationship): string {
+    console.log(fk);
+    return `
+    UPDATE  ${this.tableIdentifier(fk.referencing)}  
+    SET FK_${fk.referenced.surrogateKey} = ${this.tableIdentifier(
+      fk.referenced
+    )}.${fk.referenced.surrogateKey} 
+    FROM  ${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
+      fk.referenced
+    )}
+    WHERE ${fk.relationship.referencing
+      .map(
+        (c, i) =>
+          `${this.schemaWideColumnIdentifier(
+            fk.referencing,
+            c
+          )} = ${this.schemaWideColumnIdentifier(
+            fk.referenced,
+            fk.relationship.referenced[i]
+          )}`
+      )
+      .join(' AND ')};`;
+  }
+
+  public foreignSurrogateKeySql(fk: TableRelationship) {
+    return `
+    ALTER TABLE ${this.tableIdentifier(fk.referencing)} 
+    ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
+    FOREIGN KEY (FK_${fk.referenced.surrogateKey})
+    REFERENCES ${this.tableIdentifier(fk.referenced)} (${
+      fk.referenced.surrogateKey
+    });`;
   }
 
   public uniqueConstraint(fk: TableRelationship): string {
@@ -68,11 +117,11 @@ ALTER TABLE ${this.tableIdentifier(
     for (const table of tables) {
       if (table.pk) {
         Sql +=
-          `ALTER TABLE ${this.tableIdentifier(
-            table
-          )} ADD PRIMARY KEY (${this.generateColumnString(
-            table.pk.asArray()
-          )});` + '\n';
+          `ALTER TABLE ${this.tableIdentifier(table)} ADD PRIMARY KEY (${
+            table.implementsSurrogateKey()
+              ? table.surrogateKey
+              : this.generateColumnString(table.pk.asArray())
+          });` + '\n';
       }
     }
     return Sql;
@@ -84,5 +133,9 @@ ALTER TABLE ${this.tableIdentifier(
   public abstract dataTransferSql(table: Table): string;
   public abstract tableIdentifier(table: Table): string;
   public abstract sourceTableIdentifier(table: SourceTable): string;
+  public abstract schemaWideColumnIdentifier(
+    table: Table,
+    column: Column
+  ): string;
   public abstract columnIdentifier(column: Column): string;
 }
