@@ -2,11 +2,14 @@ import ITablePage from "@/definitions/ITablePage";
 import { pseudoRandomBytes } from "crypto";
 import sql from "mssql";
 import SqlUtils, {
+  DbmsType,
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "../definitions/IAttribute";
+import IAttribute from "@/definitions/IAttribute";
+import ITable from "@/definitions/ITable";
+import { IColumnRelationship } from "@/definitions/IRelationship";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -42,6 +45,10 @@ export default class MsSqlUtils extends SqlUtils {
     this.connection = await sql.connect(this.config);
   }
 
+  public UNIVERSAL_DATATYPE(): string {
+    return "varchar(max)";
+  }
+
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
     const result: sql.IResult<SchemaQueryRow> = await sql.query(`SELECT 
       t.name as table_name, 
@@ -73,7 +80,8 @@ export default class MsSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const result: sql.IResult<any> = await sql.query(
-        `SELECT * FROM [${schemaname}].[${tablename}] 
+        `SELECT * FROM [${schemaname}].[${tablename}]
+        ORDER BY (SELECT NULL) 
         OFFSET ${offset} ROWS
         FETCH NEXT ${limit} ROWS ONLY`
       );
@@ -108,6 +116,36 @@ export default class MsSqlUtils extends SqlUtils {
     }
   }
 
+  /**
+   * This also checks if table and schema exist in database.
+   */
+  public async columnsExistInTable(
+    schema: string,
+    table: string,
+    columns: Array<string>
+  ): Promise<boolean> {
+    const ps = new sql.PreparedStatement();
+    try {
+      ps.input("schema", sql.NVarChar);
+      ps.input("table", sql.NVarChar);
+
+      await ps.prepare(
+        "select column_name from INFORMATION_SCHEMA.COLUMNS WHERE table_schema = @schema AND table_name = @table"
+      );
+      const result: sql.IResult<string> = await ps.execute({ schema, table });
+      return columns.every((c) =>
+        result.recordset
+          .map((r) => r.toString().toLowerCase())
+          .includes(c.toLowerCase())
+      );
+    } catch (e) {
+      console.log(e);
+      throw Error("Error while checking if table contains columns.");
+    } finally {
+      ps.unprepare();
+    }
+  }
+
   public async tableExistsInSchema(
     schema: string,
     table: string
@@ -137,6 +175,134 @@ export default class MsSqlUtils extends SqlUtils {
     );
     const result = await ps.execute({ schema });
     return result.recordset.length > 0;
+  }
+
+  public override async getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+        ` ORDER BY ${lhs.join(",")}
+          OFFSET ${offset} ROWS
+          FETCH NEXT ${limit} ROWS ONLY
+        `
+    );
+    return {
+      rows: result.recordset,
+      attributes: Object.keys(result.recordset.columns),
+    };
+  }
+
+  public async getViolatingRowsForSuggestedIND(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      ) +
+        ` ORDER BY ${columnRelationships
+          .map((cc) => cc.referencingColumn)
+          .join(",")}
+          OFFSET ${offset} ROWS
+          FETCH NEXT ${limit} ROWS ONLY
+        `
+    );
+    return {
+      rows: result.recordset,
+      attributes: Object.keys(result.recordset.columns),
+    };
+  }
+
+  public async getViolatingRowsForSuggestedINDCount(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): Promise<number> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      `SELECT COUNT (*) as count FROM 
+      (
+      ${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )} 
+      ) AS X
+      `
+    );
+    return result.recordset[0].count;
+  }
+
+  public async getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<number> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      `SELECT COUNT (*) as count FROM 
+      (
+      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+      ) AS X
+      `
+    );
+    return result.recordset[0].count;
   }
 
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
@@ -199,7 +365,6 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
             : " NULL")
       )
       .join(",");
-    console.log(primaryKey);
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) ${suffix}`;
   }
 
@@ -235,7 +400,7 @@ EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
   public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }
-  public getDbmsName(): "mssql" | "postgres" {
-    return "mssql";
+  public getDbmsName(): DbmsType {
+    return DbmsType.mssql;
   }
 }

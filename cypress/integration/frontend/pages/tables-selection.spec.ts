@@ -63,7 +63,48 @@ describe("The table selection page", () => {
       .should("contain.text", "6");
   });
 
-  it("renders the schema editing page when clicking on the Go button", () => {
+  it("display loading dialog after clicking in Ok Button of Metanome Settings", () => {
     cy.selectTablesAndGo();
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').should(
+      "have.length",
+      2
+    );
+    cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').click({
+      multiple: true,
+    });
+    cy.contains("Binder").click();
+    cy.contains("Ok").click();
+
+    cy.get('[class="sbb-dialog-title ng-star-inserted"]').contains(
+      "Running Metanome"
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "Functional Dependencies and Inclusion Dependencies are currently being searched."
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains("Fetching results");
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "de.metanome.algorithms.hyfd_extended.HyFDExtended with public.part_partsupp_supplier_denormalized"
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "de.metanome.algorithms.hyfd_extended.HyFDExtended with public.nation_region_denormalized"
+    );
+    cy.get(
+      '[class="sbb-dialog-content sbb-scrollbar ng-star-inserted"]'
+    ).contains(
+      "de.metanome.algorithms.binder.BINDERFile with public.nation_region_denormalized,public.part_partsupp_supplier_denormalized"
+    );
+  });
+
+  it("renders the schema editing page after clicking on the Go and Ok button", () => {
+    cy.selectTablesAndGo();
+    cy.loadMetanomeConfigAndOk();
   });
 });

@@ -9,8 +9,11 @@
     "outDir": "dist",
     "paths": {
       "@common/*": ["../common/*"],
-      "@/*": ["./*"]
+      "@/*": ["*"]
     }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   },
   "include": ["./**/*.ts"]
 }

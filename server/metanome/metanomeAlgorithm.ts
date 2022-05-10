@@ -1,18 +1,20 @@
-import { absoluteServerDir } from "../utils/files";
+import { absoluteServerDir } from "@/utils/files";
 import { join } from "path";
-import { sqlUtils } from "../db";
-import { rename } from "fs/promises";
+import { sqlUtils } from "@/db";
+import { rename, copyFile } from "fs/promises";
 import { createHash, randomUUID } from "crypto";
 import * as _ from "lodash";
+import { totalmem } from "os";
 import { addToIndex, getIndexContent } from "./IndexFile";
-
-export type MetanomeConfig = Record<string, string | number | boolean>;
+import {
+  MetanomeResultType,
+  IIndexFileEntry,
+} from "@/definitions/IIndexFileEntry";
+import { IMetanomeConfig } from "@/definitions/IMetanomeConfig";
 
 export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
 
 export default abstract class MetanomeAlgorithm {
-  public memory = "12g";
-
   public static resultsFolder = join(
     absoluteServerDir,
     "metanome",
@@ -26,6 +28,7 @@ export default abstract class MetanomeAlgorithm {
    */
   public async moveFiles(): Promise<void> {
     return rename(this.originalOutputPath(), await this.resultPath());
+    // return copyFile(this.originalOutputPath(), await this.resultPath());
   }
 
   /**
@@ -40,10 +43,11 @@ export default abstract class MetanomeAlgorithm {
       tables: this.schemaAndTables,
       algorithm: this.algoClass(),
       dbmsName: sqlUtils.getDbmsName(),
+      resultType: this.resultType(),
       database: process.env.DB_DATABASE,
       fileName: randomUUID() + ".json",
       config: this.config,
-      createDate: Date.now().toString(),
+      createDate: +Date.now(),
     });
   }
 
@@ -52,33 +56,17 @@ export default abstract class MetanomeAlgorithm {
    */
   public abstract processFiles(): Promise<void>;
 
-  /**
-   * Returns the desired metanome results for the
-   * selected table if they exists.
-   * @throws an error that is of form
-   * { code: 'EMOENT' } if no results exist
-   */
-  public abstract getResults(): Promise<any>;
-
-  // FOR USE FROM OUTSIDE QUEUE
-
-  /**
-   * Adds a job to the metanome queue that runs the requested algorithm
-   * @returns Promise that resolves once the algorithm execution finishes
-   */
-  public abstract execute(config?: MetanomeConfig): Promise<void>;
+  protected abstract resultType(): MetanomeResultType;
 
   /**
    * @returns terminal command to execute the algorithm as string
    */
   public command(): string {
-    return `java -Xmx${
-      this.memory
-    } -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
+    return `java -Xmx${this.memory()} -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
       process.env.DB_TYPE
     }" --table-key "${this.tableKey()}"  --tables "${this.schemaAndTables.join(
       ","
-    )}" --output "file:${this.outputFileName()}" ${this.configString()}}`.replace(
+    )}" --output "file:${this.outputFileName()}" ${this.configString()}`.replace(
       /(\r\n|\n|\r)/gm,
       ""
     );
@@ -87,9 +75,9 @@ export default abstract class MetanomeAlgorithm {
   // INTERNAL
 
   protected classpath_separator = process.platform === "win32" ? ";" : ":";
-  protected config: MetanomeConfig;
+  protected config: IMetanomeConfig;
   protected schemaAndTables: string[];
-  constructor(tables: string[], config: MetanomeConfig = {}) {
+  constructor(tables: string[], config: IMetanomeConfig = { memory: "" }) {
     this.schemaAndTables = tables;
     this.config = config;
   }
@@ -113,15 +101,18 @@ export default abstract class MetanomeAlgorithm {
    */
   public async resultPath(): Promise<string> {
     const metadata = await getIndexContent();
-    const entry = metadata.find((entry) => {
+    const entries = metadata.filter((entry) => {
       return (
         _.isEqual(this.schemaAndTables, entry.tables) &&
-        // _.isEqual(this.config, entry.config) &&
+        _.isEqual(this.config, entry.config) &&
         entry.algorithm == this.algoClass()
       );
     });
-    if (!entry) throw { code: "ENOENT" };
-    return join(MetanomeAlgorithm.resultsFolder, entry.fileName);
+    if (!entries.length) throw { code: "ENOENT" };
+
+    // if there are mutliple fitting entries, take the newest one
+    const sorted = entries.sort((e1, e2) => e2.createDate - e1.createDate);
+    return join(MetanomeAlgorithm.resultsFolder, sorted[0].fileName);
   }
   /**
    * Location of the algorithm-specific jar file relative to the metanome folder
@@ -131,7 +122,7 @@ export default abstract class MetanomeAlgorithm {
   /**
    * Location of the main class file of the algorithm in the JAR defined in {@link algoJarPath}
    */
-  protected abstract algoClass(): string;
+  public abstract algoClass(): string;
 
   /**
    * algorithm-specific table key required by the metanome CLI
@@ -160,16 +151,32 @@ export default abstract class MetanomeAlgorithm {
   protected abstract originalOutputPath(): string;
 
   /**
-   * @returns location where file shouuld be moved to
+   * @returns a valid java memory string to be put after -xmx
+   * Checks whether config.memory is a valid java memory string
+   * and returns it if it is, otherwise it will use 75% of total
+   * system memory
    */
+  protected memory(): string {
+    const asNum = +this.config.memory;
+    const asString = this.config.memory.toString().trim().toLowerCase();
+    // Memory can be a number bigger than 2MB which is a multiple of 1024
+    if (+asNum && !(asNum % 1024) && asNum >= 2 * 1024 * 1024) return asString;
+    // or a number with a suffix abbreviation (kilo, mega, giga...)
+    else if (asString && /^\d+[kmgt]$/gm.test(asString)) return asString;
+    else return ((totalmem() * 0.75) / 1024).toFixed(0) + "k";
+  }
 
+  /**
+   * @returns config in metanome-readable format
+   */
   protected configString(): string {
-    if (!Object.keys(this.config).length) return "";
+    const entries = Object.entries(this.config).filter(
+      (item) => item[0] !== "memory"
+    );
+    if (!entries.length) return "";
     return (
       "--algorithm-config " +
-      Object.entries(this.config)
-        .map((item) => `${item[0]}:${item[1]}`)
-        .join(",")
+      entries.map((item) => `${item[0]}:${item[1]}`).join(",")
     );
   }
 }

@@ -25,16 +25,12 @@ export default class Join {
 
     this.join();
 
-    this.schema.addTables(this.newTable);
-    this.schema.deleteTables(this.referencing);
-    this.schema.deleteTables(this.referenced);
-
     this.schema.calculateFdsOf(this.newTable);
   }
 
   private join() {
     // name, pk
-    this.newTable.pk = this.referencing.pk?.copy();
+    this.newTable.pk = this.referencing.pk?.deepCopy();
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
 
@@ -42,11 +38,10 @@ export default class Join {
     this.referencing.sources.forEach((sourceTable) =>
       this.newTable.sources.push(sourceTable)
     );
-    this.newTable.columns.add(...this.referencing.columns);
+    this.newTable.addColumns(...this.referencing.columns.deepCopy());
     this.newTable.relationships.push(...this.referencing.relationships);
 
     // sources and relationships from referenced table
-
     for (const source of this.referenced.sourcesTopological().reverse()) {
       if (this.referenced.isRoot(source)) {
         if (this.relationship.sourceRelationship().isTrivial) {
@@ -86,14 +81,19 @@ export default class Join {
     }
 
     // columns from referenced table
-    this.newTable.columns.add(
+    this.newTable.addColumns(
       ...this.referenced.columns
-        .copy()
-        .setMinus(new ColumnCombination(this.relationship.referenced))
+        .deepCopy()
         .applySourceMapping(this.sourceMapping)
     );
-
     this.newTable.establishIdentities();
+    if (!this.relationship.sourceRelationship().isTrivial) {
+      this.newTable.removeColumns(
+        ...this.relationship.referenced.map((column) =>
+          column.applySourceMapping(this.sourceMapping)
+        )
+      );
+    }
   }
 
   private findEquivalentSource(

@@ -133,5 +133,27 @@
         [table]="this.table"
       ></app-union-sidebar>
     </sbb-expansion-panel>
+    <sbb-expansion-panel
+      [expanded]="false"
+      [hidden]="this.table.sources.length !== 1"
+    >
+      <sbb-expansion-panel-header
+        >Check Contained Subtable</sbb-expansion-panel-header
+      >
+      <app-check-fd [table]="this.table"></app-check-fd>
+    </sbb-expansion-panel>
+
+    <sbb-expansion-panel
+      [expanded]="false"
+      [hidden]="this.table.sources.length !== 1"
+    >
+      <sbb-expansion-panel-header
+        >Suggest Foreign Key</sbb-expansion-panel-header
+      >
+      <app-check-ind
+        [referencingTable]="this.table"
+        [tables]="this.schema.tables!"
+      ></app-check-ind>
+    </sbb-expansion-panel>
   </sbb-accordion>
 </div>

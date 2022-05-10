@@ -3,8 +3,6 @@ import expressStaticGzip from "express-static-gzip";
 // import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import { getTableRowCounts } from "./routes/rowCounts";
-import getFDs from "./routes/fds";
-import getINDs from "./routes/inds";
 import { getStaticDir } from "./utils/files";
 import morgan from "morgan";
 import getCreateForeignKeySQL from "./routes/persist_schema/createForeignKey";
@@ -18,10 +16,17 @@ import getAddPrimaryKeySQL from "./routes/persist_schema/createPrimaryKey";
 import { getTablePage } from "./routes/tablePage";
 
 import createQueueMonitor from "./queueMonitor";
+import getViolatingRowsForFD from "./routes/violatingRows/fds";
+import getViolatingRowsForFDCount from "./routes/violatingRows/fdRowCounts";
+import getViolatingRowsForSuggestedIND from "./routes/violatingRows/inds";
+import getViolatingRowsForSuggestedINDCount from "./routes/violatingRows/indsRowCounts";
+
 import {
   deleteMetanomeResults,
+  getMetanomeIndex,
   getMetanomeResults,
-} from "./routes/metanomeResults";
+} from "./routes/metanomeResults/";
+import { runMetanome } from "./routes/metanomeResults/run";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -60,16 +65,22 @@ app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
 
 // Metanome
-app.get("/tables/:name/fds", getFDs);
-app.get("/tables/:tableNames/inds", getINDs);
-app.get("/metanomeResults", getMetanomeResults);
+app.get("/metanomeResults", getMetanomeIndex);
+app.get("/metanomeResults/:fileName", getMetanomeResults);
 app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
+app.post("/metanomeResults", runMetanome);
 
 app.post("/persist/createTable", getCreateTableSQL());
 app.post("/persist/createForeignKey", getCreateForeignKeySQL());
 app.post("/persist/schemaPreparation", getSchemaPreparationSQL());
 app.post("/persist/dataTransfer", getDataTransferSQL());
 app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
+
+app.post("/violatingRows/fd", getViolatingRowsForFD);
+app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
+
+app.post("/violatingRows/rowcount/ind", getViolatingRowsForSuggestedINDCount);
+app.post("/violatingRows/ind", getViolatingRowsForSuggestedIND);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 

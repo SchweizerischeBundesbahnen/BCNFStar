@@ -2,23 +2,18 @@ import Column from '../Column';
 import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Relationship from '../Relationship';
-import Schema from '../Schema';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
 export default class Split {
-  public newTables?: [Table, Table];
+  public newTables!: [Table, Table];
 
   public constructor(
-    private schema: Schema,
     private table: Table,
     private fd: FunctionalDependency,
     private generatingName?: string
   ) {
     this.split();
-
-    this.schema.addTables(...this.newTables!);
-    this.schema.deleteTables(this.table);
   }
 
   private split() {
@@ -31,8 +26,8 @@ export default class Split {
     this.projectFds(remaining);
     this.projectFds(generating);
 
-    remaining.pk = this.table.pk;
-    generating.pk = this.fd.lhs.copy();
+    remaining.pk = this.table.pk?.deepCopy();
+    generating.pk = this.fd.lhs.deepCopy();
 
     remaining.schemaName = this.table.schemaName;
     generating.schemaName = this.table.schemaName;
@@ -99,6 +94,9 @@ export default class Split {
     });
   }
 
+  /**
+   * Ersetzt jede column aus columns in table durch eine kopie
+   */
   private substitute(table: Table, columns: ColumnCombination) {
     const mapping = new Map<Column, Column>();
     for (const column of columns) {

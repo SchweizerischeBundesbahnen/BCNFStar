@@ -1,16 +1,19 @@
 import { config } from "dotenv";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { absoluteServerDir, splitlines } from "../utils/files";
+import { absoluteServerDir, splitlines } from "@/utils/files";
 import MsSqlUtils from "./MsSqlUtils";
 import PostgresSqlUtils from "./PostgresSqlUtils";
 import SqlUtils from "./SqlUtils";
 
-export function setupDBCredentials(): SqlUtils {
+/**
+ * Reads the config files and sets environment variables accordingly
+ */
+export function setupDBCredentials(): void {
   try {
     config({ path: join(absoluteServerDir, "..", ".env.local") });
     if (!process.env.DB_PASSFILE)
-      process.env.DB_PASSFILE = getDefaultPgpassLocation();
+      process.env.DB_PASSFILE = getDefaultDbPassfileLocation();
 
     // replace ~ with full home directory, as fs doesn't understand it
     if (process.env.DB_PASSFILE.startsWith("~"))
@@ -38,16 +41,20 @@ The current value of DB_PASSFILE is ${process.env.DB_PASSFILE}`);
       process.exit();
     } else throw e;
   }
-  return createDbUtils();
 }
 
-function getDefaultPgpassLocation(): string {
+function getDefaultDbPassfileLocation(): string {
   if (process.platform == "win32")
     return join(process.env.APPDATA, "postgresql", "pgpass.conf");
   else return join(process.env.HOME, ".pgpass");
 }
 
-function createDbUtils() {
+/**
+ * Creates SqlUtils depending on environment variables.
+ * Should be called after setupDBCredentials
+ * @returns a SqlUtils instance to be used by all other components
+ */
+function createDbUtils(): SqlUtils {
   if (process.env.DB_TYPE == "mssql" || process.env.DB_TYPE == "sqlserver") {
     return new MsSqlUtils(
       process.env.DB_HOST,

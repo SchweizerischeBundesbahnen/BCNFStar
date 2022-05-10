@@ -6,8 +6,12 @@ describe("The schema editing side bar", () => {
 
     cy.selectTablesAndGo();
 
+    cy.loadMetanomeConfigAndOk();
+
     cy.get(".table-head-title")
       .contains("public.nation_region_denormalized")
+      // because we have multiple UI layers with CSS, Cypress may think the element is obstructed
+      // while it isn't
       .click({ force: true });
   });
 

@@ -1,4 +1,5 @@
 import SqlUtils, {
+  DbmsType,
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
@@ -7,6 +8,8 @@ import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
 import ITablePage from "@/definitions/ITablePage";
+import ITable from "@/definitions/ITable";
+import { IColumnRelationship } from "@/definitions/IRelationship";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -56,6 +59,10 @@ export default class PostgresSqlUtils extends SqlUtils {
       []
     );
     return query_result.rows;
+  }
+
+  public UNIVERSAL_DATATYPE(): string {
+    return "text";
   }
 
   public async tableExistsInSchema(
@@ -161,6 +168,158 @@ from
     return result.rows;
   }
 
+  public override async getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const query_result = await this.pool.query(
+      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+        `ORDER BY ${lhs.join(",")}
+        LIMIT ${limit} 
+        OFFSET ${offset}
+        `
+    );
+    return {
+      rows: query_result.rows,
+      attributes: query_result.fields.map((v) => v.name),
+    };
+  }
+
+  public override async getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<number> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+    const count = await this.pool.query<{ count: number }>(
+      `SELECT COUNT (*) as count FROM 
+      (
+      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+      ) AS X
+      `
+    );
+    return count.rows[0].count;
+  }
+
+  public async getViolatingRowsForSuggestedIND(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+    const query_result = await this.pool.query(
+      `${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}` +
+        `
+        ORDER BY ${columnRelationships
+          .map((cc) => cc.referencingColumn)
+          .join(",")}
+        LIMIT ${limit} 
+        OFFSET ${offset}
+        `
+    );
+    return {
+      rows: query_result.rows,
+      attributes: query_result.fields.map((v) => v.name),
+    };
+  }
+
+  public async getViolatingRowsForSuggestedINDCount(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): Promise<number> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+
+    const count = await this.pool.query<{ count: number }>(
+      `SELECT COUNT (*) as count FROM 
+      (
+        ${this.violatingRowsForSuggestedIND_SQL(
+          referencingTable,
+          referencedTable,
+          columnRelationships
+        )}
+      ) AS X
+      `
+    );
+    return count.rows[0].count;
+  }
+
+  public async columnsExistInTable(
+    schema: string,
+    table: string,
+    columns: Array<string>
+  ): Promise<boolean> {
+    try {
+      const queryConfig: QueryConfig = {
+        text: "SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2",
+        name: "columns-in-table",
+        values: [schema, table],
+      };
+      const columnsInTable = await this.pool.query<{ column_name: string }>(
+        queryConfig
+      );
+      return columns.every((c) =>
+        columnsInTable.rows
+          .map((d) => d.column_name.toLowerCase())
+          .includes(c.toLowerCase())
+      );
+    } catch (e) {
+      console.log(e);
+      throw Error("Error while checking if table contains columns.");
+    }
+  }
+
   public override SQL_CREATE_SCHEMA(schema: string): string {
     return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
   }
@@ -188,7 +347,6 @@ from
             : " NULL")
       )
       .join(",");
-    console.log(primaryKey);
     return `CREATE TABLE ${newSchema}.${newTable} (${attributeString});`;
   }
 
@@ -227,7 +385,7 @@ from
   public getJdbcPath(): string {
     return "postgresql-42.3.1.jar";
   }
-  public getDbmsName(): "mssql" | "postgres" {
-    return "postgres";
+  public getDbmsName(): DbmsType {
+    return DbmsType.postgres;
   }
 }

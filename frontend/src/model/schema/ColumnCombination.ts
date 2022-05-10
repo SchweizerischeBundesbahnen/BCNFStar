@@ -21,6 +21,10 @@ export default class ColumnCombination {
     return new ColumnCombination(new Array(...this._columns));
   }
 
+  public deepCopy(): ColumnCombination {
+    return new ColumnCombination(this._columns.map((column) => column.copy()));
+  }
+
   public columnsFromNames(...names: Array<string>) {
     return new ColumnCombination(
       this.asArray().filter((column: Column) => names.includes(column.name))
@@ -128,6 +132,10 @@ export default class ColumnCombination {
 
   public columnNames(): Array<string> {
     return this.inOrder().map((col) => col.name);
+  }
+
+  public sourceColumnNames(): Array<string> {
+    return this.inOrder().map((col) => col.sourceColumn.name);
   }
 
   public toString(): string {

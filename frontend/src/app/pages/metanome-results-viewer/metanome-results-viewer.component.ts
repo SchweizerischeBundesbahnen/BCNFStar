@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { DatabaseService } from '../../database.service';
-import { IIndexFileEntry } from '../../../../../server/definitions/IIndexTableEntry';
+import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
@@ -24,9 +24,15 @@ export class MetanomeResultsViewerComponent {
   }
 
   public async reload() {
-    this.tableData = await firstValueFrom(
-      this.http.get<IIndexFileEntry[]>(this.url)
-    );
+    this.tableData = (
+      await firstValueFrom(this.http.get<IIndexFileEntry[]>(this.url))
+    ).sort(function (a: IIndexFileEntry, b: IIndexFileEntry) {
+      return a.createDate >= b.createDate ? -1 : 1;
+    });
+  }
+
+  async deleteAllEntries() {
+    await Promise.all(this.tableData.map((entry) => this.deleteEntry(entry)));
   }
 
   async deleteEntry(entry: IIndexFileEntry) {

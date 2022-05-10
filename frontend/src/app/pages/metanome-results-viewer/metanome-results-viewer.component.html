@@ -1,26 +1,40 @@
 <sbb-table-wrapper>
-  <h1>Metanome results</h1>
+  <div class="d-flex justify-content-between align-items-center">
+    <h1>Metanome results</h1>
+    <div>
+      <div class="d-flex justify-content-between align-items-center">
+        <div>Delete All Results</div>
+        <button
+          class="delete-all-btn ms-2"
+          sbb-icon-button
+          (click)="deleteAllEntries()"
+        >
+          <sbb-icon svgIcon="kom:trash-medium" class="sbb-icon-fit"></sbb-icon>
+        </button>
+      </div>
+    </div>
+  </div>
   <table class="sbb-table">
     <thead>
       <tr>
-        <th>File name</th>
-        <th>Algorithm</th>
-        <th>Tables</th>
         <th>Config</th>
+        <th>Algorithm</th>
+        <th>File name</th>
+        <th>Tables</th>
         <th>Date</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let entry of this.tableData">
-        <td>{{ entry.fileName }}</td>
-        <td>{{ entry.algorithm }}</td>
-        <td>{{ entry.tables.join("\n") }}</td>
         <td>
           <div *ngFor="let item of entry.config | keyvalue">
             {{ item.key }}: {{ item.value }}
           </div>
         </td>
-        <td>{{ entry.createDate | date }}</td>
+        <td>{{ entry.algorithm }}</td>
+        <td>{{ entry.fileName }}</td>
+        <td>{{ entry.tables.join("\n") }}</td>
+        <td class="creation-date">{{ entry.createDate | date: "medium" }}</td>
         <td>
           <button
             class="delete-btn"

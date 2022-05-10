@@ -7,16 +7,17 @@ import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
 import SplitCommand from 'src/model/commands/SplitCommand';
 import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
-import { Subject } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
-import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { TableRelationship } from '@/src/model/types/TableRelationship';
+import SourceRelationship from '@/src/model/schema/SourceRelationship';
 
 @Component({
   selector: 'app-schema-editing',
@@ -47,8 +48,43 @@ export class SchemaEditingComponent {
     this.selectedColumns = columns;
   }
 
-  public onJoin(fk: TableRelationship): void {
-    let command = new JoinCommand(this.schema, fk);
+  public onClickJoin(fk: TableRelationship): void {
+    const dialogRef = this.dialog.open(JoinDialogComponent, {
+      data: { fk: fk, schema: this.schema },
+    });
+
+    dialogRef
+      .afterClosed()
+      .subscribe(
+        (value: {
+          duplicate: boolean;
+          newTableName?: string;
+          sourceName?: string;
+        }) => {
+          if (value)
+            this.onJoin(
+              fk,
+              value.duplicate,
+              value.newTableName,
+              value.sourceName
+            );
+        }
+      );
+  }
+
+  public onJoin(
+    fk: TableRelationship,
+    duplicate: boolean,
+    newName?: string,
+    sourceName?: string
+  ): void {
+    let command = new JoinCommand(
+      this.schema,
+      fk,
+      duplicate,
+      newName,
+      sourceName
+    );
 
     command.onDo = () => {
       this.selectedTable = undefined;
@@ -61,16 +97,14 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onClickSplit(fd: FunctionalDependency): void {
+  public async onClickSplit(fd: FunctionalDependency) {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
       data: fd,
     });
 
-    dialogRef
-      .afterClosed()
-      .subscribe((value: { fd: FunctionalDependency; name?: string }) => {
-        if (fd) this.onSplitFd(value);
-      });
+    const value: { fd: FunctionalDependency; name?: string } =
+      await firstValueFrom(dialogRef.afterClosed());
+    if (fd) this.onSplitFd(value);
   }
 
   public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {

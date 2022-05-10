@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { EOL } from "os";
-import { sqlUtils } from "../../db";
+import { sqlUtils } from "@/db";
 
 export default function getSchemaPreparationSQL(): RequestHandler {
   async function schemaPreparationStatement(

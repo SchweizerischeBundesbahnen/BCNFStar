@@ -1,0 +1,23 @@
+<div sbbDialogTitle>Join Options</div>
+<div sbbDialogContent>
+  Name of new table
+  <input
+    type="text"
+    sbbInput
+    [(ngModel)]="newTableName"
+    placeholder="{{ fk.referencing.name }}"
+  />
+  <br />
+  Column prefix in case of ambiguous column names
+  <input type="text" sbbInput [(ngModel)]="sourceName" placeholder="" />
+  <br />
+  <div class="sbb-checkbox-group-vertical">
+    <sbb-checkbox [(ngModel)]="duplicate">
+      Duplicate {{ fk.referenced.name }} before joining
+    </sbb-checkbox>
+  </div>
+</div>
+<div sbbDialogActions>
+  <button sbb-button (click)="confirm()" cdkFocusInitial>Ok</button>
+  <button sbb-secondary-button sbbDialogClose>Cancel</button>
+</div>

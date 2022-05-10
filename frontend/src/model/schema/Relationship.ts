@@ -35,6 +35,11 @@ export default class Relationship {
     this._referenced = value;
   }
 
+  public add(referencing: Column, referenced: Column) {
+    this._referencing.push(referencing);
+    this._referenced.push(referenced);
+  }
+
   public sourceRelationship(): SourceRelationship {
     const sourceRel = new SourceRelationship();
     for (const i in this._referencing) {
@@ -53,7 +58,7 @@ export default class Relationship {
     );
   }
 
-  public toString(): String {
+  public toString(): string {
     return this.referencing.toString() + '->' + this.referenced.toString();
   }
 
@@ -69,10 +74,10 @@ export default class Relationship {
         schemaName: this.referenced[0].sourceTableInstance.table.schemaName,
         attributes: [],
       },
-      columnRelationships: this._referencing.map((element, index) => {
+      columnRelationships: this._referencing.map((referencingCol, index) => {
         return {
-          referencingColumn: element.name,
-          referencedColumn: this._referenced[index].name,
+          referencingColumn: referencingCol.sourceColumn.name,
+          referencedColumn: this._referenced[index].sourceColumn.name,
         };
       }),
     };
