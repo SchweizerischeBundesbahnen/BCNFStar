@@ -1,6 +1,13 @@
 <div class="union-dialog">
   <div sbbDialogTitle>Match Columns</div>
   <div sbbDialogContent>
+    Name of the generated table
+    <input
+      type="text"
+      sbbInput
+      [(ngModel)]="newTableName"
+      [placeholder]="tableLeft.name"
+    />
     <div class="row">
       <h2 class="col-3">Columns of {{ tableLeft.fullName }}</h2>
       <h2 class="col-6">Matched Columns</h2>

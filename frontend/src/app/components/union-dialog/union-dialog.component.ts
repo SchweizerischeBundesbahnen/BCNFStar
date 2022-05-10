@@ -22,6 +22,8 @@ export class UnionDialogComponent {
   public tableRightAvailable: Array<Column | null>;
   public tableRightMatched: Array<Column | null> = [];
 
+  public newTableName: string = '';
+
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<UnionDialogComponent>,
