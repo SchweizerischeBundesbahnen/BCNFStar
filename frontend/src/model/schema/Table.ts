@@ -21,6 +21,11 @@ export default class Table {
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
 
+  public surrogateKey: string = '';
+  public implementsSurrogateKey(): boolean {
+    return this.surrogateKey.length > 1;
+  }
+
   /**
    * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
    */

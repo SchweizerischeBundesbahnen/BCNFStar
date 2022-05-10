@@ -131,6 +131,10 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
       });
   }
 
+  public addSurrogateKey(): void {
+    console.log(this.table.surrogateKey);
+  }
+
   public transformIndToFk(): void {
     const ind = this.selectedInd();
     if (!ind) return;
