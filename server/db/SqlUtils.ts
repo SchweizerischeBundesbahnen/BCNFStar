@@ -14,6 +14,7 @@ export type SchemaQueryRow = {
 };
 
 export type ForeignKeyResult = {
+  fk_name: string;
   table_schema: string;
   table_name: string;
   column_name: string;
