@@ -35,10 +35,10 @@ import { JoinDialogComponent } from './components/join-dialog/join-dialog.compon
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
-
 export let InjectorInstance: Injector;
 import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
-import { LoadSavedSchemaComponent } from './pages/load-saved-schema/load-saved-schema.component';
+import { LoadSavedSchemaComponent } from './components/load-saved-schema/load-saved-schema.component';
+import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
 
 @NgModule({
   declarations: [
@@ -79,6 +79,7 @@ import { LoadSavedSchemaComponent } from './pages/load-saved-schema/load-saved-s
     SbbTableModule,
     SbbFormFieldModule,
     SbbToggleModule,
+    SbbFileSelectorModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

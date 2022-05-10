@@ -1,0 +1,11 @@
+<div>
+  <sbb-file-selector
+    (fileChanged)="onChange($event)"
+    accept="text/plain"
+  ></sbb-file-selector>
+</div>
+<div>
+  <button type="button" sbb-button (click)="onLoad()" [disabled]="!file.name">
+    Load
+  </button>
+</div>

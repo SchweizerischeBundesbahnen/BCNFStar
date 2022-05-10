@@ -37,7 +37,6 @@ interface JSONTable {
   schemaName: string;
   columns: JSONColumnCombination;
   pk?: JSONColumnCombination;
-  // fds: Array<JSONFunctionalDependency>;
   relationships: Array<JSONRelationship>;
   sources: Array<JSONSourceTableInstance>;
 }
@@ -85,32 +84,44 @@ interface JSONSourceTable {
 })
 export class LoadSavedSchemaComponent {
   public newSchema = new Schema();
-  public savedSchemas: Map<string, string> = new Map<string, string>();
+  public file: File = new File([], '');
 
-  constructor(public dataService: DatabaseService, public router: Router) {
-    Object.keys(localStorage).forEach((key) => {
-      if (localStorage.getItem(key))
-        this.savedSchemas.set(key, localStorage.getItem(key)!);
-    });
-    // console.log(this.savedSchemas);
+  constructor(public dataService: DatabaseService, public router: Router) {}
+
+  public onChange(fileList: Array<File>) {
+    if (fileList) {
+      this.file = fileList[0];
+    }
   }
 
-  public deleteAll() {
-    localStorage.clear();
-    window.location.reload();
+  public async onLoad() {
+    await this.readFileContent(this.file).then((result) => {
+      this.getSchema(result);
+      this.dataService.schema = this.newSchema;
+      this.router.navigate(['/edit-schema']);
+    });
+  }
+
+  private readFileContent(file: File): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      if (!file) {
+        resolve('');
+      }
+      const fileReader = new FileReader();
+
+      fileReader.onload = () => {
+        if (fileReader.result) {
+          resolve(fileReader.result.toString());
+        }
+      };
+      fileReader.onerror = reject;
+      fileReader.readAsText(file);
+    });
   }
 
   public getSchema(savedSchemaEntry: string) {
-    // console.log(savedSchemaEntry)
-    let schemaObject: JSONSchema = JSON.parse(savedSchemaEntry);
+    let schemaObject = JSON.parse(savedSchemaEntry);
     this.parseSchema(schemaObject);
-    this.dataService.schema = this.newSchema;
-    this.router.navigate(['/edit-schema']);
-    // console.log(this.existingSourceTables)
-    // console.log(this.existingSourceColumns)
-    // console.log(this.existingSourceTableInstances)
-    // console.log(this.existingSourceRelationships)
-    // console.log(this.existingSourceFunctionalDependencies)
   }
 
   private parseSchema(schema: JSONSchema) {
@@ -124,7 +135,6 @@ export class LoadSavedSchemaComponent {
     this.parseTableFds(schema._fds).forEach((sfd) => {
       this.newSchema.addFd(sfd);
     });
-    console.log('schema', this.newSchema);
     this.newSchema.tables.forEach((table) => {
       this.newSchema.calculateFdsOf(table);
     });
@@ -154,12 +164,6 @@ export class LoadSavedSchemaComponent {
 
     if (table.pk && table.pk._columns.length > 0)
       newTable.pk = this.parseColumnCombination(table.pk);
-
-    // let newFds = new Array<FunctionalDependency>();
-    // table.fds.forEach((fd) => {
-    //   newFds.push(this.parseFunctionalDependency(fd));
-    // });
-    // newTable.fds = newFds;
 
     let newRelationships = new Array<Relationship>();
     table.relationships.forEach((relationship) => {
