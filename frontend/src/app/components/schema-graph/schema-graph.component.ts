@@ -259,7 +259,7 @@ export class SchemaGraphComponent implements AfterContentInit {
 
   private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
-    for (let column of table.columns.inOrder()) {
+    for (let column of table.columns) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
         id: column.sourceColumn.table.fullName + '.' + column.name + '_left', // generated if `id` value is not present
