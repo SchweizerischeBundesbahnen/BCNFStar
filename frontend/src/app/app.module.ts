@@ -28,6 +28,7 @@ import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { UnionSidebarComponent } from './components/union-sidebar/union-sidebar.component';
 import { UnionDialogComponent } from './components/union-dialog/union-dialog.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { UnionDialogComponent } from './components/union-dialog/union-dialog.com
     SbbPaginationModule,
     SbbDialogModule,
     SbbTableModule,
+    DragDropModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

@@ -28,8 +28,8 @@ export class UnionSidebarComponent implements OnInit {
   async openDialog(): Promise<void> {
     const dialogRef = this.dialog.open(UnionDialogComponent, {
       data: {
-        table1: this.table,
-        table2: this.otherTable,
+        tableLeft: this.table,
+        tableRight: this.otherTable,
       }, //panelClass: "union-dialog"
     });
 

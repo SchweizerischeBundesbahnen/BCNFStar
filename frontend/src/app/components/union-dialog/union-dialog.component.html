@@ -1,22 +1,86 @@
 <div class="union-dialog">
   <div sbbDialogTitle>Match Columns</div>
   <div sbbDialogContent>
-    <div
-      class="match-columns d-flex mt-1 mb-1"
-      *ngFor="let column of table1.columns"
-    >
-      <div class="matching-column">
-        {{ column.name }}
+    <div class="row">
+      <h2 class="col-3">Columns of {{ tableLeft.fullName }}</h2>
+      <h2 class="col-6">Matched Columns</h2>
+      <h2 class="col-3">Columns of {{ tableRight.fullName }}</h2>
+    </div>
+
+    <div class="row">
+      <div class="grid-child col-3">
+        <div
+          cdkDropList
+          (cdkDropListDropped)="drop($event)"
+          class="list"
+          #tableLeftAvailableList="cdkDropList"
+          [cdkDropListConnectedTo]="[tableLeftMatchedList]"
+          [cdkDropListData]="tableLeftAvailable"
+        >
+          <div class="box" *ngFor="let column of tableLeftAvailable" cdkDrag>
+            {{ column ? column.name : "Fill Column with NULL" }}
+          </div>
+        </div>
       </div>
-      <sbb-select class="select-matching-columns">
-        <sbb-option *ngFor="let column of table2.columns">
-          {{ column.name }}
-        </sbb-option>
-      </sbb-select>
+
+      <div class="grid-child col-3">
+        <div
+          id="tableLeftMatchedList"
+          cdkDropList
+          (cdkDropListDropped)="drop($event)"
+          class="list"
+          #tableLeftMatchedList="cdkDropList"
+          [cdkDropListConnectedTo]="[tableLeftAvailableList]"
+          [cdkDropListData]="tableLeftMatched"
+        >
+          <div class="box" *ngFor="let column of tableLeftMatched" cdkDrag>
+            {{ column ? column.name : "Fill Column with NULL" }}
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-child col-3">
+        <div
+          id="tableRightMatchedList"
+          cdkDropList
+          (cdkDropListDropped)="drop($event)"
+          class="list"
+          #tableRightMatchedList="cdkDropList"
+          [cdkDropListConnectedTo]="[tableRightAvailableList]"
+          [cdkDropListData]="tableRightMatched"
+        >
+          <div class="box" *ngFor="let column of tableRightMatched" cdkDrag>
+            {{ column ? column.name : "Fill Column with NULL" }}
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-child col-3">
+        <div
+          cdkDropList
+          (cdkDropListDropped)="drop($event)"
+          class="list"
+          #tableRightAvailableList="cdkDropList"
+          [cdkDropListConnectedTo]="[tableRightMatchedList]"
+          [cdkDropListData]="tableRightAvailable"
+        >
+          <div class="box" *ngFor="let column of tableRightAvailable" cdkDrag>
+            {{ column ? column.name : "Fill Column with NULL" }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
   <div sbbDialogActions>
-    <button sbb-button [sbbDialogClose]="true" cdkFocusInitial>Union</button>
+    <button
+      sbb-button
+      [sbbDialogClose]="true"
+      cdkFocusInitial
+      [disabled]="!unionPossible()"
+    >
+      Union
+    </button>
     <button sbb-secondary-button sbbDialogClose>Cancel</button>
   </div>
 </div>
