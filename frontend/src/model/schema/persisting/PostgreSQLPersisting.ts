@@ -18,6 +18,12 @@ export default class PostgreSQLPersisting extends SQLPersisting {
   public createTableSql(table: Table): string {
     let columnStrings: string[] = [];
 
+    if (table.implementsSurrogateKey()) {
+      columnStrings.push(
+        `${table.surrogateKey} INT GENERATED ALWAYS AS IDENTITY`
+      );
+    }
+
     for (const column of table.columns) {
       let columnString: string = `${column.name} ${column.dataType} `;
       if (table.pk?.includes(column) || !column.nullable) {
@@ -78,5 +84,12 @@ export default class PostgreSQLPersisting extends SQLPersisting {
 
   public columnIdentifier(column: Column): string {
     return `"${column.sourceTableInstance.identifier}"."${column.sourceColumn.name}"`;
+  }
+
+  public override schemaWideColumnIdentifier(
+    table: Table,
+    column: Column
+  ): string {
+    return `"${table.schemaName}"."${table.name}"."${column.sourceColumn.name}"`;
   }
 }

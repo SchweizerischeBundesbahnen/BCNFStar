@@ -25,6 +25,10 @@ GO
   public createTableSql(table: Table): string {
     let columnStrings: string[] = [];
 
+    if (table.implementsSurrogateKey()) {
+      columnStrings.push(`${table.surrogateKey} INT IDENTITY(1,1)`);
+    }
+
     for (const column of table.columns) {
       let columnString: string = `${column.name} ${column.dataType} `;
       if (table.pk?.includes(column) || !column.nullable) {
@@ -85,5 +89,12 @@ GO
 
   public columnIdentifier(column: Column): string {
     return `[${column.sourceTableInstance.identifier}].[${column.sourceColumn.name}]`;
+  }
+
+  public override schemaWideColumnIdentifier(
+    table: Table,
+    column: Column
+  ): string {
+    return `[${table.schemaName}].[${table.name}].[${column.sourceColumn.name}]`;
   }
 }
