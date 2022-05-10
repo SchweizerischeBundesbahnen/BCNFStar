@@ -9,6 +9,7 @@ describe("The app routing", () => {
   it("renders the schema editing component", () => {
     cy.visitFrontend();
     cy.selectTablesAndGo();
+    cy.loadMetanomeConfigAndOk();
     cy.url().should(
       "contain",
       Cypress.env("FRONTEND_BASEURL") + "/#/edit-schema"

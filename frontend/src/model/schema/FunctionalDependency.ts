@@ -16,7 +16,6 @@ export default class FunctionalDependency {
     this.extend();
   }
 
-  //  "[c_address] --> c_acctbal, c_comment, c_custkey, c_mktsegment, c_name, c_nationkey, c_phone"
   public static fromIFunctionalDependency(
     table: Table,
     iFd: IFunctionalDependency

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { sqlUtils } from "../db";
+import { sqlUtils } from "@/db";
 
 export async function getTableRowCounts(
   req: Request,

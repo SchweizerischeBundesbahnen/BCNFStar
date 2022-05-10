@@ -212,7 +212,7 @@ export default class Schema {
             otherTable.isKey(new ColumnCombination(otherCC))
           );
         if (otherCCs.length == 0) continue;
-        result.set(rel, []);
+        if (!result.has(rel)) result.set(rel, []);
         ccs.forEach((cc) => {
           otherCCs.forEach((otherCC) => {
             result.get(rel)!.push({
@@ -368,7 +368,7 @@ export default class Schema {
       let current = queue.shift()!;
       if (this.splittableFdsOf(current).length > 0) {
         let children = new Split(current, this.splittableFdsOf(current)[0])
-          .newTables!;
+          .newTables;
         queue.push(...children);
       } else {
         resultingTables.push(current);

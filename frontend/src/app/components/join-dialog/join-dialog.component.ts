@@ -15,9 +15,7 @@ export class JoinDialogComponent {
   public fk: TableRelationship;
 
   constructor(
-    // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<JoinDialogComponent>,
-    // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA) data: { fk: TableRelationship; schema: Schema }
   ) {
     this.fk = data.fk;

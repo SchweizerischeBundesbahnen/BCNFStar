@@ -21,6 +21,8 @@ import ColumnCombination from '../model/schema/ColumnCombination';
 import SourceColumn from '../model/schema/SourceColumn';
 import SourceRelationship from '../model/schema/SourceRelationship';
 import SourceFunctionalDependency from '../model/schema/SourceFunctionalDependency';
+import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
+import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 
 @Injectable({
   providedIn: 'root',
@@ -172,12 +174,28 @@ export class DatabaseService {
     this.schema!.calculateFdsOf(table);
   }
 
-  public async setInputTables(tables: Array<Table>) {
-    const inds = this.getINDs(tables);
-    const fds = tables.map(
-      (table) =>
-        [table, this.getFDs(table)] as [Table, Promise<IFunctionalDependency[]>]
-    );
+  /**
+   * Creates InputSchema for use on edit-schema page with the supplied tables
+   * @param tables used on edit-schema page
+   * @param indFile name of a metanome results file that contains INDs for all the tables
+   * @param fdFiles Record that maps from table.schemaAndName to FD result file name
+   */
+  public async setInputTables(
+    tables: Array<Table>,
+    indFile: string,
+    fdFiles: Record<string, string>
+  ) {
+    const indPromise = this.getMetanomeResult(indFile) as Promise<
+      Array<IInclusionDependency>
+    >;
+    const fdPromises = new Map<Table, Promise<Array<IFunctionalDependency>>>();
+    for (const table of tables)
+      fdPromises.set(
+        table,
+        this.getMetanomeResult(fdFiles[table.fullName]) as Promise<
+          Array<IFunctionalDependency>
+        >
+      );
 
     this.schema = new Schema(...tables);
     for (const table of tables) {
@@ -192,30 +210,31 @@ export class DatabaseService {
         );
     }
 
-    for (const [table, tableFds] of fds) {
+    for (const [table, tableFds] of fdPromises.entries()) {
       this.resolveFds(await tableFds, table);
     }
-    this.resolveInds(await inds);
+    this.resolveInds(await indPromise);
     this.resolveIFks(this.iFks);
     this.resolveIPks(this.iPks);
   }
 
-  private getFDs(table: Table): Promise<Array<IFunctionalDependency>> {
-    return firstValueFrom(
-      this.http.get<Array<IFunctionalDependency>>(
-        `${this.baseUrl}/tables/${table.fullName}/fds`
+  public async runMetanome(entry: IIndexFileEntry) {
+    const job: IMetanomeJob = {
+      algoClass: entry.algorithm,
+      config: entry.config,
+      schemaAndTables: entry.tables,
+    };
+    return await firstValueFrom(
+      this.http.post<{ message: string; fileName: string }>(
+        `${this.baseUrl}/metanomeResults/`,
+        job
       )
     );
   }
 
-  private getINDs(tables: Array<Table>): Promise<Array<IInclusionDependency>> {
-    let tableNamesConcatenation = tables
-      .map((table) => table.fullName)
-      .join(',');
+  private getMetanomeResult(fileName: string) {
     return firstValueFrom(
-      this.http.get<Array<IInclusionDependency>>(
-        `${this.baseUrl}/tables/${tableNamesConcatenation}/inds`
-      )
+      this.http.get(`${this.baseUrl}/metanomeResults/${fileName}`)
     );
   }
 
