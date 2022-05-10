@@ -6,7 +6,7 @@ import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
 export default class Split {
-  public newTables?: [Table, Table];
+  public newTables!: [Table, Table];
 
   public constructor(
     private table: Table,

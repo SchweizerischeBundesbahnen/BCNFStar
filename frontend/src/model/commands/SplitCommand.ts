@@ -1,4 +1,5 @@
 import FunctionalDependency from '../schema/FunctionalDependency';
+import Split from '../schema/methodObjects/Split';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
 import Command from './Command';
@@ -19,7 +20,12 @@ export default class SplitCommand extends Command {
   }
 
   protected override _do(): void {
-    this.children = this.schema.split(this.table, this.fd, this.generatingName);
+    this.children = new Split(
+      this.table,
+      this.fd,
+      this.generatingName
+    ).newTables;
+    this._redo();
   }
 
   protected override _undo(): void {
