@@ -1,3 +1,4 @@
+import { TableRelationship } from '../../types/TableRelationship';
 import Column from '../Column';
 import Schema from '../Schema';
 import SourceTable from '../SourceTable';
@@ -43,7 +44,9 @@ export default class PostgreSQLPersisting extends SQLPersisting {
 
     Sql = `INSERT INTO ${this.tableIdentifier(
       table
-    )} SELECT DISTINCT ${table.columns
+    )} (${this.generateColumnString(
+      table.columns.asArray()
+    )}) SELECT DISTINCT ${table.columns
       .asArray()
       .map((col) => `${this.columnIdentifier(col)}`)
       .join(', ')} FROM ${table.sources
@@ -70,6 +73,27 @@ export default class PostgreSQLPersisting extends SQLPersisting {
     return Sql;
   }
 
+  // https://stackoverflow.com/questions/47925251/postgresql-update-row-based-on-the-same-table#:~:text=In%20Postgres%20SQL%2C%20you%20should%20not%20repeat%20the%20name%20of%20the%20target%20table%20in%20the%20FROM%20clause%20(so%20you%20cannot%20use%20a%20JOIN)
+  public override updateSurrogateKeySql(fk: TableRelationship): string {
+    return `
+    UPDATE  ${this.tableIdentifier(fk.referencing)}  
+    SET FK_${fk.referenced.surrogateKey} = ${this.tableIdentifier(
+      fk.referenced
+    )}.${fk.referenced.surrogateKey} 
+    FROM  ${this.tableIdentifier(fk.referencing)} AS X, ${this.tableIdentifier(
+      fk.referenced
+    )}
+    WHERE ${fk.relationship.referencing
+      .map(
+        (c, i) =>
+          `X.${c.sourceColumn.name} = ${this.schemaWideColumnIdentifier(
+            fk.referenced,
+            fk.relationship.referenced[i]
+          )}`
+      )
+      .join(' AND ')};`;
+  }
+
   public generateColumnString(columns: Column[]): string {
     return columns.map((c) => `"${c.name}"`).join(', ');
   }
@@ -91,5 +115,8 @@ export default class PostgreSQLPersisting extends SQLPersisting {
     column: Column
   ): string {
     return `"${table.schemaName}"."${table.name}"."${column.sourceColumn.name}"`;
+  }
+  public override suffix(): string {
+    return '';
   }
 }
