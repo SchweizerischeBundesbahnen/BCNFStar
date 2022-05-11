@@ -22,9 +22,9 @@ export default class Table {
   private _keys?: Array<ColumnCombination>;
 
   /**
-   * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
+   * cached results of schema.fdClustersOf(this). Should not be accessed from outside the schema class
    */
-  public _splittableFdClusters!: Array<{
+  public _fdClusters!: Array<{
     columns: ColumnCombination;
     fds: Array<FunctionalDependency>;
   }>;
@@ -187,6 +187,16 @@ export default class Table {
 
   public generatingSchema(fd: FunctionalDependency): ColumnCombination {
     return fd.rhs.deepCopy();
+  }
+
+  public splitPreservesCC(
+    fd: FunctionalDependency,
+    cc: ColumnCombination
+  ): boolean {
+    return (
+      cc.isSubsetOf(this.remainingSchema(fd)) ||
+      cc.isSubsetOf(this.generatingSchema(fd))
+    );
   }
 
   /**

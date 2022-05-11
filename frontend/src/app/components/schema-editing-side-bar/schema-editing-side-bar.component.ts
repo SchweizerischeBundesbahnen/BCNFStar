@@ -107,7 +107,7 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
   public fdClusters(): Array<FdCluster> {
     const cc = this.fdClusterFilter;
     return this.schema
-      .splittableFdClustersOf(this.table)
+      .fdClustersOf(this.table)
       .filter((c) => cc.isSubsetOf(c.columns));
   }
 

@@ -87,6 +87,18 @@ export default class Schema {
     return count;
   }
 
+  public referencesOf(table: Table): Array<TableRelationship> {
+    //könnte noch gecached werden
+    const result = new Array<TableRelationship>();
+    for (const other of this.tables) {
+      if (other == table) continue;
+      result.push(
+        ...this.fksOf(other).filter((rel) => rel.referenced == table)
+      );
+    }
+    return result;
+  }
+
   public fksOf(table: Table): Array<TableRelationship> {
     if (!table._relationshipsValid) this.updateRelationshipsOf(table);
     return table._fks;
@@ -299,13 +311,13 @@ export default class Schema {
     }
   }
 
-  public splittableFdClustersOf(table: Table): Array<FdCluster> {
-    if (!table._splittableFdClusters)
-      table._splittableFdClusters = this.calculateSplittableFdClustersOf(table);
-    return table._splittableFdClusters;
+  public fdClustersOf(table: Table): Array<FdCluster> {
+    if (!table._fdClusters)
+      table._fdClusters = this.calculateFdClustersOf(table);
+    return table._fdClusters;
   }
 
-  public calculateSplittableFdClustersOf(table: Table): Array<FdCluster> {
+  public calculateFdClustersOf(table: Table): Array<FdCluster> {
     let clusters = new Array<FdCluster>();
     if (table.pk)
       clusters.push({
@@ -314,7 +326,7 @@ export default class Schema {
           new FunctionalDependency(table.pk!.copy(), table.columns.copy())
         ),
       });
-    for (let fd of this.splittableFdsOf(table)) {
+    for (let fd of table.violatingFds()) {
       let cluster = [...clusters].find((c) => c.columns.equals(fd.rhs));
       if (!cluster) {
         cluster = { columns: fd.rhs.copy(), fds: new Array() };
@@ -329,14 +341,29 @@ export default class Schema {
     return table.violatingFds().filter((fd) => this.isFdSplittable(fd, table));
   }
 
+  public fdSplitFKViolationsOf(
+    fd: FunctionalDependency,
+    table: Table
+  ): Array<ColumnCombination> {
+    return this.fksOf(table)
+      .map((fk) => new ColumnCombination(fk.relationship.referencing))
+      .filter((cc) => !table.splitPreservesCC(fd, cc));
+  }
+
+  public fdSplitReferenceViolationsOf(
+    fd: FunctionalDependency,
+    table: Table
+  ): Array<ColumnCombination> {
+    return this.referencesOf(table)
+      .map((ref) => new ColumnCombination(ref.relationship.referenced))
+      .filter((cc) => !table.splitPreservesCC(fd, cc));
+  }
+
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
-    return [...this.fksOf(table)].every((fk) => {
-      let fkColumns = new ColumnCombination(fk.relationship.referencing);
-      return (
-        fkColumns.isSubsetOf(table.remainingSchema(fd)) ||
-        fkColumns.isSubsetOf(table.generatingSchema(fd))
-      );
-    });
+    return (
+      this.fdSplitFKViolationsOf(fd, table).length == 0 &&
+      this.fdSplitReferenceViolationsOf(fd, table).length == 0
+    );
   }
 
   public autoNormalize(...table: Array<Table>): Array<Table> {
@@ -344,12 +371,11 @@ export default class Schema {
     let resultingTables = new Array<Table>();
     while (queue.length > 0) {
       let current = queue.shift()!;
-      if (this.splittableFdsOf(current).length > 0) {
-        let newTables = new Split(current, this.splittableFdsOf(current)[0])
-          .newTables;
+      let splittableFds = this.splittableFdsOf(current);
+      if (splittableFds.length > 0) {
+        let newTables = new Split(current, splittableFds[0]).newTables;
         this.deleteTables(current);
         this.addTables(...newTables);
-
         queue.push(...newTables);
       } else {
         resultingTables.push(current);
