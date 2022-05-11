@@ -2,6 +2,7 @@ import { exampleSchema } from "../../utils/exampleTables";
 import Schema from "../../../frontend/src/model/schema/Schema";
 import Table from "../../../frontend/src/model/schema/Table";
 import Column from "../../../frontend/src/model/schema/Column";
+import JoinCommand from "../../../frontend/src/model/commands/JoinCommand";
 import SourceTableInstance from "../../../frontend/src/model/schema/SourceTableInstance";
 import FunctionalDependency from "../../../frontend/src/model/schema/FunctionalDependency";
 import ColumnCombination from "../../../frontend/src/model/schema/ColumnCombination";
@@ -22,16 +23,29 @@ describe("Schema", () => {
 
   it("fds of joined tables contain right fds", () => {
     const relAC = schema.fksOf(tableA).find((rel) => rel.referenced == tableC)!;
-    let table = schema.join(
-      schema.fksOf(tableA).find((rel) => rel.referenced == tableB)!
+
+    let join = new JoinCommand(
+      schema,
+      schema.fksOf(tableA).find((rel) => rel.referenced == tableB)!,
+      false
     );
-    table = schema.join(
+    join.do();
+    let table = join.newTable!;
+
+    join = new JoinCommand(
+      schema,
       schema
         .fksOf(table)
-        .find((rel) => rel.relationship.referencing[0].name != "A5")!
+        .find((rel) => rel.relationship.referencing[0].name != "A5")!,
+      false
     );
+    join.do();
+    table = join.newTable!;
+
     relAC.referencing = table;
-    table = schema.join(relAC);
+    join = new JoinCommand(schema, relAC, false);
+    join.do();
+    table = join.newTable!;
 
     const colsBySource = table.columnsBySource();
 
