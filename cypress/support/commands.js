@@ -52,6 +52,23 @@ Cypress.Commands.add("selectTablesAndGo", { prevSubject: false }, () => {
   cy.contains("Go").click();
 });
 
+Cypress.Commands.add(
+  "selectTablesAndGo",
+  { prevSubject: false },
+  (tablenames) => {
+    // expand expandable if it isn't expanded yet
+    cy.get("sbb-expansion-panel").then(($el) => {
+      if (!$el.hasClass("sbb-expanded")) {
+        cy.contains("public").click();
+      }
+    });
+    for (const table of tablenames) {
+      cy.contains(table).click();
+    }
+    cy.contains("Go").click();
+  }
+);
+
 Cypress.Commands.add("loadMetanomeConfigAndOk", { prevSubject: false }, () => {
   cy.contains("Ok").click();
 
