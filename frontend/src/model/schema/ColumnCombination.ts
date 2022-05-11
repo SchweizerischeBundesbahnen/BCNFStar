@@ -26,13 +26,13 @@ export default class ColumnCombination {
   }
 
   public columnsFromNames(...names: Array<string>) {
-    return new ColumnCombination(
-      this.asArray().filter((column: Column) => names.includes(column.name))
-    );
+    return names.map((name) => this.columnFromName(name));
   }
 
-  public columnFromName(name: string) {
-    return this.asArray().find((column: Column) => name.includes(column.name));
+  public columnFromName(name: string): Column {
+    const result = this.asArray().find((column) => name.includes(column.name));
+    if (!result) console.error('column with name ' + name + ' not found');
+    return result!;
   }
 
   public columnsFromIds(...numbers: Array<number>) {
