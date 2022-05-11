@@ -1,6 +1,5 @@
 import { FdCluster } from '@/src/model/types/FdCluster';
 import { TableRelationship } from '../types/TableRelationship';
-import SplitCommand from '../commands/SplitCommand';
 import FunctionalDependency from './FunctionalDependency';
 import IndScore from './methodObjects/IndScore';
 import Relationship from './Relationship';
@@ -11,6 +10,7 @@ import SourceFunctionalDependency from './SourceFunctionalDependency';
 import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
+import Split from './methodObjects/Split';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -345,13 +345,12 @@ export default class Schema {
     while (queue.length > 0) {
       let current = queue.shift()!;
       if (this.splittableFdsOf(current).length > 0) {
-        let split = new SplitCommand(
-          this,
-          current,
-          this.splittableFdsOf(current)[0]
-        );
-        split.do();
-        queue.push(...split.children!);
+        let newTables = new Split(current, this.splittableFdsOf(current)[0])
+          .newTables;
+        this.deleteTables(current);
+        this.addTables(...newTables);
+
+        queue.push(...newTables);
       } else {
         resultingTables.push(current);
       }
