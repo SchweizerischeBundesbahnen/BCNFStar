@@ -1,13 +1,23 @@
 <div sbbDialogTitle>Split Options</div>
 <div sbbDialogContent>
-  FK Violations
-  <div *ngFor="let fk of fkViolations">{{ fk.referenced }}<br /></div>
-  <br />
-  Reference Violations
-  <div *ngFor="let ref of referenceViolations">
-    {{ ref.referencing }}
+  <div *ngIf="fkViolations.length > 0" class="violation">
+    These foreign keys would be destroyed when splitting:
+    <ul>
+      <li *ngFor="let fk of fkViolations">
+        {{ toString(fk) }}
+      </li>
+    </ul>
   </div>
-  <br />
+
+  <div *ngIf="referenceViolations.length > 0" class="violation">
+    These referenced keys would be destroyed when splitting:
+    <ul>
+      <li *ngFor="let ref of referenceViolations">
+        {{ toString(ref) }}
+      </li>
+    </ul>
+  </div>
+
   Name of the generated table
   <input
     type="text"
@@ -15,6 +25,7 @@
     [(ngModel)]="tableName"
     placeholder="if empty: column names of the chosen subtable key"
   />
+
   <div>
     Which of these attributes are determined by {{ fd.lhs.toString() }}:
   </div>

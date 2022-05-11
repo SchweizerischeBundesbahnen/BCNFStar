@@ -1,4 +1,5 @@
 import Column from '@/src/model/schema/Column';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
@@ -54,6 +55,14 @@ export class SplitDialogComponent {
       this.fd,
       this.table
     );
+  }
+
+  public toString(rel: TableRelationship): string {
+    return `(${rel.referencing.name}) ${new ColumnCombination(
+      rel.relationship.referencing
+    ).toString()} -> (${rel.referenced.name}) ${new ColumnCombination(
+      rel.relationship.referenced
+    ).toString()}`;
   }
 
   public canConfirm() {
