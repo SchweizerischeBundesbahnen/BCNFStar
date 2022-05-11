@@ -1,6 +1,8 @@
 import Column from '@/src/model/schema/Column';
-import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
+import Schema from '@/src/model/schema/Schema';
+import Table from '@/src/model/schema/Table';
+import { TableRelationship } from '@/src/model/types/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 
@@ -10,25 +12,48 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
   styleUrls: ['./split-dialog.component.css'],
 })
 export class SplitDialogComponent {
+  public fd: FunctionalDependency;
+  public table: Table;
+  public schema: Schema;
+  public fkViolations!: Array<TableRelationship>;
+  public referenceViolations!: Array<TableRelationship>;
+
   public selectedColumns = new Map<Column, Boolean>();
-  public columns = new Array<Column>();
 
   public tableName: string;
+
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<SplitDialogComponent>,
     // eslint-disable-next-line no-unused-vars
-    @Inject(SBB_DIALOG_DATA) public fd: FunctionalDependency
+    @Inject(SBB_DIALOG_DATA)
+    data: { fd: FunctionalDependency; table: Table; schema: Schema }
   ) {
-    fd.rhs
+    this.fd = new FunctionalDependency(data.fd.lhs.copy(), data.fd.rhs.copy());
+    this.table = data.table;
+    this.schema = data.schema;
+    this.updateViolations();
+    this.fd.rhs
       .copy()
-      .setMinus(fd.lhs)
+      .setMinus(this.fd.lhs)
       .asArray()
-      .forEach((column) => {
-        this.selectedColumns.set(column, true);
-        this.columns.push(column);
-      });
-    this.tableName = fd.lhs.columnNames().join('_').substring(0, 50);
+      .forEach((column) => this.selectedColumns.set(column, true));
+    this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
+  }
+
+  public setColumnSelection(column: Column, value: boolean) {
+    this.selectedColumns.set(column, value);
+    if (value) this.fd.rhs.add(column);
+    else this.fd.rhs.delete(column);
+    this.updateViolations();
+  }
+
+  public updateViolations() {
+    this.fkViolations = this.schema.fdSplitFKViolationsOf(this.fd, this.table);
+    this.referenceViolations = this.schema.fdSplitReferenceViolationsOf(
+      this.fd,
+      this.table
+    );
   }
 
   public canConfirm() {
@@ -36,13 +61,6 @@ export class SplitDialogComponent {
   }
 
   public confirm() {
-    let new_rhs = [...this.selectedColumns]
-      .filter(([, included]) => included)
-      .map(([column]) => column);
-    let new_fd = new FunctionalDependency(
-      this.fd.lhs,
-      new ColumnCombination(new_rhs)
-    );
-    this.dialogRef.close({ fd: new_fd, name: this.tableName });
+    this.dialogRef.close({ fd: this.fd, name: this.tableName });
   }
 }

@@ -99,7 +99,11 @@ export class SchemaEditingComponent {
 
   public async onClickSplit(fd: FunctionalDependency) {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
-      data: fd,
+      data: {
+        fd: fd,
+        table: this.selectedTable!,
+        schema: this.schema,
+      },
     });
 
     const value: { fd: FunctionalDependency; name?: string } =

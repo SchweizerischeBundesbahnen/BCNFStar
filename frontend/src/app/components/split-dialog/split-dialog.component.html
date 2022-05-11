@@ -1,5 +1,13 @@
 <div sbbDialogTitle>Split Options</div>
 <div sbbDialogContent>
+  FK Violations
+  <div *ngFor="let fk of fkViolations">{{ fk.referenced }}<br /></div>
+  <br />
+  Reference Violations
+  <div *ngFor="let ref of referenceViolations">
+    {{ ref.referencing }}
+  </div>
+  <br />
   Name of the generated table
   <input
     type="text"
@@ -13,8 +21,8 @@
   <div class="sbb-checkbox-group-vertical">
     <sbb-checkbox
       [ngModel]="selectedColumns.get(column)"
-      (ngModelChange)="selectedColumns.set(column, $event)"
-      *ngFor="let column of columns"
+      (ngModelChange)="setColumnSelection(column, $event)"
+      *ngFor="let column of selectedColumns.keys()"
     >
       {{ column.name }}
     </sbb-checkbox>

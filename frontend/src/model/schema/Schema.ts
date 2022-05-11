@@ -344,19 +344,27 @@ export default class Schema {
   public fdSplitFKViolationsOf(
     fd: FunctionalDependency,
     table: Table
-  ): Array<ColumnCombination> {
-    return this.fksOf(table)
-      .map((fk) => new ColumnCombination(fk.relationship.referencing))
-      .filter((cc) => !table.splitPreservesCC(fd, cc));
+  ): Array<TableRelationship> {
+    return this.fksOf(table).filter(
+      (fk) =>
+        !table.splitPreservesCC(
+          fd,
+          new ColumnCombination(fk.relationship.referencing)
+        )
+    );
   }
 
   public fdSplitReferenceViolationsOf(
     fd: FunctionalDependency,
     table: Table
-  ): Array<ColumnCombination> {
-    return this.referencesOf(table)
-      .map((ref) => new ColumnCombination(ref.relationship.referenced))
-      .filter((cc) => !table.splitPreservesCC(fd, cc));
+  ): Array<TableRelationship> {
+    return this.referencesOf(table).filter(
+      (ref) =>
+        !table.splitPreservesCC(
+          fd,
+          new ColumnCombination(ref.relationship.referenced)
+        )
+    );
   }
 
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
