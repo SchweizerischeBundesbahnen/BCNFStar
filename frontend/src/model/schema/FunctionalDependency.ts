@@ -23,7 +23,10 @@ export default class FunctionalDependency {
     const lhs = table.columns.columnsFromNames(...iFd.lhsColumns);
     const rhs = table.columns.columnsFromNames(...iFd.rhsColumns);
 
-    return new FunctionalDependency(lhs, rhs);
+    return new FunctionalDependency(
+      new ColumnCombination(lhs),
+      new ColumnCombination(rhs)
+    );
   }
 
   private extend(): void {
