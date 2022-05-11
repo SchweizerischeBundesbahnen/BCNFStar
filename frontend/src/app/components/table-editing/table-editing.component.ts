@@ -12,7 +12,7 @@ export class TableEditingComponent implements OnChanges {
   @Input() public table!: Table;
 
   /**
-   * curretly edited column
+   * Currently edited column
    */
   public editingColumn?: Column;
   /**
@@ -21,7 +21,7 @@ export class TableEditingComponent implements OnChanges {
   public columnNameEditString: string = '';
 
   /**
-   * currently edited source
+   * Currently edited source
    */
   public editingSource?: SourceTableInstance;
   /**
