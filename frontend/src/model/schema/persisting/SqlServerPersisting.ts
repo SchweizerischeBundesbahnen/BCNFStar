@@ -97,4 +97,7 @@ GO
   ): string {
     return `[${table.schemaName}].[${table.name}].[${column.sourceColumn.name}]`;
   }
+  public override suffix(): string {
+    return '\n GO \n';
+  }
 }

@@ -57,12 +57,11 @@ export default abstract class SQLPersisting {
     return `ALTER TABLE  ${this.tableIdentifier(fk.referencing)}  ADD FK_${
       fk.referenced.surrogateKey
     } INT;
-    GO
+    ${this.suffix()}
     `;
   }
 
   public updateSurrogateKeySql(fk: TableRelationship): string {
-    console.log(fk);
     return `
     UPDATE  ${this.tableIdentifier(fk.referencing)}  
     SET FK_${fk.referenced.surrogateKey} = ${this.tableIdentifier(
@@ -138,4 +137,5 @@ ALTER TABLE ${this.tableIdentifier(
     column: Column
   ): string;
   public abstract columnIdentifier(column: Column): string;
+  public abstract suffix(): string;
 }
