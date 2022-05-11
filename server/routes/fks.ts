@@ -10,14 +10,13 @@ export default async function getFks(
     const query_result = await sqlUtils.getForeignKeys();
     const fkLookup = new Map<string, IForeignKey>();
     for (const row of query_result) {
-      const lookupString = `${row.table_schema}.${row.table_name}#${row.foreign_table_schema}.${row.foreign_table_name}`;
-      if (!fkLookup.get(lookupString)) {
-        fkLookup.set(lookupString, {
+      if (!fkLookup.has(row.fk_name)) {
+        fkLookup.set(row.fk_name, {
           referencing: [],
           referenced: [],
         });
       }
-      const fk = fkLookup.get(lookupString);
+      const fk = fkLookup.get(row.fk_name);
       fk.referencing.push({
         schemaIdentifier: row.table_schema,
         tableIdentifier: row.table_name,
