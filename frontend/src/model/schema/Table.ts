@@ -9,6 +9,7 @@ import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import SourceRelationship from './SourceRelationship';
+import { FdCluster } from '../types/FdCluster';
 
 export default class Table {
   public name = '';
@@ -20,14 +21,8 @@ export default class Table {
   public sources = new Array<SourceTableInstance>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
+  private _fdClusters?: Array<FdCluster>;
 
-  /**
-   * cached results of schema.fdClustersOf(this). Should not be accessed from outside the schema class
-   */
-  public _fdClusters!: Array<{
-    columns: ColumnCombination;
-    fds: Array<FunctionalDependency>;
-  }>;
   /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
@@ -361,6 +356,28 @@ export default class Table {
         });
     }
     return this._violatingFds;
+  }
+
+  public fdClusters(): Array<FdCluster> {
+    if (!this._fdClusters) {
+      this._fdClusters = new Array<FdCluster>();
+      if (this.pk)
+        this._fdClusters.push({
+          columns: this.columns.copy(),
+          fds: new Array(
+            new FunctionalDependency(this.pk!.copy(), this.columns.copy())
+          ),
+        });
+      for (let fd of this.violatingFds()) {
+        let cluster = this._fdClusters.find((c) => c.columns.equals(fd.rhs));
+        if (!cluster) {
+          cluster = { columns: fd.rhs.copy(), fds: new Array() };
+          this._fdClusters.push(cluster);
+        }
+        cluster.fds.push(fd);
+      }
+    }
+    return this._fdClusters;
   }
 
   public toTestString(): string {

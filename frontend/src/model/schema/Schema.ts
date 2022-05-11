@@ -1,4 +1,3 @@
-import { FdCluster } from '@/src/model/types/FdCluster';
 import { TableRelationship } from '../types/TableRelationship';
 import SplitCommand from '../commands/SplitCommand';
 import FunctionalDependency from './FunctionalDependency';
@@ -309,32 +308,6 @@ export default class Schema {
         }
       }
     }
-  }
-
-  public fdClustersOf(table: Table): Array<FdCluster> {
-    if (!table._fdClusters)
-      table._fdClusters = this.calculateFdClustersOf(table);
-    return table._fdClusters;
-  }
-
-  public calculateFdClustersOf(table: Table): Array<FdCluster> {
-    let clusters = new Array<FdCluster>();
-    if (table.pk)
-      clusters.push({
-        columns: table.columns.copy(),
-        fds: new Array(
-          new FunctionalDependency(table.pk!.copy(), table.columns.copy())
-        ),
-      });
-    for (let fd of table.violatingFds()) {
-      let cluster = [...clusters].find((c) => c.columns.equals(fd.rhs));
-      if (!cluster) {
-        cluster = { columns: fd.rhs.copy(), fds: new Array() };
-        clusters.push(cluster);
-      }
-      cluster.fds.push(fd);
-    }
-    return clusters;
   }
 
   public splittableFdsOf(table: Table): Array<FunctionalDependency> {
