@@ -30,7 +30,7 @@ export class SplitDialogComponent {
     @Inject(SBB_DIALOG_DATA)
     data: { fd: FunctionalDependency; table: Table; schema: Schema }
   ) {
-    this.fd = new FunctionalDependency(data.fd.lhs.copy(), data.fd.rhs.copy());
+    this.fd = data.fd.copy();
     this.table = data.table;
     this.schema = data.schema;
     this.updateViolations();
