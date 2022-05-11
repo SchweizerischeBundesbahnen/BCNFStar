@@ -9,18 +9,14 @@ export default class SourceTableInstance {
    * Whether the id is needed to enforce unique source names. See id
    */
   public useId = false;
-  /**
-   * Whether an alias is used. This is either the case when the user specifies an alias or when the same SourceTable
-   * is used more than once in a Table
-   */
-  public useAlias = false;
+  public userAlias?: string;
 
-  constructor(public table: SourceTable, public customAlias?: string) {
-    this.useAlias = !!customAlias;
+  constructor(public table: SourceTable, userAlias?: string) {
+    this.setUserAlias(userAlias);
   }
 
   public get baseAlias(): string {
-    return this.customAlias || this.defaultName;
+    return this.userAlias ?? this.defaultName;
   }
 
   /**
@@ -32,12 +28,13 @@ export default class SourceTableInstance {
     return alias;
   }
 
-  public get identifier() {
-    return this.useAlias ? this.alias : this.table.name;
-  }
-
   public get defaultName() {
     return this.table.name;
+  }
+
+  public setUserAlias(newAlias?: string) {
+    if (!newAlias || newAlias == this.defaultName) this.userAlias = undefined;
+    this.userAlias = newAlias;
   }
 
   public equals(other: SourceTableInstance): boolean {

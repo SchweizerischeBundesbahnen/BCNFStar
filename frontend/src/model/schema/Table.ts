@@ -119,7 +119,7 @@ export default class Table {
       if (checked.has(column)) continue;
       const sameName = this.columns
         .asArray()
-        .filter((other) => other.sourceColumn.name == column.sourceColumn.name);
+        .filter((other) => other.baseAlias == column.baseAlias);
       if (sameName.length > 1)
         sameName.forEach(
           (equivColumn) => (equivColumn.includeSourceName = true)
@@ -139,25 +139,29 @@ export default class Table {
     this.checkColumnNameDuplicates();
   }
 
+  public checkSourceNameDuplicates() {
+    const checked = new Set<SourceTableInstance>();
+    for (const source of this.sources) {
+      if (checked.has(source)) continue;
+      const sameName = this.sources.filter(
+        (other) => other.baseAlias == source.baseAlias
+      );
+      const useId = sameName.length > 1;
+      sameName.forEach((equivSource, i) => {
+        equivSource.id = i + 1;
+        equivSource.useId = useId;
+      });
+      sameName.forEach((source) => checked.add(source));
+    }
+  }
+
   public addSource(
     sourceTable: SourceTable,
     name?: string
   ): SourceTableInstance {
     const newSource = new SourceTableInstance(sourceTable, name);
-    const sameAlias = this.sources.filter(
-      (source) => source.baseAlias == newSource.baseAlias
-    );
-    newSource.id = sameAlias.length + 1;
-    if (sameAlias.length == 1) {
-      sameAlias[0].useAlias = true;
-      sameAlias[0].useId = true;
-    }
-    if (sameAlias.length >= 1) {
-      newSource.useAlias = true;
-      newSource.useId = true;
-    }
-
     this.sources.push(newSource);
+    this.checkSourceNameDuplicates();
     return newSource;
   }
 

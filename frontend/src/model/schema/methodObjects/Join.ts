@@ -52,7 +52,10 @@ export default class Join {
         } else {
           this.sourceMapping.set(
             source,
-            this.newTable.addSource(source.table, this.name)
+            this.newTable.addSource(
+              source.table,
+              this.newUserAlias(source.baseAlias)
+            )
           );
           this.newTable.relationships.push(
             this.relationship.applySourceMapping(this.sourceMapping)
@@ -66,7 +69,10 @@ export default class Join {
         } else {
           this.sourceMapping.set(
             source,
-            this.newTable.addSource(source.table, this.name)
+            this.newTable.addSource(
+              source.table,
+              this.newUserAlias(source.baseAlias)
+            )
           );
           this.newTable.relationships.push(
             this.referenced.relationships
@@ -113,5 +119,12 @@ export default class Join {
           equivalentReferencingColumns
         ) && rel.referenced[0].sourceTableInstance.table.equals(source.table)
     )?.referenced[0].sourceTableInstance;
+  }
+
+  private newUserAlias(prevName: string): string | undefined {
+    let newUserAlias: string | undefined = '';
+    if (this.name) newUserAlias += this.name + '_';
+    newUserAlias += prevName;
+    return newUserAlias;
   }
 }
