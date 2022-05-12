@@ -32,9 +32,9 @@ export default class Table {
    */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
   /**
-   * This variable tracks if the cached results fks and inds are still valid
+   * This variable tracks if the cached inds are still valid
    */
-  public _relationshipsValid = true;
+  public _indsValid = true;
 
   public constructor(columns?: ColumnCombination) {
     this.columns = columns || new ColumnCombination();

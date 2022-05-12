@@ -16,6 +16,7 @@ export default class Schema {
   private _fks = new Array<SourceRelationship>();
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
+  private _tableFksValid = true;
 
   public constructor(...tables: Array<Table>) {
     this.addTables(...tables);
@@ -47,7 +48,7 @@ export default class Schema {
 
   public addInd(ind: SourceRelationship) {
     this._inds.push(ind);
-    this.relationshipsValid = false;
+    this.tableIndsValid = false;
   }
 
   public addFd(fd: SourceFunctionalDependency) {
@@ -72,7 +73,12 @@ export default class Schema {
   }
 
   private set relationshipsValid(valid: boolean) {
-    this.tables.forEach((table) => (table._relationshipsValid = valid));
+    this._tableFksValid = valid;
+    this.tableIndsValid = valid;
+  }
+
+  private set tableIndsValid(valid: boolean) {
+    this.tables.forEach((table) => (table._indsValid = valid));
   }
 
   public numReferences(table: Table): number {
@@ -99,7 +105,7 @@ export default class Schema {
   }
 
   public fksOf(table: Table): Array<TableRelationship> {
-    if (!table._relationshipsValid) this.updateRelationshipsOf(table);
+    if (!this._tableFksValid) this.updateFks();
     return table._fks;
   }
 
@@ -111,14 +117,19 @@ export default class Schema {
   public indsOf(
     table: Table
   ): Map<SourceRelationship, Array<TableRelationship>> {
-    if (!table._relationshipsValid) this.updateRelationshipsOf(table);
+    if (!table._indsValid) this.updateIndsOf(table);
     return table._inds;
   }
 
-  private updateRelationshipsOf(table: Table): void {
-    table._fks = this.calculateFksOf(table);
+  private updateIndsOf(table: Table): void {
+    if (!this._tableFksValid) this.updateFks();
     table._inds = this.calculateIndsOf(table);
-    table._relationshipsValid = true;
+    table._indsValid = true;
+  }
+
+  private updateFks(): void {
+    for (const table of this.tables) this.calculateFksOf(table);
+    this._tableFksValid = true;
   }
 
   /**
