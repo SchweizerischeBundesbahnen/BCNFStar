@@ -109,7 +109,7 @@ export default class Schema {
 
   private updateIndsOf(table: Table): void {
     if (!this._tableFksValid) this.updateFks();
-    table._inds = this.calculateIndsOf(table);
+    this.calculateIndsOf(table);
     table._indsValid = true;
   }
 
@@ -119,7 +119,7 @@ export default class Schema {
     this._tableFksValid = true;
   }
 
-  private calculateFks() {
+  private calculateFks(): void {
     for (const table of this.tables) {
       table._fks = new Array();
       table._references = new Array();
@@ -163,7 +163,7 @@ export default class Schema {
    * A table which has the same columns as another tables pk has a relationship with this table.
    * This method adds these relationships to the tables.
    */
-  private calculateTrivialFks() {
+  private calculateTrivialFks(): void {
     for (const referencingTable of this.tables) {
       for (const referencedTable of this.tables) {
         if (referencedTable == referencingTable || !referencedTable.pk)
@@ -194,26 +194,22 @@ export default class Schema {
   }
 
   /**
-   * @param table
-   * @returns All INDs where table is referencing,
+   * Fills table._inds with all inds where table is referencing,
    * except for the ones that are already foreign keys
    */
-  private calculateIndsOf(
-    table: Table
-  ): Map<SourceRelationship, Array<TableRelationship>> {
-    let onlyInds = new Array(...this.inds).filter(
+  private calculateIndsOf(table: Table): void {
+    const onlyInds = new Array(...this.inds).filter(
       (ind) => !this.fks.find((fk) => fk.equals(ind))
     );
 
-    let result = this.matchSourceRelationships(table, onlyInds);
-    for (const rels of result.values()) {
+    table._inds = this.matchSourceRelationships(table, onlyInds);
+    for (const rels of table._inds.values()) {
       rels.sort((ind1, ind2) => {
         const score1 = new IndScore(ind1.relationship).get();
         const score2 = new IndScore(ind2.relationship).get();
         return score2 - score1;
       });
     }
-    return result;
   }
 
   /**
@@ -259,7 +255,7 @@ export default class Schema {
     return result;
   }
 
-  public calculateFdsOf(table: Table) {
+  public calculateFdsOf(table: Table): void {
     const fds = new Map<SourceTableInstance, Array<FunctionalDependency>>();
     table.sources.forEach((source) => fds.set(source, new Array()));
     const columnsByInstance = table.columnsBySource();
