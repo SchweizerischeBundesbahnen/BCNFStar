@@ -108,7 +108,6 @@ export default class Schema {
   }
 
   private updateIndsOf(table: Table): void {
-    if (!this._tableFksValid) this.updateFks();
     this.calculateIndsOf(table);
     table._indsValid = true;
   }
