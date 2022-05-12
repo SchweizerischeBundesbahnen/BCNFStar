@@ -16,7 +16,7 @@ export default class Schema {
   private _fks = new Array<SourceRelationship>();
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
-  private _tableFksValid = true;
+  private _tableFksValid = false;
 
   public constructor(...tables: Array<Table>) {
     this.addTables(...tables);
@@ -82,26 +82,12 @@ export default class Schema {
   }
 
   public numReferences(table: Table): number {
-    let count = 0;
-    for (let otherTable of this.tables) {
-      if (otherTable == table) continue;
-      count += this.fksOf(otherTable).filter(
-        (fk) => fk.referenced == table
-      ).length;
-    }
-    return count;
+    return table._references.length;
   }
 
   public referencesOf(table: Table): Array<TableRelationship> {
-    //könnte noch gecached werden
-    const result = new Array<TableRelationship>();
-    for (const other of this.tables) {
-      if (other == table) continue;
-      result.push(
-        ...this.fksOf(other).filter((rel) => rel.referenced == table)
-      );
-    }
-    return result;
+    if (!this._tableFksValid) this.updateFks();
+    return table._references;
   }
 
   public fksOf(table: Table): Array<TableRelationship> {
@@ -128,47 +114,89 @@ export default class Schema {
   }
 
   private updateFks(): void {
-    for (const table of this.tables) this.calculateFksOf(table);
+    this.calculateFks();
+    this.calculateTrivialFks();
     this._tableFksValid = true;
   }
 
-  /**
-   *
-   * @param table
-   * @returns FKs, where table is on the referencing side
-   */
-  private calculateFksOf(table: Table): Array<TableRelationship> {
-    let result = [
-      ...this.matchSourceRelationships(table, this.fks).values(),
-    ].flat();
-    for (const otherTable of this.tables) {
-      if (otherTable == table || !otherTable.pk) continue;
-      const pk = otherTable.pk!.asArray();
-      const sourceColumns = pk.map((column) => column.sourceColumn);
-      table.columnsEquivalentTo(sourceColumns, true).forEach((cc) => {
-        const fk = new TableRelationship(
-          new Relationship(cc, pk),
-          table,
-          otherTable
-        );
-        if (
-          !result.some(
-            (other) =>
-              other.relationship.equals(fk.relationship) &&
-              other.referencing == fk.referencing &&
-              other.referenced == fk.referenced
-          )
-        )
-          result.push(fk);
-      });
+  private calculateFks() {
+    for (const table of this.tables) {
+      table._fks = new Array();
+      table._references = new Array();
     }
-    return result;
+    for (const rel of this._fks) {
+      const referencings = new Map<Table, Array<Array<Column>>>();
+      for (const table of this.tables) {
+        const columns = table.columnsEquivalentTo(rel.referencing, true);
+        if (columns.length > 0) referencings.set(table, columns);
+      }
+      if ([...referencings.keys()].length == 0) continue;
+
+      const referenceds = new Map<Table, Array<Array<Column>>>();
+      for (const table of this.tables) {
+        const columns = table
+          .columnsEquivalentTo(rel.referenced, false)
+          .filter((possibleColumns) =>
+            table.isKey(new ColumnCombination(possibleColumns))
+          );
+        if (columns.length > 0) referenceds.set(table, columns);
+      }
+
+      for (const referencedTable of referenceds.keys())
+        for (const referencedColumns of referenceds.get(referencedTable)!)
+          for (const referencingTable of referencings.keys())
+            for (const referencingColumns of referencings.get(
+              referencingTable
+            )!) {
+              const relationship = new TableRelationship(
+                new Relationship(referencingColumns, referencedColumns),
+                referencingTable,
+                referencedTable
+              );
+              referencingTable._fks.push(relationship);
+              referencedTable._references.push(relationship);
+            }
+    }
+  }
+
+  /**
+   * A table which has the same columns as another tables pk has a relationship with this table.
+   * This method adds these relationships to the tables.
+   */
+  private calculateTrivialFks() {
+    for (const referencingTable of this.tables) {
+      for (const referencedTable of this.tables) {
+        if (referencedTable == referencingTable || !referencedTable.pk)
+          continue;
+        const pk = referencedTable.pk!.asArray();
+        const pkSourceColumns = pk.map((column) => column.sourceColumn);
+        referencingTable
+          .columnsEquivalentTo(pkSourceColumns, true)
+          .forEach((referencingColumns) => {
+            const relationship = new TableRelationship(
+              new Relationship(referencingColumns, pk),
+              referencingTable,
+              referencedTable
+            );
+            if (
+              !referencingTable._fks.some(
+                (otherRel) =>
+                  otherRel.referenced == relationship.referenced &&
+                  otherRel.relationship.equals(relationship.relationship)
+              )
+            ) {
+              referencingTable._fks.push(relationship);
+              referencedTable._references.push(relationship);
+            }
+          });
+      }
+    }
   }
 
   /**
    * @param table
    * @returns All INDs where table is referencing,
-   * except for the ones that are akready foreign keys
+   * except for the ones that are already foreign keys
    */
   private calculateIndsOf(
     table: Table

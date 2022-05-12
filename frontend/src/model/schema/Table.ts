@@ -28,13 +28,17 @@ export default class Table {
    */
   public _fks!: Array<TableRelationship>;
   /**
+   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   */
+  public _references!: Array<TableRelationship>;
+  /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
   /**
    * This variable tracks if the cached inds are still valid
    */
-  public _indsValid = true;
+  public _indsValid = false;
 
   public constructor(columns?: ColumnCombination) {
     this.columns = columns || new ColumnCombination();
