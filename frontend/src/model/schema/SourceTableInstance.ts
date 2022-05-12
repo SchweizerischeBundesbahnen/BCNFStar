@@ -34,7 +34,7 @@ export default class SourceTableInstance {
 
   public setUserAlias(newAlias?: string) {
     if (!newAlias || newAlias == this.defaultName) this.userAlias = undefined;
-    this.userAlias = newAlias;
+    else this.userAlias = newAlias;
   }
 
   public equals(other: SourceTableInstance): boolean {

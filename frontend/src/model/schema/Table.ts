@@ -113,7 +113,7 @@ export default class Table {
     });
   }
 
-  public checkColumnNameDuplicates() {
+  public resolveColumnNameDuplicates() {
     const checked = new Set<Column>();
     for (const column of this.columns) {
       if (checked.has(column)) continue;
@@ -131,15 +131,15 @@ export default class Table {
 
   public addColumns(...columns: Array<Column>) {
     this.columns.add(...columns);
-    this.checkColumnNameDuplicates();
+    this.resolveColumnNameDuplicates();
   }
 
   public removeColumns(...columns: Array<Column>) {
     this.columns.delete(...columns);
-    this.checkColumnNameDuplicates();
+    this.resolveColumnNameDuplicates();
   }
 
-  public checkSourceNameDuplicates() {
+  public resolveSourceNameDuplicates() {
     const checked = new Set<SourceTableInstance>();
     for (const source of this.sources) {
       if (checked.has(source)) continue;
@@ -161,7 +161,7 @@ export default class Table {
   ): SourceTableInstance {
     const newSource = new SourceTableInstance(sourceTable, name);
     this.sources.push(newSource);
-    this.checkSourceNameDuplicates();
+    this.resolveSourceNameDuplicates();
     return newSource;
   }
 

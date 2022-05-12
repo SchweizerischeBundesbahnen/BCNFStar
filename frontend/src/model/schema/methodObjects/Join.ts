@@ -121,8 +121,8 @@ export default class Join {
     )?.referenced[0].sourceTableInstance;
   }
 
-  private newUserAlias(prevName: string): string | undefined {
-    let newUserAlias: string | undefined = '';
+  private newUserAlias(prevName: string): string {
+    let newUserAlias: string = '';
     if (this.name) newUserAlias += this.name + '_';
     newUserAlias += prevName;
     return newUserAlias;

@@ -49,7 +49,7 @@ export class TableEditingComponent implements OnChanges {
     this.editingColumn!.userAlias = this.columnNameEditString || undefined;
     if (this.editingColumn!.userAlias == this.editingColumn!.sourceColumn.name)
       this.editingColumn!.userAlias = undefined;
-    this.table.checkColumnNameDuplicates();
+    this.table.resolveColumnNameDuplicates();
     console.log('new alias is ', this.editingColumn!.userAlias);
     this.resetColumnEdit();
   }
@@ -68,7 +68,7 @@ export class TableEditingComponent implements OnChanges {
 
   public changeSourceName() {
     this.editingSource!.setUserAlias(this.sourceNameEditString);
-    this.table.checkSourceNameDuplicates();
+    this.table.resolveSourceNameDuplicates();
     console.log('new alias is ', this.editingSource!.userAlias);
     this.resetSourceEdit();
   }
