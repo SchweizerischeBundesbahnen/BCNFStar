@@ -1,23 +1,5 @@
 <div sbbDialogTitle>Split Options</div>
 <div sbbDialogContent>
-  <div *ngIf="fkViolations.length > 0" class="violation">
-    These foreign keys would be destroyed when splitting:
-    <ul>
-      <li *ngFor="let fk of fkViolations">
-        {{ fk }}
-      </li>
-    </ul>
-  </div>
-
-  <div *ngIf="referenceViolations.length > 0" class="violation">
-    These referenced keys would be destroyed when splitting:
-    <ul>
-      <li *ngFor="let ref of referenceViolations">
-        {{ ref }}
-      </li>
-    </ul>
-  </div>
-
   Name of the generated table
   <input
     type="text"
@@ -37,6 +19,25 @@
     >
       {{ column.name }}
     </sbb-checkbox>
+  </div>
+
+  <div *ngIf="fkViolations.length > 0" class="violation">
+    These foreign keys would be destroyed when splitting:
+    <ul>
+      <li *ngFor="let fk of fkViolations">
+        {{ fk }}
+      </li>
+    </ul>
+    <br />
+  </div>
+
+  <div *ngIf="referenceViolations.length > 0" class="violation">
+    These referenced keys would be destroyed when splitting:
+    <ul>
+      <li *ngFor="let ref of referenceViolations">
+        {{ ref }}
+      </li>
+    </ul>
   </div>
 </div>
 <div sbbDialogActions>
