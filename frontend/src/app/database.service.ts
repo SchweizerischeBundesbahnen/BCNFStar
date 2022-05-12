@@ -248,7 +248,7 @@ export class DatabaseService {
     const relationship_: IRelationship = {
       referencing: referencing.toITable(),
       referenced: referenced.toITable(),
-      columnRelationships: referenced.pk!.inOrder().map((element) => {
+      columnRelationships: referenced.pk!.asArray().map((element) => {
         return {
           referencingColumn:
             relationship.referencing[
