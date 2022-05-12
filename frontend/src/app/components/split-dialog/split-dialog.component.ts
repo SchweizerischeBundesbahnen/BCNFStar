@@ -15,6 +15,7 @@ export class SplitDialogComponent {
   public fd: FunctionalDependency;
   public table: Table;
   public schema: Schema;
+  public pkViolation!: boolean;
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
 
@@ -49,6 +50,7 @@ export class SplitDialogComponent {
   }
 
   public updateViolations() {
+    this.pkViolation = this.schema.fdSplitPKViolationOf(this.fd, this.table);
     this.fkViolations = this.schema.fdSplitFKViolationsOf(this.fd, this.table);
     this.referenceViolations = this.schema.fdSplitReferenceViolationsOf(
       this.fd,

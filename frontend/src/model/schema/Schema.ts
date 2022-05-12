@@ -353,6 +353,10 @@ export default class Schema {
     return table.violatingFds().filter((fd) => this.isFdSplittable(fd, table));
   }
 
+  public fdSplitPKViolationOf(fd: FunctionalDependency, table: Table): boolean {
+    return !!table.pk && !table.splitPreservesCC(fd, table.pk);
+  }
+
   public fdSplitFKViolationsOf(
     fd: FunctionalDependency,
     table: Table
@@ -382,7 +386,8 @@ export default class Schema {
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
     return (
       this.fdSplitFKViolationsOf(fd, table).length == 0 &&
-      this.fdSplitReferenceViolationsOf(fd, table).length == 0
+      this.fdSplitReferenceViolationsOf(fd, table).length == 0 &&
+      !this.fdSplitPKViolationOf(fd, table)
     );
   }
 

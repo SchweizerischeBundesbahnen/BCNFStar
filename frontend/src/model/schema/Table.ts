@@ -334,7 +334,6 @@ export default class Table {
   public isBCNFViolating(fd: FunctionalDependency): boolean {
     if (this.isKeyFd(fd)) return false;
     if (fd.lhs.cardinality == 0) return false;
-    if (this.pk && !this.pk.isSubsetOf(this.remainingSchema(fd))) return false;
     return true;
   }
 

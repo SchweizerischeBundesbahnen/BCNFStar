@@ -21,6 +21,10 @@
     </sbb-checkbox>
   </div>
 
+  <div *ngIf="pkViolation" class="violation">
+    The primary key {{ table.pk }} would be destroyed when splitting.
+  </div>
+
   <div *ngIf="fkViolations.length > 0" class="violation">
     These foreign keys would be destroyed when splitting:
     <ul>
@@ -28,7 +32,6 @@
         {{ fk }}
       </li>
     </ul>
-    <br />
   </div>
 
   <div *ngIf="referenceViolations.length > 0" class="violation">
