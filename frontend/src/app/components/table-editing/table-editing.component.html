@@ -1,7 +1,11 @@
 <div>
-  <h2 *ngIf="!isEditingTableName; else editing">
+  <h2 id="table-name" *ngIf="!isEditingTableName; else editing">
     {{ table.fullName }}
-    <sbb-icon svgIcon="kom:pen-small" (click)="startTableEdit()"></sbb-icon>
+    <sbb-icon
+      id="table-edit-icon"
+      svgIcon="kom:pen-small"
+      (click)="startTableEdit()"
+    ></sbb-icon>
   </h2>
   <ng-template #editing class="row">
     <input
