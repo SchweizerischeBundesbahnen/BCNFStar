@@ -4,11 +4,12 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
-import { TableRelationship } from '../types/TableRelationship';
+import TableRelationship from './TableRelationship';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import SourceRelationship from './SourceRelationship';
+import { FdCluster } from '../types/FdCluster';
 
 export default class Table {
   public name = '';
@@ -20,26 +21,24 @@ export default class Table {
   public sources = new Array<SourceTableInstance>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
+  private _fdClusters?: Array<FdCluster>;
 
-  /**
-   * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
-   */
-  public _splittableFdClusters!: Array<{
-    columns: ColumnCombination;
-    fds: Array<FunctionalDependency>;
-  }>;
   /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
   public _fks!: Array<TableRelationship>;
   /**
+   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   */
+  public _references!: Array<TableRelationship>;
+  /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
   /**
-   * This variable tracks if the cached results fks and inds are still valid
+   * This variable tracks if the cached inds are still valid
    */
-  public _relationshipsValid = true;
+  public _indsValid = false;
 
   public constructor(columns?: ColumnCombination) {
     this.columns = columns || new ColumnCombination();
@@ -193,6 +192,16 @@ export default class Table {
     return fd.rhs.deepCopy();
   }
 
+  public splitPreservesCC(
+    fd: FunctionalDependency,
+    cc: ColumnCombination
+  ): boolean {
+    return (
+      cc.isSubsetOf(this.remainingSchema(fd)) ||
+      cc.isSubsetOf(this.generatingSchema(fd))
+    );
+  }
+
   /**
    * @returns the selected columns of each source (SourceTableInstance) of this table
    */
@@ -329,7 +338,6 @@ export default class Table {
   public isBCNFViolating(fd: FunctionalDependency): boolean {
     if (this.isKeyFd(fd)) return false;
     if (fd.lhs.cardinality == 0) return false;
-    if (this.pk && !this.pk.isSubsetOf(this.remainingSchema(fd))) return false;
     return true;
   }
 
@@ -355,6 +363,28 @@ export default class Table {
         });
     }
     return this._violatingFds;
+  }
+
+  public fdClusters(): Array<FdCluster> {
+    if (!this._fdClusters) {
+      this._fdClusters = new Array<FdCluster>();
+      if (this.pk)
+        this._fdClusters.push({
+          columns: this.columns.copy(),
+          fds: new Array(
+            new FunctionalDependency(this.pk!.copy(), this.columns.copy())
+          ),
+        });
+      for (let fd of this.violatingFds()) {
+        let cluster = this._fdClusters.find((c) => c.columns.equals(fd.rhs));
+        if (!cluster) {
+          cluster = { columns: fd.rhs.copy(), fds: new Array() };
+          this._fdClusters.push(cluster);
+        }
+        cluster.fds.push(fd);
+      }
+    }
+    return this._fdClusters;
   }
 
   public toTestString(): string {

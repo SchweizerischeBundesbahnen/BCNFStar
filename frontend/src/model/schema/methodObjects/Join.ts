@@ -1,4 +1,4 @@
-import { TableRelationship } from '../../types/TableRelationship';
+import TableRelationship from '../TableRelationship';
 import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
 import Schema from '../Schema';
