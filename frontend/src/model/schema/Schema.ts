@@ -1,4 +1,4 @@
-import { TableRelationship } from './TableRelationship';
+import TableRelationship from './TableRelationship';
 import SplitCommand from '../commands/SplitCommand';
 import FunctionalDependency from './FunctionalDependency';
 import IndScore from './methodObjects/IndScore';

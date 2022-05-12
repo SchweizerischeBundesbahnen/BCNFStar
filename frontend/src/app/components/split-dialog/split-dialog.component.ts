@@ -2,7 +2,7 @@ import Column from '@/src/model/schema/Column';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
-import { TableRelationship } from '@/src/model/schema/TableRelationship';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 
