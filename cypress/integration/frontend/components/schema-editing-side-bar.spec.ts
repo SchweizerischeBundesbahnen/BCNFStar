@@ -58,20 +58,6 @@ describe("The schema editing side bar", () => {
     cy.get("button").contains("Create Foreign Key");
   });
 
-  // ############# Rename table in sidebar #############
-  it("changes table name when editing it", () => {
-    cy.get('[svgIcon="kom:pen-small"]').click();
-    cy.get("#rename-table-input").clear().type("Nations{enter}");
-    cy.get("h2").contains("Nations");
-    cy.get(".table-head-title").contains("Nations");
-  });
-
-  it("leaves editing mode and not renames table when something changes", () => {
-    cy.get('[svgIcon="kom:pen-small"]').click();
-    cy.get(".table-head-title").contains("part_partsupp").click();
-    cy.get("h2").contains("part_partsupp");
-  });
-
   // ############# Rename table in split dialog #############
   it("sets default name when splitting by fd", () => {
     cy.get("sbb-expansion-panel-header")
