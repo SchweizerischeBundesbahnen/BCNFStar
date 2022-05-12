@@ -1,9 +1,8 @@
 import Column from '@/src/model/schema/Column';
-import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import { TableRelationship } from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 
@@ -55,14 +54,6 @@ export class SplitDialogComponent {
       this.fd,
       this.table
     );
-  }
-
-  public toString(rel: TableRelationship): string {
-    return `(${rel.referencing.name}) ${new ColumnCombination(
-      rel.relationship.referencing
-    )} -> (${rel.referenced.name}) ${new ColumnCombination(
-      rel.relationship.referenced
-    )}`;
   }
 
   public canConfirm() {

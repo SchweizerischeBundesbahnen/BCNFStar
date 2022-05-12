@@ -1,4 +1,4 @@
-import { TableRelationship } from '../types/TableRelationship';
+import { TableRelationship } from './TableRelationship';
 import SplitCommand from '../commands/SplitCommand';
 import FunctionalDependency from './FunctionalDependency';
 import IndScore from './methodObjects/IndScore';
@@ -135,11 +135,11 @@ export default class Schema {
       const pk = otherTable.pk!.asArray();
       const sourceColumns = pk.map((column) => column.sourceColumn);
       table.columnsEquivalentTo(sourceColumns, true).forEach((cc) => {
-        const fk = {
-          relationship: new Relationship(cc, pk),
-          referencing: table,
-          referenced: otherTable,
-        };
+        const fk = new TableRelationship(
+          new Relationship(cc, pk),
+          table,
+          otherTable
+        );
         if (
           !result.some(
             (other) =>
@@ -204,11 +204,15 @@ export default class Schema {
         if (!result.has(rel)) result.set(rel, []);
         ccs.forEach((cc) => {
           otherCCs.forEach((otherCC) => {
-            result.get(rel)!.push({
-              relationship: new Relationship(cc, otherCC),
-              referencing: table,
-              referenced: otherTable,
-            });
+            result
+              .get(rel)!
+              .push(
+                new TableRelationship(
+                  new Relationship(cc, otherCC),
+                  table,
+                  otherTable
+                )
+              );
           });
         });
       }

@@ -16,7 +16,7 @@ import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import { TableRelationship } from '@/src/model/schema/TableRelationship';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 
 @Component({

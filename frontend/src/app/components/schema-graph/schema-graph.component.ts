@@ -13,7 +13,7 @@ import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Observable } from 'rxjs';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import { TableRelationship } from '@/src/model/schema/TableRelationship';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;

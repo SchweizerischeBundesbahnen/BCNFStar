@@ -4,7 +4,7 @@
     These foreign keys would be destroyed when splitting:
     <ul>
       <li *ngFor="let fk of fkViolations">
-        {{ toString(fk) }}
+        {{ fk }}
       </li>
     </ul>
   </div>
@@ -13,7 +13,7 @@
     These referenced keys would be destroyed when splitting:
     <ul>
       <li *ngFor="let ref of referenceViolations">
-        {{ toString(ref) }}
+        {{ ref }}
       </li>
     </ul>
   </div>

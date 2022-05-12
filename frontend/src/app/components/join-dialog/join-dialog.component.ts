@@ -1,5 +1,5 @@
 import Schema from '@/src/model/schema/Schema';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import { TableRelationship } from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 
