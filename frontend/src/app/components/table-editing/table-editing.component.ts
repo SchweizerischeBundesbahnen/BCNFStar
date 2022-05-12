@@ -11,26 +11,41 @@ import Table from 'src/model/schema/Table';
 export class TableEditingComponent implements OnChanges {
   @Input() public table!: Table;
 
-  /**
-   * Currently edited column
-   */
+  /** Is the table name being edited? */
+  public isEditingTableName = false;
+  /** The string inside the schema editing field */
+  public tableNameEditString: string = '';
+
+  /** Currently edited column */
   public editingColumn?: Column;
-  /**
-   * The string inside the column editing field
-   */
+  /** The string inside the column editing field */
   public columnNameEditString: string = '';
 
-  /**
-   * Currently edited source
-   */
+  /** Currently edited source */
   public editingSource?: SourceTableInstance;
-  /**
-   * The string inside the source editing field
-   */
+  /** The string inside the source editing field */
   public sourceNameEditString: string = '';
 
   ngOnChanges(): void {
+    this.resetTableEdit();
     this.resetColumnEdit();
+    this.resetSourceEdit();
+  }
+
+  // TABLENAME EDITING
+
+  public resetTableEdit() {
+    this.isEditingTableName = false;
+  }
+
+  public startTableEdit() {
+    this.isEditingTableName = true;
+    this.tableNameEditString = this.table.name;
+  }
+
+  public changeTableName() {
+    this.table.name = this.tableNameEditString;
+    this.resetTableEdit();
   }
 
   // COLUMN EDITING
