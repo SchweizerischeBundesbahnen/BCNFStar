@@ -60,9 +60,9 @@ export class SplitDialogComponent {
   public toString(rel: TableRelationship): string {
     return `(${rel.referencing.name}) ${new ColumnCombination(
       rel.relationship.referencing
-    ).toString()} -> (${rel.referenced.name}) ${new ColumnCombination(
+    )} -> (${rel.referenced.name}) ${new ColumnCombination(
       rel.relationship.referenced
-    ).toString()}`;
+    )}`;
   }
 
   public canConfirm() {
