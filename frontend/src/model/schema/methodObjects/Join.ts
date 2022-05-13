@@ -1,7 +1,6 @@
 import TableRelationship from '../TableRelationship';
 import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
-import Schema from '../Schema';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
@@ -14,18 +13,12 @@ export default class Join {
 
   private sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
 
-  public constructor(
-    private schema: Schema,
-    fk: TableRelationship,
-    private name?: string
-  ) {
+  public constructor(fk: TableRelationship, private name?: string) {
     this.referencing = fk.referencing;
     this.referenced = fk.referenced;
     this.relationship = fk.relationship;
 
     this.join();
-
-    this.schema.calculateFdsOf(this.newTable);
   }
 
   private resolveChildSources(

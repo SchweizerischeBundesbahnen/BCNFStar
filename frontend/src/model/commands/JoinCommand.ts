@@ -18,7 +18,8 @@ export default class JoinCommand extends Command {
   }
 
   protected override _do(): void {
-    this.newTable = new Join(this.schema, this.fk, this.sourceName).newTable;
+    this.newTable = new Join(this.fk, this.sourceName).newTable;
+    this.schema.calculateFdsOf(this.newTable);
     if (this.newTableName) this.newTable.name = this.newTableName;
     this._redo();
   }
