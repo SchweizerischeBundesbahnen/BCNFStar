@@ -1,4 +1,4 @@
-import { TableRelationship } from '../../types/TableRelationship';
+import TableRelationship from '../TableRelationship';
 import Column from '../Column';
 import Schema from '../Schema';
 import SourceTable from '../SourceTable';
@@ -55,7 +55,7 @@ ALTER TABLE ${this.tableIdentifier(
   }
 
   public foreignKeySql(fk: TableRelationship): string {
-    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)} 
+    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)}
       ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
       FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
       REFERENCES ${this.tableIdentifier(

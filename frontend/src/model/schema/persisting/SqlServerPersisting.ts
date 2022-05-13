@@ -12,8 +12,8 @@ export default class SqlServerPersisting extends SQLPersisting {
 IF NOT EXISTS ( SELECT  *
 FROM sys.schemas
 WHERE name = N'${schema.name!}' )
-EXEC('CREATE SCHEMA [${schema.name!}]'); 
-GO 
+EXEC('CREATE SCHEMA [${schema.name!}]');
+GO
 ` + '\n';
     for (const table of schema.tables) {
       Sql +=
@@ -50,7 +50,8 @@ GO
       .join(', ')} FROM ${table.sources
       .map((source) => {
         let sourceString = this.sourceTableIdentifier(source.table);
-        if (source.useAlias) sourceString += ' AS ' + source.alias;
+        if (source.alias != source.defaultName)
+          sourceString += ' AS ' + source.alias;
         return sourceString;
       })
       .join(', ')}`;
@@ -84,6 +85,6 @@ GO
   }
 
   public columnIdentifier(column: Column): string {
-    return `[${column.sourceTableInstance.identifier}].[${column.sourceColumn.name}]`;
+    return `[${column.sourceTableInstance.alias}].[${column.sourceColumn.name}]`;
   }
 }

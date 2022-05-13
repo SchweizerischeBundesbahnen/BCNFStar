@@ -83,12 +83,10 @@ export default class Split {
   private projectFds(table: Table) {
     this.table.fds.forEach((fd) => {
       if (fd.lhs.isSubsetOf(table.columns)) {
-        fd = new FunctionalDependency(
-          fd.lhs.copy(),
-          fd.rhs.copy().intersect(table.columns)
-        );
-        if (!fd.isFullyTrivial()) {
-          table.fds.push(fd);
+        const newFd = fd.copy();
+        newFd.rhs.intersect(table.columns);
+        if (!newFd.isFullyTrivial()) {
+          table.fds.push(newFd);
         }
       }
     });

@@ -15,12 +15,11 @@ import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.co
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
 import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersisting';
 import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 
 @Component({
   selector: 'app-schema-editing',
@@ -106,7 +105,11 @@ export class SchemaEditingComponent implements OnInit {
 
   public async onClickSplit(fd: FunctionalDependency) {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
-      data: fd,
+      data: {
+        fd: fd,
+        table: this.selectedTable!,
+        schema: this.schema,
+      },
     });
 
     const value: { fd: FunctionalDependency; name?: string } =
@@ -149,13 +152,6 @@ export class SchemaEditingComponent implements OnInit {
     command.onUndo = function () {
       self.selectedTable = previousSelectedTable;
     };
-    this.commandProcessor.do(command);
-    this.schemaChanged.next();
-  }
-
-  public onChangeTableName(value: { table: Table; newName: string }): void {
-    let command = new TableRenameCommand(value.table, value.newName);
-
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }
