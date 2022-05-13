@@ -1,14 +1,24 @@
 import Table from '@/src/model/schema/Table';
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import ITablePage from '@server/definitions/ITablePage';
 import { DatabaseService } from 'src/app/database.service';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import { Router } from '@angular/router';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { MetanomeSettingsComponent } from '../../components/metanome-settings/metanome-settings.component';
+import { MetanomeSettingsComponent } from '../metanome-settings/metanome-settings.component';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
+import { SchemaCreationService } from '../../schema-creation.service';
+import Schema from '@/src/model/schema/Schema';
 
 @Component({
   selector: 'app-table-selection',
@@ -19,6 +29,9 @@ export class TableSelectionComponent implements OnInit {
   @ViewChild(SbbTable) public table?: SbbTable<ITablePage>;
   @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
   @ViewChild('loadingDialog') public loadingDialog!: TemplateRef<any>;
+
+  @Input() public withTable: boolean = true;
+  @Output() public schema = new EventEmitter<Schema>();
 
   public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
@@ -41,6 +54,7 @@ export class TableSelectionComponent implements OnInit {
 
   constructor(
     private dataService: DatabaseService,
+    private schemaCreationService: SchemaCreationService,
     public router: Router,
     public dialog: SbbDialog,
     public metanomeDialog: SbbDialog
@@ -50,6 +64,18 @@ export class TableSelectionComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.tables = await this.dataService.loadTables();
+
+    for (const table of this.tables) {
+      this.selectedTables.set(table, false);
+      if (!this.tablesInSchema[table.schemaName])
+        this.tablesInSchema[table.schemaName] = [];
+      this.tablesInSchema[table.schemaName].push(table);
+    }
+
+    await this.initTable();
+  }
+
+  private async initTable() {
     const rowCountPromise = this.dataService.loadTableRowCounts();
 
     const tablePagePromises: Record<string, Promise<ITablePage>> = {};
@@ -60,11 +86,6 @@ export class TableSelectionComponent implements OnInit {
         0,
         this.pageLimit
       );
-
-      this.selectedTables.set(table, false);
-      if (!this.tablesInSchema[table.schemaName])
-        this.tablesInSchema[table.schemaName] = [];
-      this.tablesInSchema[table.schemaName].push(table);
     }
 
     const rowCounts: Record<string, number> = await rowCountPromise;
@@ -149,18 +170,21 @@ export class TableSelectionComponent implements OnInit {
       await this.runMetanome(
         Object.values(values).filter((entry) => !entry.fileName)
       );
-      let fdResults: Record<string, string> = {};
-      for (let value of Object.entries(values)) {
-        if (value[0] != 'ind') {
-          fdResults[value[1].tables[0]] = value[1].fileName;
-        }
+      let fdResults = new Map<Table, string>();
+      for (let [name, config] of Object.entries(values)) {
+        if (name != 'ind')
+          fdResults.set(
+            [...this.tables].find((t) => t.fullName === config.tables[0])!,
+            config.fileName
+          );
       }
-      await this.dataService.setInputTables(
+      const schema = await this.schemaCreationService.createSchema(
         tables,
         values['ind'].fileName,
         fdResults
       );
-      this.router.navigate(['/edit-schema']);
+      console.log('emitting', schema);
+      this.schema.emit(schema);
     } catch (e) {
       this.error = e;
       console.error(e);

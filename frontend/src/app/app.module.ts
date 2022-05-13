@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TableSelectionComponent } from './pages/table-selection/table-selection.component';
+import { TableSelectionComponent } from './components/table-selection/table-selection.component';
 import { SchemaEditingComponent } from './pages/schema-editing/schema-editing.component';
 import { SchemaEditingSideBarComponent } from './components/schema-editing-side-bar/schema-editing-side-bar.component';
 import { SbbIconModule } from '@sbb-esta/angular/icon';
@@ -37,6 +37,7 @@ import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.comp
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 import { TableEditingComponent } from './components/table-editing/table-editing.component';
+import { HomeComponent } from './pages/home/home.component';
 
 export let InjectorInstance: Injector;
 
@@ -59,6 +60,7 @@ export let InjectorInstance: Injector;
     ViolatingRowsViewIndsComponent,
     DatabaseTableViewerComponent,
     TableEditingComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
