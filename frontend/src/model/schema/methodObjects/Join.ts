@@ -95,18 +95,18 @@ export default class Join {
     if (this.relationship.sourceRelationship().isTrivial) {
       this.sourceMapping.set(
         referencedRootSource,
-        this.relationship.referencing[0].sourceTableInstance
+        this.sourceMapping.get(
+          this.relationship.referencing[0].sourceTableInstance
+        )!
       );
       this.resolveChildSources(referencedRootSource, false);
     } else {
-      this.addSourcesAndRels(referencedRootSource, this.relationship, true);
+      this.addSourcesAndRels(referencedRootSource, this.relationship, false);
     }
 
     // columns from referenced table
     this.newTable.addColumns(
-      ...this.referenced.columns
-        .deepCopy()
-        .applySourceMapping(this.sourceMapping)
+      ...this.referenced.columns.applySourceMapping(this.sourceMapping)
     );
     this.newTable.establishIdentities();
     if (!this.relationship.sourceRelationship().isTrivial) {
@@ -123,10 +123,8 @@ export default class Join {
     relToSource: Relationship
   ): SourceTableInstance | undefined {
     const equivalentReferencingColumns = new ColumnCombination(
-      relToSource.referencing.map((column) =>
-        column.applySourceMapping(this.sourceMapping)
-      )
-    );
+      relToSource.referencing
+    ).applySourceMapping(this.sourceMapping);
     return this.newTable.relationships.find(
       (rel) =>
         new ColumnCombination(rel.referencing).equals(
