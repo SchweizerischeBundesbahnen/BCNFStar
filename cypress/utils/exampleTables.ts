@@ -182,6 +182,12 @@ export function multiFkSchema(): Schema {
     "TableA"
   );
   const tableB = Table.fromColumnNames(["b_b1", "b_b2", "b_b3"], "TableB");
+  tableB.addFd(
+    new FunctionalDependency(
+      new ColumnCombination(tableB.columns.columnsFromNames("b_b1", "b_b2")),
+      tableB.columns.copy()
+    )
+  );
   tableA.addFd(
     new FunctionalDependency(
       new ColumnCombination(tableA.columns.columnsFromNames("a_a1", "a_a2")),
