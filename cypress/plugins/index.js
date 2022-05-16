@@ -1,6 +1,3 @@
-const postgreSQL = require("cypress-postgresql");
-const pg = require("pg");
-const dbConfig = require("../../cypress.json");
 /// <reference types="cypress" />
 // ***********************************************************
 // This example plugins/index.js can be used to load plugins
@@ -20,6 +17,20 @@ const dbConfig = require("../../cypress.json");
  */
 // eslint-disable-next-line no-unused-vars
 module.exports = (on, config) => {
+  config = require("cypress-dotenv")(config);
+  console.log(config.env);
+
+  const db = {
+    user: config.env.PGUSER,
+    password: config.env.PGPASSWORD,
+    host: config.env.PGHOST,
+    port: config.env.PGPORT,
+    database: config.env.PGDATABASE,
+  };
+
+  on("task", {
+    dbQuery: (query) => require("cypress-postgres")(query.query, db),
+  });
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
 
@@ -30,10 +41,4 @@ module.exports = (on, config) => {
     url: config.env.BACKEND_BASEURL + "/__coverage__",
   };
   return config;
-};
-module.exports = (on) => {
-  on("task", {
-    dbQuery: (query) =>
-      require("cypress-postgres")(query.query, query.connection),
-  });
 };
