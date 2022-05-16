@@ -40,30 +40,24 @@ Cypress.Commands.add("visitFrontend", { prevSubject: false }, (options) => {
 
 Cypress.Commands.add("selectTablesAndGo", { prevSubject: false }, () => {
   // expand expandable if it isn't expanded yet
-  cy.get("sbb-expansion-panel").then(($el) => {
-    if (!$el.hasClass("sbb-expanded")) {
-      cy.contains("public").click();
-    }
-  });
-
-  cy.contains("nation_region_denormalized").click();
-  cy.contains("part_partsupp_supplier_denormalized").click();
-
-  cy.contains("Go").click();
+  cy.selectSpecificTablesAndGo("public", [
+    "nation_region_denormalized",
+    "part_partsupp_supplier_denormalized",
+  ]);
 });
 
 Cypress.Commands.add(
-  "selectTablesAndGo",
+  "selectSpecificTablesAndGo",
   { prevSubject: false },
-  (tablenames) => {
+  (schemaname, tablenames) => {
     // expand expandable if it isn't expanded yet
     cy.get("sbb-expansion-panel").then(($el) => {
       if (!$el.hasClass("sbb-expanded")) {
-        cy.contains("public").click();
+        cy.contains(schemaname).click();
       }
     });
     for (const table of tablenames) {
-      cy.contains(table).click();
+      cy.get(".sbb-expansion-panel-body:visible").contains(table).click();
     }
     cy.contains("Go").click();
   }
@@ -74,4 +68,16 @@ Cypress.Commands.add("loadMetanomeConfigAndOk", { prevSubject: false }, () => {
 
   // wait for normalize page to load
   cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
+});
+
+Cypress.Commands.add("executeSql", (Sql) => {
+  cy.task("dbQuery", { query: Sql });
+});
+
+Cypress.Commands.add("createSchema", (schemaName) => {
+  cy.get("#schema-name-input").type(schemaName);
+  cy.get("button").contains("Download").click();
+  cy.readFile(`./cypress/downloads/${schemaName}.sql`).then((SQL) =>
+    cy.executeSql(SQL)
+  );
 });
