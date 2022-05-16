@@ -21,11 +21,9 @@ export default class DirectDimensionCommand extends Command {
     this.newTable = this.oldTable;
     let newRel = this.route[0].relationship;
     for (let i = 0; i < this.route.length - 1; i++) {
-      const join: Join = new Join(this.schema, {
-        relationship: newRel,
-        referencing: this.newTable!,
-        referenced: this.route[i].referenced,
-      });
+      const join: Join = new Join(
+        new TableRelationship(newRel, this.newTable!, this.route[i].referenced)
+      );
       this.newTable = join.newTable;
       newRel = this.route[i + 1].relationship.applySourceMapping(
         join.sourceMapping
