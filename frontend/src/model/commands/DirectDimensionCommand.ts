@@ -1,5 +1,4 @@
-import ColumnCombination from '../schema/ColumnCombination';
-import Join from '../schema/methodObjects/Join';
+import DirectDimension from '../schema/methodObjects/DirectDimension';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
 import TableRelationship from '../schema/TableRelationship';
@@ -18,22 +17,7 @@ export default class DirectDimensionCommand extends Command {
   }
 
   protected override _do(): void {
-    this.newTable = this.oldTable;
-    let newRel = this.route[0].relationship;
-    for (let i = 0; i < this.route.length - 1; i++) {
-      const join: Join = new Join(
-        new TableRelationship(newRel, this.newTable!, this.route[i].referenced)
-      );
-      this.newTable = join.newTable;
-      newRel = this.route[i + 1].relationship.applySourceMapping(
-        join.sourceMapping
-      );
-    }
-    this.newTable.columns.intersect(
-      new ColumnCombination(new Array(...newRel.referencing)).union(
-        this.oldTable.columns
-      )
-    );
+    this.newTable = new DirectDimension(this.route).newTable;
     this._redo();
   }
 

@@ -11,6 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
+import DirectDimension from './methodObjects/DirectDimension';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -89,7 +90,13 @@ export default class Schema {
   public filteredRoutesFromFactTo(
     table: Table
   ): Array<Array<TableRelationship>> {
-    return this.routesFromFactTo(table).filter((route) => route.length > 1);
+    console.log(table.name);
+    return this.routesFromFactTo(table).filter(
+      (route) =>
+        route.length > 1 &&
+        new DirectDimension(route).newTable.columns.cardinality >
+          route[0].referencing.columns.cardinality
+    );
   }
 
   public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
