@@ -14,14 +14,6 @@ export default class Relationship {
    */
   public _score?: number;
 
-  public toJSON() {
-    return {
-      _referencing: this._referencing,
-      _referenced: this._referenced,
-      _score: this._score,
-    };
-  }
-
   public constructor(referencing: Array<Column>, referenced: Array<Column>) {
     this._referencing = referencing;
     this._referenced = referenced;

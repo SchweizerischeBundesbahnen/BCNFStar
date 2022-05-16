@@ -29,15 +29,9 @@ export class SaveSchemaEditingComponent {
   }
 
   private downloadFile(schmeaJSON: string) {
-    const file: File = new File([schmeaJSON], this.filename + '.txt', {
+    const file: File = new File([schmeaJSON], this.filename + '.json', {
       type: 'text/plain;charset=utf-8',
     });
     saveAs(file);
-  }
-
-  private buildSchemaEntry(schema: Schema) {
-    return {
-      schema: schema,
-    };
   }
 }

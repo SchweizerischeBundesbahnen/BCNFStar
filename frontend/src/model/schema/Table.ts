@@ -47,7 +47,6 @@ export default class Table {
       schemaName: this.schemaName,
       columns: this.columns,
       pk: this.pk,
-      fds: this.fds,
       relationships: this.relationships,
       sources: this.sources,
     };

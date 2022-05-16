@@ -19,23 +19,11 @@ export default class Schema {
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
 
   public toJSON() {
-    let parsedMapArray = Array<{
-      key: SourceTable;
-      value: Array<SourceFunctionalDependency>;
-    }>();
-    this._fds.forEach(
-      (value: Array<SourceFunctionalDependency>, key: SourceTable) => {
-        parsedMapArray.push({
-          key: key,
-          value: value,
-        });
-      }
-    );
     return {
       tables: Array.from(this.tables),
       _fks: this.fks,
       _inds: this.inds,
-      _fds: parsedMapArray,
+      _fds: [...this._fds.values()].flat(),
     };
   }
 

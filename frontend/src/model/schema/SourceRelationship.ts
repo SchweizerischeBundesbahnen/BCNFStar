@@ -10,13 +10,6 @@ export default class SourceRelationship {
     public referenced = new Array<SourceColumn>()
   ) {}
 
-  public toJSON() {
-    return {
-      referencing: this.referencing,
-      referenced: this.referenced,
-    };
-  }
-
   public equals(other: SourceRelationship): boolean {
     if (this == other) return true;
     if (!this.referencing[0].table.equals(other.referencing[0].table))

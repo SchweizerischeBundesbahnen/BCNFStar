@@ -16,10 +16,7 @@ interface JSONSchema {
   tables: Array<JSONTable>;
   _fks: Array<JSONSourceRelationship>;
   _inds: Array<JSONSourceRelationship>;
-  _fds: Array<{
-    key: JSONSourceTable;
-    value: Array<JSONSourceFunctionalDependency>;
-  }>;
+  _fds: Array<JSONSourceFunctionalDependency>;
 }
 
 interface JSONSourceFunctionalDependency {
@@ -42,16 +39,16 @@ interface JSONTable {
 }
 
 interface JSONRelationship {
-  _referencing: Array<JSONColums>;
-  _referenced: Array<JSONColums>;
+  _referencing: Array<JSONColumn>;
+  _referenced: Array<JSONColumn>;
   _score: number;
 }
 
 interface JSONColumnCombination {
-  _columns: Array<JSONColums>;
+  _columns: Array<JSONColumn>;
 }
 
-interface JSONColums {
+interface JSONColumn {
   sourceTableInstance: JSONSourceTableInstance;
   sourceColumn: JSONSourceColumn;
   alias?: string;
@@ -140,12 +137,10 @@ export class LoadSavedSchemaComponent {
     });
   }
 
-  private existingSourceTables = new Set<SourceTable>();
-  private existingSourceColumns = new Set<SourceColumn>();
-  private existingSourceTableInstances = new Set<SourceTableInstance>();
-  private existingSourceRelationships = new Set<SourceRelationship>();
-  private existingSourceFunctionalDependencies =
-    new Set<SourceFunctionalDependency>();
+  private existingSourceTables = new Array<SourceTable>();
+  private existingSourceColumns = new Array<SourceColumn>();
+  private existingSourceRelationships = new Array<SourceRelationship>();
+  private existingColumnsForTable = new Map<Table, Array<Column>>();
 
   private parseTableArray(tables: Array<JSONTable>) {
     let newTables = new Array<Table>();
@@ -155,60 +150,63 @@ export class LoadSavedSchemaComponent {
     return newTables;
   }
 
-  private parseTable(table: JSONTable) {
-    let newTable = new Table();
-    newTable.name = table.name;
-    newTable.schemaName = table.schemaName;
+  private parseTable(jsonTable: JSONTable) {
+    let table = new Table();
+    this.existingColumnsForTable.set(table, []);
 
-    newTable.columns = this.parseColumnCombination(table.columns);
+    table.name = jsonTable.name;
+    table.schemaName = jsonTable.schemaName;
 
-    if (table.pk && table.pk._columns.length > 0)
-      newTable.pk = this.parseColumnCombination(table.pk);
+    table.sources = jsonTable.sources.map((source) =>
+      this.parseSourceTableInstance(source)
+    );
+
+    table.columns = this.parseColumnCombination(jsonTable.columns, table);
+
+    if (jsonTable.pk && jsonTable.pk._columns.length > 0)
+      table.pk = this.parseColumnCombination(jsonTable.pk, table);
 
     let newRelationships = new Array<Relationship>();
-    table.relationships.forEach((relationship) => {
-      newRelationships.push(this.parseRelationship(relationship));
+    jsonTable.relationships.forEach((relationship) => {
+      newRelationships.push(this.parseRelationship(relationship, table));
     });
-    newTable.relationships = newRelationships;
+    table.relationships = newRelationships;
 
-    let newSources = new Array<SourceTableInstance>();
-    table.sources.forEach((source) => {
-      newSources.push(this.parseSourceTableInstance(source));
-    });
-    newTable.sources = newSources;
-
-    return newTable;
+    return table;
   }
 
-  private parseColumnCombination(cc: JSONColumnCombination) {
-    let newColumns: Array<Column> = [];
-    cc._columns.forEach((col) => {
-      newColumns.push(this.parseColumn(col));
-    });
+  private parseColumnCombination(cc: JSONColumnCombination, newTable: Table) {
+    let newColumns = cc._columns.map((col) => this.parseColumn(col, newTable));
     return new ColumnCombination(newColumns);
   }
 
-  private parseColumn(col: JSONColums) {
-    this.parseSourceTableInstance(col.sourceTableInstance);
-    return new Column(
-      this.parseSourceTableInstance(col.sourceTableInstance),
+  private parseColumn(col: JSONColumn, table: Table): Column {
+    let column = new Column(
+      this.findSourceTableInstance(col.sourceTableInstance, table.sources),
       this.parseSourceColumn(col.sourceColumn),
       col.alias
     );
+    let existing = this.existingColumnsForTable
+      .get(table)!
+      .find((other) => other.equals(column));
+    if (existing) {
+      return existing;
+    } else {
+      this.existingColumnsForTable.get(table)!.push(column);
+      return column;
+    }
   }
 
   private parseSourceTableInstance(sti: JSONSourceTableInstance) {
     let newSourceTable = new SourceTable(sti.table.name, sti.table.schemaName);
-    if (
-      Array.from(this.existingSourceTables).filter((ele) =>
-        ele.equals(newSourceTable)
-      ).length > 0
-    ) {
-      newSourceTable = Array.from(this.existingSourceTables).find((ele) =>
-        ele.equals(newSourceTable)
-      )!;
+
+    let existing = this.existingSourceTables.find((other) =>
+      other.equals(newSourceTable)
+    );
+    if (existing) {
+      newSourceTable = existing;
     } else {
-      this.existingSourceTables.add(newSourceTable);
+      this.existingSourceTables.push(newSourceTable);
     }
 
     let newSourceTableInstance = new SourceTableInstance(
@@ -218,33 +216,28 @@ export class LoadSavedSchemaComponent {
     newSourceTableInstance.id = sti.id;
     newSourceTableInstance.useId = sti.useId;
 
-    if (
-      Array.from(this.existingSourceTableInstances).filter((ele) =>
-        ele.equals(newSourceTableInstance)
-      ).length > 0
-    ) {
-      newSourceTableInstance = Array.from(
-        this.existingSourceTableInstances
-      ).find((ele) => ele.equals(newSourceTableInstance))!;
-    } else {
-      this.existingSourceTableInstances.add(newSourceTableInstance);
-    }
-
     return newSourceTableInstance;
+  }
+
+  private findSourceTableInstance(
+    sti: JSONSourceTableInstance,
+    existingSourceTableInstances: Array<SourceTableInstance>
+  ): SourceTableInstance {
+    return existingSourceTableInstances.find((other) =>
+      other.equals(this.parseSourceTableInstance(sti))
+    )!;
   }
 
   private parseSourceColumn(sc: JSONSourceColumn) {
     let newSourceTable = new SourceTable(sc.table.name, sc.table.schemaName);
-    if (
-      Array.from(this.existingSourceTables).filter((ele) =>
-        ele.equals(newSourceTable)
-      ).length > 0
-    ) {
-      newSourceTable = Array.from(this.existingSourceTables).find((ele) =>
-        ele.equals(newSourceTable)
-      )!;
+
+    let existingTab = this.existingSourceTables.find((other) =>
+      other.equals(newSourceTable)
+    );
+    if (existingTab) {
+      newSourceTable = existingTab;
     } else {
-      this.existingSourceTables.add(newSourceTable);
+      this.existingSourceTables.push(newSourceTable);
     }
 
     let newSourceColumn = new SourceColumn(
@@ -254,31 +247,29 @@ export class LoadSavedSchemaComponent {
       sc.ordinalPosition,
       sc.nullable
     );
-    if (
-      Array.from(this.existingSourceColumns).filter((ele) =>
-        ele.equals(newSourceColumn)
-      ).length > 0
-    ) {
-      newSourceColumn = Array.from(this.existingSourceColumns).find((ele) =>
-        ele.equals(newSourceColumn)
-      )!;
+
+    let existingCol = this.existingSourceColumns.find((other) =>
+      other.equals(newSourceColumn)
+    );
+    if (existingCol) {
+      newSourceColumn = existingCol;
     } else {
-      this.existingSourceColumns.add(newSourceColumn);
+      this.existingSourceColumns.push(newSourceColumn);
     }
 
     return newSourceColumn;
   }
 
-  private parseRelationship(relationship: JSONRelationship) {
+  private parseRelationship(relationship: JSONRelationship, table: Table) {
     let newReferencingColumns: Array<Column> = [];
     relationship._referencing.forEach((col) => {
-      newReferencingColumns.push(this.parseColumn(col));
+      newReferencingColumns.push(this.parseColumn(col, table));
     });
     let newReferencing = newReferencingColumns;
 
     let newReferencedColumns: Array<Column> = [];
     relationship._referenced.forEach((col) => {
-      newReferencedColumns.push(this.parseColumn(col));
+      newReferencedColumns.push(this.parseColumn(col, table));
     });
     let newReferenced = newReferencedColumns;
 
@@ -288,12 +279,12 @@ export class LoadSavedSchemaComponent {
     return newRelationship;
   }
 
-  private parseSourceRelationshipArray(sra: Array<JSONSourceRelationship>) {
-    let newSourceRelationships = new Array<SourceRelationship>();
-    sra.forEach((sr) => {
-      newSourceRelationships.push(this.parseSourceRelationship(sr));
-    });
-    return newSourceRelationships;
+  private parseSourceRelationshipArray(
+    sourceRelationships: Array<JSONSourceRelationship>
+  ) {
+    return sourceRelationships.map((sourceRelationship) =>
+      this.parseSourceRelationship(sourceRelationship)
+    );
   }
 
   private parseSourceRelationship(sr: JSONSourceRelationship) {
@@ -304,75 +295,32 @@ export class LoadSavedSchemaComponent {
     newSourceRelationship.referencing = this.parseSourceColumnArray(
       sr.referencing
     );
-    if (
-      Array.from(this.existingSourceRelationships).filter((ele) =>
-        ele.equals(newSourceRelationship)
-      ).length > 0
-    ) {
-      newSourceRelationship = Array.from(this.existingSourceRelationships).find(
-        (ele) => ele.equals(newSourceRelationship)
-      )!;
+
+    let existing = this.existingSourceRelationships.find((other) =>
+      other.equals(newSourceRelationship)
+    );
+    if (existing) {
+      newSourceRelationship = existing;
     } else {
-      this.existingSourceRelationships.add(newSourceRelationship);
+      this.existingSourceRelationships.push(newSourceRelationship);
     }
     return newSourceRelationship;
   }
 
-  private parseSourceColumnArray(asc: Array<JSONSourceColumn>) {
-    let newSourceColumns = Array<SourceColumn>();
-    asc.forEach((sc) => {
-      newSourceColumns.push(this.parseSourceColumn(sc));
-    });
-    return newSourceColumns;
+  private parseSourceColumnArray(sourceColumns: Array<JSONSourceColumn>) {
+    return sourceColumns.map((sourceColumn) =>
+      this.parseSourceColumn(sourceColumn)
+    );
   }
 
-  private parseTableFds(
-    fds: Array<{
-      key: JSONSourceTable;
-      value: Array<JSONSourceFunctionalDependency>;
-    }>
-  ) {
-    let newSourceFunctionalDependencies =
-      new Array<SourceFunctionalDependency>();
-    fds.forEach((fd) => {
-      newSourceFunctionalDependencies.push(
-        ...this.parseSourceFunctionalDependencyArray(fd.value)
-      );
-    });
-    return newSourceFunctionalDependencies;
-  }
-
-  private parseSourceFunctionalDependencyArray(
-    sfda: Array<JSONSourceFunctionalDependency>
-  ) {
-    let newSourceFunctionalDependencies =
-      new Array<SourceFunctionalDependency>();
-    sfda.forEach((sfd) => {
-      newSourceFunctionalDependencies.push(
-        this.parseSourceFunctionalDependency(sfd)
-      );
-    });
-    return newSourceFunctionalDependencies;
+  private parseTableFds(fds: Array<JSONSourceFunctionalDependency>) {
+    return fds.map((fd) => this.parseSourceFunctionalDependency(fd));
   }
 
   private parseSourceFunctionalDependency(sfd: JSONSourceFunctionalDependency) {
-    let newSourceFunctionalDependency = new SourceFunctionalDependency(
+    return new SourceFunctionalDependency(
       this.parseSourceColumnArray(sfd.lhs),
       this.parseSourceColumnArray(sfd.rhs)
     );
-    if (
-      Array.from(this.existingSourceFunctionalDependencies).filter((ele) =>
-        ele.equals(newSourceFunctionalDependency)
-      ).length > 0
-    ) {
-      newSourceFunctionalDependency = Array.from(
-        this.existingSourceFunctionalDependencies
-      ).find((ele) => ele.equals(newSourceFunctionalDependency))!;
-    } else {
-      this.existingSourceFunctionalDependencies.add(
-        newSourceFunctionalDependency
-      );
-    }
-    return newSourceFunctionalDependency;
   }
 }
