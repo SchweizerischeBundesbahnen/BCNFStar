@@ -34,7 +34,11 @@ describe("The metanome settings dialog", () => {
 
   it("displays all tabbars", () => {
     cy.get("sbb-toggle").should("have.length", 3);
-    cy.get("sbb-toggle-option").should("have.length", 7);
+    cy.get("sbb-toggle-option").should("have.length", 10);
+    cy.get('sbb-toggle-option:contains("Use no Metanome result")').should(
+      "have.length",
+      3
+    );
     cy.get('sbb-toggle-option:contains("Use existing result")').should(
       "have.length",
       3
@@ -475,5 +479,57 @@ describe("The metanome settings dialog", () => {
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
     ).should("contain", "SAMPLE_GOAL: 600", { force: true });
+  });
+
+  it("not calculate fds and inds when using use no Metanome result tab", () => {
+    cy.get('.sbb-toggle-option:contains("Use no Metanome result")').click({
+      multiple: true,
+    });
+    cy.contains("Ok").click();
+    cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
+    cy.get(
+      '.table-head-title:contains("public.nation_region_denormalized")'
+    ).click();
+    cy.contains(
+      "No contained subtables were found with the current filter for this table"
+    );
+    cy.contains(
+      "No possible foreign keys were found with the current filter for this table"
+    );
+    cy.get(
+      '.table-head-title:contains("public.part_partsupp_supplier_denormalized ")'
+    ).click({ force: true });
+    cy.contains(
+      "No contained subtables were found with the current filter for this table"
+    ).should("not.exist");
+    cy.contains(
+      "No possible foreign keys were found with the current filter for this table"
+    );
+  });
+
+  it("not calculate fds and inds when using use no Metanome result tab for one table", () => {
+    cy.get('.sbb-toggle-option:contains("Use no Metanome result")')
+      .eq(0)
+      .click();
+    cy.contains("Ok").click();
+    cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
+    cy.get(
+      '.table-head-title:contains("public.nation_region_denormalized")'
+    ).click();
+    cy.contains(
+      "No contained subtables were found with the current filter for this table"
+    );
+    cy.contains(
+      "No possible foreign keys were found with the current filter for this table"
+    );
+    cy.get(
+      '.table-head-title:contains("public.part_partsupp_supplier_denormalized ")'
+    ).click({ force: true });
+    cy.contains(
+      "No contained subtables were found with the current filter for this table"
+    ).should("not.exist");
+    cy.contains(
+      "No possible foreign keys were found with the current filter for this table"
+    );
   });
 });

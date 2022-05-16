@@ -9,7 +9,7 @@
           [formControl]="selectedFdTab[index]"
           (change)="setFdConfig(table)"
         >
-          <sbb-toggle-option label="Use no metanome result" value="no-result">
+          <sbb-toggle-option label="Use no Metanome result" value="no-result">
             <sbb-toggle-details>
               Don't use Functional Dependencies for this table.
             </sbb-toggle-details>
@@ -48,7 +48,7 @@
       <h2>Inclusion Dependencies</h2>
       {{ getAllTableNames() }}
       <sbb-toggle [formControl]="selectedIndTab" (change)="setIndConfig()">
-        <sbb-toggle-option label="Use no metanome result" value="no-result">
+        <sbb-toggle-option label="Use no Metanome result" value="no-result">
           <sbb-toggle-details>
             Don't use Inclusion Dependencies for these tables.
           </sbb-toggle-details>
