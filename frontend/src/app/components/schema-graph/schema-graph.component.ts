@@ -13,7 +13,7 @@ import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Observable } from 'rxjs';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -260,7 +260,7 @@ export class SchemaGraphComponent implements AfterContentInit {
 
   private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
-    for (let column of table.columns.inOrder()) {
+    for (let column of table.columns) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
         id: column.sourceColumn.table.fullName + '.' + column.name + '_left', // generated if `id` value is not present

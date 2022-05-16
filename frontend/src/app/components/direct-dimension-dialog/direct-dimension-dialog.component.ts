@@ -1,6 +1,6 @@
 import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject, ViewChild } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';

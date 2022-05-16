@@ -55,7 +55,8 @@ export default class FdScore {
   }
 
   public fdPositionScore(): number {
-    return (this.lhsPositionScore() + this.rhsPositionScore()) / 2;
+    // TODO fix coherenceScore
+    return 0; // (this.lhsPositionScore() + this.rhsPositionScore()) / 2;
   }
 
   private lhsPositionScore(): number {
@@ -71,8 +72,8 @@ export default class FdScore {
   }
 
   public numAttributesBetween(attributes: ColumnCombination): number {
-    let firstColumn = attributes.inOrder()[0];
-    let lastColumn = attributes.inOrder()[attributes.cardinality - 1];
+    let firstColumn = attributes.asArray()[0];
+    let lastColumn = attributes.asArray()[attributes.cardinality - 1];
     let range = lastColumn.ordinalPosition - firstColumn.ordinalPosition + 1;
     return range - attributes.cardinality;
   }

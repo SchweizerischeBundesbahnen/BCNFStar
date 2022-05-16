@@ -2,7 +2,7 @@ import ColumnCombination from '../schema/ColumnCombination';
 import Join from '../schema/methodObjects/Join';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
-import { TableRelationship } from '../types/TableRelationship';
+import TableRelationship from '../schema/TableRelationship';
 import Command from './Command';
 
 export default class DirectDimensionCommand extends Command {

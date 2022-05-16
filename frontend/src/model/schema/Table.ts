@@ -4,42 +4,41 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
-import { TableRelationship } from '../types/TableRelationship';
+import TableRelationship from './TableRelationship';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import SourceRelationship from './SourceRelationship';
+import { FdCluster } from '../types/FdCluster';
 
 export default class Table {
   public name = '';
   public schemaName = '';
-  public columns;
+  public columns: ColumnCombination;
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
   public relationships = new Array<Relationship>();
   public sources = new Array<SourceTableInstance>();
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
+  private _fdClusters?: Array<FdCluster>;
 
-  /**
-   * cached results of schema.splitteableFdClustersOf(this). Should not be accessed from outside the schema class
-   */
-  public _splittableFdClusters!: Array<{
-    columns: ColumnCombination;
-    fds: Array<FunctionalDependency>;
-  }>;
   /**
    * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
    */
   public _fks!: Array<TableRelationship>;
   /**
+   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   */
+  public _references!: Array<TableRelationship>;
+  /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
   /**
-   * This variable tracks if the cached results fks and inds are still valid
+   * This variable tracks if the cached inds are still valid
    */
-  public _relationshipsValid = true;
+  public _indsValid = false;
 
   public constructor(columns?: ColumnCombination) {
     this.columns = columns || new ColumnCombination();
@@ -113,13 +112,13 @@ export default class Table {
     });
   }
 
-  public checkColumnNameDuplicates() {
+  public resolveColumnNameDuplicates() {
     const checked = new Set<Column>();
     for (const column of this.columns) {
       if (checked.has(column)) continue;
       const sameName = this.columns
         .asArray()
-        .filter((other) => other.sourceColumn.name == column.sourceColumn.name);
+        .filter((other) => other.baseAlias == column.baseAlias);
       if (sameName.length > 1)
         sameName.forEach(
           (equivColumn) => (equivColumn.includeSourceName = true)
@@ -131,12 +130,28 @@ export default class Table {
 
   public addColumns(...columns: Array<Column>) {
     this.columns.add(...columns);
-    this.checkColumnNameDuplicates();
+    this.resolveColumnNameDuplicates();
   }
 
   public removeColumns(...columns: Array<Column>) {
     this.columns.delete(...columns);
-    this.checkColumnNameDuplicates();
+    this.resolveColumnNameDuplicates();
+  }
+
+  public resolveSourceNameDuplicates() {
+    const checked = new Set<SourceTableInstance>();
+    for (const source of this.sources) {
+      if (checked.has(source)) continue;
+      const sameName = this.sources.filter(
+        (other) => other.baseAlias == source.baseAlias
+      );
+      const useId = sameName.length > 1;
+      sameName.forEach((equivSource, i) => {
+        equivSource.id = i + 1;
+        equivSource.useId = useId;
+      });
+      sameName.forEach((source) => checked.add(source));
+    }
   }
 
   public addSource(
@@ -144,20 +159,8 @@ export default class Table {
     name?: string
   ): SourceTableInstance {
     const newSource = new SourceTableInstance(sourceTable, name);
-    const sameAlias = this.sources.filter(
-      (source) => source.baseAlias == newSource.baseAlias
-    );
-    newSource.id = sameAlias.length + 1;
-    if (sameAlias.length == 1) {
-      sameAlias[0].useAlias = true;
-      sameAlias[0].useId = true;
-    }
-    if (sameAlias.length >= 1) {
-      newSource.useAlias = true;
-      newSource.useId = true;
-    }
-
     this.sources.push(newSource);
+    this.resolveSourceNameDuplicates();
     return newSource;
   }
 
@@ -187,6 +190,16 @@ export default class Table {
 
   public generatingSchema(fd: FunctionalDependency): ColumnCombination {
     return fd.rhs.deepCopy();
+  }
+
+  public splitPreservesCC(
+    fd: FunctionalDependency,
+    cc: ColumnCombination
+  ): boolean {
+    return (
+      cc.isSubsetOf(this.remainingSchema(fd)) ||
+      cc.isSubsetOf(this.generatingSchema(fd))
+    );
   }
 
   /**
@@ -325,7 +338,6 @@ export default class Table {
   public isBCNFViolating(fd: FunctionalDependency): boolean {
     if (this.isKeyFd(fd)) return false;
     if (fd.lhs.cardinality == 0) return false;
-    if (this.pk && !this.pk.isSubsetOf(this.remainingSchema(fd))) return false;
     return true;
   }
 
@@ -351,6 +363,28 @@ export default class Table {
         });
     }
     return this._violatingFds;
+  }
+
+  public fdClusters(): Array<FdCluster> {
+    if (!this._fdClusters) {
+      this._fdClusters = new Array<FdCluster>();
+      if (this.pk)
+        this._fdClusters.push({
+          columns: this.columns.copy(),
+          fds: new Array(
+            new FunctionalDependency(this.pk!.copy(), this.columns.copy())
+          ),
+        });
+      for (let fd of this.violatingFds()) {
+        let cluster = this._fdClusters.find((c) => c.columns.equals(fd.rhs));
+        if (!cluster) {
+          cluster = { columns: fd.rhs.copy(), fds: new Array() };
+          this._fdClusters.push(cluster);
+        }
+        cluster.fds.push(fd);
+      }
+    }
+    return this._fdClusters;
   }
 
   public toTestString(): string {
