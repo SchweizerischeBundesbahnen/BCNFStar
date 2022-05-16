@@ -1,3 +1,4 @@
+import { exampleSchemaToJSON } from "../../../utils/exampleTables";
 /// <reference types="cypress" />
 
 describe("The table selection page", () => {
@@ -106,5 +107,27 @@ describe("The table selection page", () => {
   it("renders the schema editing page after clicking on the Go and Ok button", () => {
     cy.selectTablesAndGo();
     cy.loadMetanomeConfigAndOk();
+  });
+
+  it("loads, saves and loads edited schema correct", () => {
+    cy.get("sbb-expansion-panel:contains('Load saved schema')").click();
+    cy.contains("Upload file").click();
+    cy.get('input[type="file"]').selectFile(
+      {
+        contents: Cypress.Buffer.from(exampleSchemaToJSON()),
+        fileName: "savedSchema.txt",
+        lastModified: Date.now(),
+      },
+      { force: true }
+    );
+    cy.get(".sbb-button").eq(0).should("contain", "Load").click();
+    cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
+    cy.get("input").eq(1).type("savedSchema");
+    cy.contains("Save current schema state").click();
+    cy.get("sbb-simple-notification").contains("Schema download");
+    cy.readFile("cypress/downloads/savedSchema.txt").should(
+      "eq",
+      exampleSchemaToJSON()
+    );
   });
 });

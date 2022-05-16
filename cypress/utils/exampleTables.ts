@@ -189,3 +189,7 @@ export function exampleSchema(): Schema {
 
   return schema;
 }
+
+export function exampleSchemaToJSON(): string {
+  return JSON.stringify(exampleSchema());
+}
