@@ -150,11 +150,13 @@ export class TableSelectionComponent implements OnInit {
 
     try {
       await this.runMetanome(
-        Object.values(values).filter((entry) => !entry.fileName)
+        Object.values(values).filter(
+          (entry) => !entry.fileName && entry.algorithm != 'no-result'
+        )
       );
       let fdResults: Record<string, string> = {};
       for (let value of Object.entries(values)) {
-        if (value[0] != 'ind') {
+        if (value[1].algorithm != 'no-result' && value[0] != 'ind') {
           fdResults[value[1].tables[0]] = value[1].fileName;
         }
       }

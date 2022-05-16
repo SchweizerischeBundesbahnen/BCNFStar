@@ -174,28 +174,34 @@ export class DatabaseService {
     indFile: string,
     fdFiles: Record<string, string>
   ) {
-    const indPromise = this.getMetanomeResult(indFile) as Promise<
-      Array<IInclusionDependency>
-    >;
     const fdPromises: Record<
       string,
       Promise<Array<IFunctionalDependency>>
     > = {};
-    for (const table of tables)
-      fdPromises[table.schemaAndName()] = this.getMetanomeResult(
-        fdFiles[table.schemaAndName()]
-      ) as Promise<Array<IFunctionalDependency>>;
-
+    for (const table of tables) {
+      if (fdFiles[table.schemaAndName()]) {
+        fdPromises[table.schemaAndName()] = this.getMetanomeResult(
+          fdFiles[table.schemaAndName()]
+        ) as Promise<Array<IFunctionalDependency>>;
+      }
+    }
     this.inputSchema = new Schema(...tables);
     for (const table of tables) {
       const iFDs = await fdPromises[table.schemaAndName()];
-
-      const fds = iFDs.map((fd) =>
-        FunctionalDependency.fromIFunctionalDependency(table, fd)
-      );
-      table.setFds(fds);
+      if (iFDs) {
+        const fds = iFDs.map((fd) =>
+          FunctionalDependency.fromIFunctionalDependency(table, fd)
+        );
+        table.setFds(fds);
+      }
     }
-    this.resolveInds(await indPromise);
+
+    if (indFile) {
+      const indPromise = this.getMetanomeResult(indFile) as Promise<
+        Array<IInclusionDependency>
+      >;
+      this.resolveInds(await indPromise);
+    }
     this.resolveIFks(this.iFks);
     this.resolveIPks(this.iPks);
   }

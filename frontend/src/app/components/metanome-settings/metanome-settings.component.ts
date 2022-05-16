@@ -176,14 +176,14 @@ export class MetanomeSettingsComponent {
     return typeof value == 'boolean';
   }
 
-  public metanomeConfigInfo(result: IIndexFileEntry): String {
+  public metanomeConfigInfo(result: IIndexFileEntry): string {
     let settings = [
       new Date(+result.createDate).toLocaleString(),
       result.algorithm.split('.').slice(-1),
       Object.entries(result.config)
         .join(';')
-        .replace(',', ': ')
-        .replace(';', ', ') || 'no further configs',
+        .replaceAll(',', ': ')
+        .replaceAll(';', ', ') || 'no further configs',
     ];
     return settings.join(' | ');
   }
@@ -191,6 +191,15 @@ export class MetanomeSettingsComponent {
   public setFdConfig(table: Table) {
     const tab: string = this.selectedFdTab[this.tables.indexOf(table)].value;
     switch (tab) {
+      case 'no-result':
+        this.formGroup.patchValue({
+          ['fds_' + table.schemaAndName()]: this.createDefaultFdIndexFile(
+            table.schemaAndName(),
+            Object.assign({}, { memory: '' }),
+            'no-result'
+          ),
+        });
+        break;
       case 'existing-result':
         this.formGroup.patchValue({
           ['fds_' + table.schemaAndName()]:
@@ -210,6 +219,14 @@ export class MetanomeSettingsComponent {
   public setIndConfig() {
     const tab: string = this.selectedIndTab.value;
     switch (tab) {
+      case 'no-result':
+        this.formGroup.patchValue({
+          ind: this.createDefaultIndIndexFile(
+            Object.assign({}, { memory: '' }),
+            'no-result'
+          ),
+        });
+        break;
       case 'existing-result':
         this.formGroup.patchValue({
           ind: this.filteredMetanomeResultsForInd()[0],

@@ -9,6 +9,11 @@
           [formControl]="selectedFdTab[index]"
           (change)="setFdConfig(table)"
         >
+          <sbb-toggle-option label="Use no metanome result" value="no-result">
+            <sbb-toggle-details>
+              Don't use Functional Dependencies for this table.
+            </sbb-toggle-details>
+          </sbb-toggle-option>
           <sbb-toggle-option
             label="Use existing result"
             value="existing-result"
@@ -19,6 +24,7 @@
                 <sbb-option
                   *ngFor="let result of filteredMetanomeResultsForFd(table)"
                   [value]="result"
+                  [sbbTooltip]="metanomeConfigInfo(result)"
                 >
                   {{ metanomeConfigInfo(result) }}
                 </sbb-option>
@@ -42,6 +48,11 @@
       <h2>Inclusion Dependencies</h2>
       {{ getAllTableNames() }}
       <sbb-toggle [formControl]="selectedIndTab" (change)="setIndConfig()">
+        <sbb-toggle-option label="Use no metanome result" value="no-result">
+          <sbb-toggle-details>
+            Don't use Inclusion Dependencies for these tables.
+          </sbb-toggle-details>
+        </sbb-toggle-option>
         <sbb-toggle-option
           label="Use existing result"
           value="existing-result"
@@ -52,6 +63,7 @@
               <sbb-option
                 *ngFor="let result of filteredMetanomeResultsForInd()"
                 [value]="result"
+                [sbbTooltip]="metanomeConfigInfo(result)"
               >
                 {{ metanomeConfigInfo(result) }}
               </sbb-option>
