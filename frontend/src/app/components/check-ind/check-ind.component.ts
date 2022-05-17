@@ -64,6 +64,7 @@ export class CheckIndComponent {
       this.dialog.open(ViolatingRowsViewIndsComponent, {
         data: {
           dataService: dataQuery,
+          rowCount: rowCount,
         },
       });
     }

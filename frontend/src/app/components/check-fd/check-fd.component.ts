@@ -48,6 +48,7 @@ export class CustomFunctionalDependencySideBarComponent {
       this.dialog.open(ViolatingRowsViewComponent, {
         data: {
           dataService: dataQuery,
+          rowCount: rowCount,
         },
       });
     }

@@ -19,24 +19,17 @@ export class DatabaseTableViewerComponent implements OnInit {
   @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
   @Input() dataService!: DataQuery;
-  public rowCount: number = 0;
+  @Input() rowCount!: number;
 
   constructor() {}
 
   public async ngOnInit(): Promise<void> {
-    await this.loadRowCount();
     this.reloadData();
   }
 
   public changePage(evt: SbbPageEvent) {
     this.page = evt.pageIndex;
     this.reloadData();
-  }
-
-  public async loadRowCount(): Promise<void> {
-    this.isLoading = true;
-    this.rowCount = await this.dataService.loadRowCount();
-    this.isLoading = false;
   }
 
   public async reloadData() {
