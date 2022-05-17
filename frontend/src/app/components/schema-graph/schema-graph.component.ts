@@ -4,6 +4,8 @@ import {
   Output,
   EventEmitter,
   AfterContentInit,
+  SimpleChanges,
+  OnChanges,
 } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
@@ -31,7 +33,7 @@ enum PortSide {
   templateUrl: './schema-graph.component.html',
   styleUrls: ['./schema-graph.component.css'],
 })
-export class SchemaGraphComponent implements AfterContentInit {
+export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Input() public schema!: Schema;
   @Input() public selectedTable?: Table;
   @Input() public selectedColumns?: Map<Table, ColumnCombination>;
@@ -80,8 +82,13 @@ export class SchemaGraphComponent implements AfterContentInit {
 
     this.schemaChanged.subscribe(() => {
       this.updateGraph();
+      this.centerOnSelectedTable();
     });
     this.updateGraph();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedTable']) this.centerOnSelectedTable();
   }
 
   public updateGraph() {
@@ -280,6 +287,22 @@ export class SchemaGraphComponent implements AfterContentInit {
       });
       counter++;
     }
+  }
+
+  public centerOnSelectedTable() {
+    if (!this.selectedTable) return;
+    // center on selectedTable
+    const paper = document.querySelector('#paper svg') as SVGElement;
+    const bbox = this.graphStorage.get(this.selectedTable)?.jointjsEl.getBBox();
+    if (!bbox) return;
+    const offsetX =
+      paper.getBoundingClientRect().width / 2 -
+      this.panzoomTransform.scale * (bbox.x + bbox.width / 2);
+    const offsetY =
+      paper.getBoundingClientRect().height / 2 -
+      this.panzoomTransform.scale * (bbox.y + bbox.height / 2);
+
+    this.panzoomHandler?.smoothMoveTo(offsetX, offsetY);
   }
 
   public resetView() {
