@@ -1,180 +1,157 @@
-// WIP, to be completed and reviewed later
-
 // import Column from './Column';
 // import Schema from './Schema';
 // import Table from './Table';
 
-// // interface PCGNode<T> {
-// //   elLeft: T;
-// //   elRight: T;
-// // }
+import { filter } from 'rxjs';
+import Column from './Column';
+import Table from './Table';
 
-// // interface PCGEdge<S, F> {
-// //   start: PCGNode<S>;
-// //   end: PCGNode<F>;
-// //   label: string;
-// // }
+type Graph<LabelType> = Record<string, Record<string, LabelType>>;
 
-// export default function matchSchemas(schemaLeft: Schema, schemaRight: Schema) {
-//   const result = similarityFlooding(schemaLeft, schemaRight);
-//   const absoluteSimilarities: Record<string, Record<string, number>> = {};
-//   for (const node in result) {
-//     const [, start, end] = node.split(':');
-//     if (!absoluteSimilarities[start]) absoluteSimilarities[start] = {};
-//     absoluteSimilarities[start][end] = result[node];
-//   }
-//   const relativeSimilarities: Record<string, Record<string, number>> = {};
+/**
+ *
+ * @param graph Record<label, start,end>
+ */
+function buildPCG(graphLeft: Graph<string>, graphRight: Graph<string>) {
+  const pcg: Graph<string> = {};
+  for (const label in graphLeft) {
+    const labelLevel: typeof pcg[0] = (pcg[label] = {});
+    for (const startLeft in graphLeft[label]) {
+      for (const startRight in graphRight[label]) {
+        const start = `${startLeft}:${startRight}`;
+        const end = `${labelLevel[startLeft]}:${labelLevel[startRight]}`;
+        labelLevel[start] = end;
+      }
+    }
+  }
+  return pcg;
+}
+/**
+ *
+ * @param pcg
+ * @returns Record<start,Record<end, propagation value>
+ */
+function buildIPG(pcg: Graph<string>) {
+  const ipg: Graph<number> = {};
+  for (const label in pcg) {
+    const labelLevel: typeof pcg[0] = pcg[label];
+    const startCounts: Record<string, number> = {};
+    const endCounts: Record<string, number> = {};
+    for (const start in labelLevel)
+      startCounts[start] = startCounts[start] + 1 || 1;
+    for (const end in Object.values(labelLevel))
+      endCounts[end] = endCounts[end] + 1 || 1;
+    for (const start in labelLevel) {
+      const end = labelLevel[start];
+      if (!ipg[start]) ipg[start] = {};
+      if (!ipg[end]) ipg[end] = {};
+      ipg[start][end] = (ipg[start][end] || 0) + 1.0 / startCounts[start];
+      ipg[end][start] = (ipg[end][start] || 0) + 1.0 / endCounts[end];
+    }
+  }
+  return ipg;
+}
 
-//   const selectTreshold = 1.0;
+function propagate(
+  ipg: Graph<number>,
+  initial: Record<string, number>,
+  last: Record<string, number>
+): Record<string, number> {
+  const result: Record<string, number> = {};
+  const contribution = (node: string) => last[node] + initial[node];
+  for (const start in ipg) {
+    result[start] = contribution(start);
+    for (const end in ipg[start]) {
+      const propagationVal = ipg[start][end];
+      result[start] += propagationVal * contribution(end);
+    }
+  }
+  return result;
+}
+function filter(flooded: Record<string, number>): Record<string, number> {
+  throw new Error('not implemented');
+}
 
-//   for (const start in absoluteSimilarities) {
-//     relativeSimilarities[start] = {};
-//     const max = Math.max(...Object.values(absoluteSimilarities[start]));
-//     for (const end in absoluteSimilarities) {
-//       const val = absoluteSimilarities[start][end] / max;
-//       if (val > selectTreshold) relativeSimilarities[start][end] = val;
-//     }
-//   }
-//   return result;
-// }
+function matchSchemas(tablesLeft: Array<Table>, tablesRight: Array<Table>) {
+  const graphLeft = createGraph(tablesLeft);
+  const graphRight = createGraph(tablesRight);
+  const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
+  const flooded = similarityFlood(graphLeft, graphRight, initialSimliarity);
+  const filtered: Record<string, number> = filter(flooded);
+  return filtered;
+}
 
-// // class Graph {
-// //     forward: Record<string, Graph> = {}
-// //     reverse: Record<string, Graph> = {}
-// //     constructor(public label: string) { }
+function similarityFlood(
+  graphLeft: Graph<string>,
+  graphRight: Graph<string>,
+  initial: Record<string, number>
+) {
+  const pcg = buildPCG(graphLeft, graphRight);
+  const ipg = buildIPG(pcg);
+  const threshold = 0.000_000_001;
+  let last: Record<string, number> = initial;
+  let current: Record<string, number>;
+  let difference;
+  do {
+    current = propagate(ipg, initial, last);
+    last = current;
+    // calculating change by computing the length of the residual vector
+    const residualVector = Object.keys(current).map(
+      (node) => current[node] - last[node]
+    );
+    difference = Math.sqrt(
+      residualVector.reduce((prev, curr) => prev + curr * curr)
+    );
+  } while (difference > threshold);
+  return current;
+}
 
-// //     addChild(label: string, ...path: string[]) {
-// //         if (path.length) {
-// //             this.getChild(...path).addChild(label)
-// //         }
-// //         else {
-// //             const g = new Graph(label)
-// //             this.forward[label] = g;
-// //             g.reverse[this.label] = this;
-// //         }
-// //     }
-// //     getChild(...path: string[]): Graph {
-// //         if (path.length == 1) return this.forward[path[0]]
-// //         return this.forward[path[0]].getChild(...path.slice(1))
-// //     }
-// // }
+function createGraph(tablesLeft: Table[]): Graph<string> {
+  throw new Error('Function not implemented.');
+}
 
-// /**
-//  *
-//  * @param schemaLeft
-//  * @param schemaRight
-//  * @returns elements mapped to their similarity
-//  */
-// function similarityFlooding(
-//   schemaLeft: Schema,
-//   schemaRight: Schema
-// ): Record<string, number> {
-//   // <start,<end>>
-//   const PCG: Record<string, Set<string>> = {};
-//   const reversePCG: Record<string, Set<string>> = {};
-//   PCG['schema:left:right'] = new Set();
-//   const initialSimilarity: Record<string, number> = {};
-//   initialSimilarity['schema:left:right'] = 0;
-//   // building PCG
-//   for (const tableLeft of schemaLeft.tables) {
-//     for (const tableRight of schemaRight.tables) {
-//       const tableIdentifier = `table:${tableLeft.fullName}:${tableRight.fullName}`;
-//       PCG['schema:left:right'].add(tableIdentifier);
-//       PCG[tableIdentifier] = new Set();
-//       reversePCG[tableIdentifier] = new Set(['schema:left:right']);
-//       initialSimilarity[tableIdentifier] = tableSimilarity(
-//         tableLeft,
-//         tableRight
-//       );
-//       for (const colLeft of tableLeft.columns) {
-//         for (const colRight of tableRight.columns) {
-//           const colIdentifier = `col:${colLeft.name}:${colRight.name}`;
-//           PCG[tableIdentifier].add(colIdentifier);
-//           if (!reversePCG[colIdentifier]) reversePCG[colIdentifier] = new Set();
-//           reversePCG[colIdentifier].add(tableIdentifier);
-//           initialSimilarity[colIdentifier] = colSimilarity(colLeft, colRight);
-//         }
-//       }
-//     }
-//   }
+function calcInitialSimilarity(
+  tablesLeft: Table[],
+  tablesRight: Table[]
+): Record<string, number> {
+  throw new Error('Function not implemented.');
+}
 
-//   let changeAmount = 1;
-//   const threshold = 0.0001;
-//   let currentSimilarity: Record<string, number> = initialSimilarity;
-//   let prevSimilarity: Record<string, number> = {};
+function tableSimilarity(tableLeft: Table, tableRight: Table): number {
+  return levenshteinDistance(tableLeft.name, tableRight.name);
+}
 
-//   const propagate = (graph: Record<string, Set<string>>, node: string) =>
-//     [...graph[node]].reduce(
-//       (acc, el) => acc + initialSimilarity[el] + prevSimilarity[el],
-//       0
-//     );
+function colSimilarity(colLeft: Column, colRight: Column): number {
+  return (
+    0.5 * levenshteinDistance(colLeft.name, colRight.name) +
+    0.5 * levenshteinDistance(colLeft.dataType, colRight.dataType)
+  );
+}
 
-//   while (changeAmount > threshold) {
-//     let biggestValThisRound = 0;
-//     prevSimilarity = currentSimilarity;
-//     currentSimilarity = {};
-//     for (const node of Object.keys(PCG)) {
-//       currentSimilarity[node] =
-//         prevSimilarity[node] +
-//         initialSimilarity[node] +
-//         // / size to apply propagation coefficients
-//         propagate(PCG, node) / PCG[node].size +
-//         propagate(reversePCG, node) / reversePCG[node].size;
-//       biggestValThisRound = Math.max(
-//         biggestValThisRound,
-//         currentSimilarity[node]
-//       );
-//     }
-//     // normalization
-//     for (const node in currentSimilarity) {
-//       currentSimilarity[node] /= biggestValThisRound;
-//     }
-//     // calculating change by computing the length of the residual vector
-//     const residualVector = Object.keys(currentSimilarity).map(
-//       (node) => currentSimilarity[node] - prevSimilarity[node]
-//     );
-//     changeAmount = Math.sqrt(
-//       residualVector.reduce((prev, curr) => prev + curr * curr)
-//     );
-//   }
-//   return currentSimilarity;
-// }
-
-// function tableSimilarity(tableLeft: Table, tableRight: Table): number {
-//   return levenshteinDistance(tableLeft.name, tableRight.name);
-// }
-
-// function colSimilarity(colLeft: Column, colRight: Column): number {
-//   return (
-//     0.5 * levenshteinDistance(colLeft.name, colRight.name) +
-//     0.5 * levenshteinDistance(colLeft.dataType, colRight.dataType)
-//   );
-// }
-
-// /**
-//  * Distance of two strings
-//  * Code taken from https://www.30secondsofcode.org/js/s/levenshtein-distance
-//  * Scaled to (0,1)
-//  */
-// function levenshteinDistance(string1: string, string2: string): number {
-//   if (!string1.length) return string2.length;
-//   if (!string2.length) return string1.length;
-//   const arr = [];
-//   for (let i = 0; i <= string2.length; i++) {
-//     arr[i] = [i];
-//     for (let j = 1; j <= string1.length; j++) {
-//       arr[i][j] =
-//         i === 0
-//           ? j
-//           : Math.min(
-//               arr[i - 1][j] + 1,
-//               arr[i][j - 1] + 1,
-//               arr[i - 1][j - 1] + (string1[j - 1] === string2[i - 1] ? 0 : 1)
-//             );
-//     }
-//   }
-//   return (
-//     arr[string2.length][string1.length] /
-//     Math.max(string1.length, string2.length)
-//   );
-// }
+/**
+ * Distance of two strings
+ * Code taken from https://www.30secondsofcode.org/js/s/levenshtein-distance
+ * Scaled to (0,1)
+ */
+function levenshteinDistance(string1: string, string2: string): number {
+  if (!string1.length) return string2.length;
+  if (!string2.length) return string1.length;
+  const arr = [];
+  for (let i = 0; i <= string2.length; i++) {
+    arr[i] = [i];
+    for (let j = 1; j <= string1.length; j++) {
+      arr[i][j] =
+        i === 0
+          ? j
+          : Math.min(
+              arr[i - 1][j] + 1,
+              arr[i][j - 1] + 1,
+              arr[i - 1][j - 1] + (string1[j - 1] === string2[i - 1] ? 0 : 1)
+            );
+    }
+  }
+  return (
+    arr[string2.length][string1.length] /
+    Math.max(string1.length, string2.length)
+  );
+}
