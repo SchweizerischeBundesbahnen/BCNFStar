@@ -14,6 +14,7 @@ export class DatabaseTableViewerComponent implements OnInit {
   public page: number = 0;
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
   public tableColumns: Array<string> = [];
+  public isLoading = false;
 
   @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
@@ -23,7 +24,7 @@ export class DatabaseTableViewerComponent implements OnInit {
   constructor() {}
 
   public async ngOnInit(): Promise<void> {
-    this.rowCount = await this.dataService.loadRowCount();
+    await this.loadRowCount();
     this.reloadData();
   }
 
@@ -32,11 +33,19 @@ export class DatabaseTableViewerComponent implements OnInit {
     this.reloadData();
   }
 
+  public async loadRowCount(): Promise<void> {
+    this.isLoading = true;
+    this.rowCount = await this.dataService.loadRowCount();
+    this.isLoading = false;
+  }
+
   public async reloadData() {
+    this.isLoading = true;
     const result = await this.dataService.loadTablePage(
       this.page * this.pageSize,
       this.pageSize
     );
+    this.isLoading = false;
 
     if (!result) return;
     this.tableColumns = result.attributes;

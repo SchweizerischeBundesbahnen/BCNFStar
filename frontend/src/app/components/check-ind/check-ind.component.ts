@@ -18,6 +18,7 @@ export class CheckIndComponent {
   @Input() tables!: Set<Table>;
 
   public rowCount: number = 0;
+  public isLoading: boolean = false;
 
   public referencedTable: Table | undefined;
   public relationship: Relationship = new Relationship();
@@ -52,7 +53,10 @@ export class CheckIndComponent {
 
   public async checkInd(): Promise<void> {
     const dataQuery = new ViolatingINDRowsDataQuery(this.relationship);
+
+    this.isLoading = true;
     const rowCount: number = await dataQuery.loadRowCount();
+    this.isLoading = false;
 
     if (rowCount == 0) {
       // valid Inclusion Dependency

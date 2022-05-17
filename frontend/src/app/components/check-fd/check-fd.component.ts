@@ -17,7 +17,7 @@ export class CustomFunctionalDependencySideBarComponent {
 
   public _lhs: Array<Column> = new Array<Column>();
   public _rhs: Array<Column> = new Array<Column>();
-
+  public isLoading: boolean = false;
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
   public checkNotAllowed(): boolean {
@@ -33,7 +33,10 @@ export class CustomFunctionalDependencySideBarComponent {
       this._lhs,
       this._rhs
     );
+
+    this.isLoading = true;
     const rowCount: number = await dataQuery.loadRowCount();
+    this.isLoading = false;
 
     if (rowCount == 0) {
       // valid Functional Dependency

@@ -1,3 +1,8 @@
+<sbb-loading
+  mode="inline"
+  aria-valuetext="Loading, please wait"
+  *ngIf="this.isLoading"
+></sbb-loading>
 <sbb-paginator
   (page)="changePage($event)"
   [pageIndex]="this.page"

@@ -78,6 +78,11 @@
       <button sbb-button (click)="checkInd()" [disabled]="!canCheckIND()">
         Check Inclusion Dependency
       </button>
+      <sbb-loading
+        mode="inline"
+        aria-valuetext="Loading, please wait"
+        *ngIf="this.isLoading"
+      ></sbb-loading>
     </div>
   </div>
 </div>

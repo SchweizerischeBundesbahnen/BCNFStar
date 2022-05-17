@@ -17,5 +17,9 @@
   </sbb-select>
 </div>
 <button sbb-button [disabled]="this.checkNotAllowed()" (click)="checkFd()">
-  Check Functional Dependency
-</button>
+  Check Functional Dependency</button
+><sbb-loading
+  mode="inline"
+  aria-valuetext="Loading, please wait"
+  *ngIf="this.isLoading"
+></sbb-loading>
