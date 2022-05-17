@@ -62,6 +62,10 @@ export class SchemaGraphComponent implements AfterContentInit {
       },
     });
 
+    this.paper.on('blank:pointerclick', () => {
+      this.selectedTableChange.emit();
+    });
+
     // move the corresponding HTML overlay whenever a graph element changes position
     this.graph.on('change:position', (element) => {
       if (element.isElement)
@@ -279,7 +283,6 @@ export class SchemaGraphComponent implements AfterContentInit {
   }
 
   public resetView() {
-    this.selectedTableChange.emit();
     this.panzoomHandler?.moveTo(0, 0);
     this.panzoomHandler?.zoomAbs(0, 0, 1);
   }
