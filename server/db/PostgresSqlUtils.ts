@@ -87,7 +87,7 @@ export default class PostgresSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} 
+        `SELECT * FROM "${schemaname}"."${tablename}"
         LIMIT ${limit} 
         OFFSET ${offset}`
       );
