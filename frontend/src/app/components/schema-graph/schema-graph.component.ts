@@ -286,11 +286,11 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   }
 
   public centerOnSelectedTable() {
+    if (!this.selectedTable) return;
     // center on selectedTable
     const paper = document.querySelector('#paper svg') as SVGElement;
-    const bbox = this.graphStorage
-      .get(this.selectedTable!)
-      ?.jointjsEl.getBBox()!;
+    const bbox = this.graphStorage.get(this.selectedTable)?.jointjsEl.getBBox();
+    if (!bbox) return;
     const offsetX =
       paper.getBoundingClientRect().width / 2 -
       this.panzoomTransform.scale * (bbox.x + bbox.width / 2);
