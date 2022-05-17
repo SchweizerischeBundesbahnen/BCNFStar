@@ -29,6 +29,10 @@ export default class FunctionalDependency {
     );
   }
 
+  public copy(): FunctionalDependency {
+    return new FunctionalDependency(this.lhs.copy(), this.rhs.copy());
+  }
+
   private extend(): void {
     this.rhs.union(this.lhs);
     // TODO: Inter-FD-extension (maybe)

@@ -51,14 +51,15 @@ interface JSONColumnCombination {
 interface JSONColumn {
   sourceTableInstance: JSONSourceTableInstance;
   sourceColumn: JSONSourceColumn;
-  alias?: string;
+  userAlias?: string;
+  includeSourceName: boolean;
 }
 
 interface JSONSourceTableInstance {
+  table: JSONSourceTable;
+  userAlias?: string;
   id: number;
   useId: boolean;
-  table: JSONSourceTable;
-  customAlias?: string;
 }
 
 interface JSONSourceColumn {
@@ -184,8 +185,9 @@ export class LoadSavedSchemaComponent {
     let column = new Column(
       this.findSourceTableInstance(col.sourceTableInstance, table.sources),
       this.parseSourceColumn(col.sourceColumn),
-      col.alias
+      col.userAlias
     );
+    column.includeSourceName = col.includeSourceName;
     let existing = this.existingColumnsForTable
       .get(table)!
       .find((other) => other.equals(column));
@@ -211,7 +213,7 @@ export class LoadSavedSchemaComponent {
 
     let newSourceTableInstance = new SourceTableInstance(
       newSourceTable,
-      sti.customAlias
+      sti.userAlias
     );
     newSourceTableInstance.id = sti.id;
     newSourceTableInstance.useId = sti.useId;

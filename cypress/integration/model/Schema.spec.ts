@@ -1,4 +1,4 @@
-import { exampleSchema } from "../../utils/exampleTables";
+import { exampleSchema, multiFkSchema } from "../../utils/exampleTables";
 import Schema from "../../../frontend/src/model/schema/Schema";
 import Table from "../../../frontend/src/model/schema/Table";
 import Column from "../../../frontend/src/model/schema/Column";
@@ -163,5 +163,31 @@ describe("Schema", () => {
     let ind = flatInds[0];
     expect(ind.referencing).to.equal(tableA);
     expect(ind.referenced).to.equal(tableC);
+  });
+
+  it("checks splittability of fds correctly", () => {
+    schema = multiFkSchema();
+    tableA = [...schema.tables].find((table) => table.name == "TableA")!;
+    tableB = [...schema.tables].find((table) => table.name == "TableB")!;
+    tableC = [...schema.tables].find((table) => table.name == "TableC")!;
+    expect(tableA.violatingFds().length).to.equal(1);
+    const fd = tableA.violatingFds()[0];
+    expect(schema.splittableFdsOf(tableA).length).to.equal(0);
+
+    expect(schema.fdSplitReferenceViolationsOf(fd, tableA).length).to.equal(1);
+    expect(
+      schema.fdSplitReferenceViolationsOf(fd, tableA)[0].referencing
+    ).to.equal(tableC);
+
+    expect(schema.fdSplitFKViolationsOf(fd, tableA).length).to.equal(0);
+
+    fd.rhs.delete(...tableA.columns.columnsFromNames("a_a2", "a_b1"));
+
+    expect(schema.fdSplitReferenceViolationsOf(fd, tableA).length).to.equal(0);
+
+    expect(schema.fdSplitFKViolationsOf(fd, tableA).length).to.equal(1);
+    expect(schema.fdSplitFKViolationsOf(fd, tableA)[0].referenced).to.equal(
+      tableB
+    );
   });
 });

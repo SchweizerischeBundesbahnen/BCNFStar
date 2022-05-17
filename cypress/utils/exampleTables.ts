@@ -8,22 +8,6 @@ import SourceFunctionalDependency from "../../frontend/src/model/schema/SourceFu
 import Column from "../../frontend/src/model/schema/Column";
 import ColumnCombination from "../../frontend/src/model/schema/ColumnCombination";
 
-export const exampleITable: Array<ITable> = [
-  {
-    name: "Example Table",
-    schemaName: "public",
-    attributes: [
-      { dataType: "int", name: "CD_ID" },
-      { dataType: "varchar", name: "Albumtitel" },
-      { dataType: "varchar", name: "Interpret" },
-      { dataType: "int", name: "Gründungsjahr" },
-      { dataType: "int", name: "Erscheinungsjahr" },
-      { dataType: "int", name: "Tracknr" },
-      { dataType: "int", name: "Titel" },
-    ],
-  },
-];
-
 export function sportartVereinTable(): Table {
   const table = Table.fromColumnNames(
     ["Name", "Sportart", "Verein"],
@@ -192,4 +176,50 @@ export function exampleSchema(): Schema {
 
 export function exampleSchemaToJSON(): string {
   return JSON.stringify(exampleSchema());
+}
+
+export function multiFkSchema(): Schema {
+  const schema = new Schema();
+  const tableC = Table.fromColumnNames(["c_a1", "c_a2"], "TableC");
+  const tableA = Table.fromColumnNames(
+    ["a_a1", "a_a2", "a_b1", "a_b2", "a_a3"],
+    "TableA"
+  );
+  const tableB = Table.fromColumnNames(["b_b1", "b_b2"], "TableB");
+  tableA.addFd(
+    new FunctionalDependency(
+      new ColumnCombination(tableA.columns.columnsFromNames("a_a1", "a_a2")),
+      tableA.columns.copy()
+    )
+  );
+  tableA.addFd(
+    new FunctionalDependency(
+      new ColumnCombination(tableA.columns.columnsFromNames("a_a3")),
+      new ColumnCombination(
+        tableA.columns.columnsFromNames("a_a2", "a_b1", "a_b2", "a_a3")
+      )
+    )
+  );
+  schema.addTables(tableC, tableA, tableB);
+  schema.addFk(
+    new SourceRelationship(
+      tableC.columns
+        .columnsFromNames("c_a1", "c_a2")
+        .map((col) => col.sourceColumn),
+      tableA.columns
+        .columnsFromNames("a_a1", "a_a2")
+        .map((col) => col.sourceColumn)
+    )
+  );
+  schema.addFk(
+    new SourceRelationship(
+      tableA.columns
+        .columnsFromNames("a_b1", "a_b2")
+        .map((col) => col.sourceColumn),
+      tableB.columns
+        .columnsFromNames("b_b1", "b_b2")
+        .map((col) => col.sourceColumn)
+    )
+  );
+  return schema;
 }

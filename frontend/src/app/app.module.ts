@@ -19,6 +19,7 @@ import { SbbNotificationToastModule } from '@sbb-esta/angular/notification-toast
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
 import { SbbTableModule } from '@sbb-esta/angular/table';
+import { SbbTabsModule } from '@sbb-esta/angular/tabs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './components/graph-element/graph-element.component';
@@ -35,10 +36,11 @@ import { JoinDialogComponent } from './components/join-dialog/join-dialog.compon
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
-export let InjectorInstance: Injector;
+import { TableEditingComponent } from './components/table-editing/table-editing.component';
 import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
 import { LoadSavedSchemaComponent } from './components/load-saved-schema/load-saved-schema.component';
 import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
+export let InjectorInstance: Injector;
 
 @NgModule({
   declarations: [
@@ -60,6 +62,7 @@ import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
     DatabaseTableViewerComponent,
     SaveSchemaEditingComponent,
     LoadSavedSchemaComponent,
+    TableEditingComponent,
   ],
   imports: [
     BrowserModule,
@@ -80,6 +83,7 @@ import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
     SbbFormFieldModule,
     SbbToggleModule,
     SbbFileSelectorModule,
+    SbbTabsModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
