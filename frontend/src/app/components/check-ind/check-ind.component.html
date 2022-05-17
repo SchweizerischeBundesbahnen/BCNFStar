@@ -77,8 +77,22 @@
       </button>
     </div>
     <div style="padding-top: 15px">
-      <button sbb-button (click)="checkInd()" [disabled]="!canCheckIND()">
+      <button
+        sbb-button
+        (click)="checkInd()"
+        [disabled]="!canCheckIND()"
+        style="width: 80%"
+      >
         Check Inclusion Dependency
+      </button>
+      <button
+        style="width: 20%"
+        type="button"
+        sbb-icon-button
+        (click)="switchTables()"
+        [disabled]="!tableSelected()"
+      >
+        <sbb-icon svgIcon="kom:arrows-circle-medium"></sbb-icon>
       </button>
       <sbb-loading
         mode="inline"

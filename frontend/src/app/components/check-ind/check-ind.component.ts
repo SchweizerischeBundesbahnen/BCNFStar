@@ -76,6 +76,12 @@ export class CheckIndComponent implements OnChanges {
     }
   }
 
+  public switchTables(): void {
+    const copy: Column[] = this.relationship.referenced;
+    this.relationship.referenced = this.relationship.referencing;
+    this.relationship.referencing = copy;
+  }
+
   public onTableSelected(table: Table) {
     if (
       !this.referencedTable?.sources[0].table.equals(table.sources[0].table)
