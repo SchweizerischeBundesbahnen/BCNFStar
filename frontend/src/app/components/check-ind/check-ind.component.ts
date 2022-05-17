@@ -21,7 +21,7 @@ export class CheckIndComponent implements OnChanges {
   public isLoading: boolean = false;
 
   public referencedTable: Table | undefined;
-  public relationship: Relationship = new Relationship([], []);
+  private _relationship: Relationship = new Relationship([], []);
 
   public referencingColumn: Column | undefined;
   public referencedColumn: Column | undefined;
@@ -29,14 +29,21 @@ export class CheckIndComponent implements OnChanges {
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
   public tableColumns: Array<string> = [];
 
+  public isValid: boolean = false;
+
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
   ngOnChanges() {
     this.referencedTable = undefined;
-    this.relationship = new Relationship([], []);
+    this._relationship = new Relationship([], []);
 
     this.referencingColumn = undefined;
     this.referencedColumn = undefined;
+  }
+
+  public get relationship(): Relationship {
+    this.isValid = false;
+    return this._relationship;
   }
 
   public canAddColumnRelation(): boolean {
@@ -46,8 +53,8 @@ export class CheckIndComponent implements OnChanges {
     )
       return false;
     return !(
-      this.relationship.referencing.includes(this.referencingColumn!) ||
-      this.relationship.referenced.includes(this.referencedColumn)
+      this._relationship.referencing.includes(this.referencingColumn!) ||
+      this._relationship.referenced.includes(this.referencedColumn)
     );
   }
 
@@ -60,14 +67,14 @@ export class CheckIndComponent implements OnChanges {
   public async checkInd(): Promise<void> {
     if (this.canAddColumnRelation()) this.addColumnRelation();
 
-    const dataQuery = new ViolatingINDRowsDataQuery(this.relationship);
+    const dataQuery = new ViolatingINDRowsDataQuery(this._relationship);
 
     this.isLoading = true;
     const rowCount: number = await dataQuery.loadRowCount();
     this.isLoading = false;
 
     if (rowCount == 0) {
-      // valid Inclusion Dependency
+      this.isValid = true;
     } else {
       this.dialog.open(ViolatingRowsViewIndsComponent, {
         data: {
@@ -115,11 +122,11 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public referencingColumns(): Array<Column> {
-    return this.relationship.referencing;
+    return this._relationship.referencing;
   }
 
   public referencedColumns(): Array<Column> {
-    return this.relationship.referenced;
+    return this._relationship.referenced;
   }
 
   public validReferencingColumns(): Array<Column> {

@@ -19,11 +19,23 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
   public _lhs: Array<Column> = new Array<Column>();
   public _rhs: Array<Column> = new Array<Column>();
   public isLoading: boolean = false;
+
+  public isValid: boolean = false;
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
   ngOnChanges(): void {
-    this._lhs = [];
-    this._rhs = [];
+    this.lhs = [];
+    this.rhs = [];
+  }
+
+  public set lhs(columns: Array<Column>) {
+    this.isValid = false;
+    this._lhs = columns;
+  }
+
+  public set rhs(columns: Array<Column>) {
+    this.isValid = false;
+    this._rhs = columns;
   }
 
   public checkNotAllowed(): boolean {
@@ -32,7 +44,7 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
 
   public async checkFd(): Promise<void> {
     // a column always defines itself,
-    this._rhs = this._rhs.filter((c) => !this._lhs.includes(c));
+    this.rhs = this._rhs.filter((c) => !this._lhs.includes(c));
 
     const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
       this.table,
@@ -45,7 +57,7 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
     this.isLoading = false;
 
     if (rowCount == 0) {
-      // valid Functional Dependency
+      this.isValid = true;
       this.table.addFd(
         new FunctionalDependency(
           new ColumnCombination(this._lhs),
