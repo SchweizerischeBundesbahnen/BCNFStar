@@ -125,9 +125,8 @@ describe("The table selection page", () => {
     cy.get("input").eq(1).type("savedSchema");
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
-    cy.readFile("cypress/downloads/savedSchema.txt").should(
-      "eq",
-      exampleSchemaToJSON()
-    );
+    cy.readFile("cypress/downloads/savedSchema.json").then((result) => {
+      expect(JSON.stringify(result) == exampleSchemaToJSON());
+    });
   });
 });

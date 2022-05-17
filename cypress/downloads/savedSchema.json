@@ -1,0 +1,544 @@
+{
+  "tables": [
+    {
+      "name": "TableA",
+      "schemaName": "",
+      "columns": {
+        "_columns": [
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableA", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "A1",
+              "table": { "name": "TableA", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 0,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableA", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "A2",
+              "table": { "name": "TableA", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 1,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableA", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "A3",
+              "table": { "name": "TableA", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 2,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableA", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "A4",
+              "table": { "name": "TableA", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 3,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableA", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "A5",
+              "table": { "name": "TableA", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 4,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableA", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "A6",
+              "table": { "name": "TableA", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 5,
+              "nullable": false
+            },
+            "includeSourceName": false
+          }
+        ]
+      },
+      "pk": {
+        "_columns": [
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableA", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "A1",
+              "table": { "name": "TableA", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 0,
+              "nullable": false
+            },
+            "includeSourceName": false
+          }
+        ]
+      },
+      "relationships": [],
+      "sources": [
+        {
+          "id": 1,
+          "useId": false,
+          "table": { "name": "TableA", "schemaName": "" }
+        }
+      ]
+    },
+    {
+      "name": "TableB",
+      "schemaName": "",
+      "columns": {
+        "_columns": [
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableB", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "B1",
+              "table": { "name": "TableB", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 0,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableB", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "B2",
+              "table": { "name": "TableB", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 1,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableB", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "B3",
+              "table": { "name": "TableB", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 2,
+              "nullable": false
+            },
+            "includeSourceName": false
+          }
+        ]
+      },
+      "pk": {
+        "_columns": [
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableB", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "B1",
+              "table": { "name": "TableB", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 0,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableB", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "B2",
+              "table": { "name": "TableB", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 1,
+              "nullable": false
+            },
+            "includeSourceName": false
+          }
+        ]
+      },
+      "relationships": [],
+      "sources": [
+        {
+          "id": 1,
+          "useId": false,
+          "table": { "name": "TableB", "schemaName": "" }
+        }
+      ]
+    },
+    {
+      "name": "TableC",
+      "schemaName": "",
+      "columns": {
+        "_columns": [
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableC", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "C1",
+              "table": { "name": "TableC", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 0,
+              "nullable": false
+            },
+            "includeSourceName": false
+          },
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableC", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "C2",
+              "table": { "name": "TableC", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 1,
+              "nullable": false
+            },
+            "includeSourceName": false
+          }
+        ]
+      },
+      "pk": {
+        "_columns": [
+          {
+            "sourceTableInstance": {
+              "id": 1,
+              "useId": false,
+              "table": { "name": "TableC", "schemaName": "" }
+            },
+            "sourceColumn": {
+              "name": "C1",
+              "table": { "name": "TableC", "schemaName": "" },
+              "dataType": "unknown data type",
+              "ordinalPosition": 0,
+              "nullable": false
+            },
+            "includeSourceName": false
+          }
+        ]
+      },
+      "relationships": [],
+      "sources": [
+        {
+          "id": 1,
+          "useId": false,
+          "table": { "name": "TableC", "schemaName": "" }
+        }
+      ]
+    }
+  ],
+  "_fks": [
+    {
+      "referencing": [
+        {
+          "name": "A2",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 1,
+          "nullable": false
+        },
+        {
+          "name": "A3",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 2,
+          "nullable": false
+        }
+      ],
+      "referenced": [
+        {
+          "name": "B1",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 0,
+          "nullable": false
+        },
+        {
+          "name": "B2",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 1,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "referencing": [
+        {
+          "name": "B2",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 1,
+          "nullable": false
+        }
+      ],
+      "referenced": [
+        {
+          "name": "C1",
+          "table": { "name": "TableC", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 0,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "referencing": [
+        {
+          "name": "A5",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 4,
+          "nullable": false
+        }
+      ],
+      "referenced": [
+        {
+          "name": "C1",
+          "table": { "name": "TableC", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 0,
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "_inds": [
+    {
+      "referencing": [
+        {
+          "name": "A4",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 3,
+          "nullable": false
+        }
+      ],
+      "referenced": [
+        {
+          "name": "C1",
+          "table": { "name": "TableC", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 0,
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "_fds": [
+    {
+      "lhs": [
+        {
+          "name": "A1",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 0,
+          "nullable": false
+        }
+      ],
+      "rhs": [
+        {
+          "name": "A2",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 1,
+          "nullable": false
+        },
+        {
+          "name": "A3",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 2,
+          "nullable": false
+        },
+        {
+          "name": "A4",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 3,
+          "nullable": false
+        },
+        {
+          "name": "A5",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 4,
+          "nullable": false
+        },
+        {
+          "name": "A6",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 5,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "lhs": [
+        {
+          "name": "A3",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 2,
+          "nullable": false
+        }
+      ],
+      "rhs": [
+        {
+          "name": "A4",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 3,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "lhs": [
+        {
+          "name": "A5",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 4,
+          "nullable": false
+        }
+      ],
+      "rhs": [
+        {
+          "name": "A6",
+          "table": { "name": "TableA", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 5,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "lhs": [
+        {
+          "name": "B1",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 0,
+          "nullable": false
+        },
+        {
+          "name": "B2",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 1,
+          "nullable": false
+        }
+      ],
+      "rhs": [
+        {
+          "name": "B3",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 2,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "lhs": [
+        {
+          "name": "B3",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 2,
+          "nullable": false
+        }
+      ],
+      "rhs": [
+        {
+          "name": "B2",
+          "table": { "name": "TableB", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 1,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "lhs": [
+        {
+          "name": "C1",
+          "table": { "name": "TableC", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 0,
+          "nullable": false
+        }
+      ],
+      "rhs": [
+        {
+          "name": "C2",
+          "table": { "name": "TableC", "schemaName": "" },
+          "dataType": "unknown data type",
+          "ordinalPosition": 1,
+          "nullable": false
+        }
+      ]
+    }
+  ]
+}
