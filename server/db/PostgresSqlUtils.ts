@@ -87,7 +87,7 @@ export default class PostgresSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} 
+        `SELECT * FROM "${schemaname}"."${tablename}"
         LIMIT ${limit} 
         OFFSET ${offset}`
       );
@@ -136,7 +136,8 @@ export default class PostgresSqlUtils extends SqlUtils {
     att.attname as "foreign_column_name",
     table_schema,
     rel_referencing as "table_name",
-    att2.attname as "column_name"
+    att2.attname as "column_name",
+    conname as "fk_name"
 from
    (select 
         unnest(con1.conkey) as "parent", 
