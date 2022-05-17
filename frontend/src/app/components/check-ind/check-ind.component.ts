@@ -58,6 +58,8 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public async checkInd(): Promise<void> {
+    if (this.canAddColumnRelation()) this.addColumnRelation();
+
     const dataQuery = new ViolatingINDRowsDataQuery(this.relationship);
 
     this.isLoading = true;
@@ -80,6 +82,10 @@ export class CheckIndComponent implements OnChanges {
     const copy: Column[] = this.relationship.referenced;
     this.relationship.referenced = this.relationship.referencing;
     this.relationship.referencing = copy;
+
+    const copy2: Table = this.referencedTable!;
+    this.referencedTable = this.referencingTable;
+    this.referencingTable = copy2;
   }
 
   public onTableSelected(table: Table) {
@@ -101,12 +107,11 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public canCheckIND(): boolean {
-    return this.referencingColumns().length != 0;
+    return this.referencingColumns().length != 0 || this.canAddColumnRelation();
   }
 
   public removeColumnRelation(index: number): void {
-    this.referencingColumns().splice(index, 1);
-    this.referencedColumns().splice(index, 1);
+    this.relationship.removeByIndex(index);
   }
 
   public referencingColumns(): Array<Column> {
