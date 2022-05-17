@@ -26,7 +26,9 @@ export default class Split {
     this.projectFds(remaining);
     this.projectFds(generating);
 
-    remaining.pk = this.table.pk?.deepCopy();
+    remaining.pk = this.table.pk?.isSubsetOf(remaining.columns)
+      ? this.table.pk.deepCopy()
+      : undefined;
     generating.pk = this.fd.lhs.deepCopy();
 
     remaining.schemaName = this.table.schemaName;
@@ -83,12 +85,10 @@ export default class Split {
   private projectFds(table: Table) {
     this.table.fds.forEach((fd) => {
       if (fd.lhs.isSubsetOf(table.columns)) {
-        fd = new FunctionalDependency(
-          fd.lhs.copy(),
-          fd.rhs.copy().intersect(table.columns)
-        );
-        if (!fd.isFullyTrivial()) {
-          table.fds.push(fd);
+        const newFd = fd.copy();
+        newFd.rhs.intersect(table.columns);
+        if (!newFd.isFullyTrivial()) {
+          table.fds.push(newFd);
         }
       }
     });

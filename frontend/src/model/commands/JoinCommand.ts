@@ -1,7 +1,7 @@
 import Join from '../schema/methodObjects/Join';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
-import { TableRelationship } from '../types/TableRelationship';
+import TableRelationship from '../schema/TableRelationship';
 import Command from './Command';
 
 export default class JoinCommand extends Command {
@@ -18,7 +18,8 @@ export default class JoinCommand extends Command {
   }
 
   protected override _do(): void {
-    this.newTable = new Join(this.schema, this.fk, this.sourceName).newTable;
+    this.newTable = new Join(this.fk, this.sourceName).newTable;
+    this.schema.calculateFdsOf(this.newTable);
     if (this.newTableName) this.newTable.name = this.newTableName;
     this._redo();
   }

@@ -1,7 +1,6 @@
-import { TableRelationship } from '../../types/TableRelationship';
+import TableRelationship from '../TableRelationship';
 import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
-import Schema from '../Schema';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
@@ -14,18 +13,50 @@ export default class Join {
 
   private sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
 
-  public constructor(
-    private schema: Schema,
-    fk: TableRelationship,
-    private name?: string
-  ) {
+  public constructor(fk: TableRelationship, private name?: string) {
     this.referencing = fk.referencing;
     this.referenced = fk.referenced;
     this.relationship = fk.relationship;
 
     this.join();
+  }
 
-    this.schema.calculateFdsOf(this.newTable);
+  private resolveChildSources(
+    source: SourceTableInstance,
+    definitelyNew: boolean
+  ) {
+    this.referenced.relationships
+      .filter((rel) => rel.referencing[0].sourceTableInstance == source)
+      .forEach((rel) =>
+        this.addSourcesAndRels(
+          rel.referenced[0].sourceTableInstance,
+          rel,
+          definitelyNew
+        )
+      );
+  }
+
+  private addSourcesAndRels(
+    source: SourceTableInstance,
+    relToSource: Relationship,
+    definitelyNew: boolean
+  ) {
+    if (!definitelyNew) {
+      const equivalentSource = this.findEquivalentSource(source, relToSource);
+      if (equivalentSource) {
+        this.sourceMapping.set(source, equivalentSource);
+        this.resolveChildSources(source, false);
+        return;
+      }
+    }
+    this.sourceMapping.set(
+      source,
+      this.newTable.addSource(source.table, this.newUserAlias(source.baseAlias))
+    );
+    this.newTable.relationships.push(
+      relToSource.applySourceMapping(this.sourceMapping)
+    );
+    this.resolveChildSources(source, true);
   }
 
   private join() {
@@ -34,57 +65,41 @@ export default class Join {
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
 
-    // inherit sources, columns and relationships from referencing table
-    this.referencing.sources.forEach((sourceTable) =>
-      this.newTable.sources.push(sourceTable)
+    // inherit sources, relationships and columns from referencing table
+    this.referencing.sources.forEach((source) => {
+      this.sourceMapping.set(
+        source,
+        this.newTable.addSource(source.table, source.userAlias)
+      );
+    });
+    this.newTable.relationships.push(
+      ...this.referencing.relationships.map((rel) =>
+        rel.applySourceMapping(this.sourceMapping)
+      )
     );
-    this.newTable.addColumns(...this.referencing.columns.deepCopy());
-    this.newTable.relationships.push(...this.referencing.relationships);
+    this.newTable.addColumns(
+      ...this.referencing.columns.applySourceMapping(this.sourceMapping)
+    );
 
     // sources and relationships from referenced table
-    for (const source of this.referenced.sourcesTopological().reverse()) {
-      if (this.referenced.isRoot(source)) {
-        if (this.relationship.sourceRelationship().isTrivial) {
-          this.sourceMapping.set(
-            source,
-            this.relationship.referencing[0].sourceTableInstance
-          );
-        } else {
-          this.sourceMapping.set(
-            source,
-            this.newTable.addSource(source.table, this.name)
-          );
-          this.newTable.relationships.push(
-            this.relationship.applySourceMapping(this.sourceMapping)
-          );
-        }
-      } else {
-        const equivalentSource = this.findEquivalentSource(source);
-
-        if (equivalentSource) {
-          this.sourceMapping.set(source, equivalentSource);
-        } else {
-          this.sourceMapping.set(
-            source,
-            this.newTable.addSource(source.table, this.name)
-          );
-          this.newTable.relationships.push(
-            this.referenced.relationships
-              .find(
-                (relationship) =>
-                  relationship.referenced[0].sourceTableInstance == source
-              )!
-              .applySourceMapping(this.sourceMapping)
-          );
-        }
-      }
+    const referencedRootSource = this.referenced
+      .sourcesTopological()
+      .reverse()[0];
+    if (this.relationship.sourceRelationship().isTrivial) {
+      this.sourceMapping.set(
+        referencedRootSource,
+        this.sourceMapping.get(
+          this.relationship.referencing[0].sourceTableInstance
+        )!
+      );
+      this.resolveChildSources(referencedRootSource, false);
+    } else {
+      this.addSourcesAndRels(referencedRootSource, this.relationship, false);
     }
 
     // columns from referenced table
     this.newTable.addColumns(
-      ...this.referenced.columns
-        .deepCopy()
-        .applySourceMapping(this.sourceMapping)
+      ...this.referenced.columns.applySourceMapping(this.sourceMapping)
     );
     this.newTable.establishIdentities();
     if (!this.relationship.sourceRelationship().isTrivial) {
@@ -97,21 +112,24 @@ export default class Join {
   }
 
   private findEquivalentSource(
-    source: SourceTableInstance
+    source: SourceTableInstance,
+    relToSource: Relationship
   ): SourceTableInstance | undefined {
-    const relToSource = this.referenced.relationships.find(
-      (relationship) => relationship.referenced[0].sourceTableInstance == source
-    )!;
     const equivalentReferencingColumns = new ColumnCombination(
-      relToSource.referencing.map((column) =>
-        column.applySourceMapping(this.sourceMapping)
-      )
-    );
+      relToSource.referencing
+    ).applySourceMapping(this.sourceMapping);
     return this.newTable.relationships.find(
       (rel) =>
         new ColumnCombination(rel.referencing).equals(
           equivalentReferencingColumns
         ) && rel.referenced[0].sourceTableInstance.table.equals(source.table)
     )?.referenced[0].sourceTableInstance;
+  }
+
+  private newUserAlias(prevName: string): string {
+    let newUserAlias: string = '';
+    if (this.name) newUserAlias += this.name + '_';
+    newUserAlias += prevName;
+    return newUserAlias;
   }
 }
