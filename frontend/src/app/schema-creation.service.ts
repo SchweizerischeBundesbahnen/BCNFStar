@@ -173,8 +173,8 @@ export class SchemaCreationService {
 
     for (const fd of await fdPromise) schema.addFd(fd);
     for (const table of schema.tables) schema.calculateFdsOf(table);
-    schema.addInd(...(await indPromise));
-    schema.addFk(...(await fkPromise));
+    schema.addInds(...(await indPromise));
+    schema.addFks(...(await fkPromise));
     for (const [table, pk] of (await pkPromise).entries()) table.pk = pk;
     return schema;
   }
