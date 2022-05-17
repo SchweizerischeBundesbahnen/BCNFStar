@@ -4,7 +4,7 @@
       {{ table.fullName }}
     </h2>
     <sbb-accordion [multi]="true">
-      <sbb-expansion-panel>
+      <sbb-expansion-panel [expanded]="true">
         <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
         <ul>
           <li *ngFor="let key of table.keys().slice(0, 5)">
@@ -13,7 +13,7 @@
         </ul>
       </sbb-expansion-panel>
 
-      <sbb-expansion-panel>
+      <sbb-expansion-panel [expanded]="true">
         <sbb-expansion-panel-header>
           Contained Subtables
         </sbb-expansion-panel-header>
@@ -78,7 +78,7 @@
         </ng-template>
       </sbb-expansion-panel>
 
-      <sbb-expansion-panel>
+      <sbb-expansion-panel [expanded]="true">
         <sbb-expansion-panel-header
           >Possible Foreign Keys</sbb-expansion-panel-header
         >
