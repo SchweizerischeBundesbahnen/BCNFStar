@@ -50,7 +50,8 @@ GO
       .join(', ')} FROM ${table.sources
       .map((source) => {
         let sourceString = this.sourceTableIdentifier(source.table);
-        if (source.useAlias) sourceString += ' AS ' + source.alias;
+        if (source.alias != source.defaultName)
+          sourceString += ' AS ' + source.alias;
         return sourceString;
       })
       .join(', ')}`;
@@ -84,6 +85,6 @@ GO
   }
 
   public columnIdentifier(column: Column): string {
-    return `[${column.sourceTableInstance.identifier}].[${column.sourceColumn.name}]`;
+    return `[${column.sourceTableInstance.alias}].[${column.sourceColumn.name}]`;
   }
 }
