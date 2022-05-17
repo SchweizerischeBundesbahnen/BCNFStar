@@ -38,6 +38,7 @@ export default class MsSqlUtils extends SqlUtils {
         encrypt: true, // for azure
         trustServerCertificate: true, // change to true for local dev / self-signed certs
       },
+      requestTimeout: 180000,
     };
   }
 
