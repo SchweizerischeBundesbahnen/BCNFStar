@@ -181,6 +181,11 @@ export class MetanomeSettingsComponent {
       new Date(+result.createDate).toLocaleString(),
       result.algorithm.split('.').slice(-1),
       Object.entries(result.config)
+        .map((value) =>
+          value[1].constructor.name === 'String' && value[1] == ''
+            ? [value[0], '?']
+            : value
+        )
         .join(';')
         .replaceAll(',', ': ')
         .replaceAll(';', ', ') || 'no further configs',
@@ -190,59 +195,48 @@ export class MetanomeSettingsComponent {
 
   public setFdConfig(table: Table) {
     const tab: string = this.selectedFdTab[this.tables.indexOf(table)].value;
+    let indexFile: IIndexFileEntry;
     switch (tab) {
       case 'no-result':
-        this.formGroup.patchValue({
-          ['fds_' + table.schemaAndName()]: this.createDefaultFdIndexFile(
-            table.schemaAndName(),
-            Object.assign({}, { memory: '' }),
-            'no-result'
-          ),
-        });
+        indexFile = this.createDefaultFdIndexFile(
+          table.schemaAndName(),
+          { memory: '' },
+          'no-result'
+        );
         break;
       case 'existing-result':
-        this.formGroup.patchValue({
-          ['fds_' + table.schemaAndName()]:
-            this.filteredMetanomeResultsForFd(table)[0],
-        });
+        indexFile = this.filteredMetanomeResultsForFd(table)[0];
         break;
       case 'hyfd':
-        this.formGroup.patchValue({
-          ['fds_' + table.schemaAndName()]:
-            this.hyfdConfigs['fds_' + table.schemaAndName()],
-        });
+        indexFile = this.hyfdConfigs['fds_' + table.schemaAndName()];
         break;
     }
+    this.formGroup.patchValue({
+      ['fds_' + table.schemaAndName()]: indexFile!,
+    });
     this.formGroup.updateValueAndValidity();
   }
 
   public setIndConfig() {
     const tab: string = this.selectedIndTab.value;
+    let indexFile: IIndexFileEntry;
     switch (tab) {
       case 'no-result':
-        this.formGroup.patchValue({
-          ind: this.createDefaultIndIndexFile(
-            Object.assign({}, { memory: '' }),
-            'no-result'
-          ),
-        });
+        indexFile = this.createDefaultIndIndexFile({ memory: '' }, 'no-result');
         break;
       case 'existing-result':
-        this.formGroup.patchValue({
-          ind: this.filteredMetanomeResultsForInd()[0],
-        });
+        indexFile = this.filteredMetanomeResultsForInd()[0];
         break;
       case 'binder':
-        this.formGroup.patchValue({
-          ind: this.binderConfigs['ind'],
-        });
+        indexFile = this.binderConfigs['ind'];
         break;
       case 'faida':
-        this.formGroup.patchValue({
-          ind: this.faidaConfigs['ind'],
-        });
+        indexFile = this.faidaConfigs['ind'];
         break;
     }
+    this.formGroup.patchValue({
+      ind: indexFile!,
+    });
     this.formGroup.updateValueAndValidity();
   }
 

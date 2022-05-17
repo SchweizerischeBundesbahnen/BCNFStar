@@ -481,7 +481,7 @@ describe("The metanome settings dialog", () => {
     ).should("contain", "SAMPLE_GOAL: 600", { force: true });
   });
 
-  it("not calculate fds and inds when using use no Metanome result tab", () => {
+  it("does not calculate fds and inds when using use no Metanome result tab", () => {
     cy.get('.sbb-toggle-option:contains("Use no Metanome result")').click({
       multiple: true,
     });
@@ -507,7 +507,7 @@ describe("The metanome settings dialog", () => {
     );
   });
 
-  it("not calculate fds and inds when using use no Metanome result tab for one table", () => {
+  it("does not calculate fds and inds when using use no Metanome result tab for one table", () => {
     cy.get('.sbb-toggle-option:contains("Use no Metanome result")')
       .eq(0)
       .click();

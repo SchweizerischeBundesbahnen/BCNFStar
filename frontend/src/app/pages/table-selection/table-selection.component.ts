@@ -155,9 +155,9 @@ export class TableSelectionComponent implements OnInit {
         )
       );
       let fdResults: Record<string, string> = {};
-      for (let value of Object.entries(values)) {
-        if (value[1].algorithm != 'no-result' && value[0] != 'ind') {
-          fdResults[value[1].tables[0]] = value[1].fileName;
+      for (let [key, value] of Object.entries(values)) {
+        if (value.algorithm != 'no-result' && key != 'ind') {
+          fdResults[value.tables[0]] = value.fileName;
         }
       }
       await this.dataService.setInputTables(
