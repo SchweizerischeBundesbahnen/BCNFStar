@@ -1,21 +1,37 @@
 <div>
-  <sbb-select [(ngModel)]="this._lhs" multiple placeholder="Key Columns">
+  <sbb-select
+    [(ngModel)]="this._lhs"
+    multiple
+    placeholder="Key Columns"
+    id="column-dropdown"
+  >
     <sbb-option *ngFor="let column of table.columns.asArray()" [value]="column"
       >{{ column.sourceColumn.name }}
     </sbb-option>
   </sbb-select>
 </div>
 <div>
-  <sbb-select [(ngModel)]="this._rhs" multiple placeholder="Other Columns">
+  <sbb-select
+    [(ngModel)]="this._rhs"
+    multiple
+    placeholder="Other Columns"
+    id="column-dropdown"
+  >
     <sbb-option *ngFor="let column of table.columns.asArray()" [value]="column"
       >{{ column.sourceColumn.name }}
     </sbb-option>
   </sbb-select>
 </div>
-<button sbb-button [disabled]="this.checkNotAllowed()" (click)="checkFd()">
+<button
+  sbb-button
+  [disabled]="this.checkNotAllowed()"
+  (click)="checkFd()"
+  style="width: 80%"
+>
   Check Functional Dependency</button
 ><sbb-loading
   mode="inline"
   aria-valuetext="Loading, please wait"
   *ngIf="this.isLoading"
+  style="width: 20%"
 ></sbb-loading>

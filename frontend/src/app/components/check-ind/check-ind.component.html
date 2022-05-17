@@ -49,6 +49,7 @@
         <sbb-option
           *ngFor="let column of this.validReferencingColumns()"
           [value]="column"
+          [sbbTooltip]="column.name"
           >{{ column.sourceColumn.name }}
         </sbb-option>
       </sbb-select>
@@ -60,6 +61,7 @@
         <sbb-option
           *ngFor="let column of this.validReferencedColumns()"
           [value]="column"
+          [sbbTooltip]="column.name"
           >{{ column.sourceColumn.name }}
         </sbb-option>
       </sbb-select>
