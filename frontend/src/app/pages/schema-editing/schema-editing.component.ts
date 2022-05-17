@@ -11,12 +11,12 @@ import { firstValueFrom, Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
+import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
-import Relationship from '@/src/model/schema/Relationship';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import TableRenameCommand from '@/src/model/commands/TableRenameCommand';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 
 @Component({
   selector: 'app-schema-editing',
@@ -38,7 +38,7 @@ export class SchemaEditingComponent {
     public dialog: SbbDialog,
     public router: Router
   ) {
-    this.schema = dataService.inputSchema!;
+    this.schema = dataService.schema!;
     if (!this.schema) router.navigate(['']);
     // this.schemaChanged.next();
   }
@@ -47,16 +47,42 @@ export class SchemaEditingComponent {
     this.selectedColumns = columns;
   }
 
-  public onJoin(event: {
-    source: Table;
-    target: Table;
-    relationship: Relationship;
-  }): void {
+  public onClickJoin(fk: TableRelationship): void {
+    const dialogRef = this.dialog.open(JoinDialogComponent, {
+      data: { fk: fk, schema: this.schema },
+    });
+
+    dialogRef
+      .afterClosed()
+      .subscribe(
+        (value: {
+          duplicate: boolean;
+          newTableName?: string;
+          sourceName?: string;
+        }) => {
+          if (value)
+            this.onJoin(
+              fk,
+              value.duplicate,
+              value.newTableName,
+              value.sourceName
+            );
+        }
+      );
+  }
+
+  public onJoin(
+    fk: TableRelationship,
+    duplicate: boolean,
+    newName?: string,
+    sourceName?: string
+  ): void {
     let command = new JoinCommand(
       this.schema,
-      event.target,
-      event.source,
-      event.relationship
+      fk,
+      duplicate,
+      newName,
+      sourceName
     );
 
     command.onDo = () => {
@@ -72,7 +98,11 @@ export class SchemaEditingComponent {
 
   public async onClickSplit(fd: FunctionalDependency) {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
-      data: fd,
+      data: {
+        fd: fd,
+        table: this.selectedTable!,
+        schema: this.schema,
+      },
     });
 
     const value: { fd: FunctionalDependency; name?: string } =
@@ -95,13 +125,8 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onIndToFk(event: TableRelationship): void {
-    let command = new IndToFkCommand(
-      this.schema,
-      event.relationship,
-      event.referencing,
-      event.referenced
-    );
+  public onIndToFk(event: SourceRelationship): void {
+    let command = new IndToFkCommand(this.schema, event);
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();
@@ -120,13 +145,6 @@ export class SchemaEditingComponent {
     command.onUndo = function () {
       self.selectedTable = previousSelectedTable;
     };
-    this.commandProcessor.do(command);
-    this.schemaChanged.next();
-  }
-
-  public onChangeTableName(value: { table: Table; newName: string }): void {
-    let command = new TableRenameCommand(value.table, value.newName);
-
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }

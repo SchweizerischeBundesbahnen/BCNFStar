@@ -1,5 +1,3 @@
-import IAttribute from "@/definitions/IAttribute";
-import IRelationship from "@/definitions/IRelationship";
 import { Request, Response, RequestHandler } from "express";
 import { sqlUtils } from "@/db";
 import { IRequestBodyDataTransferSql } from "@/definitions/IBackendAPI";

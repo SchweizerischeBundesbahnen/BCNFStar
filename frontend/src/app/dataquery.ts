@@ -73,13 +73,14 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     limit: number
   ): Promise<ITablePage> {
     // currently supports only check on "sourceTables".
-    if (this.table.sources.size != 1) throw Error('Not Implemented Exception');
+    if (this.table.sources.length != 1)
+      throw Error('Not Implemented Exception');
 
     const data: IRequestBodyFDViolatingRows = {
-      schema: [...this.table.sources][0].schemaName,
-      table: [...this.table.sources][0].name,
-      lhs: this.lhs.map((c) => c.name),
-      rhs: this.rhs.map((c) => c.name),
+      schema: this.table.sources[0].table.schemaName,
+      table: this.table.sources[0].table.name,
+      lhs: this.lhs.map((c) => c.sourceColumn.name),
+      rhs: this.rhs.map((c) => c.sourceColumn.name),
       offset: offset,
       limit: limit,
     };
@@ -90,13 +91,13 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
 
   public override async loadRowCount(): Promise<number> {
     // currently supports only check on "sourceTables".
-    if (this.table.sources.size != 1) throw Error('Not Implemented Exception');
-
+    if (this.table.sources.length != 1)
+      throw Error('Not Implemented Exception');
     const data: IRequestBodyFDViolatingRows = {
-      schema: [...this.table.sources][0].schemaName,
-      table: [...this.table.sources][0].name,
-      lhs: this.lhs.map((c) => c.name),
-      rhs: this.rhs.map((c) => c.name),
+      schema: this.table.sources[0].table.schemaName,
+      table: this.table.sources[0].table.name,
+      lhs: this.lhs.map((c) => c.sourceColumn.name),
+      rhs: this.rhs.map((c) => c.sourceColumn.name),
       offset: 0,
       limit: 0,
     };

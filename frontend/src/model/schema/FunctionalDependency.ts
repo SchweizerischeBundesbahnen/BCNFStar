@@ -8,7 +8,7 @@ export default class FunctionalDependency {
   /**
    * cached result of the score calculation. Should not be accessed directly
    */
-  public _fdScore?: number;
+  public _score?: number;
 
   public constructor(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.lhs = lhs;
@@ -23,7 +23,14 @@ export default class FunctionalDependency {
     const lhs = table.columns.columnsFromNames(...iFd.lhsColumns);
     const rhs = table.columns.columnsFromNames(...iFd.rhsColumns);
 
-    return new FunctionalDependency(lhs, rhs);
+    return new FunctionalDependency(
+      new ColumnCombination(lhs),
+      new ColumnCombination(rhs)
+    );
+  }
+
+  public copy(): FunctionalDependency {
+    return new FunctionalDependency(this.lhs.copy(), this.rhs.copy());
   }
 
   private extend(): void {
@@ -32,7 +39,7 @@ export default class FunctionalDependency {
   }
 
   public isFullyTrivial(): boolean {
-    return this.rhs.isSubsetOf(this.lhs);
+    return this.lhs.cardinality >= this.rhs.cardinality;
   }
 
   public toString(): string {

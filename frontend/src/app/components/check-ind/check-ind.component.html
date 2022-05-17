@@ -11,7 +11,7 @@
       placeholder="Referenced Table"
     >
       <sbb-option *ngFor="let table of this.validTables()" [value]="table">{{
-        table.schemaAndName()
+        table.fullName
       }}</sbb-option>
     </sbb-select>
   </div>
@@ -22,13 +22,13 @@
           disabled="true"
           style="width: 40%"
           sbbInput
-          [value]="refColumn.name"
+          [value]="refColumn.sourceColumn.name"
         />
         <input
           disabled="true"
           style="width: 40%; margin-left: 5px; margin-right: 5px"
           sbbInput
-          [value]="this.referencedColumns()[i].name"
+          [value]="this.referencedColumns()[i].sourceColumn.name"
         />
         <button
           sbb-icon-button
@@ -49,7 +49,7 @@
         <sbb-option
           *ngFor="let column of this.validReferencingColumns()"
           [value]="column"
-          >{{ column.name }}
+          >{{ column.sourceColumn.name }}
         </sbb-option>
       </sbb-select>
       <sbb-select
@@ -60,7 +60,7 @@
         <sbb-option
           *ngFor="let column of this.validReferencedColumns()"
           [value]="column"
-          >{{ column.name }}
+          >{{ column.sourceColumn.name }}
         </sbb-option>
       </sbb-select>
 

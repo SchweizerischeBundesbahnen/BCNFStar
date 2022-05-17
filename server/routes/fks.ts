@@ -8,18 +8,28 @@ export default async function getFks(
 ): Promise<void> {
   try {
     const query_result = await sqlUtils.getForeignKeys();
-
-    let fks: Array<IForeignKey> = [];
+    const fkLookup = new Map<string, IForeignKey>();
     for (const row of query_result) {
-      fks.push({
-        name: `${row.table_schema}.${row.table_name}`,
-        column: row.column_name,
-        foreignName: `${row.foreign_table_schema}.${row.foreign_table_name}`,
-        foreignColumn: row.foreign_column_name,
+      const lookupString = `${row.table_schema}.${row.table_name}#${row.foreign_table_schema}.${row.foreign_table_name}`;
+      if (!fkLookup.get(lookupString)) {
+        fkLookup.set(lookupString, {
+          referencing: [],
+          referenced: [],
+        });
+      }
+      const fk = fkLookup.get(lookupString);
+      fk.referencing.push({
+        schemaIdentifier: row.table_schema,
+        tableIdentifier: row.table_name,
+        columnIdentifier: row.column_name,
+      });
+      fk.referenced.push({
+        schemaIdentifier: row.foreign_table_schema,
+        tableIdentifier: row.foreign_table_name,
+        columnIdentifier: row.foreign_column_name,
       });
     }
-
-    res.json(fks);
+    res.json([...fkLookup.values()]);
   } catch (error) {
     console.error(error);
     res.status(502).json({ error: "Could not get fks" });
