@@ -1,19 +1,15 @@
 import express from "express";
 import expressStaticGzip from "express-static-gzip";
-// import postCreateTable from "./routes/persist_schema/createTable";
 import getTablesFunction from "./routes/tables";
 import { getTableRowCounts } from "./routes/rowCounts";
 import { getStaticDir } from "./utils/files";
 import morgan from "morgan";
-import getCreateForeignKeySQL from "./routes/persist_schema/createForeignKey";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
 import getPksFunction from "./routes/pks";
-import getCreateTableSQL from "./routes/persist_schema/createTable";
-import getSchemaPreparationSQL from "./routes/persist_schema/prepareSchema";
-import getDataTransferSQL from "./routes/persist_schema/transferData";
-import getAddPrimaryKeySQL from "./routes/persist_schema/createPrimaryKey";
 import { getTablePage } from "./routes/tablePage";
+
+import { getDbmsName } from "./routes/dbserver";
 
 import createQueueMonitor from "./queueMonitor";
 import getViolatingRowsForFD from "./routes/violatingRows/fds";
@@ -70,11 +66,7 @@ app.get("/metanomeResults/:fileName", getMetanomeResults);
 app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
 app.post("/metanomeResults", runMetanome);
 
-app.post("/persist/createTable", getCreateTableSQL());
-app.post("/persist/createForeignKey", getCreateForeignKeySQL());
-app.post("/persist/schemaPreparation", getSchemaPreparationSQL());
-app.post("/persist/dataTransfer", getDataTransferSQL());
-app.post("/persist/createPrimaryKey", getAddPrimaryKeySQL());
+app.get("/persist/dbmsname", getDbmsName);
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
 app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);

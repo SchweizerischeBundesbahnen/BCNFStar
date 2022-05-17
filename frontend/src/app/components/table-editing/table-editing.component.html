@@ -25,7 +25,7 @@
   <h3>Select</h3>
   <table [cellPadding]="5">
     <tr *ngFor="let column of table.columns">
-      <td>{{ column.identifier() }}</td>
+      <td>{{ column.identifier }}</td>
       <td>as</td>
       <td>
         <div *ngIf="editingColumn !== column; else columnEditingField">

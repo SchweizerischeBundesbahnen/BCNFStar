@@ -6,7 +6,6 @@ import SqlUtils, {
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "@/definitions/IAttribute";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
 
@@ -15,7 +14,6 @@ import { IColumnRelationship } from "@/definitions/IRelationship";
 // prevent new queries
 // * this means: use try-finally
 
-const suffix = "\nGO\n";
 export default class MsSqlUtils extends SqlUtils {
   private config: sql.config;
   public connection: sql.ConnectionPool;
@@ -334,67 +332,6 @@ INNER JOIN sys.columns col2
   public async getPrimaryKeys(): Promise<PrimaryKeyResult[]> {
     const result = await sql.query<ForeignKeyResult>(this.QUERY_PRIMARY_KEYS);
     return result.recordset;
-  }
-
-  public override SQL_CREATE_SCHEMA(newSchema: string): string {
-    return `IF NOT EXISTS ( SELECT  *
-      FROM    sys.schemas
-      WHERE   name = N'${newSchema}' )
-EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
-  }
-  public override SQL_DROP_TABLE_IF_EXISTS(
-    newSchema: string,
-    newTable: string
-  ): string {
-    return `DROP TABLE IF EXISTS ${newSchema}.${newTable}; ${suffix}`;
-  }
-  public SQL_CREATE_TABLE(
-    attributes: IAttribute[],
-    primaryKey: string[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    const attributeString: string = attributes
-      .map(
-        (attribute) =>
-          attribute.name +
-          " " +
-          attribute.dataType +
-          (primaryKey.includes(attribute.name) || attribute.nullable == false
-            ? " NOT NULL "
-            : " NULL")
-      )
-      .join(",");
-    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) ${suffix}`;
-  }
-
-  public override SQL_FOREIGN_KEY(
-    constraintName: string,
-    referencingSchema: string,
-    referencingTable: string,
-    referencingColumns: string[],
-    referencedSchema: string,
-    referencedTable: string,
-    referencedColumns: string[]
-  ): string {
-    return `
-    ALTER TABLE ${referencingSchema}.${referencingTable} 
-    ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
-    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
-      referencedColumns
-    )});
-`;
-  }
-
-  public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
-      primaryKey
-    )});`;
-  }
-
-  private generateColumnString(columns: string[]) {
-    return columns.map((c) => `[${c}]`).join(", ");
   }
 
   public getJdbcPath(): string {
