@@ -2,11 +2,14 @@
 // import Schema from './Schema';
 // import Table from './Table';
 
-import { filter } from 'rxjs';
 import Column from './Column';
 import Table from './Table';
 
 type Graph<LabelType> = Record<string, Record<string, LabelType>>;
+
+function columnIdentifier(table: Table, col: Column) {
+  return `${table.fullName}.${col.name}`;
+}
 
 /**
  *
@@ -106,15 +109,45 @@ function similarityFlood(
   return current;
 }
 
-function createGraph(tablesLeft: Table[]): Graph<string> {
-  throw new Error('Function not implemented.');
+function createGraph(tables: Table[]): Graph<string> {
+  const graph: Graph<string> = {
+    table: {},
+    column: {},
+    type: {},
+    name: {},
+    SQLType: {},
+  };
+
+  for (const table of tables) {
+  }
+  return graph;
 }
 
 function calcInitialSimilarity(
   tablesLeft: Table[],
   tablesRight: Table[]
 ): Record<string, number> {
-  throw new Error('Function not implemented.');
+  const initialSimilarities: Record<string, number> = {};
+  for (const leftTable of tablesLeft) {
+    for (const rightTable of tablesRight) {
+      initialSimilarities[`${leftTable.fullName}:${rightTable.fullName}`] =
+        tableSimilarity(leftTable, rightTable);
+      for (const leftCol of leftTable.columns) {
+        for (const rightCol of leftTable.columns) {
+          const left = columnIdentifier(leftTable, leftCol);
+          const right = columnIdentifier(rightTable, rightCol);
+          initialSimilarities[`${left}:${right}`] = colSimilarity(
+            leftCol,
+            rightCol
+          );
+          initialSimilarities[
+            `${left}.${leftCol.dataType}:${right}.${rightCol.dataType}`
+          ] = levenshteinDistance(leftCol.dataType, rightCol.dataType);
+        }
+      }
+    }
+  }
+  return initialSimilarities;
 }
 
 function tableSimilarity(tableLeft: Table, tableRight: Table): number {
