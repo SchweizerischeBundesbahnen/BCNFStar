@@ -114,7 +114,7 @@ export class SchemaEditingComponent implements OnInit {
 
     const value: { fd: FunctionalDependency; name?: string } =
       await firstValueFrom(dialogRef.afterClosed());
-    if (fd) this.onSplitFd(value);
+    if (value) this.onSplitFd(value);
   }
 
   public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {

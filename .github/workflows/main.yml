@@ -55,6 +55,11 @@ jobs:
         env:
           CYPRESS_FRONTEND_BASEURL: "http://localhost:8080"
           CYPRESS_BACKEND_BASEURL: "http://localhost:8080"
+          PGPASSWORD: postgres
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGDATABASE: _test_
+          PGUSER: postgres
           DB_TYPE: postgres
           DB_PASSFILE: ~/.pgpass
           PORT: 8080
