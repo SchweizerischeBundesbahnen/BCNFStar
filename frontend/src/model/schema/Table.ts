@@ -331,7 +331,7 @@ export default class Table {
   }
 
   public isKey(columns: ColumnCombination): boolean {
-    if (this.keys().find((cc) => cc.equals(columns))) return true;
+    if (this.keys().find((cc) => cc.isSubsetOf(columns))) return true;
     else return false;
   }
 

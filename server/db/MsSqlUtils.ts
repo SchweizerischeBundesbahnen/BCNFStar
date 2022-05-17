@@ -308,6 +308,7 @@ export default class MsSqlUtils extends SqlUtils {
     sch.name AS table_schema,
     tab1.name AS table_name,
     col1.name AS column_name,
+    obj.name AS fk_name,
 	sch.name AS foreign_table_schema,
     tab2.name AS foreign_table_name,
     col2.name AS foreign_column_name

@@ -93,10 +93,10 @@ export class SchemaEditingComponent implements OnInit {
     );
 
     command.onDo = () => {
-      this.selectedTable = undefined;
+      this.selectedTable = command.newTable;
     };
     command.onUndo = () => {
-      this.selectedTable = undefined;
+      this.selectedTable = fk.referencing;
     };
 
     this.commandProcessor.do(command);

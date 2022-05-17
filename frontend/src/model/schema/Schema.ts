@@ -10,6 +10,7 @@ import SourceFunctionalDependency from './SourceFunctionalDependency';
 import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
+import Join from './methodObjects/Join';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -153,10 +154,20 @@ export default class Schema {
                 referencingTable,
                 referencedTable
               );
-              referencingTable._fks.push(relationship);
-              referencedTable._references.push(relationship);
+              if (this.isRelationshipValid(relationship)) {
+                referencingTable._fks.push(relationship);
+                referencedTable._references.push(relationship);
+              }
             }
     }
+  }
+
+  private isRelationshipValid(relationship: TableRelationship): boolean {
+    const newTable = new Join(relationship).newTable;
+    return (
+      newTable.columns.cardinality >
+      relationship.referencing.columns.cardinality
+    );
   }
 
   /**
@@ -183,7 +194,8 @@ export default class Schema {
                 (otherRel) =>
                   otherRel.referenced == relationship.referenced &&
                   otherRel.relationship.equals(relationship.relationship)
-              )
+              ) &&
+              this.isRelationshipValid(relationship)
             ) {
               referencingTable._fks.push(relationship);
               referencedTable._references.push(relationship);
