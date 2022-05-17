@@ -279,6 +279,7 @@ export class SchemaGraphComponent implements AfterContentInit {
   }
 
   public resetView() {
+    this.selectedTableChange.emit();
     this.panzoomHandler?.moveTo(0, 0);
     this.panzoomHandler?.zoomAbs(0, 0, 1);
   }
