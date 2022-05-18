@@ -2,17 +2,13 @@
 
 describe("The metanome settings dialog", () => {
   beforeEach(() => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
-    cy.get("tr").should("have.length.at.least", 1);
-    cy.get(".delete-all-btn").click();
+    cy.deleteAllMetanomeResults();
     cy.visitFrontend();
     cy.selectTablesAndGo();
   });
 
   after(() => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
-    cy.get("tr").should("have.length.at.least", 1);
-    cy.get(".delete-all-btn").click();
+    cy.deleteAllMetanomeResults();
   });
 
   it("renders", () => {

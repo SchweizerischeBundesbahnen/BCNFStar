@@ -14,6 +14,7 @@ import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 export class MetanomeResultsViewerComponent {
   private url: string;
   public tableData: IIndexFileEntry[] = [];
+  public isLoading: boolean = false;
   constructor(
     dataService: DatabaseService,
     private http: HttpClient,
@@ -24,22 +25,30 @@ export class MetanomeResultsViewerComponent {
   }
 
   public async reload() {
+    this.isLoading = true;
     this.tableData = (
       await firstValueFrom(this.http.get<IIndexFileEntry[]>(this.url))
     ).sort(function (a: IIndexFileEntry, b: IIndexFileEntry) {
       return a.createDate >= b.createDate ? -1 : 1;
     });
+    this.isLoading = false;
   }
 
   async deleteAllEntries() {
-    await Promise.all(this.tableData.map((entry) => this.deleteEntry(entry)));
+    await Promise.all(
+      this.tableData.map((entry) => this.deleteEntry(entry, true))
+    );
+    this.notification.open('Deleted all entries');
+    await this.reload();
   }
 
-  async deleteEntry(entry: IIndexFileEntry) {
+  async deleteEntry(entry: IIndexFileEntry, multiple = false) {
     try {
       await firstValueFrom(this.http.delete(`${this.url}/${entry.fileName}`));
-      this.notification.open('Deleted entry');
-      await this.reload();
+      if (!multiple) {
+        this.notification.open('Deleted entry');
+        await this.reload();
+      }
     } catch (e) {
       console.error(e);
       this.notification.open(

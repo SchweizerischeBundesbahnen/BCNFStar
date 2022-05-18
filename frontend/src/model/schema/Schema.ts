@@ -38,7 +38,7 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public addFks(...fks: SourceRelationship[]) {
+  public addFk(...fks: SourceRelationship[]) {
     this._fks.push(...fks);
     this.relationshipsValid = false;
   }
