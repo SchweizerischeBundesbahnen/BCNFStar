@@ -168,7 +168,9 @@ export class TableSelectionComponent implements OnInit {
 
     try {
       await this.runMetanome(
-        Object.values(values).filter((entry) => !entry.fileName)
+        Object.values(values).filter(
+          (entry) => !entry.fileName && entry.algorithm != 'no-result'
+        )
       );
       let fdResults = new Map<Table, string>();
       for (let [name, config] of Object.entries(values)) {
@@ -180,8 +182,8 @@ export class TableSelectionComponent implements OnInit {
       }
       const schema = await this.schemaCreationService.createSchema(
         tables,
-        values['ind'].fileName,
-        fdResults
+        fdResults,
+        values['ind'].fileName
       );
       console.log('emitting', schema);
       this.schema.emit(schema);

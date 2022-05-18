@@ -64,10 +64,11 @@ export class SchemaCreationService {
     const fdPromises = new Map<Table, Promise<Array<IFunctionalDependency>>>();
     const fds: Array<SourceFunctionalDependency> = [];
     for (const [table, file] of fdFiles.entries())
-      fdPromises.set(
-        table,
-        this.getMetanomeResult<Array<IFunctionalDependency>>(file)
-      );
+      if (file)
+        fdPromises.set(
+          table,
+          this.getMetanomeResult<Array<IFunctionalDependency>>(file)
+        );
     for (const [table, promise] of fdPromises.entries()) {
       const iFds = await promise;
       for (const iFd of iFds) {
@@ -151,8 +152,8 @@ export class SchemaCreationService {
    */
   public async createSchema(
     tables: Array<Table>,
-    indFile: string,
-    fdFiles: Map<Table, string>
+    fdFiles: Map<Table, string>,
+    indFile?: string
   ): Promise<Schema> {
     const schema = new Schema(...tables);
     /** this is used for looking up existing SourceColumns to cut down on later comparisons and memory */
@@ -166,14 +167,16 @@ export class SchemaCreationService {
           column.sourceColumn
         );
     }
-    const indPromise = this.getInds(indFile, sourceColumns);
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);
+    if (indFile) {
+      const indPromise = this.getInds(indFile, sourceColumns);
+      schema.addInds(...(await indPromise));
+    }
 
     for (const fd of await fdPromise) schema.addFd(fd);
     for (const table of schema.tables) schema.calculateFdsOf(table);
-    schema.addInds(...(await indPromise));
     schema.addFk(...(await fkPromise));
     for (const [table, pk] of (await pkPromise).entries()) table.pk = pk;
     return schema;
