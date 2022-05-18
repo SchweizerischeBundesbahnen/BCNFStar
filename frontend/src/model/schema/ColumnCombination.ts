@@ -1,15 +1,16 @@
 import Column from './Column';
-import TableIdentifier from './TableIdentifier';
+import SourceColumn from './SourceColumn';
+import SourceTableInstance from './SourceTableInstance';
 
 export default class ColumnCombination {
   private _columns: Array<Column> = [];
 
-  public constructor(...columns: Array<Column>) {
-    this.add(...columns);
+  public constructor(columns?: Array<Column>) {
+    this._columns = columns || new Array();
   }
 
-  public asSet(): Set<Column> {
-    return new Set(this._columns);
+  [Symbol.iterator]() {
+    return this._columns[Symbol.iterator]();
   }
 
   public asArray(): Array<Column> {
@@ -17,42 +18,61 @@ export default class ColumnCombination {
   }
 
   public copy(): ColumnCombination {
-    return new ColumnCombination(...this._columns);
+    return new ColumnCombination(new Array(...this._columns));
+  }
+
+  public deepCopy(): ColumnCombination {
+    return new ColumnCombination(this._columns.map((column) => column.copy()));
   }
 
   public columnsFromNames(...names: Array<string>) {
-    return new ColumnCombination(
-      ...this.asArray().filter((column: Column) => names.includes(column.name))
-    );
+    return names.map((name) => this.columnFromName(name));
   }
 
-  public columnFromName(name: string) {
-    return this.asArray().find((column: Column) => name.includes(column.name));
+  public columnFromName(name: string): Column {
+    const result = this.asArray().find((column) => name.includes(column.name));
+    if (!result) console.error('column with name ' + name + ' not found');
+    return result!;
   }
 
   public columnsFromIds(...numbers: Array<number>) {
     return new ColumnCombination(
-      ...this.inOrder().filter((col, i) => numbers.includes(i))
+      this.asArray().filter((col, i) => numbers.includes(i))
     );
   }
 
-  public sourceTable(): TableIdentifier {
-    let sourceTables = this.sourceTables();
-    if (sourceTables.length > 1)
+  public sourceTableInstance(): SourceTableInstance {
+    let sources = this.sourceTableInstances();
+    if (sources.length > 1)
       console.warn(
-        'Warning: expected only one sourceTable but there are ' +
-          sourceTables.length
+        'Warning: expected only one SourceTableInstance but there are ' +
+          sources.length
       );
-    return sourceTables[0];
+    return sources[0];
   }
 
-  public sourceTables(): Array<TableIdentifier> {
-    let sourceTables = new Array<TableIdentifier>();
+  public sourceTableInstances(): Array<SourceTableInstance> {
+    let sources = new Array<SourceTableInstance>();
     this._columns.forEach((column) => {
-      if (!sourceTables.includes(column.source.table))
-        sourceTables.push(column.source.table);
+      if (!sources.includes(column.sourceTableInstance))
+        sources.push(column.sourceTableInstance);
     });
-    return sourceTables;
+    return sources;
+  }
+
+  public columnsEquivalentTo(
+    sourceColumns: Array<SourceColumn>,
+    findAll: boolean
+  ): Array<Column> | null {
+    const equivalentColumns = new Array<Column>();
+    for (const sourceColumn of sourceColumns) {
+      let equivalentColumn = this.asArray().find((column) =>
+        column.sourceColumn.equals(sourceColumn)
+      );
+      if (findAll && !equivalentColumn) return null;
+      if (equivalentColumn) equivalentColumns.push(equivalentColumn);
+    }
+    return equivalentColumns;
   }
 
   public add(...columns: Array<Column>) {
@@ -100,23 +120,30 @@ export default class ColumnCombination {
     return this.asArray().every((col) => other.includes(col));
   }
 
-  public inOrder(): Array<Column> {
-    return this.asArray().sort((col1, col2) => {
-      if (
-        col1.source.table.schemaAndName() == col2.source.table.schemaAndName()
-      )
-        return col1.ordinalPosition - col2.ordinalPosition;
-      // Todo: make sure most important tables are on top, not just alphabetically
-      if (col1.source.table.name < col2.source.table.name) return 1;
-      else return -1;
-    });
+  public columnNames(): Array<string> {
+    return this.asArray().map((col) => col.name);
   }
 
-  public columnNames(): Array<string> {
-    return this.inOrder().map((col) => col.name);
+  public sourceColumnNames(): Array<string> {
+    return this.asArray().map((col) => col.sourceColumn.name);
   }
 
   public toString(): string {
     return this.columnNames().join(', ');
+  }
+
+  public applySourceMapping(
+    mapping: Map<SourceTableInstance, SourceTableInstance>
+  ): ColumnCombination {
+    return new ColumnCombination(
+      this._columns.map((column) => column.applySourceMapping(mapping))
+    );
+  }
+
+  public columnSubstitution(mapping: Map<Column, Column>) {
+    this._columns = this._columns.map(
+      (column) => mapping.get(column) || column
+    );
+    return this;
   }
 }

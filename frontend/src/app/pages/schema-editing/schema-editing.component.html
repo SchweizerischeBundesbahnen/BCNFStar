@@ -8,7 +8,7 @@
         [(selectedTable)]="this.selectedTable"
         [selectedColumns]="this.selectedColumns"
         [schemaChanged]="this.schemaChanged.asObservable()"
-        (joinFk)="onJoin($event)"
+        (joinFk)="onClickJoin($event)"
       ></app-schema-graph>
     </div>
     <div class="col-4 border schema-editing-side-bar">
@@ -30,6 +30,7 @@
       <input
         type="text"
         sbbInput
+        id="schema-name-input"
         placeholder="Schema Name"
         [(ngModel)]="schemaName"
         style="text-transform: lowercase"
@@ -51,7 +52,6 @@
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
         (selectColumns)="onSelectColumns($event)"
-        (renameTable)="onChangeTableName($event)"
       ></app-schema-editing-side-bar>
     </div>
   </div>

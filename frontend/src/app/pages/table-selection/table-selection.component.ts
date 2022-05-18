@@ -54,7 +54,7 @@ export class TableSelectionComponent implements OnInit {
 
     const tablePagePromises: Record<string, Promise<ITablePage>> = {};
     for (const table of this.tables) {
-      tablePagePromises[table.schemaAndName()] = this.dataService.loadTablePage(
+      tablePagePromises[table.fullName] = this.dataService.loadTablePage(
         table.schemaName,
         table.name,
         0,
@@ -70,11 +70,8 @@ export class TableSelectionComponent implements OnInit {
     const rowCounts: Record<string, number> = await rowCountPromise;
 
     for (const table of this.tables) {
-      this.tableRowCounts.set(table, rowCounts[table.schemaAndName()]);
-      this.tablePages.set(
-        table,
-        await tablePagePromises[table.schemaAndName()]
-      );
+      this.tableRowCounts.set(table, rowCounts[table.fullName]);
+      this.tablePages.set(table, await tablePagePromises[table.fullName]);
     }
   }
 

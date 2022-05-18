@@ -4,7 +4,7 @@
     <form class="sbb-form-group-vertical" [formGroup]="formGroup">
       <h2>Functional Dependencies</h2>
       <div *ngFor="let table of tables; let index = index">
-        {{ table.schemaAndName() }}
+        {{ table.fullName }}
         <sbb-toggle
           [formControl]="selectedFdTab[index]"
           (change)="setFdConfig(table)"
@@ -15,7 +15,7 @@
             [disabled]="filteredMetanomeResultsForFd(table).length === 0"
           >
             <sbb-toggle-details>
-              <sbb-select [formControlName]="'fds_' + table.schemaAndName()">
+              <sbb-select [formControlName]="'fds_' + table.fullName">
                 <sbb-option
                   *ngFor="let result of filteredMetanomeResultsForFd(table)"
                   [value]="result"
@@ -32,7 +32,7 @@
                 [ngTemplateOutlet]="configParameters"
                 [ngTemplateOutletContext]="{
                   config: hyfdConfigs,
-                  configName: 'fds_' + table.schemaAndName()
+                  configName: 'fds_' + table.fullName
                 }"
               ></ng-container>
             </sbb-toggle-details>
