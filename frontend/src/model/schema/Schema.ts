@@ -208,6 +208,7 @@ export default class Schema {
   private updateFks(): void {
     this.calculateFks();
     this.calculateTrivialFks();
+    if (!this.starMode) this.filterTransitiveFks();
     this._tableFksValid = true;
   }
 
@@ -293,6 +294,28 @@ export default class Schema {
             }
           });
       }
+    }
+  }
+
+  private filterTransitiveFks() {
+    for (const table of this.tables) {
+      const transitiveFks = table._fks.filter((fk) =>
+        table._fks.some(
+          (otherFk) =>
+            new ColumnCombination(fk.relationship.referencing).isSubsetOf(
+              new ColumnCombination(otherFk.relationship.referencing)
+            ) &&
+            fk.relationship.referencing.length <
+              otherFk.relationship.referencing.length
+        )
+      );
+      for (const transitiveFk of transitiveFks) {
+        transitiveFk.referenced._references =
+          transitiveFk.referenced._references.filter(
+            (fk) => fk != transitiveFk
+          );
+      }
+      table._fks = table._fks.filter((fk) => !transitiveFks.includes(fk));
     }
   }
 
