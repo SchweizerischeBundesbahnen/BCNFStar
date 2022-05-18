@@ -172,13 +172,18 @@ export class SchemaCreationService {
     const pkPromise = this.getPrimaryKeys(tables);
     if (indFile) {
       const indPromise = this.getInds(indFile, sourceColumns);
-      schema.addInds(...(await indPromise));
+      schema.addInd(...(await indPromise));
     }
 
-    for (const fd of await fdPromise) schema.addFd(fd);
-    for (const table of schema.tables) schema.calculateFdsOf(table);
     schema.addFk(...(await fkPromise));
+
+    for (const fd of await fdPromise) schema.addFd(fd);
     for (const [table, pk] of (await pkPromise).entries()) table.pk = pk;
+
+    for (const table of schema.tables) {
+      schema.clearFdsFor(table.sources[0].table);
+      schema.calculateFdsOf(table);
+    }
     return schema;
   }
 }

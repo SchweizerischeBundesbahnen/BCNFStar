@@ -30,7 +30,7 @@ export class TableSelectionComponent implements OnInit {
   @ViewChild('errorDialog') public errorDialog!: TemplateRef<any>;
   @ViewChild('loadingDialog') public loadingDialog!: TemplateRef<any>;
 
-  @Input() public withTable: boolean = true;
+  @Input() public withContentPreview: boolean = true;
   @Output() public schema = new EventEmitter<Schema>();
 
   public tablePages: Map<Table, ITablePage> = new Map();
@@ -185,7 +185,6 @@ export class TableSelectionComponent implements OnInit {
         fdResults,
         values['ind'].fileName
       );
-      console.log('emitting', schema);
       this.schema.emit(schema);
     } catch (e) {
       this.error = e;

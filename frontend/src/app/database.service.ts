@@ -12,14 +12,8 @@ import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
   providedIn: 'root',
 })
 export class DatabaseService {
-  private _schema?: Schema;
+  public schema?: Schema;
 
-  get schema() {
-    return this._schema!;
-  }
-  set schema(schema: Schema) {
-    this._schema = schema;
-  }
   /**
    * when using the angular dev server, you need to access another adress
    * for the BCNFStar express server. It is assumed that this server is
