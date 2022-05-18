@@ -4,7 +4,6 @@ import SqlUtils, {
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
 import ITablePage from "@/definitions/ITablePage";
@@ -319,68 +318,6 @@ from
       console.log(e);
       throw Error("Error while checking if table contains columns.");
     }
-  }
-
-  public override SQL_CREATE_SCHEMA(schema: string): string {
-    return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
-  }
-  public override SQL_DROP_TABLE_IF_EXISTS(
-    schema: string,
-    table: string
-  ): string {
-    return `DROP TABLE IF EXISTS ${schema}.${table};`;
-  }
-
-  public SQL_CREATE_TABLE(
-    attributes: IAttribute[],
-    primaryKey: string[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    const attributeString: string = attributes
-      .map(
-        (attribute) =>
-          attribute.name +
-          " " +
-          attribute.dataType +
-          (primaryKey.includes(attribute.name) || attribute.nullable == false
-            ? " NOT NULL "
-            : " NULL")
-      )
-      .join(",");
-    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString});`;
-  }
-
-  public override SQL_ADD_PRIMARY_KEY(
-    newSchema: string,
-    newTable: string,
-    primaryKey: string[]
-  ): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
-      primaryKey
-    )});`;
-  }
-
-  public override SQL_FOREIGN_KEY(
-    constraintName: string,
-    referencingSchema: string,
-    referencingTable: string,
-    referencingColumns: string[],
-    referencedSchema: string,
-    referencedTable: string,
-    referencedColumns: string[]
-  ): string {
-    return `ALTER TABLE ${referencingSchema}.${referencingTable} 
-    ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
-    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
-      referencedColumns
-    )});
-`;
-  }
-
-  private generateColumnString(columns: string[]): string {
-    return columns.map((c) => `"${c}"`).join(", ");
   }
 
   public getJdbcPath(): string {
