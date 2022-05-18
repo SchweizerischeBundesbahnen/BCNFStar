@@ -20,6 +20,12 @@
             : "Auto-normalize all tables"
         }}
       </button>
+      <sbb-toggle (change)="setStarMode($event)">
+        <sbb-toggle-option label="Normal Mode" [value]="false">
+        </sbb-toggle-option>
+        <sbb-toggle-option label="Star Schema Mode" [value]="true">
+        </sbb-toggle-option>
+      </sbb-toggle>
       <app-undo-redo
         class="undo-redo"
         [canUndo]="this.commandProcessor.canUndo()"

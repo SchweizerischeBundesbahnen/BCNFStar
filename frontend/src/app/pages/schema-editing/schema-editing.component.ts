@@ -22,6 +22,7 @@ import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { DirectDimensionDialogComponent } from '../../components/direct-dimension-dialog/direct-dimension-dialog.component';
 import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
 
 @Component({
   selector: 'app-schema-editing',
@@ -156,6 +157,10 @@ export class SchemaEditingComponent implements OnInit {
     };
     this.commandProcessor.do(command);
     this.schemaChanged.next();
+  }
+
+  public setStarMode(radioChange: SbbRadioChange) {
+    this.schema.starMode = radioChange.value;
   }
 
   public onClickMakeDirectDimension(table: Table): void {
