@@ -41,48 +41,57 @@ export default class Schema {
   }
 
   public addFk(fk: SourceRelationship) {
-    if (this._fks.some((existingFk) => existingFk.equals(fk))) return;
-    const referencings = this.sourceColumnsReferencing(fk.referencing);
-    referencings.push(Array.from(fk.referencing));
-    const referenceds = this.sourceColumnsReferencedBy(fk.referenced);
-    referenceds.push(Array.from(fk.referenced));
-    for (const referencing of referencings) {
-      for (const referenced of referenceds) {
-        this.basicAddFk(new SourceRelationship(referencing, referenced));
+    if (!this.basicAddFk(fk)) return;
+    const referencingFks = this._fks.filter(
+      (otherFk) =>
+        otherFk == fk ||
+        this.sourceColumnSubset(fk.referencing, otherFk.referenced)
+    );
+    const referencedFks = this._fks.filter(
+      (otherFk) =>
+        otherFk == fk ||
+        this.sourceColumnSubset(otherFk.referencing, fk.referenced)
+    );
+    for (const referencingFk of referencingFks) {
+      for (const referencedFk of referencedFks) {
+        if (referencingFk == referencedFk) continue;
+        //für jede col aus referenced finde die zugeordnete aus referencing
+        const newRelReferencing = new Array();
+        for (const referencedCol of referencedFk.referencing) {
+          const i = referencingFk.referenced.findIndex((referencingCol) => {
+            if (referencingFk == fk || referencedFk == fk)
+              return referencingCol.equals(referencedCol);
+            else return fk.sourceColumnsMapped(referencingCol, referencedCol);
+          });
+          if (i == -1) break;
+          newRelReferencing.push(referencingFk.referencing[i]);
+        }
+        if (newRelReferencing.length == referencedFk.referenced.length)
+          this.basicAddFk(
+            new SourceRelationship(
+              newRelReferencing,
+              Array.from(referencedFk.referenced)
+            )
+          );
       }
     }
     this.relationshipsValid = false;
   }
 
-  private basicAddFk(fk: SourceRelationship) {
-    if (!this._fks.some((existingFk) => existingFk.equals(fk)))
+  private basicAddFk(fk: SourceRelationship): boolean {
+    if (!this._fks.some((existingFk) => existingFk.equals(fk))) {
       this._fks.push(fk);
+      return true;
+    }
+    return false;
   }
 
-  private sourceColumnsReferencing(
-    sourceColumns: Array<SourceColumn>
-  ): Array<Array<SourceColumn>> {
-    return this._fks
-      .filter((fk) => this.sourceColumnEquality(fk.referenced, sourceColumns))
-      .map((fk) => fk.referencing);
-  }
-
-  private sourceColumnsReferencedBy(
-    sourceColumns: Array<SourceColumn>
-  ): Array<Array<SourceColumn>> {
-    return this._fks
-      .filter((fk) => this.sourceColumnEquality(fk.referencing, sourceColumns))
-      .map((fk) => fk.referenced);
-  }
-
-  private sourceColumnEquality(
-    sourceColumns1: Array<SourceColumn>,
-    sourceColumns2: Array<SourceColumn>
+  private sourceColumnSubset(
+    subset: Array<SourceColumn>,
+    superset: Array<SourceColumn>
   ): boolean {
-    //TODO optimise
-    if (sourceColumns1.length != sourceColumns2.length) return false;
-    for (const sourceCol1 of sourceColumns1) {
-      if (!sourceColumns2.some((sourceCol2) => sourceCol2.equals(sourceCol1)))
+    for (const subsetCol of subset) {
+      if (!superset.some((supersetCol) => supersetCol.equals(subsetCol)))
         return false;
     }
     return true;
