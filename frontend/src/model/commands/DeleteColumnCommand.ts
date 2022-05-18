@@ -1,7 +1,6 @@
 import Column from '../schema/Column';
 import ColumnCombination from '../schema/ColumnCombination';
-import FunctionalDependency from '../schema/FunctionalDependency';
-import Split from '../schema/methodObjects/Split';
+import Delete from '../schema/methodObjects/Delete';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
 import Command from './Command';
@@ -18,13 +17,10 @@ export default class DeleteColumnCommand extends Command {
   }
 
   protected override _do(): void {
-    this.newTable = new Split(
+    this.newTable = new Delete(
       this.table,
-      new FunctionalDependency(
-        new ColumnCombination(),
-        new ColumnCombination([this.column])
-      )
-    ).newTables[0];
+      new ColumnCombination([this.column])
+    ).newTable;
     this._redo();
   }
 
