@@ -342,8 +342,15 @@ export default class Table {
   }
 
   public isKey(columns: ColumnCombination): boolean {
-    if (this.keys().find((cc) => cc.isSubsetOf(columns))) return true;
-    else return false;
+    if (this.columns.isSubsetOf(columns)) return true;
+    const rhs = columns.copy();
+    for (const fd of this.fds) {
+      if (fd.lhs.isSubsetOf(columns)) {
+        rhs.union(fd.rhs);
+        if (this.columns.isSubsetOf(rhs)) return true;
+      }
+    }
+    return false;
   }
 
   public isBCNFViolating(fd: FunctionalDependency): boolean {
