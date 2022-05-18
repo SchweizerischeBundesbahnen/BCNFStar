@@ -58,3 +58,21 @@ Cypress.Commands.add("loadMetanomeConfigAndOk", { prevSubject: false }, () => {
   // wait for normalize page to load
   cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
 });
+
+Cypress.Commands.add(
+  "visitContainedSubtableTab",
+  { prevSubject: false },
+  () => {
+    cy.contains("Subtables").click();
+    cy.contains("Contained Subtables").click();
+  }
+);
+
+Cypress.Commands.add(
+  "visitPossibleForeignKeysTab",
+  { prevSubject: false },
+  () => {
+    cy.contains("Foreign Keys").click();
+    cy.contains("Possible Foreign Keys").click();
+  }
+);
