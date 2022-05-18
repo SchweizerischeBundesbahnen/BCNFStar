@@ -60,6 +60,10 @@ export class TableEditingComponent implements OnChanges {
     this.columnNameEditString = column.baseAlias;
   }
 
+  public deleteColumn(column: Column): void {
+    throw Error(column.toString());
+  }
+
   public changeColumnName() {
     this.editingColumn!.userAlias = this.columnNameEditString || undefined;
     if (this.editingColumn!.userAlias == this.editingColumn!.sourceColumn.name)

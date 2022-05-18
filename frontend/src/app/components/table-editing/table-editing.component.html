@@ -30,10 +30,18 @@
       <td>
         <div *ngIf="editingColumn !== column; else columnEditingField">
           {{ column.baseAlias }}
-          <sbb-icon
-            svgIcon="kom:pen-small"
-            (click)="startColumnEdit(column)"
-          ></sbb-icon>
+          <button sbb-icon-button style="float: right">
+            <sbb-icon
+              svgIcon="kom:pen-small"
+              (click)="startColumnEdit(column)"
+            ></sbb-icon>
+          </button>
+          <button sbb-icon-button style="float: right">
+            <sbb-icon
+              svgIcon="kom:trash-small"
+              (click)="deleteColumn(column)"
+            ></sbb-icon>
+          </button>
         </div>
         <ng-template #columnEditingField>
           <input
@@ -59,10 +67,12 @@
       <td>
         <div *ngIf="editingSource !== source; else sourceEditingField">
           {{ source.baseAlias }}
-          <sbb-icon
-            svgIcon="kom:pen-small"
-            (click)="startSourceEdit(source)"
-          ></sbb-icon>
+          <button sbb-icon-button>
+            <sbb-icon
+              svgIcon="kom:pen-small"
+              (click)="startSourceEdit(source)"
+            ></sbb-icon>
+          </button>
         </div>
         <ng-template #sourceEditingField>
           <input
