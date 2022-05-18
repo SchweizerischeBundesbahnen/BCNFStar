@@ -12,6 +12,7 @@ import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
 import DirectDimension from './methodObjects/DirectDimension';
+import SourceColumn from './SourceColumn';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -40,8 +41,51 @@ export default class Schema {
   }
 
   public addFk(fk: SourceRelationship) {
-    this._fks.push(fk);
+    if (this._fks.some((existingFk) => existingFk.equals(fk))) return;
+    const referencings = this.sourceColumnsReferencing(fk.referencing);
+    referencings.push(Array.from(fk.referencing));
+    const referenceds = this.sourceColumnsReferencedBy(fk.referenced);
+    referenceds.push(Array.from(fk.referenced));
+    for (const referencing of referencings) {
+      for (const referenced of referenceds) {
+        this.basicAddFk(new SourceRelationship(referencing, referenced));
+      }
+    }
     this.relationshipsValid = false;
+  }
+
+  private basicAddFk(fk: SourceRelationship) {
+    if (!this._fks.some((existingFk) => existingFk.equals(fk)))
+      this._fks.push(fk);
+  }
+
+  private sourceColumnsReferencing(
+    sourceColumns: Array<SourceColumn>
+  ): Array<Array<SourceColumn>> {
+    return this._fks
+      .filter((fk) => this.sourceColumnEquality(fk.referenced, sourceColumns))
+      .map((fk) => fk.referencing);
+  }
+
+  private sourceColumnsReferencedBy(
+    sourceColumns: Array<SourceColumn>
+  ): Array<Array<SourceColumn>> {
+    return this._fks
+      .filter((fk) => this.sourceColumnEquality(fk.referencing, sourceColumns))
+      .map((fk) => fk.referenced);
+  }
+
+  private sourceColumnEquality(
+    sourceColumns1: Array<SourceColumn>,
+    sourceColumns2: Array<SourceColumn>
+  ): boolean {
+    //TODO optimise
+    if (sourceColumns1.length != sourceColumns2.length) return false;
+    for (const sourceCol1 of sourceColumns1) {
+      if (!sourceColumns2.some((sourceCol2) => sourceCol2.equals(sourceCol1)))
+        return false;
+    }
+    return true;
   }
 
   public deleteFk(fk: SourceRelationship) {
