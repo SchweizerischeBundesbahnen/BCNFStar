@@ -15,15 +15,6 @@ export default class SourceTableInstance {
     this.setUserAlias(userAlias);
   }
 
-  public toJSON() {
-    return {
-      id: this.id,
-      useId: this.useId,
-      table: this.table,
-      userAlias: this.userAlias,
-    };
-  }
-
   public get baseAlias(): string {
     return this.userAlias ?? this.defaultName;
   }
