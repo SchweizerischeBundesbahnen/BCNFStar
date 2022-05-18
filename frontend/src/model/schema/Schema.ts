@@ -21,6 +21,7 @@ export default class Schema {
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
+  private _starMode = false;
 
   public constructor(...tables: Array<Table>) {
     this.addTables(...tables);
@@ -112,6 +113,15 @@ export default class Schema {
       this._fds.set(fd.rhs[0].table, new Array());
     }
     this._fds.get(fd.rhs[0].table)!.push(fd);
+  }
+
+  public get starMode(): boolean {
+    return this._starMode;
+  }
+
+  public set starMode(value: boolean) {
+    this._starMode = value;
+    this._tableFksValid = false;
   }
 
   /**

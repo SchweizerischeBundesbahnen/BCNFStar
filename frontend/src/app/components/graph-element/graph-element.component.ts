@@ -12,6 +12,7 @@ export class GraphElementComponent {
   @Input() public bbox!: Record<string, string>;
   @Input() public selectedColumns?: ColumnCombination;
   @Input() public fact!: boolean;
+  @Input() public dimension!: boolean;
   @Input() public showMakeDirectDimension!: boolean;
   @Output() public selectedTable = new EventEmitter<Table>();
   @Output() public makeDirectDimension = new EventEmitter<Table>();

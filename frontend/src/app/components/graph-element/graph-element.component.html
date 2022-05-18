@@ -11,7 +11,7 @@
   <div
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"
-    [ngClass]="{ fact: fact, dimension: !fact }"
+    [ngClass]="{ fact: fact, dimension: dimension }"
   >
     <span class="table-head-title" (click)="select()">
       {{ table.fullName }}

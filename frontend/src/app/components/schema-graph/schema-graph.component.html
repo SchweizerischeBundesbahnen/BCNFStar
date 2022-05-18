@@ -8,9 +8,10 @@
     [selectedColumns]="this.selectedColumns?.get(item.key)"
     [table]="item.key"
     [bbox]="item.value.style"
-    [fact]="schema.isFact(item.key)"
+    [fact]="schema.starMode && schema.isFact(item.key)"
+    [dimension]="schema.starMode && !schema.isFact(item.key)"
     [showMakeDirectDimension]="
-      schema.filteredRoutesFromFactTo(item.key).length > 0
+      schema.starMode && schema.filteredRoutesFromFactTo(item.key).length > 0
     "
   ></app-graph-element>
 </div>
