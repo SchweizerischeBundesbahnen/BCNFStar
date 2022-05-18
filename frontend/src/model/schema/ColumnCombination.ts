@@ -26,18 +26,18 @@ export default class ColumnCombination {
   }
 
   public columnsFromNames(...names: Array<string>) {
-    return new ColumnCombination(
-      this.asArray().filter((column: Column) => names.includes(column.name))
-    );
+    return names.map((name) => this.columnFromName(name));
   }
 
-  public columnFromName(name: string) {
-    return this.asArray().find((column: Column) => name.includes(column.name));
+  public columnFromName(name: string): Column {
+    const result = this.asArray().find((column) => name.includes(column.name));
+    if (!result) console.error('column with name ' + name + ' not found');
+    return result!;
   }
 
   public columnsFromIds(...numbers: Array<number>) {
     return new ColumnCombination(
-      this.inOrder().filter((col, i) => numbers.includes(i))
+      this.asArray().filter((col, i) => numbers.includes(i))
     );
   }
 
@@ -120,22 +120,12 @@ export default class ColumnCombination {
     return this.asArray().every((col) => other.includes(col));
   }
 
-  public inOrder(): Array<Column> {
-    return this.asArray().sort((col1, col2) => {
-      if (col1.sourceColumn.table.fullName == col2.sourceColumn.table.fullName)
-        return col1.ordinalPosition - col2.ordinalPosition;
-      // Todo: make sure most important tables are on top, not just alphabetically
-      if (col1.sourceColumn.table.name < col2.sourceColumn.table.name) return 1;
-      else return -1;
-    });
-  }
-
   public columnNames(): Array<string> {
-    return this.inOrder().map((col) => col.name);
+    return this.asArray().map((col) => col.name);
   }
 
   public sourceColumnNames(): Array<string> {
-    return this.inOrder().map((col) => col.sourceColumn.name);
+    return this.asArray().map((col) => col.sourceColumn.name);
   }
 
   public toString(): string {

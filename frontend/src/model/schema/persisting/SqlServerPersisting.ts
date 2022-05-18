@@ -1,7 +1,6 @@
-import { TableRelationship } from '../../types/TableRelationship';
+import TableRelationship from '../../schema/TableRelationship';
 import Column from '../Column';
 import Schema from '../Schema';
-import SourceTable from '../SourceTable';
 import Table from '../Table';
 import SQLPersisting from './SQLPersisting';
 
@@ -13,8 +12,8 @@ export default class SqlServerPersisting extends SQLPersisting {
 IF NOT EXISTS ( SELECT  *
 FROM sys.schemas
 WHERE name = N'${schema.name!}' )
-EXEC('CREATE SCHEMA [${schema.name!}]'); 
-GO 
+EXEC('CREATE SCHEMA [${schema.name!}]');
+GO
 ` + '\n';
     for (const table of schema.tables) {
       Sql +=
@@ -23,7 +22,7 @@ GO
     return Sql;
   }
 
-  public createTableSql(table: Table): string {
+  public override createTableSql(table: Table): string {
     let columnStrings: string[] = [];
 
     if (table.implementsSurrogateKey()) {
@@ -44,7 +43,7 @@ GO
     )});`;
   }
 
-  public dataTransferSql(table: Table): string {
+  public override dataTransferSql(table: Table): string {
     let Sql = '';
 
     Sql = `INSERT INTO ${this.tableIdentifier(
@@ -55,7 +54,7 @@ GO
       .join(', ')} FROM ${table.sources
       .map((source) => {
         let sourceString = this.sourceTableIdentifier(source.table);
-        if (source.useAlias) sourceString += ' AS ' + source.alias;
+        if (source.userAlias) sourceString += ' AS ' + source.alias;
         return sourceString;
       })
       .join(', ')}`;
@@ -87,7 +86,7 @@ GO
     )}
     WHERE ${fk.relationship.referencing
       .map(
-        (c, i) =>
+        (c: Column, i: number) =>
           `${this.schemaWideColumnIdentifier(
             fk.referencing,
             c
@@ -99,20 +98,8 @@ GO
       .join(' AND ')};`;
   }
 
-  public generateColumnString(columns: Column[]): string {
-    return columns.map((c) => `[${c.name}]`).join(', ');
-  }
-
-  public tableIdentifier(table: Table): string {
-    return `[${table.schemaName}].[${table.name}]`;
-  }
-
-  public sourceTableIdentifier(table: SourceTable): string {
-    return `[${table.schemaName}].[${table.name}]`;
-  }
-
-  public columnIdentifier(column: Column): string {
-    return `[${column.sourceTableInstance.identifier}].[${column.sourceColumn.name}]`;
+  public override surrogateKeyString(name: string): string {
+    return `${this.escape(name)} INT IDENTITY(1,1)`;
   }
 
   public override schemaWideColumnIdentifier(
@@ -121,7 +108,12 @@ GO
   ): string {
     return `[${table.schemaName}].[${table.name}].[${column.sourceColumn.name}]`;
   }
+
   public override suffix(): string {
     return '\n GO \n';
+  }
+
+  public escape(str: string) {
+    return `[${str}]`;
   }
 }

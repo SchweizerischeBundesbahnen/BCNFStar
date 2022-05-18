@@ -5,7 +5,6 @@ import {
   EventEmitter,
   Input,
   OnChanges,
-  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -23,7 +22,7 @@ import IndScore from '@/src/model/schema/methodObjects/IndScore';
   templateUrl: './schema-editing-side-bar.component.html',
   styleUrls: ['./schema-editing-side-bar.component.css'],
 })
-export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
+export class SchemaEditingSideBarComponent implements OnChanges {
   @Input() public table!: Table;
   @Input() public schema!: Schema;
   @Output() public splitFd = new EventEmitter<FunctionalDependency>();
@@ -31,10 +30,6 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
   @Output() public selectColumns = new EventEmitter<
     Map<Table, ColumnCombination>
   >();
-  @Output() public renameTable = new EventEmitter<{
-    table: Table;
-    newName: string;
-  }>();
 
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
@@ -42,19 +37,11 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
   public _fdClusterFilter = new Array<Column>();
   public indFilter = new Array<Table>();
 
-  public editingName = false;
-  public tableName: string = '';
-
   public page: number = 0;
   public pageSize = 5;
 
-  ngOnInit(): void {
-    this.tableName = this.table.name;
-  }
-
   ngOnChanges(): void {
     console.log(this.table);
-    this.editingName = false;
     this._fdClusterFilter = [];
     this.indFilter = Array.from(this.schema.tables);
   }
@@ -88,14 +75,6 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
     this.selectColumns.emit(map);
   }
 
-  public setTableName() {
-    this.renameTable.emit({
-      table: this.table,
-      newName: this.tableName,
-    });
-    this.editingName = false;
-  }
-
   public changePage(evt: SbbPageEvent) {
     this.page = evt.pageIndex;
   }
@@ -106,9 +85,9 @@ export class SchemaEditingSideBarComponent implements OnInit, OnChanges {
 
   public fdClusters(): Array<FdCluster> {
     const cc = this.fdClusterFilter;
-    return this.schema
-      .splittableFdClustersOf(this.table)
-      .filter((c) => cc.isSubsetOf(c.columns));
+    return this.table
+      .fdClusters()
+      .filter((cluster) => cc.isSubsetOf(cluster.columns));
   }
 
   public inds(): Array<SourceRelationship> {

@@ -1,4 +1,4 @@
-import { TableRelationship } from '../../types/TableRelationship';
+import TableRelationship from '../TableRelationship';
 import Column from '../Column';
 import Schema from '../Schema';
 import SourceTable from '../SourceTable';
@@ -6,6 +6,8 @@ import Table from '../Table';
 
 export default abstract class SQLPersisting {
   public constructor() {}
+
+  public abstract escape(str: string): string;
 
   public createSQL(schema: Schema): string {
     let SQL = '';
@@ -17,6 +19,8 @@ export default abstract class SQLPersisting {
     return SQL;
   }
 
+  public abstract schemaPreparation(schema: Schema): string;
+
   public tableCreation(tables: Array<Table>): string {
     let Sql: string = '';
     for (const table of tables) {
@@ -25,11 +29,67 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
+  public createTableSql(table: Table): string {
+    let columnStrings: string[] = [];
+
+    if (table.implementsSurrogateKey()) {
+      columnStrings.push(this.surrogateKeyString(table.surrogateKey));
+    }
+
+    for (const column of table.columns) {
+      let columnString: string = `${column.name} ${column.dataType} `;
+      if (table.pk?.includes(column) || !column.nullable) {
+        columnString += 'NOT ';
+      }
+      columnString += 'NULL';
+      columnStrings.push(columnString);
+    }
+
+    return `CREATE TABLE ${this.tableIdentifier(table)} (${columnStrings.join(
+      ', '
+    )});`;
+  }
+
   public dataTransfer(tables: Array<Table>): string {
     let Sql: string = '';
     for (const table of tables) {
       Sql += this.dataTransferSql(table) + '\n';
     }
+    return Sql;
+  }
+
+  public dataTransferSql(table: Table): string {
+    let Sql = '';
+
+    Sql = `INSERT INTO ${this.tableIdentifier(
+      table
+    )} (${this.generateColumnString(
+      table.columns.asArray()
+    )}) SELECT DISTINCT ${table.columns
+      .asArray()
+      .map((col) => `${this.columnIdentifier(col)}`)
+      .join(', ')} FROM ${table.sources
+      .map((source) => {
+        let sourceString = this.sourceTableIdentifier(source.table);
+        if (source.alias != source.defaultName)
+          sourceString += ' AS ' + source.alias;
+        return sourceString;
+      })
+      .join(', ')}`;
+    if (table.sources.length > 1)
+      Sql += ` WHERE ${table.relationships
+        .map((r) =>
+          r.referencing
+            .map(
+              (c, i) =>
+                `${this.columnIdentifier(c)} = ${this.columnIdentifier(
+                  r.referenced[i]
+                )}`
+            )
+            .join(' AND ')
+        )
+        .join(' AND ')}`;
+    Sql += ';';
     return Sql;
   }
 
@@ -65,7 +125,7 @@ export default abstract class SQLPersisting {
 
   public foreignSurrogateKeySql(fk: TableRelationship) {
     return `
-    ALTER TABLE ${this.tableIdentifier(fk.referencing)} 
+    ALTER TABLE ${this.tableIdentifier(fk.referencing)}
     ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
     FOREIGN KEY (FK_${fk.referenced.surrogateKey})
     REFERENCES ${this.tableIdentifier(fk.referenced)} (${
@@ -82,7 +142,7 @@ ALTER TABLE ${this.tableIdentifier(
   }
 
   public foreignKeySql(fk: TableRelationship): string {
-    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)} 
+    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)}
       ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
       FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
       REFERENCES ${this.tableIdentifier(
@@ -105,16 +165,30 @@ ALTER TABLE ${this.tableIdentifier(
     return Sql;
   }
 
-  public abstract generateColumnString(columns: Column[]): string;
-  public abstract schemaPreparation(schema: Schema): string;
-  public abstract createTableSql(table: Table): string;
-  public abstract dataTransferSql(table: Table): string;
-  public abstract tableIdentifier(table: Table): string;
-  public abstract sourceTableIdentifier(table: SourceTable): string;
+  public generateColumnString(columns: Column[]): string {
+    return columns.map((c) => this.escape(c.name)).join(', ');
+  }
+
+  public tableIdentifier(table: Table): string {
+    return `${this.escape(table.schemaName)}.${this.escape(table.name)}`;
+  }
+
+  public sourceTableIdentifier(table: SourceTable): string {
+    return `${this.escape(table.schemaName)}.${this.escape(table.name)}`;
+  }
+
+  public columnIdentifier(column: Column): string {
+    return `${this.escape(column.sourceTableInstance.alias)}.${this.escape(
+      column.sourceColumn.name
+    )}`;
+  }
+
+  public abstract surrogateKeyString(name: string): string;
+
   public abstract schemaWideColumnIdentifier(
     table: Table,
     column: Column
   ): string;
-  public abstract columnIdentifier(column: Column): string;
+
   public abstract suffix(): string;
 }
