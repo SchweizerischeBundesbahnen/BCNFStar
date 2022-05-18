@@ -16,6 +16,7 @@ import "@cypress/code-coverage/support";
 
 // Import commands.js using ES2015 syntax:
 import "./commands";
-
+import postgreSQL from "cypress-postgresql";
+postgreSQL.loadDBCommands();
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

@@ -4,7 +4,6 @@ import SqlUtils, {
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
 import ITablePage from "@/definitions/ITablePage";
@@ -87,7 +86,7 @@ export default class PostgresSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} 
+        `SELECT * FROM "${schemaname}"."${tablename}"
         LIMIT ${limit} 
         OFFSET ${offset}`
       );
@@ -136,7 +135,8 @@ export default class PostgresSqlUtils extends SqlUtils {
     att.attname as "foreign_column_name",
     table_schema,
     rel_referencing as "table_name",
-    att2.attname as "column_name"
+    att2.attname as "column_name",
+    conname as "fk_name"
 from
    (select 
         unnest(con1.conkey) as "parent", 
@@ -318,68 +318,6 @@ from
       console.log(e);
       throw Error("Error while checking if table contains columns.");
     }
-  }
-
-  public override SQL_CREATE_SCHEMA(schema: string): string {
-    return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
-  }
-  public override SQL_DROP_TABLE_IF_EXISTS(
-    schema: string,
-    table: string
-  ): string {
-    return `DROP TABLE IF EXISTS ${schema}.${table};`;
-  }
-
-  public SQL_CREATE_TABLE(
-    attributes: IAttribute[],
-    primaryKey: string[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    const attributeString: string = attributes
-      .map(
-        (attribute) =>
-          attribute.name +
-          " " +
-          attribute.dataType +
-          (primaryKey.includes(attribute.name) || attribute.nullable == false
-            ? " NOT NULL "
-            : " NULL")
-      )
-      .join(",");
-    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString});`;
-  }
-
-  public override SQL_ADD_PRIMARY_KEY(
-    newSchema: string,
-    newTable: string,
-    primaryKey: string[]
-  ): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
-      primaryKey
-    )});`;
-  }
-
-  public override SQL_FOREIGN_KEY(
-    constraintName: string,
-    referencingSchema: string,
-    referencingTable: string,
-    referencingColumns: string[],
-    referencedSchema: string,
-    referencedTable: string,
-    referencedColumns: string[]
-  ): string {
-    return `ALTER TABLE ${referencingSchema}.${referencingTable} 
-    ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
-    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
-      referencedColumns
-    )});
-`;
-  }
-
-  private generateColumnString(columns: string[]): string {
-    return columns.map((c) => `"${c}"`).join(", ");
   }
 
   public getJdbcPath(): string {

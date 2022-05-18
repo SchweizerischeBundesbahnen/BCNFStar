@@ -11,6 +11,7 @@ server/metanome/bcnfstar_results
 # local env files
 .env.local
 .env.*.local
+.env
 
 # Log files
 npm-debug.log*
@@ -33,6 +34,7 @@ pnpm-debug.log*
 # videos and screenshots of test runs
 cypress/videos
 cypress/screenshots
+cypress/downloads
 # Code coverage reports
 .nyc_output
 coverage
