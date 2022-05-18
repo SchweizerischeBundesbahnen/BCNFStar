@@ -161,6 +161,7 @@ export class SchemaEditingComponent implements OnInit {
 
   public setStarMode(radioChange: SbbRadioChange) {
     this.schema.starMode = radioChange.value;
+    this.schemaChanged.next();
   }
 
   public onClickMakeDirectDimension(table: Table): void {
