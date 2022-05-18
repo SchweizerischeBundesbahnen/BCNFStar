@@ -29,7 +29,8 @@ export default class Split {
     remaining.pk = this.table.pk?.isSubsetOf(remaining.columns)
       ? this.table.pk.deepCopy()
       : undefined;
-    generating.pk = this.fd.lhs.deepCopy();
+    generating.pk =
+      this.fd.lhs.cardinality > 0 ? this.fd.lhs.deepCopy() : undefined;
 
     remaining.schemaName = this.table.schemaName;
     generating.schemaName = this.table.schemaName;
