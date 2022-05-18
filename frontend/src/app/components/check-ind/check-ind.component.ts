@@ -1,6 +1,6 @@
 import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { SbbTableDataSource } from '@sbb-esta/angular/table';
 import { DatabaseService } from '@/src/app/database.service';
 import Relationship from '@/src/model/schema/Relationship';
@@ -13,7 +13,7 @@ import { ViolatingINDRowsDataQuery } from '../../dataquery';
   templateUrl: './check-ind.component.html',
   styleUrls: ['./check-ind.component.css'],
 })
-export class CheckIndComponent {
+export class CheckIndComponent implements OnChanges {
   @Input() referencingTable!: Table;
   @Input() tables!: Set<Table>;
 
@@ -29,6 +29,14 @@ export class CheckIndComponent {
   public tableColumns: Array<string> = [];
 
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
+
+  ngOnChanges() {
+    this.referencedTable = undefined;
+    this.relationship = new Relationship([], []);
+
+    this.referencingColumn = undefined;
+    this.referencedColumn = undefined;
+  }
 
   public canAddColumnRelation(): boolean {
     if (

@@ -4,6 +4,8 @@ import {
   Output,
   EventEmitter,
   AfterContentInit,
+  SimpleChanges,
+  OnChanges,
 } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
@@ -13,7 +15,7 @@ import panzoom, { PanZoom, Transform } from 'panzoom';
 import { Observable } from 'rxjs';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import { TableRelationship } from '@/src/model/types/TableRelationship';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -31,7 +33,7 @@ enum PortSide {
   templateUrl: './schema-graph.component.html',
   styleUrls: ['./schema-graph.component.css'],
 })
-export class SchemaGraphComponent implements AfterContentInit {
+export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Input() public schema!: Schema;
   @Input() public selectedTable?: Table;
   @Input() public selectedColumns?: Map<Table, ColumnCombination>;
@@ -62,6 +64,10 @@ export class SchemaGraphComponent implements AfterContentInit {
       },
     });
 
+    this.paper.on('blank:pointerclick', () => {
+      this.selectedTableChange.emit();
+    });
+
     // move the corresponding HTML overlay whenever a graph element changes position
     this.graph.on('change:position', (element) => {
       if (element.isElement)
@@ -76,8 +82,13 @@ export class SchemaGraphComponent implements AfterContentInit {
 
     this.schemaChanged.subscribe(() => {
       this.updateGraph();
+      this.centerOnSelectedTable();
     });
     this.updateGraph();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedTable']) this.centerOnSelectedTable();
   }
 
   public updateGraph() {
@@ -259,7 +270,7 @@ export class SchemaGraphComponent implements AfterContentInit {
 
   private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
-    for (let column of table.columns.inOrder()) {
+    for (let column of table.columns) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
         id: column.sourceColumn.table.fullName + '.' + column.name + '_left', // generated if `id` value is not present
@@ -276,6 +287,22 @@ export class SchemaGraphComponent implements AfterContentInit {
       });
       counter++;
     }
+  }
+
+  public centerOnSelectedTable() {
+    if (!this.selectedTable) return;
+    // center on selectedTable
+    const paper = document.querySelector('#paper svg') as SVGElement;
+    const bbox = this.graphStorage.get(this.selectedTable)?.jointjsEl.getBBox();
+    if (!bbox) return;
+    const offsetX =
+      paper.getBoundingClientRect().width / 2 -
+      this.panzoomTransform.scale * (bbox.x + bbox.width / 2);
+    const offsetY =
+      paper.getBoundingClientRect().height / 2 -
+      this.panzoomTransform.scale * (bbox.y + bbox.height / 2);
+
+    this.panzoomHandler?.smoothMoveTo(offsetX, offsetY);
   }
 
   public resetView() {
