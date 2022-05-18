@@ -20,6 +20,8 @@ import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisti
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import Column from '@/src/model/schema/Column';
+import DeleteColumnCommand from '@/src/model/commands/DeleteColumnCommand';
 
 @Component({
   selector: 'app-schema-editing',
@@ -134,6 +136,19 @@ export class SchemaEditingComponent implements OnInit {
 
   public onIndToFk(event: SourceRelationship): void {
     let command = new IndToFkCommand(this.schema, event);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onDeleteColumn(column: Column): void {
+    let command = new DeleteColumnCommand(
+      this.schema,
+      this.selectedTable!,
+      column
+    );
+    command.onDo = () => (this.selectedTable = command.newTable!);
+    command.onUndo = () => (this.selectedTable = command.table);
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();

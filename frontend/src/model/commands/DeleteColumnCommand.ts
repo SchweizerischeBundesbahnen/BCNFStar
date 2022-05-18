@@ -11,7 +11,7 @@ export default class DeleteColumnCommand extends Command {
 
   public constructor(
     private schema: Schema,
-    private table: Table,
+    public table: Table,
     private column: Column
   ) {
     super();

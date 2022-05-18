@@ -25,6 +25,7 @@ import IndScore from '@/src/model/schema/methodObjects/IndScore';
 export class SchemaEditingSideBarComponent implements OnChanges {
   @Input() public table!: Table;
   @Input() public schema!: Schema;
+  @Output() public deleteColumnEvent = new EventEmitter<Column>();
   @Output() public splitFd = new EventEmitter<FunctionalDependency>();
   @Output() public indToFk = new EventEmitter<SourceRelationship>();
   @Output() public selectColumns = new EventEmitter<

@@ -51,6 +51,7 @@
         [schema]="this.schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
+        (deleteColumnEvent)="onDeleteColumn($event)"
         (selectColumns)="onSelectColumns($event)"
       ></app-schema-editing-side-bar>
     </div>

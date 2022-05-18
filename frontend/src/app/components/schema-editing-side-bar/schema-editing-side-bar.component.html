@@ -159,6 +159,9 @@
     </sbb-accordion>
   </sbb-tab>
   <sbb-tab label="Table Editing">
-    <app-table-editing [table]="this.table"></app-table-editing>
+    <app-table-editing
+      [table]="this.table"
+      (deleteColumnEvent)="deleteColumnEvent.emit($event)"
+    ></app-table-editing>
   </sbb-tab>
 </sbb-tab-group>
