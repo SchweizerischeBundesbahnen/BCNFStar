@@ -11,7 +11,7 @@ import SqlUtils from "./SqlUtils";
  */
 export function setupDBCredentials(): void {
   try {
-    config({ path: join(absoluteServerDir, "..", ".env.local") });
+    config({ path: join(absoluteServerDir, "..", ".env") });
     if (!process.env.DB_PASSFILE)
       process.env.DB_PASSFILE = getDefaultDbPassfileLocation();
 
@@ -36,7 +36,7 @@ export function setupDBCredentials(): void {
       console.error(`Your database settings seem to be invalid. Create a pgpass file 
 (for more info, see https://www.postgresql.org/docs/9.3/libpq-pgpass.html)
 and save its location in a DB_PASSFILE environment variable. You can do this by placing 
-the line 'DB_PASSFILE=<path to file>' in a file called .env.local at the project root.
+the line 'DB_PASSFILE=<path to file>' in a file called .env at the project root.
 The current value of DB_PASSFILE is ${process.env.DB_PASSFILE}`);
       process.exit();
     } else throw e;

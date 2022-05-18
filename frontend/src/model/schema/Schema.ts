@@ -15,6 +15,7 @@ import DirectDimension from './methodObjects/DirectDimension';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
+  public name?: string;
   private _fks = new Array<SourceRelationship>();
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
