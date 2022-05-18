@@ -12,20 +12,30 @@ export default class Column {
   public constructor(
     public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
-    public alias?: string
+    public userAlias?: string
   ) {}
 
   public get name() {
-    if (this.alias) return this.alias;
     let name = '';
-    if (this.includeSourceName)
-      name += `${this.sourceTableInstance.identifier}.`;
-    name += this.sourceColumn.name;
+    if (this.includeSourceName) name += `${this.sourceTableInstance.alias}_`;
+    name += this.baseAlias;
     return name;
   }
 
+  public get identifier() {
+    return `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`;
+  }
+
+  public get baseAlias(): string {
+    return this.userAlias ?? this.sourceColumn.name;
+  }
+
   public copy(): Column {
-    return new Column(this.sourceTableInstance, this.sourceColumn, this.alias);
+    return new Column(
+      this.sourceTableInstance,
+      this.sourceColumn,
+      this.userAlias
+    );
   }
 
   public get dataType() {
@@ -52,16 +62,13 @@ export default class Column {
     );
   }
 
-  public identifier(): string {
-    return `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`;
-  }
-
   public applySourceMapping(
     mapping: Map<SourceTableInstance, SourceTableInstance>
   ): Column {
     return new Column(
       mapping.get(this.sourceTableInstance) || this.sourceTableInstance,
-      this.sourceColumn
+      this.sourceColumn,
+      this.userAlias
     );
   }
 

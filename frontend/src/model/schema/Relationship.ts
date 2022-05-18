@@ -102,13 +102,13 @@ export default class Relationship {
     const pairs = this.referencing
       .map(
         (column, index) =>
-          `${column.identifier()}.${this.referenced[index].identifier()}`
+          `${column.identifier}.${this.referenced[index].identifier}`
       )
       .sort();
-    const otherPairs = this.referencing
+    const otherPairs = other.referencing
       .map(
         (column, index) =>
-          `${column.identifier()}.${other.referenced[index].identifier()}`
+          `${column.identifier}.${other.referenced[index].identifier}`
       )
       .sort();
     return pairs.every((pair, index) => pair == otherPairs[index]);

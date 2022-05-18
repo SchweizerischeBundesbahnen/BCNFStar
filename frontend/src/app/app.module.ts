@@ -19,6 +19,7 @@ import { SbbNotificationToastModule } from '@sbb-esta/angular/notification-toast
 import { SbbLoadingModule } from '@sbb-esta/angular/loading';
 import { SbbRadioButtonModule } from '@sbb-esta/angular/radio-button';
 import { SbbTableModule } from '@sbb-esta/angular/table';
+import { SbbTabsModule } from '@sbb-esta/angular/tabs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './components/graph-element/graph-element.component';
@@ -38,6 +39,7 @@ import { JoinDialogComponent } from './components/join-dialog/join-dialog.compon
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
+import { TableEditingComponent } from './components/table-editing/table-editing.component';
 
 export let InjectorInstance: Injector;
 
@@ -61,6 +63,7 @@ export let InjectorInstance: Injector;
     CheckIndComponent,
     ViolatingRowsViewIndsComponent,
     DatabaseTableViewerComponent,
+    TableEditingComponent,
   ],
   imports: [
     BrowserModule,
@@ -81,6 +84,7 @@ export let InjectorInstance: Injector;
     DragDropModule,
     SbbFormFieldModule,
     SbbToggleModule,
+    SbbTabsModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

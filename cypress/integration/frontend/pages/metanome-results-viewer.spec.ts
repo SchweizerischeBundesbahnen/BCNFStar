@@ -31,7 +31,7 @@ describe("The metanome results page", () => {
   it("contains metanome result rows", () => {
     cy.get("tr").should("have.length.at.least", 3);
     cy.contains(hyfdAlgorithmName);
-    cy.contains(faidaAlgorithmName);
+    cy.contains(binderAlgorithmName);
     cy.contains("public.part_partsupp_supplier_denormalized");
   });
 
