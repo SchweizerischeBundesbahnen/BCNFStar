@@ -61,28 +61,7 @@ export default abstract class SQLPersisting {
     `;
   }
 
-  public updateSurrogateKeySql(fk: TableRelationship): string {
-    return `
-    UPDATE  ${this.tableIdentifier(fk.referencing)}  
-    SET FK_${fk.referenced.surrogateKey} = ${this.tableIdentifier(
-      fk.referenced
-    )}.${fk.referenced.surrogateKey} 
-    FROM  ${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
-      fk.referenced
-    )}
-    WHERE ${fk.relationship.referencing
-      .map(
-        (c, i) =>
-          `${this.schemaWideColumnIdentifier(
-            fk.referencing,
-            c
-          )} = ${this.schemaWideColumnIdentifier(
-            fk.referenced,
-            fk.relationship.referenced[i]
-          )}`
-      )
-      .join(' AND ')};`;
-  }
+  public abstract updateSurrogateKeySql(fk: TableRelationship): string;
 
   public foreignSurrogateKeySql(fk: TableRelationship) {
     return `

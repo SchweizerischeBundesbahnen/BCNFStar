@@ -80,13 +80,14 @@ export default class PostgreSQLPersisting extends SQLPersisting {
     SET FK_${fk.referenced.surrogateKey} = ${this.tableIdentifier(
       fk.referenced
     )}.${fk.referenced.surrogateKey} 
-    FROM  ${this.tableIdentifier(fk.referencing)} AS X, ${this.tableIdentifier(
-      fk.referenced
-    )}
+    FROM  ${this.tableIdentifier(fk.referenced)}
     WHERE ${fk.relationship.referencing
       .map(
         (c, i) =>
-          `X.${c.sourceColumn.name} = ${this.schemaWideColumnIdentifier(
+          `${this.schemaWideColumnIdentifier(
+            fk.referencing,
+            c
+          )} = ${this.schemaWideColumnIdentifier(
             fk.referenced,
             fk.relationship.referenced[i]
           )}`

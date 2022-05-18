@@ -1,3 +1,4 @@
+import { TableRelationship } from '../../types/TableRelationship';
 import Column from '../Column';
 import Schema from '../Schema';
 import SourceTable from '../SourceTable';
@@ -73,6 +74,29 @@ GO
         .join(' AND ')}`;
     Sql += ';';
     return Sql;
+  }
+
+  public override updateSurrogateKeySql(fk: TableRelationship): string {
+    return `
+    UPDATE  ${this.tableIdentifier(fk.referencing)}  
+    SET FK_${fk.referenced.surrogateKey} = ${this.tableIdentifier(
+      fk.referenced
+    )}.${fk.referenced.surrogateKey} 
+    FROM  ${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
+      fk.referenced
+    )}
+    WHERE ${fk.relationship.referencing
+      .map(
+        (c, i) =>
+          `${this.schemaWideColumnIdentifier(
+            fk.referencing,
+            c
+          )} = ${this.schemaWideColumnIdentifier(
+            fk.referenced,
+            fk.relationship.referenced[i]
+          )}`
+      )
+      .join(' AND ')};`;
   }
 
   public generateColumnString(columns: Column[]): string {
