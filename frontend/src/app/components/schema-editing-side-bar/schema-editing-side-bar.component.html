@@ -1,160 +1,149 @@
-<div>
-  <h2 *ngIf="!editingName; else editing">
-    {{ table.schemaAndName() }}
-    <sbb-icon svgIcon="kom:pen-small" (click)="editingName = true"></sbb-icon>
-  </h2>
-  <ng-template #editing>
-    <input
-      id="rename-table-input"
-      type="text"
-      sbbInput
-      [(ngModel)]="tableName"
-      (keyup.enter)="setTableName()"
-    />
-    <sbb-icon svgIcon="kom:tick-medium" (click)="setTableName()"></sbb-icon>
-  </ng-template>
+<sbb-tab-group>
+  <sbb-tab label="Default">
+    <h2>
+      {{ table.fullName }}
+    </h2>
+    <sbb-accordion [multi]="true">
+      <sbb-expansion-panel [expanded]="true">
+        <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
+        <ul>
+          <li *ngFor="let key of table.keys().slice(0, 5)">
+            {{ key.toString() }}
+          </li>
+        </ul>
+      </sbb-expansion-panel>
 
-  <sbb-accordion [multi]="true">
-    <sbb-expansion-panel [expanded]="true">
-      <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
-      <ul>
-        <li *ngFor="let key of table.keys().slice(0, 5)">
-          {{ key.toString() }}
-        </li>
-      </ul>
-    </sbb-expansion-panel>
-
-    <sbb-expansion-panel [expanded]="true">
-      <sbb-expansion-panel-header>
-        Contained Subtables
-      </sbb-expansion-panel-header>
-      <sbb-select
-        multiple
-        placeholder="Filter columns"
-        [(ngModel)]="_fdClusterFilter"
-      >
-        <sbb-option
-          *ngFor="let column of table.columns.asArray()"
-          [value]="column"
-          >{{ column.name }}</sbb-option
+      <sbb-expansion-panel [expanded]="true">
+        <sbb-expansion-panel-header>
+          Contained Subtables
+        </sbb-expansion-panel-header>
+        <sbb-select
+          multiple
+          placeholder="Filter columns"
+          [(ngModel)]="_fdClusterFilter"
         >
-      </sbb-select>
-      <br />
-      <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
-        <sbb-paginator
-          (page)="changePage($event)"
-          [pageSize]="pageSize"
-          [length]="fdClusters().length"
-        >
-        </sbb-paginator>
-        <sbb-expansion-panel
-          *ngFor="
-            let cluster of fdClusters().slice(
-              page * pageSize,
-              (page + 1) * pageSize
-            )
-          "
-          (mouseenter)="emitHighlightedCluster(cluster)"
-          (mouseleave)="selectColumns.emit()"
-        >
-          <sbb-expansion-panel-header style="padding: 0.2rem">
-            <span>
-              <span
-                *ngFor="let column of cluster.columns.inOrder()"
-                [ngClass]="{
-                  filtered: fdClusterFilter.includes(column)
-                }"
-                class="cluster-header"
-              >
-                {{ column.name }}</span
-              >
-            </span>
-          </sbb-expansion-panel-header>
-          Keys:
-          <br />
-          <button
-            *ngFor="let fd of cluster.fds"
-            type="button"
-            sbb-button
-            style="margin: 3px"
-            (click)="splitFd.emit(fd)"
+          <sbb-option *ngFor="let column of table.columns" [value]="column">{{
+            column.name
+          }}</sbb-option>
+        </sbb-select>
+        <br />
+        <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
+          <sbb-paginator
+            (page)="changePage($event)"
+            [pageSize]="pageSize"
+            [length]="fdClusters().length"
           >
-            {{ fd.lhs }}
-          </button>
-        </sbb-expansion-panel>
-      </sbb-accordion>
-      <ng-template #noClusters>
-        <h2>
-          No contained subtables were found with the current filter for this
-          table
-        </h2>
-      </ng-template>
-    </sbb-expansion-panel>
+          </sbb-paginator>
+          <sbb-expansion-panel
+            *ngFor="
+              let cluster of fdClusters().slice(
+                page * pageSize,
+                (page + 1) * pageSize
+              )
+            "
+            (mouseenter)="emitHighlightedCluster(cluster)"
+            (mouseleave)="selectColumns.emit()"
+          >
+            <sbb-expansion-panel-header style="padding: 0.2rem">
+              <span>
+                <span
+                  *ngFor="let column of cluster.columns"
+                  [ngClass]="{
+                    filtered: fdClusterFilter.includes(column)
+                  }"
+                  class="cluster-header"
+                >
+                  {{ column.name }}</span
+                >
+              </span>
+            </sbb-expansion-panel-header>
+            Keys:
+            <br />
+            <button
+              *ngFor="let fd of cluster.fds"
+              type="button"
+              sbb-button
+              style="margin: 3px"
+              (click)="splitFd.emit(fd)"
+            >
+              {{ fd.lhs }}
+            </button>
+          </sbb-expansion-panel>
+        </sbb-accordion>
+        <ng-template #noClusters>
+          <h2>
+            No contained subtables were found with the current filter for this
+            table
+          </h2>
+        </ng-template>
+      </sbb-expansion-panel>
 
-    <sbb-expansion-panel [expanded]="true">
-      <sbb-expansion-panel-header
-        >Possible Foreign Keys</sbb-expansion-panel-header
-      >
-      <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
-        <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
-          table.schemaAndName()
-        }}</sbb-option>
-      </sbb-select>
-      <br />
-      <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">
-        <!-- (mouseleave)="selectColumns.emit(new Map())" -->
-        <sbb-radio-button
-          (mouseenter)="emitHighlightedInd(rel)"
-          (mouseleave)="selectColumns.emit()"
-          *ngFor="let rel of inds()"
-          [value]="rel"
-          style="display: block"
-          >{{
-            rel.relationship.referencing().toString() +
-              "->(" +
-              rel.referenced.schemaAndName() +
-              ") " +
-              rel.relationship.referenced().toString()
-          }}</sbb-radio-button
+      <sbb-expansion-panel [expanded]="true">
+        <sbb-expansion-panel-header
+          >Possible Foreign Keys</sbb-expansion-panel-header
         >
-      </sbb-radio-group>
-      <ng-template #noInds>
-        <h2>
-          No possible foreign keys were found with the current filter for this
-          table
-        </h2>
-      </ng-template>
-      <br />
-      <button
-        type="button"
-        sbb-button
-        [disabled]="!selectedInd()"
-        (click)="transformIndToFk()"
+        <sbb-select
+          multiple
+          placeholder="Filter tables"
+          [(ngModel)]="indFilter"
+        >
+          <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
+            table.fullName
+          }}</sbb-option>
+        </sbb-select>
+        <br />
+        <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">
+          <!-- (mouseleave)="selectColumns.emit(new Map())" -->
+          <sbb-radio-button
+            (mouseenter)="emitHighlightedInd(rel)"
+            (mouseleave)="selectColumns.emit()"
+            *ngFor="let rel of inds()"
+            [value]="rel"
+            style="display: block"
+            >{{ rel.toString() }}</sbb-radio-button
+          >
+        </sbb-radio-group>
+        <ng-template #noInds>
+          <h2>
+            No possible foreign keys were found with the current filter for this
+            table
+          </h2>
+        </ng-template>
+        <br />
+        <button
+          type="button"
+          sbb-button
+          [disabled]="!selectedInd()"
+          (click)="transformIndToFk()"
+        >
+          Create Foreign Key
+        </button>
+      </sbb-expansion-panel>
+      <sbb-expansion-panel
+        [expanded]="false"
+        [hidden]="this.table.sources.length !== 1"
       >
-        Create Foreign Key
-      </button>
-    </sbb-expansion-panel>
-    <sbb-expansion-panel
-      [expanded]="false"
-      [hidden]="this.table.sources.size !== 1"
-    >
-      <sbb-expansion-panel-header
-        >Check Contained Subtable</sbb-expansion-panel-header
-      >
-      <app-check-fd [table]="this.table"></app-check-fd>
-    </sbb-expansion-panel>
+        <sbb-expansion-panel-header
+          >Check Contained Subtable</sbb-expansion-panel-header
+        >
+        <app-check-fd [table]="this.table"></app-check-fd>
+      </sbb-expansion-panel>
 
-    <sbb-expansion-panel
-      [expanded]="false"
-      [hidden]="this.table.sources.size !== 1"
-    >
-      <sbb-expansion-panel-header
-        >Suggest Foreign Key</sbb-expansion-panel-header
+      <sbb-expansion-panel
+        [expanded]="false"
+        [hidden]="this.table.sources.length !== 1"
       >
-      <app-check-ind
-        [referencingTable]="this.table"
-        [tables]="this.schema.tables!"
-      ></app-check-ind>
-    </sbb-expansion-panel>
-  </sbb-accordion>
-</div>
+        <sbb-expansion-panel-header
+          >Suggest Foreign Key</sbb-expansion-panel-header
+        >
+        <app-check-ind
+          [referencingTable]="this.table"
+          [tables]="this.schema.tables!"
+        ></app-check-ind>
+      </sbb-expansion-panel>
+    </sbb-accordion>
+  </sbb-tab>
+  <sbb-tab label="Table Editing">
+    <app-table-editing [table]="this.table"></app-table-editing>
+  </sbb-tab>
+</sbb-tab-group>

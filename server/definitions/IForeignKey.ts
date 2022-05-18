@@ -1,6 +1,6 @@
+import { IColumnIdentifier } from "./IInclusionDependency";
+
 export default interface IForeignKey {
-  name: string;
-  column: string;
-  foreignName: string;
-  foreignColumn: string;
+  referencing: Array<IColumnIdentifier>;
+  referenced: Array<IColumnIdentifier>;
 }

@@ -1,41 +1,38 @@
-import Relationship from '../schema/Relationship';
+import Join from '../schema/methodObjects/Join';
 import Schema from '../schema/Schema';
 import Table from '../schema/Table';
+import TableRelationship from '../schema/TableRelationship';
 import Command from './Command';
 
 export default class JoinCommand extends Command {
-  schema: Schema;
-  tables: Array<Table>;
-  relationship: Relationship;
-  parent?: Table;
+  public newTable?: Table;
 
   public constructor(
-    schema: Schema,
-    table1: Table,
-    table2: Table,
-    relationship: Relationship
+    private schema: Schema,
+    private fk: TableRelationship,
+    private duplicate: boolean,
+    private newTableName?: string,
+    private sourceName?: string
   ) {
     super();
-    this.schema = schema;
-    this.tables = [table1, table2];
-    this.relationship = relationship;
   }
 
   protected override _do(): void {
-    this.parent = this.schema.join(
-      this.tables[0],
-      this.tables[1],
-      this.relationship
-    );
+    this.newTable = new Join(this.fk, this.sourceName).newTable;
+    this.schema.calculateFdsOf(this.newTable);
+    if (this.newTableName) this.newTable.name = this.newTableName;
+    this._redo();
   }
 
   protected override _undo(): void {
-    this.schema.delete(this.parent!);
-    this.schema.add(...this.tables);
+    this.schema.deleteTables(this.newTable!);
+    this.schema.addTables(this.fk.referencing);
+    if (!this.duplicate) this.schema.addTables(this.fk.referenced);
   }
 
   protected override _redo(): void {
-    this.schema.delete(...this.tables);
-    this.schema.add(this.parent!);
+    this.schema.deleteTables(this.fk.referencing);
+    if (!this.duplicate) this.schema.deleteTables(this.fk.referenced);
+    this.schema.addTables(this.newTable!);
   }
 }

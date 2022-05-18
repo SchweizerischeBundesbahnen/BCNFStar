@@ -59,7 +59,7 @@ export class MetanomeSettingsComponent {
     private http: HttpClient
   ) {
     this.tables.sort((table, anotherTable) =>
-      table.schemaAndName() <= anotherTable.schemaAndName() ? -1 : 1
+      table.fullName <= anotherTable.fullName ? -1 : 1
     );
     let controlsConfig: Record<string, any> = {};
     controlsConfig['ind'] = {};
@@ -67,13 +67,12 @@ export class MetanomeSettingsComponent {
     tables.forEach((table) => {
       this.selectedFdTab.push(new FormControl('hyfd'));
 
-      this.hyfdConfigs['fds_' + table.schemaAndName()] =
-        this.createDefaultFdIndexFile(
-          table.schemaAndName(),
-          Object.assign({}, defaulHyfdConfig),
-          hyfdAlgorithmName
-        );
-      controlsConfig['fds_' + table.schemaAndName()] = {};
+      this.hyfdConfigs['fds_' + table.fullName] = this.createDefaultFdIndexFile(
+        table.fullName,
+        Object.assign({}, defaulHyfdConfig),
+        hyfdAlgorithmName
+      );
+      controlsConfig['fds_' + table.fullName] = {};
     });
 
     this.formGroup = formBuilder.group(controlsConfig);
@@ -129,7 +128,7 @@ export class MetanomeSettingsComponent {
     algorithm: string = binderAlgorithmName
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
-      tables: this.tables.map((table) => table.schemaAndName()).sort(),
+      tables: this.tables.map((table) => table.fullName).sort(),
       dbmsName: '',
       database: '',
       resultType: MetanomeResultType.ind,
@@ -146,7 +145,7 @@ export class MetanomeSettingsComponent {
       .filter(
         (res) =>
           res.resultType === MetanomeResultType.fd &&
-          res.tables[0] === table.schemaAndName()
+          res.tables[0] === table.fullName
       )
       .sort(function (table, otherTable) {
         return otherTable.createDate - table.createDate;
@@ -158,7 +157,7 @@ export class MetanomeSettingsComponent {
       .filter(
         (res) =>
           res.resultType === MetanomeResultType.ind &&
-          this.tables.every((t) => res.tables.includes(t.schemaAndName()))
+          this.tables.every((t) => res.tables.includes(t.fullName))
       )
       .sort(function (table, otherTable) {
         return otherTable.createDate - table.createDate;
@@ -167,7 +166,7 @@ export class MetanomeSettingsComponent {
 
   public getAllTableNames() {
     return this.tables
-      .map((table) => table.schemaAndName())
+      .map((table) => table.fullName)
       .sort()
       .join(', ');
   }
@@ -199,7 +198,7 @@ export class MetanomeSettingsComponent {
     switch (tab) {
       case 'no-result':
         indexFile = this.createDefaultFdIndexFile(
-          table.schemaAndName(),
+          table.fullName,
           { memory: '' },
           'no-result'
         );
@@ -208,11 +207,11 @@ export class MetanomeSettingsComponent {
         indexFile = this.filteredMetanomeResultsForFd(table)[0];
         break;
       case 'hyfd':
-        indexFile = this.hyfdConfigs['fds_' + table.schemaAndName()];
+        indexFile = this.hyfdConfigs['fds_' + table.fullName];
         break;
     }
     this.formGroup.patchValue({
-      ['fds_' + table.schemaAndName()]: indexFile!,
+      ['fds_' + table.fullName]: indexFile!,
     });
     this.formGroup.updateValueAndValidity();
   }

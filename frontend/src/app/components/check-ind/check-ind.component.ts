@@ -1,6 +1,6 @@
 import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { SbbTableDataSource } from '@sbb-esta/angular/table';
 import { DatabaseService } from '@/src/app/database.service';
 import Relationship from '@/src/model/schema/Relationship';
@@ -13,14 +13,14 @@ import { ViolatingINDRowsDataQuery } from '../../dataquery';
   templateUrl: './check-ind.component.html',
   styleUrls: ['./check-ind.component.css'],
 })
-export class CheckIndComponent {
+export class CheckIndComponent implements OnChanges {
   @Input() referencingTable!: Table;
   @Input() tables!: Set<Table>;
 
   public rowCount: number = 0;
 
   public referencedTable: Table | undefined;
-  public relationship: Relationship = new Relationship();
+  public relationship: Relationship = new Relationship([], []);
 
   public referencingColumn: Column | undefined;
   public referencedColumn: Column | undefined;
@@ -30,6 +30,14 @@ export class CheckIndComponent {
 
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
+  ngOnChanges() {
+    this.referencedTable = undefined;
+    this.relationship = new Relationship([], []);
+
+    this.referencingColumn = undefined;
+    this.referencedColumn = undefined;
+  }
+
   public canAddColumnRelation(): boolean {
     if (
       this.referencingColumn == undefined ||
@@ -37,15 +45,13 @@ export class CheckIndComponent {
     )
       return false;
     return !(
-      this.relationship._referencing.includes(this.referencingColumn!) ||
-      this.relationship._referenced.includes(this.referencedColumn)
+      this.relationship.referencing.includes(this.referencingColumn!) ||
+      this.relationship.referenced.includes(this.referencedColumn)
     );
   }
 
   public addColumnRelation(): void {
-    this.referencedColumns().push(this.referencedColumn!);
-    this.referencingColumns().push(this.referencingColumn!);
-
+    this.relationship.add(this.referencingColumn!, this.referencedColumn!);
     this.referencedColumn = undefined;
     this.referencingColumn = undefined;
   }
@@ -66,9 +72,12 @@ export class CheckIndComponent {
   }
 
   public onTableSelected(table: Table) {
-    if (table.schemaAndName() != this.referencedTable?.schemaAndName()) {
-      this.relationship._referenced = [];
-      this.relationship._referencing = [];
+    if (
+      !this.referencedTable?.sources[0].table.equals(table.sources[0].table)
+    ) {
+      //?
+      this.relationship.referenced = [];
+      this.relationship.referencing = [];
     }
   }
 
@@ -77,7 +86,7 @@ export class CheckIndComponent {
   }
 
   public validTables(): Array<Table> {
-    return [...this.tables].filter((table) => [...table.sources].length == 1);
+    return [...this.tables].filter((table) => table.sources.length == 1);
   }
 
   public canCheckIND(): boolean {
@@ -90,11 +99,11 @@ export class CheckIndComponent {
   }
 
   public referencingColumns(): Array<Column> {
-    return this.relationship._referencing;
+    return this.relationship.referencing;
   }
 
   public referencedColumns(): Array<Column> {
-    return this.relationship._referenced;
+    return this.relationship.referenced;
   }
 
   public validReferencingColumns(): Array<Column> {
