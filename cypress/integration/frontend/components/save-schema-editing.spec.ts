@@ -26,6 +26,6 @@ describe("The save schema editing", () => {
     cy.get("input").eq(1).type("savedSchema");
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
-    cy.readFile("cypress/downloads/savedSchema.json").should("exist");
+    cy.readFile("cypress/downloads/savedSchema.zip").should("exist");
   });
 });

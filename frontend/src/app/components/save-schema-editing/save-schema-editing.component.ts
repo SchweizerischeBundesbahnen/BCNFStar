@@ -1,8 +1,9 @@
-import CommandProcessor from '@/src/model/commands/CommandProcessor';
 import Schema from '@/src/model/schema/Schema';
 import { Component, Input } from '@angular/core';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 import * as saveAs from 'file-saver';
+import * as JSZip from 'jszip';
+import { stringify } from 'zipson';
 
 @Component({
   selector: 'app-save-schema-editing',
@@ -11,7 +12,6 @@ import * as saveAs from 'file-saver';
 })
 export class SaveSchemaEditingComponent {
   @Input() public schema!: Schema;
-  @Input() public commandProcessor!: CommandProcessor;
 
   constructor(private notification: SbbNotificationToast) {}
 
@@ -20,8 +20,8 @@ export class SaveSchemaEditingComponent {
   public saveEditedSchema() {
     try {
       let schemaEntryToJSON = JSON.stringify(this.schema);
-      // let commandProcessorJSONFile = '';
-      this.downloadFile(schemaEntryToJSON);
+      let zipedJSON = stringify(JSON.parse(schemaEntryToJSON));
+      this.downloadFile(zipedJSON);
       this.notification.open('Schema download');
     } catch (e) {
       console.error(e);
@@ -29,9 +29,17 @@ export class SaveSchemaEditingComponent {
   }
 
   private downloadFile(schmeaJSON: string) {
-    const file: File = new File([schmeaJSON], this.filename + '.json', {
-      type: 'text/plain;charset=utf-8',
-    });
-    saveAs(file);
+    let zip = new JSZip();
+    zip.file(this.filename + '.bcnfstar', schmeaJSON);
+    zip
+      .generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 9 },
+      })
+      .then((content) => {
+        // see FileSaver.js
+        saveAs(content, this.filename + '.zip');
+      });
   }
 }

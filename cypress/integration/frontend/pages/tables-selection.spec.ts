@@ -115,7 +115,7 @@ describe("The table selection page", () => {
     cy.get('input[type="file"]').selectFile(
       {
         contents: Cypress.Buffer.from(exampleSchemaToJSON()),
-        fileName: "savedSchema.txt",
+        fileName: "savedSchema.zip",
         lastModified: Date.now(),
       },
       { force: true }
@@ -125,7 +125,7 @@ describe("The table selection page", () => {
     cy.get("input").eq(1).type("savedSchema");
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
-    cy.readFile("cypress/downloads/savedSchema.json").then((result) => {
+    cy.readFile("cypress/downloads/savedSchema.zip").then((result) => {
       expect(JSON.stringify(result) == exampleSchemaToJSON());
     });
   });
