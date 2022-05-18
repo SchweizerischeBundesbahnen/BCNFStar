@@ -112,21 +112,14 @@ describe("The table selection page", () => {
   it("loads, saves and loads edited schema correct", () => {
     cy.get("sbb-expansion-panel:contains('Load saved schema')").click();
     cy.contains("Upload file").click();
-    cy.get('input[type="file"]').selectFile(
-      {
-        contents: Cypress.Buffer.from(exampleSchemaToJSON()),
-        fileName: "savedSchema.zip",
-        lastModified: Date.now(),
-      },
-      { force: true }
-    );
+    cy.get('input[type="file"]').attachFile("savedExampleSchema.zip");
     cy.get(".sbb-button").eq(0).should("contain", "Load").click();
     cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
-    cy.get("input").eq(1).type("savedSchema");
+    cy.get("input").eq(1).type("savedExampleSchema");
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
-    cy.readFile("cypress/downloads/savedSchema.zip").then((result) => {
-      expect(JSON.stringify(result) == exampleSchemaToJSON());
+    cy.readFile("cypress/downloads/savedExampleSchema.zip").then((result) => {
+      expect(result == cy.fixture("savedSchema.zip"));
     });
   });
 });
