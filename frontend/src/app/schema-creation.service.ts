@@ -181,7 +181,7 @@ export class SchemaCreationService {
     const pkPromise = this.getPrimaryKeys(tables);
     if (indFile) {
       const indPromise = this.getInds(indFile, sourceColumns);
-      schema.addInd(...(await indPromise));
+      schema.addInds(...(await indPromise));
     }
 
     schema.addFk(...(await fkPromise));

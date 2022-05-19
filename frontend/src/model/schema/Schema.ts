@@ -57,7 +57,7 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public addInd(...inds: SourceRelationship[]) {
+  public addInds(...inds: SourceRelationship[]) {
     this._inds.push(...inds);
     this.tableIndsValid = false;
   }
