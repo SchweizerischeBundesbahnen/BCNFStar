@@ -154,7 +154,6 @@ export default class Schema {
   public filteredRoutesFromFactTo(
     table: Table
   ): Array<Array<TableRelationship>> {
-    console.log(table.name);
     return this.routesFromFactTo(table).filter(
       (route) =>
         route.length > 1 &&
@@ -208,8 +207,8 @@ export default class Schema {
   private updateFks(): void {
     this.calculateFks();
     this.calculateTrivialFks();
-    if (!this.starMode) this.filterTransitiveFks();
     this._tableFksValid = true;
+    this.filterFks();
   }
 
   private calculateFks(): void {
@@ -297,26 +296,41 @@ export default class Schema {
     }
   }
 
-  private filterTransitiveFks() {
+  private filterFks() {
     for (const table of this.tables) {
-      const transitiveFks = table._fks.filter((fk) =>
-        table._fks.some(
-          (otherFk) =>
-            new ColumnCombination(fk.relationship.referencing).isSubsetOf(
-              new ColumnCombination(otherFk.relationship.referencing)
-            ) &&
-            fk.relationship.referencing.length <
-              otherFk.relationship.referencing.length
-        )
-      );
-      for (const transitiveFk of transitiveFks) {
-        transitiveFk.referenced._references =
-          transitiveFk.referenced._references.filter(
-            (fk) => fk != transitiveFk
-          );
+      const badFks = this.starMode
+        ? this.starViolatingFksOf(table)
+        : this.transitiveFksOf(table);
+      for (const badFk of badFks) {
+        badFk.referenced._references = badFk.referenced._references.filter(
+          (fk) => fk != badFk
+        );
       }
-      table._fks = table._fks.filter((fk) => !transitiveFks.includes(fk));
+      table._fks = table._fks.filter((fk) => !badFks.includes(fk));
     }
+  }
+
+  private transitiveFksOf(table: Table): Array<TableRelationship> {
+    return table._fks.filter((fk) =>
+      table._fks.some(
+        (otherFk) =>
+          new ColumnCombination(fk.relationship.referencing).isSubsetOf(
+            new ColumnCombination(otherFk.relationship.referencing)
+          ) &&
+          fk.relationship.referencing.length <
+            otherFk.relationship.referencing.length
+      )
+    );
+  }
+
+  private starViolatingFksOf(table: Table): Array<TableRelationship> {
+    if (this.isFact(table)) return new Array();
+    return table._fks.filter(
+      (fk) =>
+        !this.filteredRoutesFromFactTo(fk.referenced).some(
+          (route) => route[route.length - 1] == fk
+        )
+    );
   }
 
   /**
