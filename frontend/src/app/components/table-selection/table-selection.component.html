@@ -39,7 +39,7 @@
         Go
       </button>
     </div>
-    <div class="col-8" *ngIf="hoveredTable && withContentPreview">
+    <div class="col-8" *ngIf="withContentPreview && hoveredTable">
       <ng-container
         [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"
       >
