@@ -24,5 +24,9 @@ sbb-select {
 }
 
 sbb-tab-group {
+    height: calc(var(--window-height) - var(--export-schema-sidebar-and-heading-height)); 
+}
+
+sbb-tab-group > .sbb-tab-body-wrapper {
     height: 100%;
 }

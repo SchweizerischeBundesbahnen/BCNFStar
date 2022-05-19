@@ -8,6 +8,13 @@ body {
 
 :root {
     --sbb-button-icon-top-margin: 0;
+    --window-height: calc(97vh - var(--sbb-header-lean-height));
+    --export-schema-sidebar-height: calc(1.6666666667rem + 2 * var(--sbb-button-height) + 0.25rem + var(--sbb-divider-medium) + var(--sbb-divider-small));
+    --export-schema-sidebar-and-heading-height: calc(1.6666666667rem + var(--sbb-divider-medium) + var(--sbb-divider-small) + var(--export-schema-sidebar-height) + 8px);
+}
+
+.sbb-tab-body-wrapper {
+  height: 100%;
 }
 
 .d-flex {

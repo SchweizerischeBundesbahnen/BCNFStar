@@ -1,13 +1,58 @@
-<div class="scroll">
-  <h2 id="table-name" *ngIf="!isEditingTableName; else editing">
-    {{ table.fullName }}
+<h2
+  class="grid-container-table-heading"
+  id="table-name"
+  *ngIf="!isEditingTableName; else editing"
+>
+  <div class="item">{{ table.fullName }}</div>
+  <sbb-icon
+    id="table-edit-icon"
+    svgIcon="kom:pen-small"
+    (click)="startTableEdit()"
+  ></sbb-icon>
+</h2>
+
+<h3>Select</h3>
+<div *ngFor="let column of table.columns" class="grid-container-table">
+  <div class="item" [sbbTooltip]="column.identifier">
+    {{ column.identifier }}
+  </div>
+  <div>as</div>
+  <div
+    class="grid-container-editing-field"
+    *ngIf="editingColumn !== column; else columnEditingField"
+  >
+    <div class="item" [sbbTooltip]="column.baseAlias">
+      {{ column.baseAlias }}
+    </div>
     <sbb-icon
-      id="table-edit-icon"
       svgIcon="kom:pen-small"
-      (click)="startTableEdit()"
+      (click)="startColumnEdit(column)"
     ></sbb-icon>
-  </h2>
-  <ng-template #editing class="row">
+  </div>
+</div>
+
+<h3>From</h3>
+<div *ngFor="let source of table.sources" class="grid-container-table mb-3">
+  <div class="item" [sbbTooltip]="source.table.fullName">
+    {{ source.table.fullName }}
+  </div>
+  <div>as</div>
+  <div
+    class="grid-container-editing-field"
+    *ngIf="editingSource !== source; else sourceEditingField"
+  >
+    <div class="item" [sbbTooltip]="source.baseAlias">
+      {{ source.baseAlias }}
+    </div>
+    <sbb-icon
+      svgIcon="kom:pen-small"
+      (click)="startSourceEdit(source)"
+    ></sbb-icon>
+  </div>
+</div>
+
+<ng-template #editing>
+  <div class="grid-container-table-heading">
     <input
       class="col-10"
       id="rename-table-input"
@@ -21,63 +66,33 @@
       svgIcon="kom:tick-medium"
       (click)="changeTableName()"
     ></sbb-icon>
-  </ng-template>
-  <h3>Select</h3>
-  <table [cellPadding]="5">
-    <tr *ngFor="let column of table.columns">
-      <td>{{ column.identifier }}</td>
-      <td>as</td>
-      <td>
-        <div *ngIf="editingColumn !== column; else columnEditingField">
-          {{ column.baseAlias }}
-          <sbb-icon
-            svgIcon="kom:pen-small"
-            (click)="startColumnEdit(column)"
-          ></sbb-icon>
-        </div>
-        <ng-template #columnEditingField>
-          <input
-            id="rename-column-input"
-            type="text"
-            sbbInput
-            [(ngModel)]="columnNameEditString"
-            (keyup.enter)="changeColumnName()"
-          />
-          <sbb-icon
-            svgIcon="kom:tick-medium"
-            (click)="changeColumnName()"
-          ></sbb-icon>
-        </ng-template>
-      </td>
-    </tr>
-  </table>
-  <h3>From</h3>
-  <table [cellPadding]="5">
-    <tr *ngFor="let source of table.sources">
-      <td>{{ source.table.fullName }}</td>
-      <td>as</td>
-      <td>
-        <div *ngIf="editingSource !== source; else sourceEditingField">
-          {{ source.baseAlias }}
-          <sbb-icon
-            svgIcon="kom:pen-small"
-            (click)="startSourceEdit(source)"
-          ></sbb-icon>
-        </div>
-        <ng-template #sourceEditingField>
-          <input
-            id="rename-source-input"
-            type="text"
-            sbbInput
-            [(ngModel)]="sourceNameEditString"
-            (keyup.enter)="changeSourceName()"
-          />
-          <sbb-icon
-            svgIcon="kom:tick-medium"
-            (click)="changeSourceName()"
-          ></sbb-icon>
-        </ng-template>
-      </td>
-    </tr>
-  </table>
-</div>
+  </div>
+</ng-template>
+
+<ng-template #columnEditingField>
+  <div class="grid-container-editing-field">
+    <input
+      id="rename-column-input"
+      type="text"
+      sbbInput
+      [(ngModel)]="columnNameEditString"
+      (keyup.enter)="changeColumnName()"
+      [sbbTooltip]="columnNameEditString"
+    />
+    <sbb-icon svgIcon="kom:tick-medium" (click)="changeColumnName()"></sbb-icon>
+  </div>
+</ng-template>
+
+<ng-template #sourceEditingField>
+  <div class="grid-container-editing-field">
+    <input
+      id="rename-source-input"
+      type="text"
+      sbbInput
+      [(ngModel)]="sourceNameEditString"
+      (keyup.enter)="changeSourceName()"
+      [sbbTooltip]="sourceNameEditString"
+    />
+    <sbb-icon svgIcon="kom:tick-medium" (click)="changeSourceName()"></sbb-icon>
+  </div>
+</ng-template>
