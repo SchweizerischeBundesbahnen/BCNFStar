@@ -147,8 +147,11 @@
     <app-table-editing [table]="this.table"></app-table-editing>
   </sbb-tab>
   <!-- WIP -->
-  <!-- <sbb-tab label="Schema Integration">
+  <sbb-tab label="Schema Integration">
     <h2>Choose which tables to integrate into the current schema</h2>
-    <app-table-selection [withContentPreview]="false"></app-table-selection>
-  </sbb-tab> -->
+    <app-table-selection
+      (schema)="matchSchemas($event)"
+      [withContentPreview]="false"
+    ></app-table-selection>
+  </sbb-tab>
 </sbb-tab-group>

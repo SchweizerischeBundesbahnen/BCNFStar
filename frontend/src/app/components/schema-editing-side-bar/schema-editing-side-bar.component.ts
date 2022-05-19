@@ -16,6 +16,7 @@ import Column from '@/src/model/schema/Column';
 import { FdCluster } from '@/src/model/types/FdCluster';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import IndScore from '@/src/model/schema/methodObjects/IndScore';
+import matchSchemas from '@/src/model/schema/SchemaMatching';
 
 @Component({
   selector: 'app-schema-editing-side-bar',
@@ -41,7 +42,6 @@ export class SchemaEditingSideBarComponent implements OnChanges {
   public pageSize = 5;
 
   ngOnChanges(): void {
-    console.log(this.table);
     this._fdClusterFilter = [];
     this.indFilter = Array.from(this.schema.tables);
   }
@@ -49,6 +49,10 @@ export class SchemaEditingSideBarComponent implements OnChanges {
   public selectedInd(): SourceRelationship | undefined {
     if (!this.indSelectionGroup) return undefined;
     return this.indSelectionGroup.value;
+  }
+
+  public matchSchemas(schema: Schema) {
+    console.log(matchSchemas([...this.schema.tables], [...schema.tables]));
   }
 
   public emitHighlightedInd(rel: SourceRelationship) {
