@@ -60,10 +60,6 @@ export default class Schema {
     this._fds.get(fd.rhs[0].table)!.push(fd);
   }
 
-  public clearFdsFor(source: SourceTable) {
-    this._fds.set(source, new Array());
-  }
-
   /**
    * Returns a copy of the foreign key relationships
    */

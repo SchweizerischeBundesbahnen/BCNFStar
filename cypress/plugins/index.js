@@ -18,7 +18,6 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = (on, config) => {
   config = require("cypress-dotenv")(config);
-  console.log(config.env);
 
   const db = {
     user: config.env.PGUSER,

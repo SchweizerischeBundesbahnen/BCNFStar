@@ -526,6 +526,6 @@ describe("The metanome settings dialog", () => {
     ).should("not.exist");
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
-    );
+    ).should("not.exist");
   });
 });
