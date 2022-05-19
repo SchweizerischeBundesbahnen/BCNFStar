@@ -71,8 +71,27 @@ function propagate(
   }
   return result;
 }
-function filter(flooded: Record<string, number>): Record<string, number> {
-  throw new Error('not implemented');
+function filter(flooded: Record<string, number>, selectThreshold = 0.999) {
+  // leftName, rightName, score
+  const maxSimilarity: Record<string, number> = {};
+  for (const [name, sim] of Object.entries(flooded)) {
+    const [left, right] = name.split(':');
+    maxSimilarity[left] = Math.max(maxSimilarity[left], sim);
+    maxSimilarity[right] = Math.max(maxSimilarity[right], sim);
+  }
+  const relativeSimilarities: Record<string, Record<string, number>> = {};
+  for (const [name, sim] of Object.entries(flooded)) {
+    const [left, right] = name.split(':');
+    if (!relativeSimilarities[left]) relativeSimilarities[left] = {};
+    if (
+      sim / maxSimilarity[left] > selectThreshold &&
+      sim / maxSimilarity[right] > selectThreshold
+    ) {
+      relativeSimilarities[left][right] = sim;
+    }
+  }
+
+  return relativeSimilarities;
 }
 
 function matchSchemas(tablesLeft: Array<Table>, tablesRight: Array<Table>) {
@@ -80,7 +99,7 @@ function matchSchemas(tablesLeft: Array<Table>, tablesRight: Array<Table>) {
   const graphRight = createGraph(tablesRight);
   const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
   const flooded = similarityFlood(graphLeft, graphRight, initialSimliarity);
-  const filtered: Record<string, number> = filter(flooded);
+  const filtered = filter(flooded);
   return filtered;
 }
 
@@ -114,11 +133,17 @@ function createGraph(tables: Table[]): Graph<string> {
     table: {},
     column: {},
     type: {},
-    name: {},
-    SQLType: {},
+    // name: {},
+    // SQLType: {},
   };
 
   for (const table of tables) {
+    graph['table']['schema'] = table.fullName;
+    for (const column of table.columns) {
+      const colNode = columnIdentifier(table, column);
+      graph['column'][table.fullName] = colNode;
+      graph['type'][colNode] = colNode + column.dataType;
+    }
   }
   return graph;
 }
