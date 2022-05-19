@@ -1,9 +1,8 @@
 import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
-import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 
 @Component({
   selector: 'app-direct-dimension-dialog',
@@ -12,10 +11,7 @@ import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 })
 export class DirectDimensionDialogComponent {
   public table: Table;
-  public routes: Array<Array<TableRelationship>>;
-
-  @ViewChild('routeSelection', { read: SbbRadioGroup })
-  private routeSelectionGroup!: SbbRadioGroup;
+  public routes = new Map<Array<TableRelationship>, Boolean>();
 
   constructor(
     // eslint-disable-next-line no-unused-vars
@@ -23,17 +19,19 @@ export class DirectDimensionDialogComponent {
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA) data: { table: Table; schema: Schema }
   ) {
-    this.routes = data.schema.filteredRoutesFromFactTo(data.table);
+    for (const route of data.schema.filteredRoutesFromFactTo(data.table)) {
+      this.routes.set(route, false);
+    }
     this.table = data.table;
   }
 
   public canConfirm(): boolean {
-    return this.routeSelectionGroup?.value;
+    return [...this.routes.values()].some((bool) => bool);
   }
 
   public confirm() {
     this.dialogRef.close({
-      route: this.routeSelectionGroup.value,
+      routes: [...this.routes.keys()].filter((route) => this.routes.get(route)),
     });
   }
 }

@@ -6,7 +6,7 @@ import Command from './Command';
 
 export default class DirectDimensionCommand extends Command {
   private oldTable: Table;
-  private newTable?: Table;
+  public newTable?: Table;
 
   public constructor(
     private schema: Schema,
