@@ -30,6 +30,7 @@ export class SchemaEditingSideBarComponent implements OnChanges {
   @Output() public selectColumns = new EventEmitter<
     Map<Table, ColumnCombination>
   >();
+  @Output() public autoNormalizeSelectedTable = new EventEmitter();
 
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;

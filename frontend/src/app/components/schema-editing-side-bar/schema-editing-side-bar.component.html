@@ -87,6 +87,14 @@
         <app-check-fd [table]="this.table"></app-check-fd>
       </sbb-expansion-panel>
     </sbb-accordion>
+    <button
+      type="button"
+      sbb-button
+      (click)="autoNormalizeSelectedTable.emit()"
+      class="mt-1"
+    >
+      {{ "Auto-normalize this table" }}
+    </button>
   </sbb-tab>
 
   <sbb-tab label="Foreign Keys">

@@ -42,6 +42,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
 import { LoadSavedSchemaComponent } from './components/load-saved-schema/load-saved-schema.component';
 import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
+import { PersistSchemaComponent } from './components/persist-schema/persist-schema.component';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -66,6 +67,7 @@ export let InjectorInstance: Injector;
     LoadSavedSchemaComponent,
     TableEditingComponent,
     HomeComponent,
+    PersistSchemaComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,7 +1,5 @@
-.schema-editing-side-bar {
-  scrollbar-width: none;
-  overflow-y: scroll;
-  display: block;
+:root {
+  --export-schema-sidebar-height: 100px;
 }
 
 element::-webkit-scrollbar {
@@ -9,17 +7,43 @@ element::-webkit-scrollbar {
   /* for Chrome, Safari, and Opera */
 }
 
-.col-4 {
-  /* 97% to leave some room for border and prevnt scrollbar*/
+
+.grid-container {
+  display: grid;
+  grid-template-columns: calc(66.66% - 2px) calc(33.33% - 2px);
+  grid-template-rows: calc(var(--sbb-button-height)) auto;
+  background-color: lightgray;
+  height: calc(97vh - var(--sbb-header-lean-height));
+  gap: 4px;
+  padding: 4px;
+}
+
+.grid-container-sidebar {
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: var(--export-schema-sidebar-height) auto;
   height: calc(97vh - var(--sbb-header-lean-height));
 }
 
-.col-8 {
-  height: calc(97vh - var(--sbb-header-lean-height));
+.grid-container > div {
+  background-color: rgba(255, 255, 255, 1);
 }
 
-.row > * {
-  padding: 0;
+h2 {
+  text-align: center;
+}
+
+.item-sidebar {
+  grid-row-start: 1;
+  grid-row-end: 3;
+  grid-column-start: 1;
+  grid-column-start: 2;
+}
+
+.schema-editing-side-bar {
+  scrollbar-width: none;
+  overflow-y: scroll;
+  display: block;
 }
 
 .undo-redo {

@@ -1,17 +1,5 @@
-h2 {
-    text-align: center;
-}
-
-sbb-select {
-    width: 50%;
-}
-
 .cluster-header {
     font-size: 15px;
-}
-
-.filtered {
-    color: grey;
 }
 
 /* set comma between elemnts by adding one before each except the first */
@@ -21,4 +9,20 @@ sbb-select {
 
 .cluster-header:first-child::before {
     content: '';
+}
+
+.filtered {
+    color: grey;
+}
+
+h2 {
+    text-align: center;
+}
+
+sbb-select {
+    width: 50%;
+}
+
+sbb-tab-group {
+    height: 100%;
 }

@@ -1,7 +1,6 @@
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
-import { Component, OnInit } from '@angular/core';
-import * as saveAs from 'file-saver';
+import { Component, ViewChild } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
@@ -15,26 +14,23 @@ import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.co
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersisting';
-import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
-import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { SchemaGraphComponent } from '../../components/schema-graph/schema-graph.component';
 
 @Component({
   selector: 'app-schema-editing',
   templateUrl: './schema-editing.component.html',
   styleUrls: ['./schema-editing.component.css'],
 })
-export class SchemaEditingComponent implements OnInit {
+export class SchemaEditingComponent {
+  @ViewChild(SchemaGraphComponent, { static: true })
+  public graph!: SchemaGraphComponent;
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
-  public schemaName: string = '';
   public selectedColumns?: Map<Table, ColumnCombination>;
   public schemaChanged: Subject<void> = new Subject();
-
-  public persisting: SQLPersisting | undefined;
 
   constructor(
     public dataService: DatabaseService,
@@ -45,9 +41,6 @@ export class SchemaEditingComponent implements OnInit {
     this.schema = dataService.schema!;
     if (!this.schema) router.navigate(['']);
     // this.schemaChanged.next();
-  }
-  async ngOnInit(): Promise<void> {
-    this.persisting = await this.initPersisting();
   }
 
   public onSelectColumns(columns: Map<Table, ColumnCombination>) {
@@ -139,9 +132,9 @@ export class SchemaEditingComponent implements OnInit {
     this.schemaChanged.next();
   }
 
-  public onAutoNormalize(): void {
-    let tables = this.selectedTable
-      ? new Array(this.selectedTable)
+  public onAutoNormalize(tableSelected: boolean = true): void {
+    let tables = tableSelected
+      ? new Array(this.selectedTable!)
       : new Array(...this.schema.tables);
     let command = new AutoNormalizeCommand(this.schema, ...tables);
     let self = this;
@@ -164,33 +157,5 @@ export class SchemaEditingComponent implements OnInit {
   public onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
-  }
-
-  public async initPersisting(): Promise<SQLPersisting> {
-    const dbmsName: string = await this.dataService.getDmbsName();
-
-    if (dbmsName == 'postgres') {
-      return new PostgreSQLPersisting();
-    } else if (dbmsName == 'mssql') {
-      return new SqlServerPersisting();
-    }
-    throw Error('Unknown Dbms-Server');
-  }
-
-  public persistSchema(): string {
-    this.schema.name = this.schemaName;
-    this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
-    return this.persisting!.createSQL(this.schema);
-  }
-
-  async download(): Promise<void> {
-    const file: File = new File(
-      [this.persistSchema()],
-      this.schemaName + '.sql',
-      {
-        type: 'text/plain;charset=utf-8',
-      }
-    );
-    saveAs(file);
   }
 }
