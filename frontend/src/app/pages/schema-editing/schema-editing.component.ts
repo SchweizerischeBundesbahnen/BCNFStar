@@ -167,26 +167,32 @@ export class SchemaEditingComponent implements OnInit {
   public onClickMakeDirectDimension(table: Table): void {
     const routes = this.schema.filteredRoutesFromFactTo(table);
     if (routes.length == 1) {
-      this.onMakeDirectDimension(routes[0]);
+      this.onMakeDirectDimensions(routes);
     } else {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
         data: { table: table, schema: this.schema },
       });
       dialogRef
         .afterClosed()
-        .subscribe((value: { route: Array<TableRelationship> }) => {
-          if (value) this.onMakeDirectDimension(value.route);
+        .subscribe((value: { routes: Array<Array<TableRelationship>> }) => {
+          if (value) this.onMakeDirectDimensions(value.routes);
         });
     }
   }
 
-  public onMakeDirectDimension(route: Array<TableRelationship>) {
-    let command = new DirectDimensionCommand(this.schema, route);
-    command.onDo = () =>
-      (this.selectedTable = route[route.length - 1].referenced);
-    command.onUndo = () =>
-      (this.selectedTable = route[route.length - 1].referenced);
-    this.commandProcessor.do(command);
+  public onMakeDirectDimensions(routes: Array<Array<TableRelationship>>) {
+    for (const i in routes) {
+      const route = routes[i];
+      let command = new DirectDimensionCommand(this.schema, route);
+      command.onDo = () =>
+        (this.selectedTable = route[route.length - 1].referenced);
+      command.onUndo = () =>
+        (this.selectedTable = route[route.length - 1].referenced);
+      this.commandProcessor.do(command);
+      if (+i < routes.length - 1) {
+        routes[+i + 1][0].referencing = command.newTable!;
+      }
+    }
     this.schemaChanged.next();
   }
 

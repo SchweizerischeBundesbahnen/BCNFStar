@@ -5,16 +5,15 @@
     these do you want to replace by a foreign key in the fact table?
   </div>
   <br />
-  <sbb-radio-group #routeSelection>
-    <sbb-radio-button
-      *ngFor="let route of routes"
-      [value]="route"
-      style="display: block"
-      ><span *ngFor="let rel of route"
-        >{{ rel.relationship.sourceRelationship().toString() }}<br /></span
-      ><br />
-    </sbb-radio-button>
-  </sbb-radio-group>
+  <sbb-checkbox
+    [ngModel]="routes.get(route)"
+    (ngModelChange)="routes.set(route, $event)"
+    *ngFor="let route of routes.keys()"
+  >
+    <span *ngFor="let rel of route"
+      >{{ rel.relationship.sourceRelationship().toString() }}<br
+    /></span>
+  </sbb-checkbox>
 </div>
 <div sbbDialogActions>
   <button
