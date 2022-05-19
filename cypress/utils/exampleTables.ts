@@ -174,6 +174,10 @@ export function exampleSchema(): Schema {
   return schema;
 }
 
+export function exampleSchemaToJSON(): string {
+  return JSON.stringify(exampleSchema());
+}
+
 export function multiFkSchema(): Schema {
   const schema = new Schema();
   const tableC = Table.fromColumnNames(["c_a1", "c_a2"], "TableC");
