@@ -115,12 +115,11 @@ export default class Schema {
     table: Table
   ): Array<Array<TableRelationship>> {
     console.log(table.name);
-    return this.routesFromFactTo(table).filter(
-      (route) =>
-        route.length > 1 &&
-        new DirectDimension(route).newTable.columns.cardinality >
-          route[0].referencing.columns.cardinality
-    );
+    return this.routesFromFactTo(table).filter((route) => {
+      if (route.length <= 1) return false;
+      const dd = new DirectDimension(route);
+      return dd.newTable.columns.cardinality > dd.oldTable.columns.cardinality;
+    });
   }
 
   /**

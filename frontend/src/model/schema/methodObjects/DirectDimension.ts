@@ -5,7 +5,7 @@ import Join from './Join';
 
 export default class DirectDimension {
   public newTable!: Table;
-  private oldTable: Table;
+  public oldTable: Table;
 
   public constructor(private route: Array<TableRelationship>) {
     this.oldTable = this.route[0].referencing;
