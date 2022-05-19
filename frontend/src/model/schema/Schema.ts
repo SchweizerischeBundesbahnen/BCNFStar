@@ -107,6 +107,10 @@ export default class Schema {
     return this.referencesOf(table).length == 0;
   }
 
+  /**
+   * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
+   * or routes that would add no extra information to the fact table when joined completely
+   */
   public filteredRoutesFromFactTo(
     table: Table
   ): Array<Array<TableRelationship>> {
@@ -119,6 +123,9 @@ export default class Schema {
     );
   }
 
+  /**
+   * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
+   */
   public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
     for (const rel of this.referencesOf(table)) {
@@ -128,10 +135,6 @@ export default class Schema {
     }
     if (result.length == 0) result.push(new Array<TableRelationship>());
     return result;
-  }
-
-  public numReferences(table: Table): number {
-    return table._references.length;
   }
 
   public referencesOf(table: Table): Array<TableRelationship> {

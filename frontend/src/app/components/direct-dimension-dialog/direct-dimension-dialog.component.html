@@ -1,5 +1,10 @@
 <div sbbDialogTitle>Dimension Options</div>
 <div sbbDialogContent>
+  <div>
+    There are multiple routes from {{ table.name }} to a fact table. Which of
+    these do you want to replace by a foreign key in the fact table?
+  </div>
+  <br />
   <sbb-radio-group #routeSelection>
     <sbb-radio-button
       *ngFor="let route of routes"

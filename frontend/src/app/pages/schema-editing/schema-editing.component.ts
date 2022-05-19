@@ -165,19 +165,27 @@ export class SchemaEditingComponent implements OnInit {
   }
 
   public onClickMakeDirectDimension(table: Table): void {
-    const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
-      data: { table: table, schema: this.schema },
-    });
-
-    dialogRef
-      .afterClosed()
-      .subscribe((value: { route: Array<TableRelationship> }) => {
-        if (value) this.onMakeDirectDimension(value.route);
+    const routes = this.schema.filteredRoutesFromFactTo(table);
+    if (routes.length == 1) {
+      this.onMakeDirectDimension(routes[0]);
+    } else {
+      const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
+        data: { table: table, schema: this.schema },
       });
+      dialogRef
+        .afterClosed()
+        .subscribe((value: { route: Array<TableRelationship> }) => {
+          if (value) this.onMakeDirectDimension(value.route);
+        });
+    }
   }
 
   public onMakeDirectDimension(route: Array<TableRelationship>) {
     let command = new DirectDimensionCommand(this.schema, route);
+    command.onDo = () =>
+      (this.selectedTable = route[route.length - 1].referenced);
+    command.onUndo = () =>
+      (this.selectedTable = route[route.length - 1].referenced);
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }
