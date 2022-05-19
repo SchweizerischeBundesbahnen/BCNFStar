@@ -4,18 +4,18 @@
       <!-- [selectedTable]="this.selectedTable" -->
       <!-- (selected)="onSelect($event)" -->
       <app-schema-graph
-        [schema]="this.schema"
-        [(selectedTable)]="this.selectedTable"
-        [selectedColumns]="this.selectedColumns"
-        [schemaChanged]="this.schemaChanged.asObservable()"
+        [schema]="schema"
+        [(selectedTable)]="selectedTable"
+        [selectedColumns]="selectedColumns"
+        [schemaChanged]="schemaChanged.asObservable()"
         (joinFk)="onClickJoin($event)"
         (makeDirectDimension)="onClickMakeDirectDimension($event)"
       ></app-schema-graph>
     </div>
     <div class="col-4 border schema-editing-side-bar">
-      <button type="button" sbb-button (click)="this.onAutoNormalize()">
+      <button type="button" sbb-button (click)="onAutoNormalize()">
         {{
-          this.selectedTable !== undefined
+          selectedTable !== undefined
             ? "Auto-normalize this table"
             : "Auto-normalize all tables"
         }}
@@ -28,8 +28,8 @@
       </sbb-toggle>
       <app-undo-redo
         class="undo-redo"
-        [canUndo]="this.commandProcessor.canUndo()"
-        [canRedo]="this.commandProcessor.canRedo()"
+        [canUndo]="commandProcessor.canUndo()"
+        [canRedo]="commandProcessor.canRedo()"
         (undo)="onUndo()"
         (redo)="onRedo()"
       ></app-undo-redo>
@@ -46,16 +46,17 @@
       <button
         type="button"
         sbb-button
-        [disabled]="!this.schemaName"
+        [disabled]="!schemaName"
         (click)="download()"
       >
         Download SQL
       </button>
+      <app-save-schema-editing [schema]="schema"> </app-save-schema-editing>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
-        *ngIf="this.selectedTable"
-        [table]="this.selectedTable"
-        [schema]="this.schema"
+        *ngIf="selectedTable"
+        [table]="selectedTable"
+        [schema]="schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
         (selectColumns)="onSelectColumns($event)"

@@ -23,6 +23,15 @@ export default class Schema {
   private _tableFksValid = false;
   private _starMode = false;
 
+  public toJSON() {
+    return {
+      tables: Array.from(this.tables),
+      _fks: this.fks,
+      _inds: this.inds,
+      _fds: [...this._fds.values()].flat(),
+    };
+  }
+
   public constructor(...tables: Array<Table>) {
     this.addTables(...tables);
   }

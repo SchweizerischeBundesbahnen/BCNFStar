@@ -38,7 +38,9 @@ import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { TableEditingComponent } from './components/table-editing/table-editing.component';
-
+import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
+import { LoadSavedSchemaComponent } from './components/load-saved-schema/load-saved-schema.component';
+import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -60,6 +62,8 @@ export let InjectorInstance: Injector;
     CheckIndComponent,
     ViolatingRowsViewIndsComponent,
     DatabaseTableViewerComponent,
+    SaveSchemaEditingComponent,
+    LoadSavedSchemaComponent,
     TableEditingComponent,
   ],
   imports: [
@@ -80,6 +84,7 @@ export let InjectorInstance: Injector;
     SbbTableModule,
     SbbFormFieldModule,
     SbbToggleModule,
+    SbbFileSelectorModule,
     SbbTabsModule,
     FormsModule,
     ReactiveFormsModule,

@@ -183,17 +183,17 @@ export class DatabaseService {
     indFile: string,
     fdFiles: Record<string, string>
   ) {
-    const indPromise = this.getMetanomeResult(indFile) as Promise<
-      Array<IInclusionDependency>
-    >;
     const fdPromises = new Map<Table, Promise<Array<IFunctionalDependency>>>();
-    for (const table of tables)
-      fdPromises.set(
-        table,
-        this.getMetanomeResult(fdFiles[table.fullName]) as Promise<
-          Array<IFunctionalDependency>
-        >
-      );
+    for (const table of tables) {
+      if (fdFiles[table.fullName]) {
+        fdPromises.set(
+          table,
+          this.getMetanomeResult(fdFiles[table.fullName]) as Promise<
+            Array<IFunctionalDependency>
+          >
+        );
+      }
+    }
 
     this.schema = new Schema(...tables);
     for (const table of tables) {
@@ -211,7 +211,14 @@ export class DatabaseService {
     for (const [table, tableFds] of fdPromises.entries()) {
       this.resolveFds(await tableFds, table);
     }
-    this.resolveInds(await indPromise);
+
+    if (indFile) {
+      const indPromise = this.getMetanomeResult(indFile) as Promise<
+        Array<IInclusionDependency>
+      >;
+      this.resolveInds(await indPromise);
+    }
+
     this.resolveIFks(this.iFks);
     this.resolveIPks(this.iPks);
   }
