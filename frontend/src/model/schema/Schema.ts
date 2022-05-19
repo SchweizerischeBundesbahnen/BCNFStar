@@ -47,8 +47,8 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public addFk(fk: SourceRelationship) {
-    this._fks.push(fk);
+  public addFk(...fks: SourceRelationship[]) {
+    this._fks.push(...fks);
     this.relationshipsValid = false;
   }
 
@@ -57,8 +57,8 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public addInd(ind: SourceRelationship) {
-    this._inds.push(ind);
+  public addInds(...inds: SourceRelationship[]) {
+    this._inds.push(...inds);
     this.tableIndsValid = false;
   }
 
