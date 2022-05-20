@@ -20,12 +20,7 @@
             : "Auto-normalize all tables"
         }}
       </button>
-      <sbb-toggle (change)="setStarMode($event)">
-        <sbb-toggle-option label="Normal Mode" [value]="false">
-        </sbb-toggle-option>
-        <sbb-toggle-option label="Star Schema Mode" [value]="true">
-        </sbb-toggle-option>
-      </sbb-toggle>
+
       <app-undo-redo
         class="undo-redo"
         [canUndo]="commandProcessor.canUndo()"
@@ -52,6 +47,12 @@
         Download SQL
       </button>
       <app-save-schema-editing [schema]="schema"> </app-save-schema-editing>
+      <sbb-toggle (change)="setStarMode($event)">
+        <sbb-toggle-option label="Normal Mode" [value]="false">
+        </sbb-toggle-option>
+        <sbb-toggle-option label="Star Schema Mode" [value]="true">
+        </sbb-toggle-option>
+      </sbb-toggle>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
         *ngIf="selectedTable"
