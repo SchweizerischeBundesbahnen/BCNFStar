@@ -82,7 +82,7 @@ export default class SaveSchemaState {
       this.newSchema.addFk(fk);
     });
     this.parseSourceRelationshipArray(schema._inds).forEach((ind) => {
-      this.newSchema.addInd(ind);
+      this.newSchema.addInds(ind);
     });
     this.parseTableFds(schema._fds).forEach((sfd) => {
       this.newSchema.addFd(sfd);

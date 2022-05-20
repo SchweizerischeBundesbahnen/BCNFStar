@@ -1,13 +1,12 @@
 <div class="container px-0" [ngStyle]="bbox">
-  <button
+  <div
     *ngIf="showMakeDirectDimension"
     class="extra-button"
     type="button"
-    sbb-button
     (click)="makeDirectDimension.emit(table)"
   >
-    Direct Dimension
-  </button>
+    D
+  </div>
   <div
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"
