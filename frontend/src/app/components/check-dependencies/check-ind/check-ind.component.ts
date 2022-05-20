@@ -5,8 +5,8 @@ import { SbbTableDataSource } from '@sbb-esta/angular/table';
 import { DatabaseService } from '@/src/app/database.service';
 import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { ViolatingRowsViewIndsComponent } from '../violating-rows-view-inds/violating-rows-view-inds.component';
-import { ViolatingINDRowsDataQuery } from '../../dataquery';
+import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
+import { ViolatingINDRowsDataQuery } from '../../../dataquery';
 
 @Component({
   selector: 'app-check-ind',

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import Schema from '@/src/model/schema/Schema';
-import { DatabaseService } from '../../database.service';
+import { DatabaseService } from '../../../database.service';
 import { Router } from '@angular/router';
 import { parse } from 'zipson';
 import * as JSZip from 'jszip';

@@ -2,7 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import ITablePage from '@server/definitions/ITablePage';
-import { DataQuery } from '../../dataquery';
+import { DataQuery } from '../../../dataquery';
 
 @Component({
   selector: 'app-database-table-viewer',

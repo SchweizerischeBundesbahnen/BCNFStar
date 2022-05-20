@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
-import { DataQuery } from '../../dataquery';
+import { DataQuery } from '../../../dataquery';
 
 @Component({
   selector: 'app-violating-rows-view',

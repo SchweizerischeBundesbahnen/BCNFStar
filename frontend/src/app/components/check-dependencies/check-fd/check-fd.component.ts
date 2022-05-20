@@ -3,10 +3,10 @@ import Table from '@/src/model/schema/Table';
 import { DatabaseService } from 'src/app/database.service';
 import { Component, Input, OnChanges } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { ViolatingRowsViewComponent } from '../violating-rows-view/violating-rows-view.component';
+import { ViolatingRowsViewComponent } from '../../operation-dialogs/violating-rows-view/violating-rows-view.component';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
-import { ViolatingFDRowsDataQuery } from '../../dataquery';
+import { ViolatingFDRowsDataQuery } from '../../../dataquery';
 
 @Component({
   selector: 'app-check-fd',

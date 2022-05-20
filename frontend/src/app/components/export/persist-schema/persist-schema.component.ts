@@ -4,7 +4,7 @@ import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisti
 import Schema from '@/src/model/schema/Schema';
 import { Component, Input, OnInit } from '@angular/core';
 import * as saveAs from 'file-saver';
-import { DatabaseService } from '../../database.service';
+import { DatabaseService } from '../../../database.service';
 
 @Component({
   selector: 'app-persist-schema',

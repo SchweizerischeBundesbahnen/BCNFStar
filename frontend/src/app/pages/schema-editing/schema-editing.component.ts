@@ -9,14 +9,14 @@ import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 import { firstValueFrom, Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
-import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.component';
+import { SplitDialogComponent } from '../../components/operation-dialogs/split-dialog/split-dialog.component';
+import { JoinDialogComponent } from '../../components/operation-dialogs/join-dialog/join-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import TableRelationship from '@/src/model/schema/TableRelationship';
-import { SchemaGraphComponent } from '../../components/schema-graph/schema-graph.component';
+import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 
 @Component({
   selector: 'app-schema-editing',
