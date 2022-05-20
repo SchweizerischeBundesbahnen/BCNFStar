@@ -7,7 +7,7 @@ element::-webkit-scrollbar {
 .grid-container {
   display: grid;
   grid-template-columns: calc(66.66% - 2px) calc(33.33% - 2px);
-  grid-template-rows: calc(var(--sbb-button-height)) auto;
+  grid-template-rows: calc(2 * var(--sbb-button-height)) auto;
   background-color: lightgray;
   height: calc(97vh - var(--sbb-header-lean-height));
   gap: 4px;
@@ -20,6 +20,12 @@ element::-webkit-scrollbar {
   grid-template-columns: auto;
   grid-template-rows: calc(var(--export-schema-sidebar-height)) auto; 
   height: 100%;
+}
+
+.grid-container-graphmenu {
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto auto;
 }
 
 .grid-container > div {

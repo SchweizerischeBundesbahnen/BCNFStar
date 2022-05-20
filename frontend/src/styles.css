@@ -17,6 +17,10 @@ body {
   height: 100%;
 }
 
+.sbb-toggle-option-button {
+  border-color: var(--sbb-color-grey);
+}
+
 .d-flex {
     display: flex !important;
 }

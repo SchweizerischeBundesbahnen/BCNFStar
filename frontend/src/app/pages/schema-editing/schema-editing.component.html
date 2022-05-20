@@ -1,18 +1,33 @@
 <div class="grid-container">
-  <div>
-    <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">
-      Reset view
-    </button>
-    <button type="button" sbb-button (click)="onAutoNormalize(false)">
-      {{ "Auto-normalize all tables" }}
-    </button>
-    <app-undo-redo
-      class="undo-redo"
-      [canUndo]="commandProcessor.canUndo()"
-      [canRedo]="commandProcessor.canRedo()"
-      (undo)="onUndo()"
-      (redo)="onRedo()"
-    ></app-undo-redo>
+  <div class="grid-container-graphmenu">
+    <div>
+      <sbb-toggle (change)="setStarMode($event)">
+        <sbb-toggle-option label="Normal Mode" [value]="false">
+        </sbb-toggle-option>
+        <sbb-toggle-option label="Star Schema Mode" [value]="true">
+        </sbb-toggle-option>
+      </sbb-toggle>
+    </div>
+    <div>
+      <button
+        sbb-button
+        (click)="graph.resetView()"
+        id="reset-btn"
+        class="me-1"
+      >
+        Reset view
+      </button>
+      <button type="button" sbb-button (click)="onAutoNormalize(false)">
+        {{ "Auto-normalize all tables" }}
+      </button>
+      <app-undo-redo
+        class="undo-redo"
+        [canUndo]="commandProcessor.canUndo()"
+        [canRedo]="commandProcessor.canRedo()"
+        (undo)="onUndo()"
+        (redo)="onRedo()"
+      ></app-undo-redo>
+    </div>
   </div>
   <div>
     <app-schema-graph
@@ -21,6 +36,7 @@
       [selectedColumns]="selectedColumns"
       [schemaChanged]="schemaChanged.asObservable()"
       (joinFk)="onClickJoin($event)"
+      (makeDirectDimension)="onClickMakeDirectDimension($event)"
     ></app-schema-graph>
   </div>
 

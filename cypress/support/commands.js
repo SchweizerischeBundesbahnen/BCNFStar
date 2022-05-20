@@ -75,7 +75,7 @@ Cypress.Commands.add(
   "visitContainedSubtableTab",
   { prevSubject: false },
   () => {
-    cy.contains("Subtables").click();
+    cy.contains("Subtables").click({ force: true });
     cy.contains("Contained Subtables").click();
   }
 );
@@ -84,7 +84,7 @@ Cypress.Commands.add(
   "visitPossibleForeignKeysTab",
   { prevSubject: false },
   () => {
-    cy.contains("Foreign Keys").click();
+    cy.contains("Foreign Keys").click({ force: true });
     cy.contains("Possible Foreign Keys").click();
   }
 );
