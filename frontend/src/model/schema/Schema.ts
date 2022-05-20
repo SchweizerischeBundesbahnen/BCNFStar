@@ -11,7 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
-import FdTree from './FdTree';
+import LhsTree from './LhsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 
 export default class Schema {
@@ -318,8 +318,8 @@ export default class Schema {
   }
 
   public calculateFdsOf(table: Table): void {
-    const fds = new Map<SourceTableInstance, FdTree>();
-    table.sources.forEach((source) => fds.set(source, new FdTree()));
+    const fds = new Map<SourceTableInstance, LhsTree<FunctionalDependency>>();
+    table.sources.forEach((source) => fds.set(source, new LhsTree()));
     const columnsByInstance = table.columnsBySource();
 
     for (const source of table.sourcesTopological()) {
@@ -349,11 +349,11 @@ export default class Schema {
         if (fd.isFullyTrivial()) continue;
         const existingFd = fds.get(source)!.getEqualLhs(fd.lhs);
         if (existingFd) existingFd.rhs.union(fd.rhs);
-        else fds.get(source)!.addFd(fd);
+        else fds.get(source)!.add(fd, fd.lhs);
       }
       //extension
       const fkFds = fds.get(source)!.getSubsets(referencedColumns);
-      for (const fd of fds.get(source)!.all()) {
+      for (const fd of fds.get(source)!.getAll()) {
         const extensions = fkFds
           .filter((fkFd) => fkFd.lhs.isSubsetOf(fd.rhs))
           .map((fkFd) => fkFd.rhs);
@@ -373,7 +373,7 @@ export default class Schema {
             nextRelationship.referencing[i]
           );
 
-      for (const fd of fds.get(source)!.all()) {
+      for (const fd of fds.get(source)!.getAll()) {
         if (
           !fd.lhs
             .asArray()
@@ -401,7 +401,7 @@ export default class Schema {
         } else if (nextRelationship) {
           fd.lhs.columnSubstitution(nextRelationshipMap);
           fd.rhs.columnSubstitution(nextRelationshipMap);
-          fds.get(nextSource!)!.addFd(fd);
+          fds.get(nextSource!)!.add(fd, fd.lhs);
         }
       }
     }
