@@ -17,7 +17,7 @@ button {
 
 .grid-container-table {
   display: grid;
-  grid-template-columns: 33.33% calc(66.66% - 20px);
+  grid-template-columns: 33.33% calc(66.67% - 20px);
   gap: 10px;
   background-color: white;
 }

@@ -34,15 +34,17 @@ export class PersistSchemaComponent implements OnInit {
   }
 
   public persistSchema(): string {
-    this.schema.name = this.schemaName;
-    this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
+    this.schema.name = this.schemaName.toLowerCase();
+    this.schema.tables.forEach(
+      (table) => (table.schemaName = this.schemaName.toLowerCase())
+    );
     return this.persisting!.createSQL(this.schema);
   }
 
   async download(): Promise<void> {
     const file: File = new File(
       [this.persistSchema()],
-      this.schemaName + '.sql',
+      this.schemaName.toLowerCase() + '.sql',
       {
         type: 'text/plain;charset=utf-8',
       }
