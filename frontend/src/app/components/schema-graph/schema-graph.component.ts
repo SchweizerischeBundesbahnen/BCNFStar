@@ -40,6 +40,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Input() public schemaChanged!: Observable<void>;
   @Output() public selectedTableChange = new EventEmitter<Table>();
   @Output() public joinFk = new EventEmitter<TableRelationship>();
+  @Output() public makeDirectDimension = new EventEmitter<Table>();
 
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 

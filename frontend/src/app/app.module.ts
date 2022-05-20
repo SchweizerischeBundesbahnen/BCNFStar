@@ -36,6 +36,7 @@ import { JoinDialogComponent } from './components/join-dialog/join-dialog.compon
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
+import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { TableEditingComponent } from './components/table-editing/table-editing.component';
 import { HomeComponent } from './pages/home/home.component';
 
@@ -55,6 +56,7 @@ export let InjectorInstance: Injector;
     UndoRedoComponent,
     SplitDialogComponent,
     JoinDialogComponent,
+    DirectDimensionDialogComponent,
     MetanomeResultsViewerComponent,
     MetanomeSettingsComponent,
     CustomFunctionalDependencySideBarComponent,
