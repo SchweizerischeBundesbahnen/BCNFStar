@@ -17,6 +17,8 @@ import { FdCluster } from '@/src/model/types/FdCluster';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import IndScore from '@/src/model/schema/methodObjects/IndScore';
 import matchSchemas from '@/src/model/schema/SchemaMatching';
+import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { MatchingViewerComponent } from '../matching-viewer/matching-viewer.component';
 
 @Component({
   selector: 'app-schema-editing-side-bar',
@@ -31,6 +33,8 @@ export class SchemaEditingSideBarComponent implements OnChanges {
   @Output() public selectColumns = new EventEmitter<
     Map<Table, ColumnCombination>
   >();
+
+  constructor(private dialogRef: SbbDialog) {}
 
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
@@ -52,7 +56,12 @@ export class SchemaEditingSideBarComponent implements OnChanges {
   }
 
   public matchSchemas(schema: Schema) {
-    console.log(matchSchemas([...this.schema.tables], [...schema.tables]));
+    const matching = matchSchemas([...this.schema.tables], [...schema.tables]);
+    console.log(matching);
+    console.log(Object.keys(matching).length);
+    this.dialogRef.open(MatchingViewerComponent, {
+      data: { matching: matching },
+    });
   }
 
   public emitHighlightedInd(rel: SourceRelationship) {

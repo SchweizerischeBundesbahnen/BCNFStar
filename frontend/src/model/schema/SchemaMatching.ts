@@ -92,7 +92,7 @@ function propagate(
   for (const key in result) result[key] /= normalizationFactor;
   return result;
 }
-function filter(flooded: Record<string, number>, selectThreshold = 0.8) {
+function filter(flooded: Record<string, number>, selectThreshold = 0.99999) {
   // leftName, rightName, score
   const maxSimilarity: Record<string, number> = {};
   for (const [name, sim] of Object.entries(flooded)) {
@@ -121,9 +121,8 @@ export default function matchSchemas(
 ) {
   const graphLeft = createGraph(tablesLeft);
   const graphRight = createGraph(tablesRight);
-  // const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
-  const flooded = similarityFlood(graphLeft, graphRight, {});
-  debugger;
+  const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
+  const flooded = similarityFlood(graphLeft, graphRight, initialSimliarity);
   const filtered = filter(flooded);
   return filtered;
 }
@@ -142,9 +141,11 @@ function similarityFlood(
   initial: Record<string, number>
 ) {
   const pcg = buildPCG(graphLeft, graphRight);
+  // const newInitial = buildNewInitial(pcg)
+  // initial = newInitial;
 
   const ipg = buildIPG(pcg);
-  const threshold = 0.000_000_001;
+  const threshold = 1e-9;
   let last: Record<string, number>;
   let current: Record<string, number> = initial;
   let difference;
@@ -246,4 +247,18 @@ function levenshteinDistance(string1: string, string2: string): number {
     arr[string2.length][string1.length] /
     Math.max(string1.length, string2.length)
   );
+}
+function buildNewInitial(pcg: Graph<string>): Record<string, number> {
+  const nodes = new Set<string>();
+  const result: Record<string, number> = {};
+  for (const start in pcg) {
+    nodes.add(start);
+    for (const end in pcg[start]) nodes.add(end);
+  }
+
+  for (const node of nodes) {
+    const [left, right] = node.split(':');
+    result[node] = levenshteinDistance(left, right);
+  }
+  return result;
 }
