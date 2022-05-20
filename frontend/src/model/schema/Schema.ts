@@ -17,6 +17,7 @@ import SourceColumn from './SourceColumn';
 export default class Schema {
   public readonly tables = new Set<Table>();
   public name?: string;
+  private _intialFks = new Array<SourceRelationship>();
   private _fks = new Array<SourceRelationship>();
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
@@ -26,8 +27,8 @@ export default class Schema {
   public toJSON() {
     return {
       tables: Array.from(this.tables),
-      _fks: this.fks,
-      _inds: this.inds,
+      _fks: Array.from(this._intialFks),
+      _inds: Array.from(this._inds),
       _fds: [...this._fds.values()].flat(),
     };
   }
@@ -50,7 +51,18 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public addFk(fk: SourceRelationship) {
+  public addFks(...fks: SourceRelationship[]) {
+    this._intialFks.push(...fks);
+    this.deriveFks();
+    this.relationshipsValid = false;
+  }
+
+  private deriveFks() {
+    this._fks = new Array();
+    for (const fk of this._intialFks) this.addFkAndDerive(fk);
+  }
+
+  private addFkAndDerive(fk: SourceRelationship) {
     if (!this.basicAddFk(fk)) return;
     const referencingFks = this._fks.filter(
       (otherFk) =>
@@ -65,7 +77,6 @@ export default class Schema {
     for (const referencingFk of referencingFks) {
       for (const referencedFk of referencedFks) {
         if (referencingFk == referencedFk) continue;
-        //für jede col aus referenced finde die zugeordnete aus referencing
         const newRelReferencing = new Array();
         for (const referencedCol of referencedFk.referencing) {
           const i = referencingFk.referenced.findIndex((referencingCol) => {
@@ -85,7 +96,6 @@ export default class Schema {
           );
       }
     }
-    this.relationshipsValid = false;
   }
 
   private basicAddFk(fk: SourceRelationship): boolean {
@@ -108,7 +118,8 @@ export default class Schema {
   }
 
   public deleteFk(fk: SourceRelationship) {
-    this._fks = this._fks.filter((fk1) => fk1 != fk);
+    this._intialFks = this._intialFks.filter((fk1) => fk1 != fk);
+    this.deriveFks();
     this.relationshipsValid = false;
   }
 
@@ -131,20 +142,6 @@ export default class Schema {
   public set starMode(value: boolean) {
     this._starMode = value;
     this._tableFksValid = false;
-  }
-
-  /**
-   * Returns a copy of the foreign key relationships
-   */
-  public get fks(): Array<SourceRelationship> {
-    return new Array(...this._fks);
-  }
-
-  /**
-   * Returns a copy of the inclusion dependency relationships
-   */
-  public get inds(): Array<SourceRelationship> {
-    return new Array(...this._inds);
   }
 
   private set relationshipsValid(valid: boolean) {
@@ -349,8 +346,8 @@ export default class Schema {
    * except for the ones that are already foreign keys
    */
   private calculateIndsOf(table: Table): void {
-    const onlyInds = new Array(...this.inds).filter(
-      (ind) => !this.fks.find((fk) => fk.equals(ind))
+    const onlyInds = this._inds.filter(
+      (ind) => !this._fks.find((fk) => fk.equals(ind))
     );
 
     table._inds = this.matchSourceRelationships(table, onlyInds);
