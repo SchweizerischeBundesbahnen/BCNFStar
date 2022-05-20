@@ -1,9 +1,8 @@
-// import Column from './Column';
-// import Schema from './Schema';
-// import Table from './Table';
-
 import Column from './Column';
 import Table from './Table';
+
+const exampleGraphA = { a: { a1: 'l1', a2: 'l1' }, a1: { a2: 'l2' } };
+const exampleGraphB = { b: { b1: 'l1', b2: 'l2' }, b2: { b1: 'l2' } };
 
 type Graph<LabelType> = Record<string, Record<string, LabelType>>;
 
@@ -29,13 +28,10 @@ function columnIdentifier(table: Table, col: Column) {
  */
 function buildPCG(graphLeft: Graph<string>, graphRight: Graph<string>) {
   const pcg: Graph<string> = {};
-  for (const [startLeft, startObjLeft] of Object.entries(graphLeft)) {
-    for (const [endLeft, labelLeft] of Object.entries(startObjLeft)) {
-      // console.log('left', labelLeft, startLeft, endLeft)
-
-      for (const [startRight, startObjRight] of Object.entries(graphRight)) {
+  for (const [startLeft, startObjLeft] of Object.entries(graphLeft))
+    for (const [endLeft, labelLeft] of Object.entries(startObjLeft))
+      for (const [startRight, startObjRight] of Object.entries(graphRight))
         for (const [endRight, labelRight] of Object.entries(startObjRight)) {
-          // console.log('right', labelRight, startRight, endRight)
           if (labelRight !== labelLeft) continue;
 
           const start = `${startLeft}:${startRight}`;
@@ -43,9 +39,6 @@ function buildPCG(graphLeft: Graph<string>, graphRight: Graph<string>) {
           const startObj = init(pcg, start);
           startObj[end] = labelLeft;
         }
-      }
-    }
-  }
   return pcg;
 }
 /**
@@ -57,14 +50,13 @@ function buildIPG(pcg: Graph<string>) {
   const ipg: Graph<number> = {};
   const startCounts: Record<string, Record<string, number>> = {};
   const endCounts: Record<string, Record<string, number>> = {};
-  for (const [start, startObj] of Object.entries(pcg)) {
+  for (const [start, startObj] of Object.entries(pcg))
     for (const [end, label] of Object.entries(startObj)) {
       init(startCounts, label);
       increment(startCounts[label], start);
       init(endCounts, label);
       increment(endCounts[label], end);
     }
-  }
   for (const [start, startObj] of Object.entries(pcg)) {
     init(ipg, start);
     for (const [end, label] of Object.entries(startObj)) {
@@ -82,15 +74,22 @@ function propagate(
   last: Record<string, number>
 ): Record<string, number> {
   const result: Record<string, number> = {};
+  let normalizationFactor = 0;
   const contribution = (node: string) =>
     (last[node] || 0) + (initial[node] || 0);
+  // for testing
+  // (last[node] || 1) + (initial[node] || 1);
+  // last[node] + initial[node]
+  // last[node] || 1
   for (const start in ipg) {
     result[start] = contribution(start);
     for (const end in ipg[start]) {
-      const propagationVal = ipg[start][end];
+      const propagationVal = ipg[end][start];
       result[start] += propagationVal * contribution(end);
+      normalizationFactor = Math.max(normalizationFactor, result[start]);
     }
   }
+  for (const key in result) result[key] /= normalizationFactor;
   return result;
 }
 function filter(flooded: Record<string, number>, selectThreshold = 0.8) {
@@ -122,13 +121,21 @@ export default function matchSchemas(
 ) {
   const graphLeft = createGraph(tablesLeft);
   const graphRight = createGraph(tablesRight);
-  const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
-  const flooded = similarityFlood(graphLeft, graphRight, initialSimliarity);
+  // const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
+  const flooded = similarityFlood(graphLeft, graphRight, {});
   debugger;
   const filtered = filter(flooded);
   return filtered;
 }
 
+function matchSchemasTest() {
+  // const initial = { 'a:b': 1, 'a:b1': 1, 'a:b2': 1, 'a1:b': 1, 'a1:b1': 1, 'a1:b2': 1, 'a2:b': 1, 'a2:b1': 1, 'a2:b2': 1 }
+  const flooded = similarityFlood(exampleGraphA, exampleGraphB, {});
+  const filtered = filter(flooded);
+  return filtered;
+}
+
+// matchSchemasTest()
 function similarityFlood(
   graphLeft: Graph<string>,
   graphRight: Graph<string>,
@@ -138,18 +145,18 @@ function similarityFlood(
 
   const ipg = buildIPG(pcg);
   const threshold = 0.000_000_001;
-  let last: Record<string, number> = initial;
-  let current: Record<string, number>;
+  let last: Record<string, number>;
+  let current: Record<string, number> = initial;
   let difference;
   do {
-    current = propagate(ipg, initial, last);
     last = current;
-    // calculating change by computing the length of the residual vector
+    current = propagate(ipg, initial, last);
+    // calculating cha^nge by computing the length of the residual vector
     const residualVector = Object.keys(current).map(
-      (node) => current[node] - last[node]
+      (node) => current[node] - (last[node] || 1)
     );
     difference = Math.sqrt(
-      residualVector.reduce((prev, curr) => prev + curr * curr)
+      residualVector.reduce((prev, curr) => prev + curr * curr, 0)
     );
   } while (difference > threshold);
   return current;
