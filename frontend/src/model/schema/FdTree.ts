@@ -40,7 +40,7 @@ export default class FdTree {
     for (const column of FdTree.sortedColumns(lhs)) {
       if (!current._children.has(column))
         current._children.set(column, new FdTree());
-      current = this._children.get(column)!;
+      current = current._children.get(column)!;
     }
     return current;
   }
@@ -53,7 +53,7 @@ export default class FdTree {
     const result = [...this._children.entries()]
       .sort((val1, val2) => FdTree.compareColumns(val1[0], val2[0]))
       .map(([column, fdTree]) => {
-        if (!lhs.includes(column)) return [];
+        if (!lhs.includes(column) || lhs.cardinality === 1) return [];
         const newLhs = lhs.copy();
         newLhs.delete(column);
         return fdTree.getSubsets(newLhs);
