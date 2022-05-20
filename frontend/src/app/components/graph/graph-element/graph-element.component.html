@@ -24,8 +24,7 @@
       [sbbTooltip]="column.name"
       [ngClass]="{
         pk: table.pk && table.pk.includes(column),
-        highlighted:
-          this.selectedColumns && this.selectedColumns.includes(column)
+        highlighted: selectedColumns && selectedColumns.includes(column)
       }"
       class="ellipsis"
       data-cy="graph-element-columns"

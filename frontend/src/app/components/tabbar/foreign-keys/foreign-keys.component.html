@@ -37,11 +37,11 @@
     </button>
   </sbb-expansion-panel>
 
-  <sbb-expansion-panel [hidden]="this.table.sources.length !== 1">
+  <sbb-expansion-panel [hidden]="table.sources.length !== 1">
     <sbb-expansion-panel-header>Suggest Foreign Key</sbb-expansion-panel-header>
     <app-check-ind
-      [referencingTable]="this.table"
-      [tables]="this.schema.tables!"
+      [referencingTable]="ttable"
+      [tables]="schema.tables!"
     ></app-check-ind>
   </sbb-expansion-panel>
 </sbb-accordion>

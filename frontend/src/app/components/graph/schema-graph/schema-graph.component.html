@@ -4,7 +4,7 @@
     *ngFor="let item of graphStorage | keyvalue"
     (makeDirectDimension)="makeDirectDimension.emit($event)"
     (selectedTable)="selectedTableChange.emit($event)"
-    [selectedColumns]="this.selectedColumns?.get(item.key)"
+    [selectedColumns]="selectedColumns?.get(item.key)"
     [table]="item.key"
     [bbox]="item.value.style"
     [fact]="schema.starMode && schema.isFact(item.key)"

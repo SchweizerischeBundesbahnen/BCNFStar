@@ -62,10 +62,10 @@
       </h2>
     </ng-template>
   </sbb-expansion-panel>
-  <sbb-expansion-panel [hidden]="this.table.sources.length !== 1">
+  <sbb-expansion-panel [hidden]="table.sources.length !== 1">
     <sbb-expansion-panel-header
       >Check Contained Subtable</sbb-expansion-panel-header
     >
-    <app-check-fd [table]="this.table"></app-check-fd>
+    <app-check-fd [table]="table"></app-check-fd>
   </sbb-expansion-panel>
 </sbb-accordion>

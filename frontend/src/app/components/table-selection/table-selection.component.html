@@ -45,7 +45,7 @@
       </sbb-accordion>
     </div>
   </div>
-  <div *ngIf="hoveredTable">
+  <div *ngIf="withContentPreview && hoveredTable">
     <ng-container
       [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"
     >

@@ -6,17 +6,17 @@
   <div>
     <sbb-select
       style="width: 100%"
-      (ngModelChange)="this.onTableSelected($event)"
-      [(ngModel)]="this.referencedTable"
+      (ngModelChange)="onTableSelected($event)"
+      [(ngModel)]="referencedTable"
       placeholder="Referenced Table"
     >
-      <sbb-option *ngFor="let table of this.validTables()" [value]="table">{{
+      <sbb-option *ngFor="let table of validTables()" [value]="table">{{
         table.fullName
       }}</sbb-option>
     </sbb-select>
   </div>
-  <div *ngIf="this.referencedTable">
-    <div *ngFor="let refColumn of this.referencingColumns(); index as i">
+  <div *ngIf="referencedTable">
+    <div *ngFor="let refColumn of referencingColumns(); index as i">
       <div class="d-flex align-items-center" style="padding-top: 10px">
         <input
           disabled="true"
@@ -28,13 +28,13 @@
           disabled="true"
           style="width: 40%; margin-left: 5px; margin-right: 5px"
           sbbInput
-          [value]="this.referencedColumns()[i].sourceColumn.name"
+          [value]="referencedColumns()[i].sourceColumn.name"
         />
         <button
           sbb-icon-button
           style="width: 20%"
           type="button"
-          (click)="this.removeColumnRelation(i)"
+          (click)="removeColumnRelation(i)"
         >
           <sbb-icon svgIcon="kom:cross-small"></sbb-icon>
         </button>
@@ -43,22 +43,22 @@
     <div class="d-flex align-items-center" style="padding-top: 10px">
       <sbb-select
         style="width: 40%"
-        [(ngModel)]="this.referencingColumn"
+        [(ngModel)]="referencingColumn"
         placeholder="Referencing Column"
       >
         <sbb-option
-          *ngFor="let column of this.validReferencingColumns()"
+          *ngFor="let column of validReferencingColumns()"
           [value]="column"
           >{{ column.sourceColumn.name }}
         </sbb-option>
       </sbb-select>
       <sbb-select
         style="width: 40%; margin-left: 5px; margin-right: 5px"
-        [(ngModel)]="this.referencedColumn"
+        [(ngModel)]="referencedColumn"
         placeholder="Referenced Column"
       >
         <sbb-option
-          *ngFor="let column of this.validReferencedColumns()"
+          *ngFor="let column of validReferencedColumns()"
           [value]="column"
           >{{ column.sourceColumn.name }}
         </sbb-option>

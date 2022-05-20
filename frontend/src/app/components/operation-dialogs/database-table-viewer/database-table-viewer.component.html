@@ -1,12 +1,12 @@
 <sbb-paginator
   (page)="changePage($event)"
-  [pageIndex]="this.page"
+  [pageIndex]="page"
   [pageSize]="pageSize"
-  [length]="this.rowCount"
+  [length]="rowCount"
 >
 </sbb-paginator>
 <sbb-table-wrapper class="table-wrapper">
-  <table sbb-table [dataSource]="this._dataSource">
+  <table sbb-table [dataSource]="_dataSource">
     <sbb-text-column *ngFor="let column of tableColumns" name="{{ column }}">
     </sbb-text-column>
     <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
