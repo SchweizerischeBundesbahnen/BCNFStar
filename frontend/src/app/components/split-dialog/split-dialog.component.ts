@@ -1,4 +1,5 @@
 import Column from '@/src/model/schema/Column';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
@@ -15,9 +16,13 @@ export class SplitDialogComponent {
   public fd: FunctionalDependency;
   public table: Table;
   public schema: Schema;
+
   public pkViolation!: boolean;
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
+
+  public minimalDeterminants!: Array<ColumnCombination>;
+  public hull!: ColumnCombination;
 
   public selectedColumns = new Map<Column, Boolean>();
 
@@ -33,13 +38,15 @@ export class SplitDialogComponent {
     this.fd = data.fd.copy();
     this.table = data.table;
     this.schema = data.schema;
-    this.updateViolations();
+    this.table.columns.asArray().forEach((column) => {
+      this.selectedColumns.set(column, false);
+    });
+    this.hull = this.table.hull(this.fd.lhs);
     this.fd.rhs
-      .copy()
-      .setMinus(this.fd.lhs)
       .asArray()
       .forEach((column) => this.selectedColumns.set(column, true));
     this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
+    this.updateViolations();
   }
 
   public setColumnSelection(column: Column, value: boolean) {
@@ -49,7 +56,26 @@ export class SplitDialogComponent {
     this.updateViolations();
   }
 
+  public selectedColumnsCC() {
+    return new ColumnCombination(
+      this.table.columns
+        .asArray()
+        .filter((column) => this.selectedColumns.get(column))
+    );
+  }
+
+  public changeLhs() {
+    console.log(this.minimalDeterminants);
+  }
+
+  public isKeyNonMinimal() {
+    return !this.minimalDeterminants.some((det) => det.equals(this.fd.lhs));
+  }
+
   public updateViolations() {
+    this.minimalDeterminants = this.table.minimalDeterminantsOf(
+      this.selectedColumnsCC()
+    );
     this.pkViolation = this.schema.fdSplitPKViolationOf(this.fd, this.table);
     this.fkViolations = this.schema.fdSplitFKViolationsOf(this.fd, this.table);
     this.referenceViolations = this.schema.fdSplitReferenceViolationsOf(

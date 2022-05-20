@@ -341,6 +341,30 @@ export default class Table {
     return fd.rhs.equals(this.columns);
   }
 
+  public minimalDeterminantsOf(
+    columns: ColumnCombination
+  ): Array<ColumnCombination> {
+    const allClusters = Array.from(this.fdClusters()).sort(
+      (cluster1, cluster2) =>
+        cluster1.columns.cardinality - cluster2.columns.cardinality
+    );
+    const determinants = new Array<ColumnCombination>();
+    for (const cluster of allClusters) {
+      if (!columns.isSubsetOf(cluster.columns)) continue;
+      // if (
+      //   !Array.from(relevantClusters).some((other) =>
+      //     other.columns.isSubsetOf(cluster.columns)
+      //   )
+      // )
+      for (const fd of cluster.fds) {
+        if (!determinants.some((other) => other.isSubsetOf(fd.lhs)))
+          determinants.push(fd.lhs);
+      }
+    }
+    determinants.slice(0, 50).forEach((det) => console.log(det.toString()));
+    return determinants;
+  }
+
   public isKey(columns: ColumnCombination): boolean {
     if (this.columns.isSubsetOf(columns)) return true;
     const rhs = columns.copy();
@@ -351,6 +375,16 @@ export default class Table {
       }
     }
     return false;
+  }
+
+  public hull(columns: ColumnCombination): ColumnCombination {
+    const rhs = columns.copy();
+    for (const fd of this.fds) {
+      if (fd.lhs.isSubsetOf(columns)) {
+        rhs.union(fd.rhs);
+      }
+    }
+    return rhs;
   }
 
   public isBCNFViolating(fd: FunctionalDependency): boolean {
