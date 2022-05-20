@@ -70,7 +70,7 @@ describe("The metanome results page", () => {
       "not.contain",
       "An error ocurred while trying to delete this metanome result"
     );
-    cy.get("sbb-simple-notification").contains("Deleted entry");
+    cy.get("sbb-simple-notification").contains("Deleted all entries");
     cy.reload();
     cy.get("tr").should("have.length", 1);
     cy.get(".delete-btn").should("have.length", 0);

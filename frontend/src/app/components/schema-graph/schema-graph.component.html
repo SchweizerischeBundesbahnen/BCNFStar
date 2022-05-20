@@ -3,9 +3,15 @@
   <button sbb-button (click)="resetView()" id="reset-btn">Reset view</button>
   <app-graph-element
     *ngFor="let item of graphStorage | keyvalue"
+    (makeDirectDimension)="makeDirectDimension.emit($event)"
     (selectedTable)="selectedTableChange.emit($event)"
     [selectedColumns]="this.selectedColumns?.get(item.key)"
     [table]="item.key"
     [bbox]="item.value.style"
+    [fact]="schema.starMode && schema.isFact(item.key)"
+    [dimension]="schema.starMode && !schema.isFact(item.key)"
+    [showMakeDirectDimension]="
+      schema.starMode && schema.filteredRoutesFromFactTo(item.key).length > 0
+    "
   ></app-graph-element>
 </div>
