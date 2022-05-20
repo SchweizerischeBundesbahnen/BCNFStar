@@ -11,7 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
-import LhsTree from './LhsTree';
+import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 
 export default class Schema {
@@ -318,8 +318,11 @@ export default class Schema {
   }
 
   public calculateFdsOf(table: Table): void {
-    const fds = new Map<SourceTableInstance, LhsTree<FunctionalDependency>>();
-    table.sources.forEach((source) => fds.set(source, new LhsTree()));
+    const fds = new Map<
+      SourceTableInstance,
+      ColumnsTree<FunctionalDependency>
+    >();
+    table.sources.forEach((source) => fds.set(source, new ColumnsTree()));
     const columnsByInstance = table.columnsBySource();
 
     for (const source of table.sourcesTopological()) {
@@ -347,16 +350,14 @@ export default class Schema {
           new ColumnCombination(rhs)
         );
         if (fd.isFullyTrivial()) continue;
-        const existingFd = fds.get(source)!.getEqualLhs(fd.lhs);
+        const existingFd = fds.get(source)!.get(fd.lhs);
         if (existingFd) existingFd.rhs.union(fd.rhs);
         else fds.get(source)!.add(fd, fd.lhs);
       }
       //extension
-      const fkFds = fds.get(source)!.getSubsets(referencedColumns);
+      const fkFds = fds.get(source)!.getSubtree(referencedColumns);
       for (const fd of fds.get(source)!.getAll()) {
-        const extensions = fkFds
-          .filter((fkFd) => fkFd.lhs.isSubsetOf(fd.rhs))
-          .map((fkFd) => fkFd.rhs);
+        const extensions = fkFds.getSubsets(fd.rhs).map((fkFd) => fkFd.rhs);
         extensions.forEach((extension) => fd.rhs.union(extension));
       }
 

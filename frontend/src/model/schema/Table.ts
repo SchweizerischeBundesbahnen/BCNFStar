@@ -10,6 +10,7 @@ import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import SourceRelationship from './SourceRelationship';
 import { FdCluster } from '../types/FdCluster';
+import ColumnsTree from './ColumnsTree';
 
 export default class Table {
   public name = '';
@@ -385,22 +386,26 @@ export default class Table {
 
   public fdClusters(): Array<FdCluster> {
     if (!this._fdClusters) {
-      this._fdClusters = new Array<FdCluster>();
+      const fdClusters = new ColumnsTree<FdCluster>();
       if (this.pk)
-        this._fdClusters.push({
-          columns: this.columns.copy(),
-          fds: new Array(
-            new FunctionalDependency(this.pk!.copy(), this.columns.copy())
-          ),
-        });
+        fdClusters.add(
+          {
+            columns: this.columns.copy(),
+            fds: new Array(
+              new FunctionalDependency(this.pk!.copy(), this.columns.copy())
+            ),
+          },
+          this.columns.copy()
+        );
       for (let fd of this.violatingFds()) {
-        let cluster = this._fdClusters.find((c) => c.columns.equals(fd.rhs));
+        let cluster = fdClusters.get(fd.rhs);
         if (!cluster) {
           cluster = { columns: fd.rhs.copy(), fds: new Array() };
-          this._fdClusters.push(cluster);
+          fdClusters.add(cluster, cluster.columns);
         }
         cluster.fds.push(fd);
       }
+      this._fdClusters = fdClusters.getAll();
     }
     return this._fdClusters;
   }

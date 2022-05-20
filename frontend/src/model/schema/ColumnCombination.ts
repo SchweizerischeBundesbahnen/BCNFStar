@@ -116,16 +116,8 @@ export default class ColumnCombination {
     return this;
   }
 
-  public isSubsetOf(other: ColumnCombination) {
-    if (this._columns.length == 0) return true;
-    let index = 0;
-    const otherArr = other.asArray();
-    for (let otherIndex = 0; otherIndex < otherArr.length; otherIndex++)
-      if (otherArr[otherIndex].equals(this._columns[index])) {
-        index++;
-        if (index == this._columns.length) return true;
-      }
-    return false;
+  public isSubsetOf(other: ColumnCombination): boolean {
+    return this.asArray().every((col) => other.includes(col));
   }
 
   public columnNames(): Array<string> {
