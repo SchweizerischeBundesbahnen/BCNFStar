@@ -6,7 +6,7 @@
   </div>
   <div
     *ngFor="let column of table.columns"
-    class="row justify-content-between table-body"
+    class="grid-container-column table-body"
   >
     <div
       [sbbTooltip]="column.name"
@@ -15,20 +15,20 @@
         highlighted:
           this.selectedColumns && this.selectedColumns.includes(column)
       }"
-      class="col-7 ellipsis"
+      class="ellipsis"
       data-cy="graph-element-columns"
     >
       {{ column.name }}
     </div>
     <div
       [sbbTooltip]="column.dataTypeString()"
-      class="col-5 text-end ellipsis"
+      class="text-end ellipsis"
       data-cy="graph-element-column-datatype"
     >
       {{ column.dataTypeString() }}
     </div>
   </div>
-  <div class="row">
+  <div class="grid-container-silder">
     <sbb-icon
       class="text-end"
       svgIcon="kom:arrows-left-right-down-up-medium"

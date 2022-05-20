@@ -3,7 +3,7 @@
   id="table-name"
   *ngIf="!isEditingTableName; else editing"
 >
-  <div class="item">{{ table.fullName }}</div>
+  <div class="item" [sbbTooltip]="table.fullName">{{ table.fullName }}</div>
   <sbb-icon
     id="table-edit-icon"
     svgIcon="kom:pen-small"
@@ -54,18 +54,13 @@
 <ng-template #editing>
   <div class="grid-container-table-heading">
     <input
-      class="col-10"
       id="rename-table-input"
       type="text"
       sbbInput
       [(ngModel)]="tableNameEditString"
       (keyup.enter)="changeTableName()"
     />
-    <sbb-icon
-      class="col-2"
-      svgIcon="kom:tick-medium"
-      (click)="changeTableName()"
-    ></sbb-icon>
+    <sbb-icon svgIcon="kom:tick-medium" (click)="changeTableName()"></sbb-icon>
   </div>
 </ng-template>
 
