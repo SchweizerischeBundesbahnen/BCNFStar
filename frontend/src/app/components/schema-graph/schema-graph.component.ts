@@ -250,7 +250,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
           line: {
             sourceMarker: {
               type: 'path',
-              d: 'M 20 -10 0 0 20 10 Z',
+              d: 'M 10 -5 0 0 10 5 Z',
             },
             targetMarker: {
               type: 'none',
