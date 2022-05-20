@@ -486,18 +486,22 @@ describe("The metanome settings dialog", () => {
     cy.get(
       '.table-head-title:contains("public.nation_region_denormalized")'
     ).click();
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     );
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
     );
     cy.get(
-      '.table-head-title:contains("public.part_partsupp_supplier_denormalized ")'
+      '.table-head-title:contains("public.part_partsupp_supplier_denormalized")'
     ).click({ force: true });
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     ).should("not.exist");
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
     );
@@ -512,18 +516,22 @@ describe("The metanome settings dialog", () => {
     cy.get(
       '.table-head-title:contains("public.nation_region_denormalized")'
     ).click();
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     );
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
     );
     cy.get(
-      '.table-head-title:contains("public.part_partsupp_supplier_denormalized ")'
+      '.table-head-title:contains("public.part_partsupp_supplier_denormalized")'
     ).click({ force: true });
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     ).should("not.exist");
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
     ).should("not.exist");
