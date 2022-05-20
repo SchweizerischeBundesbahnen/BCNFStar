@@ -115,7 +115,7 @@ describe("The table selection page", () => {
     cy.get('input[type="file"]').attachFile("savedExampleSchema.zip");
     cy.get(".sbb-button").eq(0).should("contain", "Load").click();
     cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
-    cy.get("input").eq(1).type("savedExampleSchema");
+    cy.get("input").eq(3).type("savedExampleSchema");
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
     cy.readFile("cypress/downloads/savedExampleSchema.zip").then((result) => {

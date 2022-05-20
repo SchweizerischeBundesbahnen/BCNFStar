@@ -21,6 +21,7 @@ describe("The schema editing side bar", () => {
   });
 
   it("displays the 'auto normalize this table' button", () => {
+    cy.visitContainedSubtableTab();
     cy.get("button").contains("Auto-normalize this table");
   });
 
