@@ -1,8 +1,16 @@
 <div class="container-fluid ml-2 mr-2">
   <div class="row">
-    <div class="col-4">
+    <div [ngClass]="{ 'col-4': withContentPreview }">
       <div class="sbb-checkbox-group-vertical">
-        <sbb-accordion multi="true">
+        <sbb-accordion expanded="true" class="mt-3">
+          <sbb-expansion-panel>
+            <sbb-expansion-panel-header
+              >Load saved schema</sbb-expansion-panel-header
+            >
+            <app-load-saved-schema></app-load-saved-schema>
+          </sbb-expansion-panel>
+        </sbb-accordion>
+        <sbb-accordion expanded="false" multi="true" class="mt-2">
           <sbb-expansion-panel *ngFor="let item of tablesInSchema | keyvalue">
             <!-- item.key = schema name, item.value = list of associated table objects -->
             <sbb-expansion-panel-header>{{
@@ -27,19 +35,18 @@
               {{ table.name }}
             </sbb-checkbox>
           </sbb-expansion-panel>
+          <button
+            type="button"
+            sbb-button
+            [disabled]="!hasSelectedTables()"
+            (click)="selectTables()"
+          >
+            Go
+          </button>
         </sbb-accordion>
       </div>
-
-      <button
-        type="button"
-        sbb-button
-        [disabled]="!hasSelectedTables()"
-        (click)="selectTables()"
-      >
-        Go
-      </button>
     </div>
-    <div class="col-8" *ngIf="hoveredTable">
+    <div class="col-8" *ngIf="withContentPreview && hoveredTable">
       <ng-container
         [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"
       >
@@ -67,7 +74,7 @@
         <div class="row">
           <sbb-paginator
             (page)="changePage($event)"
-            [pageIndex]="this.page"
+            [pageIndex]="page"
             [pageSize]="pageLimit"
             [length]="tableRowCounts.get(hoveredTable)"
             class="col"
@@ -75,14 +82,14 @@
           </sbb-paginator>
           <ng-container *ngSwitchCase="1">
             <div class="col text-aling-right">
-              {{ this.pageLimit * this.page + 1 }} -
-              {{ this.pageLimit * this.page + this.dataSource.data.length }} /
+              {{ pageLimit * page + 1 }} -
+              {{ pageLimit * page + dataSource.data.length }} /
               {{ tableRowCounts.get(hoveredTable) }}
             </div>
           </ng-container>
           <ng-container *ngSwitchDefault>
             <div class="col text-aling-right">
-              {{ this.pageLimit * this.page }} /
+              {{ pageLimit * page }} /
               {{ tableRowCounts.get(hoveredTable) }}
             </div>
           </ng-container>

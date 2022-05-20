@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TableSelectionComponent } from './pages/table-selection/table-selection.component';
+import { TableSelectionComponent } from './components/table-selection/table-selection.component';
 import { SchemaEditingComponent } from './pages/schema-editing/schema-editing.component';
 import { SchemaEditingSideBarComponent } from './components/schema-editing-side-bar/schema-editing-side-bar.component';
 import { SbbIconModule } from '@sbb-esta/angular/icon';
@@ -37,7 +37,11 @@ import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.comp
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 import { TableEditingComponent } from './components/table-editing/table-editing.component';
+import { HomeComponent } from './pages/home/home.component';
 
+import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
+import { LoadSavedSchemaComponent } from './components/load-saved-schema/load-saved-schema.component';
+import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -58,7 +62,10 @@ export let InjectorInstance: Injector;
     CheckIndComponent,
     ViolatingRowsViewIndsComponent,
     DatabaseTableViewerComponent,
+    SaveSchemaEditingComponent,
+    LoadSavedSchemaComponent,
     TableEditingComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
@@ -78,6 +85,7 @@ export let InjectorInstance: Injector;
     SbbTableModule,
     SbbFormFieldModule,
     SbbToggleModule,
+    SbbFileSelectorModule,
     SbbTabsModule,
     FormsModule,
     ReactiveFormsModule,

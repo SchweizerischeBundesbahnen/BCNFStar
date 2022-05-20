@@ -23,6 +23,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+import "cypress-file-upload";
 
 Cypress.Commands.add("visitFrontend", { prevSubject: false }, (options) => {
   let finalOptions;
@@ -97,4 +98,15 @@ Cypress.Commands.add("createSchema", (schemaName) => {
   cy.readFile(`./cypress/downloads/${schemaName}.sql`).then((SQL) =>
     cy.executeSql(SQL)
   );
+});
+
+Cypress.Commands.add("deleteAllMetanomeResults", () => {
+  cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
+  cy.get("table").then((table) => {
+    if (table.find("tr").length > 1) {
+      cy.get(".delete-all-btn").click();
+      cy.get("sbb-simple-notification").contains("Deleted all entries");
+    }
+  });
+  cy.reload();
 });
