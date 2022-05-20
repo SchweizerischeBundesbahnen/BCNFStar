@@ -1,6 +1,6 @@
 <div class="container-fluid ml-2 mr-2">
   <div class="row">
-    <div class="col-4">
+    <div [ngClass]="{ 'col-4': withContentPreview }">
       <div class="sbb-checkbox-group-vertical">
         <sbb-accordion expanded="true" class="mt-3">
           <sbb-expansion-panel>
@@ -46,7 +46,7 @@
         </sbb-accordion>
       </div>
     </div>
-    <div class="col-8" *ngIf="hoveredTable">
+    <div class="col-8" *ngIf="withContentPreview && hoveredTable">
       <ng-container
         [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"
       >

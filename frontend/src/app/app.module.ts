@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TableSelectionComponent } from './pages/table-selection/table-selection.component';
+import { TableSelectionComponent } from './components/table-selection/table-selection.component';
 import { SchemaEditingComponent } from './pages/schema-editing/schema-editing.component';
 import { SchemaEditingSideBarComponent } from './components/schema-editing-side-bar/schema-editing-side-bar.component';
 import { SbbIconModule } from '@sbb-esta/angular/icon';
@@ -38,6 +38,8 @@ import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { TableEditingComponent } from './components/table-editing/table-editing.component';
+import { HomeComponent } from './pages/home/home.component';
+
 import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
 import { LoadSavedSchemaComponent } from './components/load-saved-schema/load-saved-schema.component';
 import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
@@ -65,6 +67,7 @@ export let InjectorInstance: Injector;
     SaveSchemaEditingComponent,
     LoadSavedSchemaComponent,
     TableEditingComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,

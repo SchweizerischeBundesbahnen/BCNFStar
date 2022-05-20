@@ -82,3 +82,14 @@ Cypress.Commands.add("createSchema", (schemaName) => {
     cy.executeSql(SQL)
   );
 });
+
+Cypress.Commands.add("deleteAllMetanomeResults", () => {
+  cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
+  cy.get("table").then((table) => {
+    if (table.find("tr").length > 1) {
+      cy.get(".delete-all-btn").click();
+      cy.get("sbb-simple-notification").contains("Deleted all entries");
+    }
+  });
+  cy.reload();
+});
