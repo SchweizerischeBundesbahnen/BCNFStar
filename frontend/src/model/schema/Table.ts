@@ -40,6 +40,17 @@ export default class Table {
    */
   public _indsValid = false;
 
+  public toJSON() {
+    return {
+      name: this.name,
+      schemaName: this.schemaName,
+      columns: this.columns,
+      pk: this.pk,
+      relationships: this.relationships,
+      sources: this.sources,
+    };
+  }
+
   public constructor(columns?: ColumnCombination) {
     this.columns = columns || new ColumnCombination();
   }

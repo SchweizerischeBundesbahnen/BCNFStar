@@ -26,12 +26,15 @@ export class MetanomeResultsViewerComponent {
 
   public async reload() {
     this.isLoading = true;
-    this.tableData = (
-      await firstValueFrom(this.http.get<IIndexFileEntry[]>(this.url))
-    ).sort(function (a: IIndexFileEntry, b: IIndexFileEntry) {
-      return a.createDate >= b.createDate ? -1 : 1;
-    });
-    this.isLoading = false;
+    try {
+      this.tableData = (
+        await firstValueFrom(this.http.get<IIndexFileEntry[]>(this.url))
+      ).sort(function (a: IIndexFileEntry, b: IIndexFileEntry) {
+        return a.createDate >= b.createDate ? -1 : 1;
+      });
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   async deleteAllEntries() {

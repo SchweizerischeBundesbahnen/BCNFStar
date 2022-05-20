@@ -69,6 +69,15 @@ export class SchemaCreationService {
           table,
           this.getMetanomeResult<Array<IFunctionalDependency>>(file)
         );
+      // if there are no fds, add one that maps from empty to every column (like with empty tables)
+      // to make the schema model work
+      else
+        fds.push(
+          new SourceFunctionalDependency(
+            [],
+            table.columns.asArray().map((c) => c.sourceColumn)
+          )
+        );
     for (const [table, promise] of fdPromises.entries()) {
       const iFds = await promise;
       for (const iFd of iFds) {
@@ -172,7 +181,7 @@ export class SchemaCreationService {
     const pkPromise = this.getPrimaryKeys(tables);
     if (indFile) {
       const indPromise = this.getInds(indFile, sourceColumns);
-      schema.addInd(...(await indPromise));
+      schema.addInds(...(await indPromise));
     }
 
     schema.addFk(...(await fkPromise));
@@ -180,10 +189,7 @@ export class SchemaCreationService {
     for (const fd of await fdPromise) schema.addFd(fd);
     for (const [table, pk] of (await pkPromise).entries()) table.pk = pk;
 
-    for (const table of schema.tables) {
-      schema.clearFdsFor(table.sources[0].table);
-      schema.calculateFdsOf(table);
-    }
+    for (const table of schema.tables) schema.calculateFdsOf(table);
     return schema;
   }
 }

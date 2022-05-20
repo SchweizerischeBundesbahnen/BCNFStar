@@ -3,6 +3,23 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
+.extra-button {
+  position: absolute;
+  left: 10px;
+  top: -5px;
+  pointer-events: auto !important;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+  background-color: green;
+  font-weight: bold;
+  color: white;
+}
+
 .container {
   position: absolute;
   /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
@@ -10,6 +27,14 @@
   -webkit-user-select: none;
   box-sizing: border-box;
   z-index: 2;
+}
+
+.fact {
+  color: red
+}
+
+.dimension {
+  color: green
 }
 
 .pk {

@@ -19,7 +19,10 @@ import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersis
 import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import { DirectDimensionDialogComponent } from '../../components/direct-dimension-dialog/direct-dimension-dialog.component';
+import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
 
 @Component({
   selector: 'app-schema-editing',
@@ -153,6 +156,43 @@ export class SchemaEditingComponent implements OnInit {
       self.selectedTable = previousSelectedTable;
     };
     this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public setStarMode(radioChange: SbbRadioChange) {
+    this.schema.starMode = radioChange.value;
+    this.schemaChanged.next();
+  }
+
+  public onClickMakeDirectDimension(table: Table): void {
+    const routes = this.schema.filteredRoutesFromFactTo(table);
+    if (routes.length == 1) {
+      this.onMakeDirectDimensions(routes);
+    } else {
+      const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
+        data: { table: table, schema: this.schema },
+      });
+      dialogRef
+        .afterClosed()
+        .subscribe((value: { routes: Array<Array<TableRelationship>> }) => {
+          if (value) this.onMakeDirectDimensions(value.routes);
+        });
+    }
+  }
+
+  public onMakeDirectDimensions(routes: Array<Array<TableRelationship>>) {
+    for (const i in routes) {
+      const route = routes[i];
+      let command = new DirectDimensionCommand(this.schema, route);
+      command.onDo = () =>
+        (this.selectedTable = route[route.length - 1].referenced);
+      command.onUndo = () =>
+        (this.selectedTable = route[route.length - 1].referenced);
+      this.commandProcessor.do(command);
+      if (+i < routes.length - 1) {
+        routes[+i + 1][0].referencing = command.newTable!;
+      }
+    }
     this.schemaChanged.next();
   }
 

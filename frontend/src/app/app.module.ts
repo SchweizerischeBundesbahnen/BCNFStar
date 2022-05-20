@@ -36,9 +36,13 @@ import { JoinDialogComponent } from './components/join-dialog/join-dialog.compon
 import { CheckIndComponent } from '@/src/app/components/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
+import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { TableEditingComponent } from './components/table-editing/table-editing.component';
 import { HomeComponent } from './pages/home/home.component';
 
+import { SaveSchemaEditingComponent } from './components/save-schema-editing/save-schema-editing.component';
+import { LoadSavedSchemaComponent } from './components/load-saved-schema/load-saved-schema.component';
+import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -52,6 +56,7 @@ export let InjectorInstance: Injector;
     UndoRedoComponent,
     SplitDialogComponent,
     JoinDialogComponent,
+    DirectDimensionDialogComponent,
     MetanomeResultsViewerComponent,
     MetanomeSettingsComponent,
     CustomFunctionalDependencySideBarComponent,
@@ -59,6 +64,8 @@ export let InjectorInstance: Injector;
     CheckIndComponent,
     ViolatingRowsViewIndsComponent,
     DatabaseTableViewerComponent,
+    SaveSchemaEditingComponent,
+    LoadSavedSchemaComponent,
     TableEditingComponent,
     HomeComponent,
   ],
@@ -80,6 +87,7 @@ export let InjectorInstance: Injector;
     SbbTableModule,
     SbbFormFieldModule,
     SbbToggleModule,
+    SbbFileSelectorModule,
     SbbTabsModule,
     FormsModule,
     ReactiveFormsModule,
