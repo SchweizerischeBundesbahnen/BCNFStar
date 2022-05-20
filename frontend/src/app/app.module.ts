@@ -36,13 +36,16 @@ import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/
 import { CheckIndComponent } from '@/src/app/components/check-dependencies/check-ind/check-ind.component';
 import { ViolatingRowsViewIndsComponent } from './components/operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/operation-dialogs/database-table-viewer/database-table-viewer.component';
-import { TableEditingComponent } from './components/table-editing/table-editing.component';
+import { TableEditingComponent } from './components/tabbar/table-editing/table-editing.component';
 import { HomeComponent } from './pages/home/home.component';
 
 import { SaveSchemaEditingComponent } from './components/export/save-schema-editing/save-schema-editing.component';
 import { LoadSavedSchemaComponent } from './components/export/load-saved-schema/load-saved-schema.component';
 import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
 import { PersistSchemaComponent } from './components/export/persist-schema/persist-schema.component';
+import { KeysComponent } from './components/tabbar/keys/keys.component';
+import { ContainedSubtablesComponent } from './components/tabbar/contained-subtables/contained-subtables.component';
+import { ForeignKeysComponent } from './components/tabbar/foreign-keys/foreign-keys.component';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -68,6 +71,9 @@ export let InjectorInstance: Injector;
     TableEditingComponent,
     HomeComponent,
     PersistSchemaComponent,
+    KeysComponent,
+    ContainedSubtablesComponent,
+    ForeignKeysComponent,
   ],
   imports: [
     BrowserModule,

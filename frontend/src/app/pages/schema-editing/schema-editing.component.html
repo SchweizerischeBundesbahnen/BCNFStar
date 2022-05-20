@@ -15,8 +15,6 @@
     ></app-undo-redo>
   </div>
   <div>
-    <!-- [selectedTable]="this.selectedTable"
-    (selected)="onSelect($event)" -->
     <app-schema-graph
       [schema]="schema"
       [(selectedTable)]="selectedTable"
@@ -44,6 +42,7 @@
         [schema]="schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
+        (selectColumns)="onSelectColumns($event)"
         (autoNormalizeSelectedTable)="onAutoNormalize()"
       ></app-schema-editing-side-bar>
     </div>

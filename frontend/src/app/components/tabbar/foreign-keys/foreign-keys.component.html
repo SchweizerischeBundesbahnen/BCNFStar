@@ -1,0 +1,47 @@
+<sbb-accordion>
+  <sbb-expansion-panel>
+    <sbb-expansion-panel-header
+      >Possible Foreign Keys</sbb-expansion-panel-header
+    >
+    <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
+      <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
+        table.fullName
+      }}</sbb-option>
+    </sbb-select>
+    <br />
+    <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">
+      <!-- (mouseleave)="selectColumns.emit(new Map())" -->
+      <sbb-radio-button
+        (mouseenter)="emitHighlightedInd(rel)"
+        (mouseleave)="selectColumns.emit()"
+        *ngFor="let rel of inds()"
+        [value]="rel"
+        style="display: block"
+        >{{ rel.toString() }}</sbb-radio-button
+      >
+    </sbb-radio-group>
+    <ng-template #noInds>
+      <h2>
+        No possible foreign keys were found with the current filter for this
+        table
+      </h2>
+    </ng-template>
+    <br />
+    <button
+      type="button"
+      sbb-button
+      [disabled]="!selectedInd()"
+      (click)="transformIndToFk()"
+    >
+      Create Foreign Key
+    </button>
+  </sbb-expansion-panel>
+
+  <sbb-expansion-panel [hidden]="this.table.sources.length !== 1">
+    <sbb-expansion-panel-header>Suggest Foreign Key</sbb-expansion-panel-header>
+    <app-check-ind
+      [referencingTable]="this.table"
+      [tables]="this.schema.tables!"
+    ></app-check-ind>
+  </sbb-expansion-panel>
+</sbb-accordion>
