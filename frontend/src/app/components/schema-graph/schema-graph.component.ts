@@ -247,6 +247,17 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
           },
           z: -1,
         });
+        link.attr({
+          line: {
+            sourceMarker: {
+              type: 'path',
+              d: 'M 10 -5 0 0 10 5 Z',
+            },
+            targetMarker: {
+              type: 'none',
+            },
+          },
+        });
         this.graphStorage.get(table)?.links.set(fk.referenced, link);
         this.graph.addCell(link);
         this.addJoinButton(link, fk);
