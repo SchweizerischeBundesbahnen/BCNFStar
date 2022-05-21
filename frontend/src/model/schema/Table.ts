@@ -384,11 +384,15 @@ export default class Table {
     return this._violatingFds;
   }
 
+  /**
+   * @returns FdClusters, which group functional dependencies that have the same right hand side
+   * Used in UI to make functional dependencies easier to discover
+   */
   public fdClusters(): Array<FdCluster> {
     if (!this._fdClusters) {
-      const fdClusters = new ColumnsTree<FdCluster>();
+      const fdClusterTree = new ColumnsTree<FdCluster>();
       if (this.pk)
-        fdClusters.add(
+        fdClusterTree.add(
           {
             columns: this.columns.copy(),
             fds: new Array(
@@ -398,14 +402,14 @@ export default class Table {
           this.columns.copy()
         );
       for (let fd of this.violatingFds()) {
-        let cluster = fdClusters.get(fd.rhs);
+        let cluster = fdClusterTree.get(fd.rhs);
         if (!cluster) {
           cluster = { columns: fd.rhs.copy(), fds: new Array() };
-          fdClusters.add(cluster, cluster.columns);
+          fdClusterTree.add(cluster, cluster.columns);
         }
         cluster.fds.push(fd);
       }
-      this._fdClusters = fdClusters.getAll();
+      this._fdClusters = fdClusterTree.getAll();
     }
     return this._fdClusters;
   }
