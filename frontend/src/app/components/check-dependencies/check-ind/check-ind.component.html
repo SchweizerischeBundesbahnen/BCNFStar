@@ -5,7 +5,6 @@
   </h3>
   <div>
     <sbb-select
-      style="width: 100%"
       (ngModelChange)="onTableSelected($event)"
       [(ngModel)]="referencedTable"
       placeholder="Referenced Table"
@@ -42,7 +41,6 @@
     </div>
     <div class="d-flex align-items-center" style="padding-top: 10px">
       <sbb-select
-        style="width: 40%"
         [(ngModel)]="referencingColumn"
         placeholder="Referencing Column"
       >
@@ -53,7 +51,6 @@
         </sbb-option>
       </sbb-select>
       <sbb-select
-        style="width: 40%; margin-left: 5px; margin-right: 5px"
         [(ngModel)]="referencedColumn"
         placeholder="Referenced Column"
       >
