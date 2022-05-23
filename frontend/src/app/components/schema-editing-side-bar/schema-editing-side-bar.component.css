@@ -15,8 +15,9 @@
     color: grey;
 }
 
-h2 {
+h1 {
     text-align: center;
+    font-weight: bold;
 }
 
 sbb-select {

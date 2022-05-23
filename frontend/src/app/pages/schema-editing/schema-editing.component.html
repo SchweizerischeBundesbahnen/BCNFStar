@@ -1,33 +1,24 @@
 <div class="grid-container">
   <div class="grid-container-graphmenu">
-    <div>
-      <sbb-toggle (change)="setStarMode($event)">
-        <sbb-toggle-option label="Normal Mode" [value]="false">
-        </sbb-toggle-option>
-        <sbb-toggle-option label="Star Schema Mode" [value]="true">
-        </sbb-toggle-option>
-      </sbb-toggle>
-    </div>
-    <div>
-      <button
-        sbb-button
-        (click)="graph.resetView()"
-        id="reset-btn"
-        class="me-1"
-      >
-        Reset view
-      </button>
-      <button type="button" sbb-button (click)="onAutoNormalize(false)">
-        {{ "Auto-normalize all tables" }}
-      </button>
-      <app-undo-redo
-        class="undo-redo"
-        [canUndo]="commandProcessor.canUndo()"
-        [canRedo]="commandProcessor.canRedo()"
-        (undo)="onUndo()"
-        (redo)="onRedo()"
-      ></app-undo-redo>
-    </div>
+    <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">
+      Reset view
+    </button>
+    <button type="button" sbb-button (click)="onAutoNormalize(false)">
+      {{ "Auto-normalize all tables" }}
+    </button>
+    <sbb-toggle (change)="setStarMode($event)" style="white-space: nowrap">
+      <sbb-toggle-option label="Normal Mode" [value]="false">
+      </sbb-toggle-option>
+      <sbb-toggle-option label="Star Schema Mode" [value]="true">
+      </sbb-toggle-option>
+    </sbb-toggle>
+    <app-undo-redo
+      class="undo-redo"
+      [canUndo]="commandProcessor.canUndo()"
+      [canRedo]="commandProcessor.canRedo()"
+      (undo)="onUndo()"
+      (redo)="onRedo()"
+    ></app-undo-redo>
   </div>
   <div>
     <app-schema-graph
@@ -43,7 +34,7 @@
   <div class="item-sidebar">
     <div class="grid-container-sidebar">
       <div>
-        <h2>Schemaexport</h2>
+        <h2>Schema export</h2>
         <div class="mb-1">
           <app-persist-schema [schema]="schema"></app-persist-schema>
         </div>
@@ -61,6 +52,9 @@
         (selectColumns)="onSelectColumns($event)"
         (autoNormalizeSelectedTable)="onAutoNormalize()"
       ></app-schema-editing-side-bar>
+      <h2 *ngIf="!selectedTable" style="align-self: center">
+        Select a table in the graph to start editing
+      </h2>
     </div>
   </div>
 </div>
