@@ -355,7 +355,7 @@ export default class Schema {
         else fds.get(source)!.add(fd, fd.lhs);
       }
       //extension
-      const fkFds = fds.get(source)!.getSubtree(referencedColumns);
+      const fkFds = fds.get(source)!.getSubtree(referencingColumns);
       for (const fd of fds.get(source)!.getAll()) {
         const extensions = fkFds.getSubsets(fd.rhs).map((fkFd) => fkFd.rhs);
         extensions.forEach((extension) => fd.rhs.union(extension));
