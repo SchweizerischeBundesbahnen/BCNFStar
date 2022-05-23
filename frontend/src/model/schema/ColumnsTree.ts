@@ -53,6 +53,13 @@ export default class ColumnsTree<T> {
     this.traverse(columns)._content = content;
   }
 
+  /**
+   * @returns the value stored at `columns`, or undefined if nothing is there
+   */
+  public get(columns: ColumnCombination): T | undefined {
+    return this.traverse(columns)._content;
+  }
+
   private traverse(lhs: ColumnCombination) {
     let current: ColumnsTree<T> = this;
     for (const column of ColumnsTree.sortedColumns(lhs)) {
@@ -63,19 +70,17 @@ export default class ColumnsTree<T> {
     return current;
   }
 
-  /**
-   * @returns the value stored at `columns`, or undefined if nothing is there
-   */
-  public get(columns: ColumnCombination): T | undefined {
-    return this.traverse(columns)._content;
+  private sortedEntries() {
+    return [...this._children.entries()].sort((val1, val2) =>
+      ColumnsTree.compareColumns(val1[0], val2[0])
+    );
   }
 
   /**
    * @returns all values stored in the tree for a subset of the given `columns`
    */
   public getSubsets(columns: ColumnCombination): Array<T> {
-    const result = [...this._children.entries()]
-      .sort((val1, val2) => ColumnsTree.compareColumns(val1[0], val2[0]))
+    const result = this.sortedEntries()
       .map(([column, LhsTree]) => {
         if (!columns.includes(column) || columns.cardinality === 0) return [];
         const newLhs = columns.copy();
@@ -93,7 +98,7 @@ export default class ColumnsTree<T> {
   getSubtree(columns: ColumnCombination): ColumnsTree<T> {
     const newTree = new ColumnsTree<T>();
     newTree._content = this._content;
-    for (const [column, subtree] of this._children.entries()) {
+    for (const [column, subtree] of this.sortedEntries()) {
       if (columns.includes(column)) {
         const newColums = columns.copy();
         newColums.delete(column);
@@ -105,8 +110,8 @@ export default class ColumnsTree<T> {
 
   /** returns all values stored in this tree */
   public getAll(): Array<T> {
-    const result: Array<T> = [...this._children.values()]
-      .map((columnsTree) => columnsTree.getAll())
+    const result: Array<T> = this.sortedEntries()
+      .map(([, columnsTree]) => columnsTree.getAll())
       .flat();
     if (this._content) result.push(this._content);
     return result;
