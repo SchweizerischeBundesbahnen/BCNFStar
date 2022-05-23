@@ -1,9 +1,13 @@
 <sbb-accordion>
-  <sbb-expansion-panel>
+  <sbb-expansion-panel [expanded]="true">
     <sbb-expansion-panel-header
       >Possible Foreign Keys</sbb-expansion-panel-header
     >
     <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
+      <app-sbb-option-all
+        [(current)]="indFilter"
+        [available]="tablesAsArray()"
+      ></app-sbb-option-all>
       <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
         table.fullName
       }}</sbb-option>

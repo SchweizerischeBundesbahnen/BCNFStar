@@ -1,6 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.css";
 
+
+.sbb-select{
+  width: 100%;
+}
+
 body {
     padding-left: 20px;
     padding-right: 20px;

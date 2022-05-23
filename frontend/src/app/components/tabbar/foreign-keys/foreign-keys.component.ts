@@ -59,6 +59,10 @@ export class ForeignKeysComponent implements OnChanges {
     this.selectColumns.emit(map);
   }
 
+  public tablesAsArray() {
+    return [...this.schema.tables];
+  }
+
   public inds(): Array<SourceRelationship> {
     const inds = this.schema.indsOf(this.table);
 
