@@ -26,7 +26,7 @@ describe("The schema editing side bar", () => {
   });
 
   it("displays the table name", () => {
-    cy.get("h2").contains("public.nation_region_denormalized");
+    cy.get("h1").contains("public.nation_region_denormalized");
   });
 
   it("displays keys", () => {

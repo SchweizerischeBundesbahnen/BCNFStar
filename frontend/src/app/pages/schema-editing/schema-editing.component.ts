@@ -135,11 +135,12 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onAutoNormalize(tableSelected: boolean = true): void {
-    let tables = tableSelected
-      ? new Array(this.selectedTable!)
-      : new Array(...this.schema.tables);
-    let command = new AutoNormalizeCommand(this.schema, ...tables);
+  public onAutoNormalize(selectedTables: Set<Table> | Table): void {
+    const tablesToNormalize =
+      selectedTables.constructor.name == 'Set'
+        ? Array.from(selectedTables as Set<Table>)
+        : [selectedTables as Table];
+    let command = new AutoNormalizeCommand(this.schema, ...tablesToNormalize);
     let self = this;
     let previousSelectedTable = this.selectedTable;
     command.onDo = function () {

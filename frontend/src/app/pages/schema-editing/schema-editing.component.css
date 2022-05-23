@@ -51,6 +51,18 @@ h2 {
   display: block;
 }
 
+sbb-toggle {
+  white-space: nowrap;
+}
+
+sbb-toggle-option {
+  height: var(--sbb-button-height);
+}
+
+.table-not-selected {
+  align-self: center
+}
+
 .undo-redo {
   width: 100%;
   white-space: nowrap;
