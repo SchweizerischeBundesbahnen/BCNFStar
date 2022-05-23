@@ -38,5 +38,9 @@ declare namespace Cypress {
      * Goes to the metanome results page and presses delete all if there is at least one entry. Waits for success message
      */
     deleteAllMetanomeResults(): void;
+
+    visitContainedSubtableTab(): void;
+
+    visitPossibleForeignKeysTab(): void;
   }
 }

@@ -1,6 +1,12 @@
 .schema-editing-side-bar {
+  scrollbar-width: none;
   overflow-y: scroll;
   display: block;
+}
+
+element::-webkit-scrollbar {
+  display: none;
+  /* for Chrome, Safari, and Opera */
 }
 
 .col-4 {
