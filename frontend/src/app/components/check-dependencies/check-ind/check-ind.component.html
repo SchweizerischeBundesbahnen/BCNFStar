@@ -9,9 +9,12 @@
       [(ngModel)]="referencedTable"
       placeholder="Referenced Table"
     >
-      <sbb-option *ngFor="let table of validTables()" [value]="table">{{
-        table.fullName
-      }}</sbb-option>
+      <sbb-option
+        *ngFor="let table of validTables()"
+        [value]="table"
+        [sbbTooltip]="table.fullName"
+        >{{ table.fullName }}</sbb-option
+      >
     </sbb-select>
   </div>
   <div *ngIf="referencedTable">
@@ -47,6 +50,7 @@
         <sbb-option
           *ngFor="let column of validReferencingColumns()"
           [value]="column"
+          [sbbTooltip]="column.sourceColumn.name"
           >{{ column.sourceColumn.name }}
         </sbb-option>
       </sbb-select>
@@ -57,6 +61,7 @@
         <sbb-option
           *ngFor="let column of validReferencedColumns()"
           [value]="column"
+          [sbbTooltip]="column.sourceColumn.name"
           >{{ column.sourceColumn.name }}
         </sbb-option>
       </sbb-select>

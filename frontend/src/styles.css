@@ -26,6 +26,10 @@ body {
   border-color: var(--sbb-color-grey);
 }
 
+.sbb-panel {
+  max-height: 40vh;
+}
+
 .d-flex {
     display: flex !important;
 }
