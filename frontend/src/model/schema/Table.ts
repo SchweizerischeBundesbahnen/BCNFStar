@@ -361,7 +361,7 @@ export default class Table {
           determinants.push(fd.lhs);
       }
     }
-    determinants.slice(0, 50).forEach((det) => console.log(det.toString()));
+    // determinants.slice(0, 50).forEach((det) => console.log(det.toString()));
     return determinants;
   }
 

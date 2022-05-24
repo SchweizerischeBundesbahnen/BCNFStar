@@ -66,6 +66,9 @@ export class SplitDialogComponent {
 
   public changeLhs() {
     console.log(this.minimalDeterminants);
+    console.log(
+      this.minimalDeterminants.filter((cc) => this.fd.lhs.isSubsetOf(cc))
+    );
   }
 
   public isKeyNonMinimal() {
