@@ -30,11 +30,11 @@
 }
 
 .fact {
-  color: red
+  color: red;
 }
 
 .dimension {
-  color: green
+  color: green;
 }
 
 .pk {
@@ -65,7 +65,7 @@
 }
 
 .selected-table {
-  border: 3px solid red !important;
+  background-color: #ffefea;
 }
 
 .table-head {
