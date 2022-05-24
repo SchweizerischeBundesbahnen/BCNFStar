@@ -1,5 +1,4 @@
 import Column from '@/src/model/schema/Column';
-import Schema from '@/src/model/schema/Schema';
 import SourceTableInstance from '@/src/model/schema/SourceTableInstance';
 import {
   Component,
@@ -17,7 +16,6 @@ import Table from 'src/model/schema/Table';
 })
 export class TableEditingComponent implements OnChanges {
   @Input() public table!: Table;
-  @Input() public schema!: Schema;
   @Output() public deleteColumnEvent = new EventEmitter<Column>();
 
   /** Is the table name being edited? */
