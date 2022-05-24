@@ -76,7 +76,6 @@ Cypress.Commands.add(
   { prevSubject: false },
   () => {
     cy.contains("Subtables").click({ force: true });
-    cy.contains("Contained Subtables").click();
   }
 );
 
