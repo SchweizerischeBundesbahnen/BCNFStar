@@ -10,7 +10,11 @@
   <div
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"
-    [ngClass]="{ fact: fact, dimension: dimension }"
+    [ngClass]="{
+      fact: fact,
+      dimension: dimension,
+      'selected-table': selectedTable === table
+    }"
   >
     <span class="table-head-title" (click)="select()">
       {{ table.fullName }}

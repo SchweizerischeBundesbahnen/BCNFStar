@@ -64,6 +64,10 @@
   text-decoration: underline;
 }
 
+.selected-table {
+  border: 3px solid red !important;
+}
+
 .table-head {
   background-color: lightgray;
   /* if you change this, also change graphElementHeaderHeight in schema-graph.component.ts */

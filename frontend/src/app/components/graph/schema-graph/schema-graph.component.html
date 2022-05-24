@@ -3,8 +3,9 @@
   <app-graph-element
     *ngFor="let item of graphStorage | keyvalue"
     (makeDirectDimension)="makeDirectDimension.emit($event)"
-    (selectedTable)="selectedTableChange.emit($event)"
+    (selectedTableChanged)="selectedTableChange.emit($event)"
     [selectedColumns]="selectedColumns?.get(item.key)"
+    [selectedTable]="selectedTable"
     [table]="item.key"
     [bbox]="item.value.style"
     [fact]="schema.starMode && schema.isFact(item.key)"
