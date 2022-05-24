@@ -1,29 +1,8 @@
-.cluster-header {
-    font-size: 15px;
-}
-
-/* set comma between elemnts by adding one before each except the first */
-.cluster-header::before {
-    content: ',';
-}
-
-.cluster-header:first-child::before {
-    content: '';
-}
-
-.filtered {
-    color: grey;
-}
-
 h1 {
     text-align: center;
     font-weight: bold;
     text-overflow: ellipsis;
     overflow: hidden;
-}
-
-sbb-select {
-    width: 50%;
 }
 
 sbb-tab-group {
