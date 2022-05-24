@@ -1,5 +1,5 @@
 <sbb-accordion>
-  <sbb-expansion-panel>
+  <sbb-expansion-panel [expanded]="true">
     <sbb-expansion-panel-header>
       Contained Subtables
     </sbb-expansion-panel-header>
@@ -8,9 +8,16 @@
       placeholder="Filter columns"
       [(ngModel)]="_fdClusterFilter"
     >
-      <sbb-option *ngFor="let column of table.columns" [value]="column">{{
-        column.name
-      }}</sbb-option>
+      <app-sbb-option-all
+        [(current)]="_fdClusterFilter"
+        [available]="table.columns.asArray()"
+      ></app-sbb-option-all>
+      <sbb-option
+        *ngFor="let column of table.columns"
+        [value]="column"
+        [sbbTooltip]="column.name"
+        >{{ column.name }}</sbb-option
+      >
     </sbb-select>
     <br />
     <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
@@ -51,6 +58,7 @@
           sbb-button
           style="margin: 3px"
           (click)="splitFd.emit(fd)"
+          [sbbTooltip]="fd.lhs.toString()"
         >
           {{ fd.lhs }}
         </button>

@@ -45,10 +45,22 @@ h2 {
   grid-column-start: 2;
 }
 
+sbb-toggle {
+  white-space: nowrap;
+}
+
+sbb-toggle-option {
+  height: var(--sbb-button-height);
+}
+
 .schema-editing-side-bar {
   scrollbar-width: none;
   overflow-y: scroll;
   display: block;
+}
+
+.table-not-selected {
+  align-self: center
 }
 
 .undo-redo {

@@ -47,6 +47,7 @@ import { PersistSchemaComponent } from './components/export/persist-schema/persi
 import { KeysComponent } from './components/tabbar/keys/keys.component';
 import { ContainedSubtablesComponent } from './components/tabbar/contained-subtables/contained-subtables.component';
 import { ForeignKeysComponent } from './components/tabbar/foreign-keys/foreign-keys.component';
+import { SbbOptionAllComponent } from './components/ui/sbb-option-all/sbb-option-all.component';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -76,6 +77,7 @@ export let InjectorInstance: Injector;
     KeysComponent,
     ContainedSubtablesComponent,
     ForeignKeysComponent,
+    SbbOptionAllComponent,
   ],
   imports: [
     BrowserModule,

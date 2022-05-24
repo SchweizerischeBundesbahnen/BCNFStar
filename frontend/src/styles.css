@@ -1,6 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.css";
 
+
+.sbb-select{
+  width: 100%;
+}
+
 body {
     padding-left: 20px;
     padding-right: 20px;
@@ -10,7 +15,7 @@ body {
     --sbb-button-icon-top-margin: 0;
     --window-height: calc(97vh - var(--sbb-header-lean-height));
     --export-schema-sidebar-height: calc(1.6666666667rem + 2 * var(--sbb-button-height) + 0.25rem + var(--sbb-divider-medium) + var(--sbb-divider-small));
-    --export-schema-sidebar-and-heading-height: calc(1.6666666667rem + var(--sbb-divider-medium) + var(--sbb-divider-small) + var(--export-schema-sidebar-height) + 8px);
+    --export-schema-sidebar-and-heading-height: calc(2.2666666667rem + var(--sbb-divider-big) + var(--sbb-divider-medium) + var(--export-schema-sidebar-height) + 8px);
 }
 
 .sbb-tab-body-wrapper {
@@ -19,6 +24,10 @@ body {
 
 .sbb-toggle-option-button {
   border-color: var(--sbb-color-grey);
+}
+
+.sbb-panel {
+  max-height: 40vh;
 }
 
 .d-flex {

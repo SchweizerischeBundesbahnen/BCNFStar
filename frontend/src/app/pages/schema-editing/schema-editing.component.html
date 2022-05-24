@@ -3,10 +3,15 @@
     <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">
       Reset view
     </button>
-    <button type="button" sbb-button (click)="onAutoNormalize(false)">
+    <button
+      type="button"
+      sbb-button
+      (click)="onAutoNormalize(schema.tables)"
+      class="me-1"
+    >
       {{ "Auto-normalize all tables" }}
     </button>
-    <sbb-toggle (change)="setStarMode($event)" style="white-space: nowrap">
+    <sbb-toggle (change)="setStarMode($event)" class="me-1">
       <sbb-toggle-option label="Normal Mode" [value]="false">
       </sbb-toggle-option>
       <sbb-toggle-option label="Star Schema Mode" [value]="true">
@@ -50,9 +55,9 @@
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
         (selectColumns)="onSelectColumns($event)"
-        (autoNormalizeSelectedTable)="onAutoNormalize()"
+        (autoNormalizeSelectedTable)="onAutoNormalize(selectedTable)"
       ></app-schema-editing-side-bar>
-      <h2 *ngIf="!selectedTable" style="align-self: center">
+      <h2 *ngIf="!selectedTable" class="table-not-selected">
         Select a table in the graph to start editing
       </h2>
     </div>

@@ -16,25 +16,25 @@
 .extra-button {
   position: absolute;
   left: 10px;
-  top: -5px;
+  top: 3px;
   pointer-events: auto !important;
-  height: 30px;
-  width: 30px;
+  height: 22px;
+  width: 22px;
   border-radius: 50%;
   text-align: center;
   vertical-align: middle;
   display: inline-block;
-  background-color: green;
+  background-color: #f27e00;
   font-weight: bold;
   color: white;
 }
 
-.fact {
-  color: red
+.dimension {
+  background-color: #ffde1577 !important;
 }
 
-.dimension {
-  color: green
+.fact {
+  background-color: #f27e0077 !important;
 }
 
 .pk {
@@ -64,11 +64,19 @@
   text-decoration: underline;
 }
 
+.selected-table {
+  background-color: #ffefea;
+}
+
+.table-head-highlight {
+  border-top: solid 3px red !important;
+}
+
 .table-head {
   background-color: lightgray;
   /* if you change this, also change graphElementHeaderHeight in schema-graph.component.ts */
   height: 25px;
-  border-top: solid 3px rgb(18, 54, 131);
+  border-top: solid 3px #2d327d;
   font-weight: bold;
   font-size: 1rem;
   text-align: center;
