@@ -1,8 +1,4 @@
-<div
-  class="container px-0"
-  [ngStyle]="bbox"
-  [ngClass]="{ 'selected-table': selectedTable === table }"
->
+<div class="container px-0" [ngStyle]="bbox">
   <div
     *ngIf="showMakeDirectDimension"
     class="extra-button"
@@ -16,7 +12,8 @@
     [sbbTooltip]="table.fullName"
     [ngClass]="{
       fact: fact,
-      dimension: dimension
+      dimension: dimension,
+      'table-head-highlight': selectedTable === table
     }"
   >
     <span class="table-head-title" (click)="select()">
