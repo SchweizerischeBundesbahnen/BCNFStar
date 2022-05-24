@@ -94,6 +94,7 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     let currentLhsValues: Array<string> = [];
     const newRows: Array<Record<string, any>> = [];
     for (const row of result.rows) {
+      // = if lhs is differnt from last row
       if (!lhsNames.every((name) => currentLhsValues.includes(row[name]))) {
         // = Array<[attribute name, attribute value]>
         const currentLhs: Array<[string, string]> = lhsNames.map((name) => [

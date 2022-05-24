@@ -32,7 +32,7 @@ export class DatabaseTableViewerComponent implements OnInit {
     this.reloadData();
   }
 
-  isGroup(_index: number, item: { isGroupBy: boolean }): boolean {
+  public isGroup(_index: number, item: { isGroupBy: boolean }): boolean {
     return item.isGroupBy;
   }
 
