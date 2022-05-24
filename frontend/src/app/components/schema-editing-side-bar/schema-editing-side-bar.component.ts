@@ -31,6 +31,7 @@ export class SchemaEditingSideBarComponent implements OnChanges {
   @Output() public selectColumns = new EventEmitter<
     Map<Table, ColumnCombination>
   >();
+  @Output() public setSurrogateKey = new EventEmitter<string>();
 
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
@@ -41,10 +42,13 @@ export class SchemaEditingSideBarComponent implements OnChanges {
   public page: number = 0;
   public pageSize = 5;
 
+  public surrogateKey = '';
+
   ngOnChanges(): void {
     console.log(this.table);
     this._fdClusterFilter = [];
     this.indFilter = Array.from(this.schema.tables);
+    this.surrogateKey = this.table ? this.table.surrogateKey : '';
   }
 
   public selectedInd(): SourceRelationship | undefined {

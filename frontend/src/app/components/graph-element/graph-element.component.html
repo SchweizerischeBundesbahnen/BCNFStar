@@ -5,15 +5,14 @@
     </span>
   </div>
   <div
-    *ngFor="let column of table.columns"
+    *ngFor="let column of schema.displayedColumnsOf(table)"
     class="row justify-content-between table-body"
   >
     <div
       [sbbTooltip]="column.name"
       [ngClass]="{
-        pk: table.pk && table.pk.includes(column),
-        highlighted:
-          this.selectedColumns && this.selectedColumns.includes(column)
+        pk: isPkColumn(column),
+        highlighted: isHighlightedColumn(column)
       }"
       class="col-7 ellipsis"
       data-cy="graph-element-columns"
@@ -21,11 +20,11 @@
       {{ column.name }}
     </div>
     <div
-      [sbbTooltip]="column.dataTypeString()"
+      [sbbTooltip]="column.dataTypeString"
       class="col-5 text-end ellipsis"
       data-cy="graph-element-column-datatype"
     >
-      {{ column.dataTypeString() }}
+      {{ column.dataTypeString }}
     </div>
   </div>
   <div class="row">

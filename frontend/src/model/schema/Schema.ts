@@ -11,6 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
+import BasicColumn from '../types/BasicColumn';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -421,5 +422,18 @@ export default class Schema {
       }
     }
     return resultingTables;
+  }
+
+  public displayedColumnsOf(table: Table): Array<BasicColumn> {
+    const columns: Array<BasicColumn> = Array.from(table.columns.asArray());
+    if (table.implementsSurrogateKey())
+      columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
+    for (const fk of this.fksOf(table))
+      if (fk.referenced.implementsSurrogateKey())
+        columns.push({
+          name: fk.referenced.surrogateKey,
+          dataTypeString: 'integer',
+        });
+    return columns;
   }
 }

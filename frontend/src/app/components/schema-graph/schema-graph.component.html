@@ -6,6 +6,7 @@
     (selectedTable)="selectedTableChange.emit($event)"
     [selectedColumns]="this.selectedColumns?.get(item.key)"
     [table]="item.key"
+    [schema]="schema"
     [bbox]="item.value.style"
   ></app-graph-element>
 </div>

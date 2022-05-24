@@ -181,6 +181,11 @@ export class SchemaEditingComponent implements OnInit {
     this.schemaChanged.next();
   }
 
+  public onSetSurrogateKey(name: string) {
+    this.selectedTable!.surrogateKey = name;
+    this.schemaChanged.next();
+  }
+
   public async initPersisting(): Promise<SQLPersisting> {
     const dbmsName: string = await this.dataService.getDmbsName();
 

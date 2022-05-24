@@ -142,19 +142,14 @@
         ></app-check-ind>
       </sbb-expansion-panel>
 
-      <sbb-expansion-panel
-        [expanded]="false"
-        [hidden]="this.table.sources.length !== 1"
-      >
+      <sbb-expansion-panel [expanded]="false">
         <sbb-expansion-panel-header
           >Surrogate Key Options</sbb-expansion-panel-header
         >
-        <input
-          style="width: 40%"
-          sbbInput
-          [(ngModel)]="this.table.surrogateKey"
-        />
-        <!-- <button sbb-button (click)="this.addSurrogateKey()"> </button> -->
+        <input style="width: 40%" sbbInput [(ngModel)]="surrogateKey" />
+        <button sbb-button (click)="setSurrogateKey.emit(surrogateKey)">
+          Add Surrogate Key
+        </button>
       </sbb-expansion-panel>
     </sbb-accordion>
   </sbb-tab>
