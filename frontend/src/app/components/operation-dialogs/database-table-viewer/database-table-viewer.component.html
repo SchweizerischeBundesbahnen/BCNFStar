@@ -11,5 +11,20 @@
     </sbb-text-column>
     <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
     <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+    <!-- Horizontal Table Divider -->
+    <ng-container sbbColumnDef="horizontalTableDivider">
+      <td
+        class="groupby-cell"
+        [attr.colspan]="tableColumns.length"
+        sbb-cell
+        *sbbCellDef="let groupBy"
+      >
+        <span class="sbb-table-divider-title">{{ groupBy.title }}</span>
+      </td>
+    </ng-container>
+    <tr
+      sbb-row
+      *sbbRowDef="let row; columns: ['horizontalTableDivider']; when: isGroup"
+    ></tr>
   </table>
 </sbb-table-wrapper>

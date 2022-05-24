@@ -32,6 +32,10 @@ export class DatabaseTableViewerComponent implements OnInit {
     this.reloadData();
   }
 
+  isGroup(_index: number, item: { isGroupBy: boolean }): boolean {
+    return item.isGroupBy;
+  }
+
   public async reloadData() {
     const result = await this.dataService.loadTablePage(
       this.page * this.pageSize,
