@@ -8,9 +8,12 @@
         [(current)]="indFilter"
         [available]="tablesAsArray()"
       ></app-sbb-option-all>
-      <sbb-option *ngFor="let table of schema.tables" [value]="table">{{
-        table.fullName
-      }}</sbb-option>
+      <sbb-option
+        *ngFor="let table of schema.tables"
+        [value]="table"
+        [sbbTooltip]="table.fullName"
+        >{{ table.fullName }}</sbb-option
+      >
     </sbb-select>
     <br />
     <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">

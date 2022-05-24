@@ -14,12 +14,13 @@ export class GraphElementComponent {
   @Input() public fact!: boolean;
   @Input() public dimension!: boolean;
   @Input() public showMakeDirectDimension!: boolean;
-  @Output() public selectedTable = new EventEmitter<Table>();
+  @Input() selectedTable?: Table;
+  @Output() public selectedTableChanged = new EventEmitter<Table>();
   @Output() public makeDirectDimension = new EventEmitter<Table>();
 
   constructor() {}
 
   select() {
-    this.selectedTable.emit(this.table);
+    this.selectedTableChanged.emit(this.table);
   }
 }
