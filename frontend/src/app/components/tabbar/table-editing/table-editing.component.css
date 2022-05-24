@@ -1,0 +1,24 @@
+.grid-container-editing-field {
+  display: grid;
+  grid-template-columns: 70% auto;
+}
+
+.grid-container-table {
+  display: grid;
+  grid-template-columns: 60% 5% auto;
+}
+
+.grid-container-table-heading {
+  display: grid;
+  grid-template-columns: 90% auto;
+}
+
+input {
+  width: 100%;
+}
+
+.item {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

@@ -1,0 +1,34 @@
+<sbb-paginator
+  (page)="changePage($event)"
+  [pageIndex]="page"
+  [pageSize]="pageSize"
+  [length]="rowCount"
+>
+</sbb-paginator>
+<sbb-table-wrapper class="table-wrapper">
+  <table sbb-table [dataSource]="_dataSource">
+    <sbb-text-column *ngFor="let column of tableColumns" name="{{ column }}">
+    </sbb-text-column>
+    <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
+    <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+
+    <!-- Horizontal Table Divider -->
+    <!-- from sbb angular example 
+      "Grouped Rows And Columns Table"
+      https://angular.app.sbb.ch/angular/components/table/examples -->
+    <tr
+      sbb-row
+      *sbbRowDef="let row; columns: ['horizontalTableDivider']; when: isGroup"
+    ></tr>
+    <ng-container sbbColumnDef="horizontalTableDivider">
+      <td
+        class="groupby-cell"
+        [attr.colspan]="tableColumns.length"
+        sbb-cell
+        *sbbCellDef="let groupBy"
+      >
+        <span class="sbb-table-divider-title">{{ groupBy.title }}</span>
+      </td>
+    </ng-container>
+  </table>
+</sbb-table-wrapper>

@@ -15,9 +15,22 @@ button {
   margin-left: 0.5vw;
 }
 
+.grid-container-table {
+  display: grid;
+  grid-template-columns: 33.33% calc(66.67% - 20px);
+  gap: 10px;
+  background-color: white;
+}
+
+.grid-container-paginator {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+  background-color: white;
+}
+
 h3 {
   font-weight: bold;
-  margin-top: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
