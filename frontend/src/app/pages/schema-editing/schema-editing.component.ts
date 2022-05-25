@@ -195,18 +195,10 @@ export class SchemaEditingComponent {
   }
 
   public onMakeDirectDimensions(routes: Array<Array<TableRelationship>>) {
-    for (const i in routes) {
-      const route = routes[i];
-      let command = new DirectDimensionCommand(this.schema, route);
-      command.onDo = () =>
-        (this.selectedTable = route[route.length - 1].referenced);
-      command.onUndo = () =>
-        (this.selectedTable = route[route.length - 1].referenced);
-      this.commandProcessor.do(command);
-      if (+i < routes.length - 1) {
-        routes[+i + 1][0].referencing = command.newTable!;
-      }
-    }
+    const command = new DirectDimensionCommand(this.schema, routes);
+    command.onDo = () => (this.selectedTable = command.newTables[0]);
+    command.onUndo = () => (this.selectedTable = command.newTables[0]);
+    this.commandProcessor.do(command);
     this.schemaChanged.next();
   }
 

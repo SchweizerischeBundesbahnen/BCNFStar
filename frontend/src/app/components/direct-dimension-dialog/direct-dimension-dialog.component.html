@@ -9,10 +9,15 @@
     [ngModel]="routes.get(route)"
     (ngModelChange)="routes.set(route, $event)"
     *ngFor="let route of routes.keys()"
+    class="block mt-1"
   >
-    <span *ngFor="let rel of route"
-      >{{ rel.relationship.sourceRelationship().toString() }}<br
-    /></span>
+    <span class="bold">{{ route[0].referencing.fullName }}</span>
+    <span *ngFor="let rel of route">
+      <span [sbbTooltip]="rel.relationship.sourceRelationship().toString()">
+        -&gt;
+      </span>
+      <span class="bold">{{ rel.referenced.fullName }}</span>
+    </span>
   </sbb-checkbox>
 </div>
 <div sbbDialogActions>

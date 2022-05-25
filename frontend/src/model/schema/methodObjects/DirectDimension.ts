@@ -6,28 +6,49 @@ import Join from './Join';
 export default class DirectDimension {
   public newTable!: Table;
   public oldTable: Table;
+  private join!: Join;
 
-  public constructor(private route: Array<TableRelationship>) {
-    this.oldTable = this.route[0].referencing;
-    this.newTable = this.oldTable;
-    this.directDimension();
+  public constructor(private routes: Array<Array<TableRelationship>>) {
+    this.oldTable = routes[0][0].referencing;
+    for (const i in this.routes) {
+      this.newTable = this.directDimension(+i);
+      this.mapOtherRoutes(+i, this.join);
+    }
   }
 
-  private directDimension() {
-    let newRel = this.route[0].relationship;
-    for (let i = 0; i < this.route.length - 1; i++) {
-      const join: Join = new Join(
-        new TableRelationship(newRel, this.newTable!, this.route[i].referenced)
+  private directDimension(i: number): Table {
+    const route = this.routes[i];
+    let oldTable = route[0].referencing;
+    let newTable = oldTable;
+    let newRel = route[0].relationship;
+    for (let j = 0; j < route.length - 1; j++) {
+      this.join = new Join(
+        new TableRelationship(newRel, newTable!, route[j].referenced)
       );
-      this.newTable = join.newTable;
-      newRel = this.route[i + 1].relationship.applySourceMapping(
-        join.sourceMapping
+      newTable = this.join.newTable;
+      newRel = route[j + 1].relationship.applySourceMapping(
+        this.join.sourceMapping
       );
     }
-    this.newTable.columns.intersect(
+    newTable.columns.intersect(
       new ColumnCombination(new Array(...newRel.referencing)).union(
-        this.oldTable.columns
+        oldTable.columns
       )
     );
+    return newTable;
+  }
+
+  private mapOtherRoutes(i: number, join: Join) {
+    for (let j = i + 1; j < this.routes.length; j++) {
+      const nextRouteFk = this.routes[j][0];
+      nextRouteFk.referencing = join.newTable;
+      nextRouteFk.relationship.referencing =
+        nextRouteFk.relationship.referencing.map(
+          (col) =>
+            join.newTable.columns
+              .asArray()
+              .find((newCol) => newCol.equals(col))!
+        );
+    }
   }
 }
