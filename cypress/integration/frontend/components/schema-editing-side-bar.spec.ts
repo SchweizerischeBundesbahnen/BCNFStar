@@ -21,11 +21,12 @@ describe("The schema editing side bar", () => {
   });
 
   it("displays the 'auto normalize this table' button", () => {
+    cy.visitContainedSubtableTab();
     cy.get("button").contains("Auto-normalize this table");
   });
 
   it("displays the table name", () => {
-    cy.get("h2").contains("public.nation_region_denormalized");
+    cy.get("h1").contains("public.nation_region_denormalized");
   });
 
   it("displays keys", () => {
@@ -40,7 +41,7 @@ describe("The schema editing side bar", () => {
     cy.get("sbb-expansion-panel-header")
       // commas that exist on page between these columns are just css
       .contains("n_regionkey r_comment r_name r_regionkey")
-      .click();
+      .click({ force: true });
     cy.get(".sbb-expansion-panel-body button").contains("r_regionkey");
     cy.get(".sbb-expansion-panel-body button").contains("r_comment");
     cy.get(".sbb-expansion-panel-body button").contains("r_name");
@@ -68,7 +69,7 @@ describe("The schema editing side bar", () => {
 
     cy.get("sbb-expansion-panel-header")
       .contains("n_regionkey r_comment r_name r_regionkey")
-      .click();
+      .click({ force: true });
     cy.get(".sbb-expansion-panel-body button").contains("r_regionkey").click();
     cy.get("button").contains("Ok").click();
     cy.contains("r_regionkey");
@@ -79,7 +80,7 @@ describe("The schema editing side bar", () => {
 
     cy.get("sbb-expansion-panel-header")
       .contains("n_regionkey r_comment r_name r_regionkey")
-      .click();
+      .click({ force: true });
     cy.get(".sbb-expansion-panel-body button").contains("r_regionkey").click();
     cy.get('app-split-dialog [type="text"]').clear().type("Regions");
     cy.get("button").contains("Ok").click();
