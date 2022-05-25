@@ -30,12 +30,14 @@ describe("The persist-button should create executable SQL", () => {
   });
 
   it("creates keys", () => {
-    cy.get(
-      '[data-cy="graph-element-columns"][class="col-7 ellipsis pk"]'
-    ).should("have.length", 1);
-    cy.get(
-      '[data-cy="graph-element-columns"][class="col-7 ellipsis pk"]'
-    ).should("contain", "r_regionkey");
+    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+      "have.length",
+      1
+    );
+    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+      "contain",
+      "r_regionkey"
+    );
     cy.get(".joint-tool").should("have.length", 1);
   });
 

@@ -1,24 +1,14 @@
-h2 {
+h1 {
     text-align: center;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-sbb-select {
-    width: 50%;
+sbb-tab-group {
+    height: calc(var(--window-height) - var(--export-schema-sidebar-and-heading-height)); 
 }
 
-.cluster-header {
-    font-size: 15px;
-}
-
-.filtered {
-    color: grey;
-}
-
-/* set comma between elemnts by adding one before each except the first */
-.cluster-header::before {
-    content: ',';
-}
-
-.cluster-header:first-child::before {
-    content: '';
+sbb-tab-group > .sbb-tab-body-wrapper {
+    height: 100%;
 }

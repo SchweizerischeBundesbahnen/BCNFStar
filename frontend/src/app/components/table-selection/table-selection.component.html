@@ -1,0 +1,167 @@
+<div class="grid-container-table">
+  <div>
+    <div class="sbb-checkbox-group-vertical">
+      <sbb-accordion expanded="true" class="mt-3">
+        <sbb-expansion-panel>
+          <sbb-expansion-panel-header
+            >Load saved schema</sbb-expansion-panel-header
+          >
+          <app-load-saved-schema></app-load-saved-schema>
+        </sbb-expansion-panel>
+      </sbb-accordion>
+      <sbb-accordion expanded="false" multi="true" class="mt-2">
+        <sbb-expansion-panel *ngFor="let item of tablesInSchema | keyvalue">
+          <!-- item.key = schema name, item.value = list of associated table objects -->
+          <sbb-expansion-panel-header>{{
+            item.key
+          }}</sbb-expansion-panel-header>
+          <sbb-checkbox
+            (change)="clickSelectAll(item.key)"
+            [checked]="areAllSelectedIn(item.key)"
+            [indeterminate]="
+              !areAllSelectedIn(item.key) && !areZeroSelectedIn(item.key)
+            "
+          >
+            All
+          </sbb-checkbox>
+          <sbb-checkbox
+            *ngFor="let table of item.value"
+            [ngModel]="selectedTables.get(table)"
+            (ngModelChange)="selectedTables.set(table, $event)"
+            class="table-checkbox"
+            (mouseenter)="mouseEnter(table)"
+          >
+            {{ table.name }}
+          </sbb-checkbox>
+        </sbb-expansion-panel>
+        <button
+          type="button"
+          sbb-button
+          [disabled]="!hasSelectedTables()"
+          (click)="selectTables()"
+        >
+          Go
+        </button>
+      </sbb-accordion>
+    </div>
+  </div>
+  <div *ngIf="withContentPreview && hoveredTable">
+    <ng-container
+      [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"
+    >
+      <h3>
+        <span>{{ hoveredTable.fullName }}</span>
+      </h3>
+      <sbb-table-wrapper class="table-wrapper">
+        <table sbb-table [dataSource]="dataSource">
+          <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
+          <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+          <ng-container
+            *ngFor="let column of hoveredTable.columns.sourceColumnNames()"
+            [sbbColumnDef]="column"
+          >
+            <th sbb-header-cell *sbbHeaderCellDef>{{ column }}</th>
+            <td
+              [ngClass]="{ numeric: isNumeric(column) }"
+              *sbbCellDef="let element"
+            >
+              {{ element[column] }}
+            </td>
+          </ng-container>
+        </table>
+      </sbb-table-wrapper>
+      <div class="grid-container-paginator">
+        <sbb-paginator
+          (page)="changePage($event)"
+          [pageIndex]="page"
+          [pageSize]="pageLimit"
+          [length]="tableRowCounts.get(hoveredTable)"
+          class="mt-2"
+        >
+        </sbb-paginator>
+        <ng-container *ngSwitchCase="1">
+          <div class="text-aling-right mt-2">
+            {{ pageLimit * page + 1 }} -
+            {{ pageLimit * page + dataSource.data.length }} /
+            {{ tableRowCounts.get(hoveredTable) }}
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <div class="text-aling-right mt-2">
+            {{ pageLimit * page }} /
+            {{ tableRowCounts.get(hoveredTable) }}
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #loadingDialog class="loading-box">
+  <div sbbDialogTitle>Running Metanome</div>
+  <div sbbDialogContent>
+    <span *ngIf="loadingStatus.size">
+      Functional Dependencies and Inclusion Dependencies are currently being
+      searched. <br />
+      More detailed progress reports including logs can be found
+      <a [href]="queueUrl" target="_blank">here</a>
+    </span>
+
+    <ul>
+      <li *ngFor="let item of loadingStatus | keyvalue">
+        {{ item.key.algorithm }} with {{ item.key.tables }}
+        <sbb-loading
+          mode="inline"
+          aria-valuetext="Loading, please wait"
+          *ngIf="item.value === 'loading'"
+        ></sbb-loading>
+        <sbb-icon
+          svgIcon="kom:cross-medium"
+          style="color: red"
+          *ngIf="item.value === 'error'"
+        ></sbb-icon>
+        <sbb-icon
+          svgIcon="kom:tick-medium"
+          style="color: green"
+          *ngIf="item.value === 'done'"
+        ></sbb-icon>
+      </li>
+      <li>
+        Fetching results
+        <sbb-loading
+          mode="inline"
+          aria-valuetext="Loading, please wait"
+        ></sbb-loading>
+      </li>
+    </ul>
+  </div>
+</ng-template>
+
+<ng-template #errorDialog>
+  <div sbbDialogTitle>Warning</div>
+  <div sbbDialogContent>
+    An error occured while getting required table data from the server. Check
+    the browser's console and the metanome queue for details.
+  </div>
+
+  <div sbbDialogActions>
+    <a
+      class="hover-color-white"
+      type="button"
+      sbb-button
+      sbbDialogClose
+      [href]="queueUrl"
+      target="_blank"
+      >Investigate Metanome logs</a
+    >
+    <a
+      class="hover-color-white"
+      type="button"
+      sbb-button
+      sbbDialogClose
+      routerLink="/edit-schema"
+      >Edit schema regardless</a
+    >
+    <a type="button" sbb-secondary-button sbbDialogClose>Cancel</a>
+  </div>
+</ng-template>

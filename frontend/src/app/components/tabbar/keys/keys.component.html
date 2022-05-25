@@ -1,0 +1,19 @@
+<sbb-accordion [multi]="true">
+  <sbb-expansion-panel [expanded]="true">
+    <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
+    <ul>
+      <li *ngFor="let key of table.keys().slice(0, 5)">
+        {{ key.toString() }}
+      </li>
+    </ul>
+  </sbb-expansion-panel>
+  <sbb-expansion-panel [expanded]="true">
+    <sbb-expansion-panel-header
+      >Surrogate Key Options</sbb-expansion-panel-header
+    >
+    <input style="width: 40%" sbbInput [(ngModel)]="surrogateKey" />
+    <button sbb-button (click)="setSurrogateKey.emit(surrogateKey)">
+      Add Surrogate Key
+    </button>
+  </sbb-expansion-panel>
+</sbb-accordion>

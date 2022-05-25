@@ -169,9 +169,13 @@ export function exampleSchema(): Schema {
   );
   schema.addFk(new SourceRelationship([b2.sourceColumn], [c1.sourceColumn]));
   schema.addFk(new SourceRelationship([a5.sourceColumn], [c1.sourceColumn]));
-  schema.addInd(new SourceRelationship([a4.sourceColumn], [c1.sourceColumn]));
+  schema.addInds(new SourceRelationship([a4.sourceColumn], [c1.sourceColumn]));
 
   return schema;
+}
+
+export function exampleSchemaToJSON(): string {
+  return JSON.stringify(exampleSchema());
 }
 
 export function multiFkSchema(): Schema {
