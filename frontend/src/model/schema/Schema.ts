@@ -213,13 +213,18 @@ export default class Schema {
   }
 
   private updateFks(): void {
-    this.calculateFks();
-    this.calculateTrivialFks();
+    const currentFks = new Array<TableRelationship>();
+    this.calculateFks(currentFks);
+    this.calculateTrivialFks(currentFks);
+    for (const fk of currentFks) {
+      fk.referencing._fks.push(fk);
+      fk.referenced._references.push(fk);
+    }
     this._tableFksValid = true;
     this.filterFks();
   }
 
-  private calculateFks(): void {
+  private calculateFks(result: Array<TableRelationship>): void {
     for (const table of this.tables) {
       table._fks = new Array();
       table._references = new Array();
@@ -253,12 +258,80 @@ export default class Schema {
                 referencingTable,
                 referencedTable
               );
-              if (this.isRelationshipValid(relationship)) {
-                referencingTable._fks.push(relationship);
-                referencedTable._references.push(relationship);
-              }
+              if (this.isRelationshipValid(relationship))
+                this.addCurrentFkAndDerive(relationship, result);
             }
     }
+  }
+
+  private addCurrentFkAndDerive(
+    fk: TableRelationship,
+    result: Array<TableRelationship>
+  ) {
+    if (!this.basicAddCurrentFk(fk, result)) return;
+    const referencingFks = result.filter(
+      (otherFk) =>
+        otherFk == fk ||
+        (fk.referencing == otherFk.referenced &&
+          new ColumnCombination(fk.relationship.referencing).isSubsetOf(
+            new ColumnCombination(otherFk.relationship.referenced)
+          ))
+    );
+    const referencedFks = result.filter(
+      (otherFk) =>
+        otherFk == fk ||
+        (otherFk.referencing == fk.referenced &&
+          new ColumnCombination(otherFk.relationship.referencing).isSubsetOf(
+            new ColumnCombination(fk.relationship.referenced)
+          ))
+    );
+    for (const referencingFk of referencingFks) {
+      for (const referencedFk of referencedFks) {
+        if (referencingFk == referencedFk) continue;
+        const newRelReferencing = new Array();
+        for (const referencedCol of referencedFk.relationship.referencing) {
+          const i = referencingFk.relationship.referenced.findIndex(
+            (referencingCol) => {
+              if (referencingFk == fk || referencedFk == fk)
+                return referencingCol.equals(referencedCol);
+              else
+                return fk.relationship.columnsMapped(
+                  referencingCol,
+                  referencedCol
+                );
+            }
+          );
+          if (i == -1) break;
+          newRelReferencing.push(referencingFk.relationship.referencing[i]);
+        }
+        if (
+          newRelReferencing.length ==
+          referencedFk.relationship.referenced.length
+        )
+          this.basicAddCurrentFk(
+            new TableRelationship(
+              new Relationship(
+                newRelReferencing,
+                Array.from(referencedFk.relationship.referenced)
+              ),
+              referencingFk.referencing,
+              referencedFk.referenced
+            ),
+            result
+          );
+      }
+    }
+  }
+
+  private basicAddCurrentFk(
+    fk: TableRelationship,
+    result: Array<TableRelationship>
+  ) {
+    if (!result.some((existingFk) => existingFk.equals(fk))) {
+      result.push(fk);
+      return true;
+    }
+    return false;
   }
 
   private isRelationshipValid(relationship: TableRelationship): boolean {
@@ -273,7 +346,7 @@ export default class Schema {
    * A table which has the same columns as another tables pk has a relationship with this table.
    * This method adds these relationships to the tables.
    */
-  private calculateTrivialFks(): void {
+  private calculateTrivialFks(result: Array<TableRelationship>): void {
     for (const referencingTable of this.tables) {
       for (const referencedTable of this.tables) {
         if (referencedTable == referencingTable || !referencedTable.pk)
@@ -296,8 +369,7 @@ export default class Schema {
               ) &&
               this.isRelationshipValid(relationship)
             ) {
-              referencingTable._fks.push(relationship);
-              referencedTable._references.push(relationship);
+              this.addCurrentFkAndDerive(relationship, result);
             }
           });
       }
