@@ -114,9 +114,9 @@ export default abstract class SQLPersisting {
 
   // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
   public addSkColumnToReferencingSql(fk: TableRelationship): string {
-    return `ALTER TABLE  ${this.tableIdentifier(fk.referencing)}  ADD FK_${
-      fk.referenced.surrogateKey
-    } INT;
+    return `ALTER TABLE  ${this.tableIdentifier(
+      fk.referencing
+    )}  ADD F${this.fkSurrogateKeyName(fk)} INT;
     ${this.suffix()}
     `;
   }
@@ -127,7 +127,7 @@ export default abstract class SQLPersisting {
     return `
     ALTER TABLE ${this.tableIdentifier(fk.referencing)}
     ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
-    FOREIGN KEY (FK_${fk.referenced.surrogateKey})
+    FOREIGN KEY (${this.fkSurrogateKeyName(fk)})
     REFERENCES ${this.tableIdentifier(fk.referenced)} (${
       fk.referenced.surrogateKey
     });`;
@@ -181,6 +181,14 @@ ALTER TABLE ${this.tableIdentifier(
     return `${this.escape(column.sourceTableInstance.alias)}.${this.escape(
       column.sourceColumn.name
     )}`;
+  }
+
+  public fkSurrogateKeyName(fk: TableRelationship): string {
+    return (
+      fk.referenced.surrogateKey +
+      '_' +
+      fk.relationship.referencing.map((col) => col.name).join('_')
+    );
   }
 
   public abstract surrogateKeyString(name: string): string;

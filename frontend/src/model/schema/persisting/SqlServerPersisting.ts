@@ -78,7 +78,7 @@ GO
   public override updateSurrogateKeySql(fk: TableRelationship): string {
     return `
     UPDATE  ${this.tableIdentifier(fk.referencing)}  
-    SET FK_${fk.referenced.surrogateKey} = ${this.tableIdentifier(
+    SET ${this.fkSurrogateKeyName(fk)} = ${this.tableIdentifier(
       fk.referenced
     )}.${fk.referenced.surrogateKey} 
     FROM  ${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
