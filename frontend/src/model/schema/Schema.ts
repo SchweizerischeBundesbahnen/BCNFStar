@@ -429,11 +429,16 @@ export default class Schema {
     if (table.implementsSurrogateKey())
       columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
     for (const fk of this.fksOf(table))
-      if (fk.referenced.implementsSurrogateKey())
+      if (fk.referenced.implementsSurrogateKey()) {
+        const name =
+          fk.referenced.surrogateKey +
+          '_' +
+          fk.relationship.referencing.map((col) => col.name).join('_');
         columns.push({
-          name: fk.referenced.surrogateKey,
+          name: name,
           dataTypeString: 'integer',
         });
+      }
     return columns;
   }
 }

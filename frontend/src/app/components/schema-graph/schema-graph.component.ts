@@ -229,7 +229,9 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
           ? fk.referenced.surrogateKey
           : fk.relationship.referenced[0].name;
         const referencingName = fk.referenced.implementsSurrogateKey()
-          ? fk.referenced.surrogateKey
+          ? fk.referenced.surrogateKey +
+            '_' +
+            fk.relationship.referencing.map((col) => col.name).join('_')
           : fk.relationship.referencing[0].name;
         let link = new joint.shapes.standard.Link({
           source: {
