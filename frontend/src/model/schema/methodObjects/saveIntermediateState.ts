@@ -78,12 +78,8 @@ export default class SaveSchemaState {
 
   public parseSchema(schema: JSONSchema) {
     this.newSchema.addTables(...this.parseTableArray(schema.tables));
-    this.parseSourceRelationshipArray(schema._fks).forEach((fk) => {
-      this.newSchema.addFk(fk);
-    });
-    this.parseSourceRelationshipArray(schema._inds).forEach((ind) => {
-      this.newSchema.addInds(ind);
-    });
+    this.newSchema.addFks(...this.parseSourceRelationshipArray(schema._fks));
+    this.newSchema.addInds(...this.parseSourceRelationshipArray(schema._inds));
     this.parseTableFds(schema._fds).forEach((sfd) => {
       this.newSchema.addFd(sfd);
     });
