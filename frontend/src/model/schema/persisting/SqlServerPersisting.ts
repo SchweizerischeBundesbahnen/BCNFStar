@@ -77,10 +77,10 @@ GO
 
   public override updateSurrogateKeySql(fk: TableRelationship): string {
     return `
-    UPDATE  ${this.tableIdentifier(fk.referencing)}  
+    UPDATE  ${this.tableIdentifier(fk.referencing)}
     SET ${this.fkSurrogateKeyName(fk)} = ${this.tableIdentifier(
       fk.referenced
-    )}.${fk.referenced.surrogateKey} 
+    )}.${fk.referenced.surrogateKey}
     FROM  ${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
       fk.referenced
     )}
@@ -100,13 +100,6 @@ GO
 
   public override surrogateKeyString(name: string): string {
     return `${this.escape(name)} INT IDENTITY(1,1)`;
-  }
-
-  public override schemaWideColumnIdentifier(
-    table: Table,
-    column: Column
-  ): string {
-    return `[${table.schemaName}].[${table.name}].[${column.sourceColumn.name}]`;
   }
 
   public override suffix(): string {

@@ -193,10 +193,11 @@ ALTER TABLE ${this.tableIdentifier(
 
   public abstract surrogateKeyString(name: string): string;
 
-  public abstract schemaWideColumnIdentifier(
-    table: Table,
-    column: Column
-  ): string;
+  public schemaWideColumnIdentifier(table: Table, column: Column): string {
+    return `${this.escape(table.schemaName)}.${this.escape(
+      table.name
+    )}.${this.escape(column.name)}`;
+  }
 
   public abstract suffix(): string;
 }

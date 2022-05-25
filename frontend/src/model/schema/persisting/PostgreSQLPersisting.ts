@@ -1,5 +1,3 @@
-import Column from '../Column';
-import Table from '../Table';
 import Schema from '../Schema';
 import SQLPersisting from './SQLPersisting';
 import TableRelationship from '../TableRelationship';
@@ -21,7 +19,7 @@ export default class PostgreSQLPersisting extends SQLPersisting {
     UPDATE  ${this.tableIdentifier(fk.referencing)}
     SET ${this.fkSurrogateKeyName(fk)} = ${this.tableIdentifier(
       fk.referenced
-    )}.${fk.referenced.surrogateKey} 
+    )}.${fk.referenced.surrogateKey}
     FROM  ${this.tableIdentifier(fk.referenced)}
     WHERE ${fk.relationship.referencing
       .map(
@@ -39,13 +37,6 @@ export default class PostgreSQLPersisting extends SQLPersisting {
 
   public override surrogateKeyString(name: string): string {
     return `${name} INT GENERATED ALWAYS AS IDENTITY`;
-  }
-
-  public override schemaWideColumnIdentifier(
-    table: Table,
-    column: Column
-  ): string {
-    return `"${table.schemaName}"."${table.name}"."${column.sourceColumn.name}"`;
   }
 
   public override suffix(): string {
