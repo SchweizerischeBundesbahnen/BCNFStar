@@ -10,13 +10,26 @@ import SourceFunctionalDependency from './SourceFunctionalDependency';
 import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
+import Join from './methodObjects/Join';
+import DirectDimension from './methodObjects/DirectDimension';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
+  public name?: string;
   private _fks = new Array<SourceRelationship>();
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
+  private _starMode = false;
+
+  public toJSON() {
+    return {
+      tables: Array.from(this.tables),
+      _fks: this.fks,
+      _inds: this.inds,
+      _fds: [...this._fds.values()].flat(),
+    };
+  }
 
   public constructor(...tables: Array<Table>) {
     this.addTables(...tables);
@@ -36,8 +49,8 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public addFk(fk: SourceRelationship) {
-    this._fks.push(fk);
+  public addFk(...fks: SourceRelationship[]) {
+    this._fks.push(...fks);
     this.relationshipsValid = false;
   }
 
@@ -46,8 +59,8 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public addInd(ind: SourceRelationship) {
-    this._inds.push(ind);
+  public addInds(...inds: SourceRelationship[]) {
+    this._inds.push(...inds);
     this.tableIndsValid = false;
   }
 
@@ -56,6 +69,15 @@ export default class Schema {
       this._fds.set(fd.rhs[0].table, new Array());
     }
     this._fds.get(fd.rhs[0].table)!.push(fd);
+  }
+
+  public get starMode(): boolean {
+    return this._starMode;
+  }
+
+  public set starMode(value: boolean) {
+    this._starMode = value;
+    this._tableFksValid = false;
   }
 
   /**
@@ -81,8 +103,37 @@ export default class Schema {
     this.tables.forEach((table) => (table._indsValid = valid));
   }
 
-  public numReferences(table: Table): number {
-    return table._references.length;
+  public isFact(table: Table): boolean {
+    return this.referencesOf(table).length == 0;
+  }
+
+  /**
+   * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
+   * or routes that would add no extra information to the fact table when joined completely
+   */
+  public filteredRoutesFromFactTo(
+    table: Table
+  ): Array<Array<TableRelationship>> {
+    console.log(table.name);
+    return this.routesFromFactTo(table).filter((route) => {
+      if (route.length <= 1) return false;
+      const dd = new DirectDimension(route);
+      return dd.newTable.columns.cardinality > dd.oldTable.columns.cardinality;
+    });
+  }
+
+  /**
+   * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
+   */
+  public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
+    const result = new Array<Array<TableRelationship>>();
+    for (const rel of this.referencesOf(table)) {
+      const routes = this.routesFromFactTo(rel.referencing);
+      routes.forEach((route) => route.push(rel));
+      result.push(...routes);
+    }
+    if (result.length == 0) result.push(new Array<TableRelationship>());
+    return result;
   }
 
   public referencesOf(table: Table): Array<TableRelationship> {
@@ -152,10 +203,20 @@ export default class Schema {
                 referencingTable,
                 referencedTable
               );
-              referencingTable._fks.push(relationship);
-              referencedTable._references.push(relationship);
+              if (this.isRelationshipValid(relationship)) {
+                referencingTable._fks.push(relationship);
+                referencedTable._references.push(relationship);
+              }
             }
     }
+  }
+
+  private isRelationshipValid(relationship: TableRelationship): boolean {
+    const newTable = new Join(relationship).newTable;
+    return (
+      newTable.columns.cardinality >
+      relationship.referencing.columns.cardinality
+    );
   }
 
   /**
@@ -182,7 +243,8 @@ export default class Schema {
                 (otherRel) =>
                   otherRel.referenced == relationship.referenced &&
                   otherRel.relationship.equals(relationship.relationship)
-              )
+              ) &&
+              this.isRelationshipValid(relationship)
             ) {
               referencingTable._fks.push(relationship);
               referencedTable._references.push(relationship);

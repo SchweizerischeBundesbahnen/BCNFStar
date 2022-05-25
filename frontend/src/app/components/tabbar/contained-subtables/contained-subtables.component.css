@@ -1,0 +1,16 @@
+.cluster-header {
+    font-size: 15px;
+}
+
+/* set comma between elemnts by adding one before each except the first */
+.cluster-header::before {
+    content: ',';
+}
+
+.cluster-header:first-child::before {
+    content: '';
+}
+
+.filtered {
+    color: grey;
+}

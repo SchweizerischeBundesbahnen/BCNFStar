@@ -1,7 +1,6 @@
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
-import { Component } from '@angular/core';
-import * as saveAs from 'file-saver';
+import { Component, ViewChild } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
@@ -10,13 +9,17 @@ import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 import { firstValueFrom, Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
-import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.component';
+import { SplitDialogComponent } from '../../components/operation-dialogs/split-dialog/split-dialog.component';
+import { JoinDialogComponent } from '../../components/operation-dialogs/join-dialog/join-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import { DirectDimensionDialogComponent } from '../../components/direct-dimension-dialog/direct-dimension-dialog.component';
+import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
+import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
 
 @Component({
   selector: 'app-schema-editing',
@@ -24,11 +27,11 @@ import TableRelationship from '@/src/model/schema/TableRelationship';
   styleUrls: ['./schema-editing.component.css'],
 })
 export class SchemaEditingComponent {
+  @ViewChild(SchemaGraphComponent, { static: true })
+  public graph!: SchemaGraphComponent;
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
-  public schemaName: string = '';
-  public sql: PersistSchemaSql = new PersistSchemaSql();
   public selectedColumns?: Map<Table, ColumnCombination>;
   public schemaChanged: Subject<void> = new Subject();
 
@@ -86,10 +89,10 @@ export class SchemaEditingComponent {
     );
 
     command.onDo = () => {
-      this.selectedTable = undefined;
+      this.selectedTable = command.newTable;
     };
     command.onUndo = () => {
-      this.selectedTable = undefined;
+      this.selectedTable = fk.referencing;
     };
 
     this.commandProcessor.do(command);
@@ -107,7 +110,7 @@ export class SchemaEditingComponent {
 
     const value: { fd: FunctionalDependency; name?: string } =
       await firstValueFrom(dialogRef.afterClosed());
-    if (fd) this.onSplitFd(value);
+    if (value) this.onSplitFd(value);
   }
 
   public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
@@ -132,11 +135,12 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onAutoNormalize(): void {
-    let tables = this.selectedTable
-      ? new Array(this.selectedTable)
-      : new Array(...this.schema.tables);
-    let command = new AutoNormalizeCommand(this.schema, ...tables);
+  public onAutoNormalize(selectedTables: Set<Table> | Table): void {
+    const tablesToNormalize =
+      selectedTables.constructor.name == 'Set'
+        ? Array.from(selectedTables as Set<Table>)
+        : [selectedTables as Table];
+    let command = new AutoNormalizeCommand(this.schema, ...tablesToNormalize);
     let self = this;
     let previousSelectedTable = this.selectedTable;
     command.onDo = function () {
@@ -149,6 +153,43 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
+  public setStarMode(radioChange: SbbRadioChange) {
+    this.schema.starMode = radioChange.value;
+    this.schemaChanged.next();
+  }
+
+  public onClickMakeDirectDimension(table: Table): void {
+    const routes = this.schema.filteredRoutesFromFactTo(table);
+    if (routes.length == 1) {
+      this.onMakeDirectDimensions(routes);
+    } else {
+      const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
+        data: { table: table, schema: this.schema },
+      });
+      dialogRef
+        .afterClosed()
+        .subscribe((value: { routes: Array<Array<TableRelationship>> }) => {
+          if (value) this.onMakeDirectDimensions(value.routes);
+        });
+    }
+  }
+
+  public onMakeDirectDimensions(routes: Array<Array<TableRelationship>>) {
+    for (const i in routes) {
+      const route = routes[i];
+      let command = new DirectDimensionCommand(this.schema, route);
+      command.onDo = () =>
+        (this.selectedTable = route[route.length - 1].referenced);
+      command.onUndo = () =>
+        (this.selectedTable = route[route.length - 1].referenced);
+      this.commandProcessor.do(command);
+      if (+i < routes.length - 1) {
+        routes[+i + 1][0].referencing = command.newTable!;
+      }
+    }
+    this.schemaChanged.next();
+  }
+
   public onUndo() {
     this.commandProcessor.undo();
     this.schemaChanged.next();
@@ -157,92 +198,5 @@ export class SchemaEditingComponent {
   public onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
-  }
-
-  public async persistSchema(): Promise<void> {
-    this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
-
-    const tables: Table[] = Array.from(this.schema.tables);
-
-    console.log('Requesting SQL-Generation (Prepare Schema Statements)');
-    const res = await this.dataService.getSchemaPreparationSql(
-      this.schemaName,
-      tables
-    );
-    this.sql.databasePreparation += '\n' + res.sql + '\n';
-
-    console.log('Requesting SQL-Generation (Create Table Statements)');
-    for (const table of this.schema.tables) {
-      const createTableSql = await this.dataService.getCreateTableSql(table);
-      this.sql.createTableStatements += '\n' + createTableSql.sql + '\n';
-      const dataTransferSql = await this.dataService.getDataTransferSql(
-        table,
-        table.columns.asArray()
-      );
-      this.sql.dataTransferStatements += '\n' + dataTransferSql.sql + '\n';
-
-      if (table.pk) {
-        const pk = await this.dataService.getPrimaryKeySql(
-          table.schemaName,
-          table.name,
-          table.pk!.columnNames()
-        );
-        this.sql.primaryKeyConstraints += '\n' + pk.sql + '\n';
-      }
-
-      for (const fk of this.schema.fksOf(table)) {
-        const fkSql = await this.dataService.getForeignKeySql(
-          fk.referencing,
-          fk.relationship,
-          fk.referenced
-        );
-        this.sql.foreignKeyConstraints += '\n' + fkSql.sql + '\n';
-      }
-    }
-
-    console.log('Requesting SQL-Generation (Primary Keys)');
-
-    console.log('Requesting SQL-Generation (Foreign Keys)');
-
-    console.log('Finished! ' + this.schemaName);
-  }
-
-  async download(): Promise<void> {
-    await this.persistSchema();
-    const file: File = new File(
-      [this.sql.to_string()],
-      this.schemaName + '.sql',
-      {
-        type: 'text/plain;charset=utf-8',
-      }
-    );
-    saveAs(file);
-  }
-}
-
-class PersistSchemaSql {
-  public databasePreparation: string = '';
-  public createTableStatements: string = '';
-  public dataTransferStatements: string = '';
-  public primaryKeyConstraints: string = '';
-  public foreignKeyConstraints: string = '';
-  public to_string(): string {
-    return (
-      '/* SCHEMA PREPARATION: */\n' +
-      this.databasePreparation! +
-      '\n' +
-      '/* SCHEMA CREATION: */\n' +
-      this.createTableStatements! +
-      '\n' +
-      '/* DATA TRANSER: */\n' +
-      this.dataTransferStatements! +
-      '\n' +
-      '/* PRIMARY KEYS: */\n' +
-      this.primaryKeyConstraints! +
-      '\n' +
-      '/* FOREIGN KEYS: */\n' +
-      this.foreignKeyConstraints! +
-      '\n'
-    );
   }
 }

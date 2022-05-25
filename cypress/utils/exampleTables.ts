@@ -169,9 +169,13 @@ export function exampleSchema(): Schema {
   );
   schema.addFk(new SourceRelationship([b2.sourceColumn], [c1.sourceColumn]));
   schema.addFk(new SourceRelationship([a5.sourceColumn], [c1.sourceColumn]));
-  schema.addInd(new SourceRelationship([a4.sourceColumn], [c1.sourceColumn]));
+  schema.addInds(new SourceRelationship([a4.sourceColumn], [c1.sourceColumn]));
 
   return schema;
+}
+
+export function exampleSchemaToJSON(): string {
+  return JSON.stringify(exampleSchema());
 }
 
 export function multiFkSchema(): Schema {
@@ -181,7 +185,13 @@ export function multiFkSchema(): Schema {
     ["a_a1", "a_a2", "a_b1", "a_b2", "a_a3"],
     "TableA"
   );
-  const tableB = Table.fromColumnNames(["b_b1", "b_b2"], "TableB");
+  const tableB = Table.fromColumnNames(["b_b1", "b_b2", "b_b3"], "TableB");
+  tableB.addFd(
+    new FunctionalDependency(
+      new ColumnCombination(tableB.columns.columnsFromNames("b_b1", "b_b2")),
+      tableB.columns.copy()
+    )
+  );
   tableA.addFd(
     new FunctionalDependency(
       new ColumnCombination(tableA.columns.columnsFromNames("a_a1", "a_a2")),

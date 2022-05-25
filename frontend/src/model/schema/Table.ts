@@ -40,6 +40,17 @@ export default class Table {
    */
   public _indsValid = false;
 
+  public toJSON() {
+    return {
+      name: this.name,
+      schemaName: this.schemaName,
+      columns: this.columns,
+      pk: this.pk,
+      relationships: this.relationships,
+      sources: this.sources,
+    };
+  }
+
   public constructor(columns?: ColumnCombination) {
     this.columns = columns || new ColumnCombination();
   }
@@ -331,8 +342,15 @@ export default class Table {
   }
 
   public isKey(columns: ColumnCombination): boolean {
-    if (this.keys().find((cc) => cc.equals(columns))) return true;
-    else return false;
+    if (this.columns.isSubsetOf(columns)) return true;
+    const rhs = columns.copy();
+    for (const fd of this.fds) {
+      if (fd.lhs.isSubsetOf(columns)) {
+        rhs.union(fd.rhs);
+        if (this.columns.isSubsetOf(rhs)) return true;
+      }
+    }
+    return false;
   }
 
   public isBCNFViolating(fd: FunctionalDependency): boolean {

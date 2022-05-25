@@ -29,18 +29,22 @@ describe("The schema editing page", () => {
   });
 
   it("displays existing primary keys", () => {
-    cy.get(
-      '[data-cy="graph-element-columns"][class="col-7 ellipsis pk"]'
-    ).should("have.length", 3);
-    cy.get(
-      '[data-cy="graph-element-columns"][class="col-7 ellipsis pk"]'
-    ).should("contain", "ps_partkey");
-    cy.get(
-      '[data-cy="graph-element-columns"][class="col-7 ellipsis pk"]'
-    ).should("contain", "ps_suppkey");
-    cy.get(
-      '[data-cy="graph-element-columns"][class="col-7 ellipsis pk"]'
-    ).should("contain", "ps_supplycost");
+    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+      "have.length",
+      3
+    );
+    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+      "contain",
+      "ps_partkey"
+    );
+    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+      "contain",
+      "ps_suppkey"
+    );
+    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+      "contain",
+      "ps_supplycost"
+    );
     it("shows nullable information for columns", () => {
       cy.get('[data-cy="graph-element-column-datatype"]').should(
         "contain",

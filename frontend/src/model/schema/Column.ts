@@ -17,9 +17,13 @@ export default class Column {
 
   public get name() {
     let name = '';
-    if (this.includeSourceName) name += `${this.sourceTableInstance.alias}.`;
+    if (this.includeSourceName) name += `${this.sourceTableInstance.alias}_`;
     name += this.baseAlias;
     return name;
+  }
+
+  public get identifier() {
+    return `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`;
   }
 
   public get baseAlias(): string {
@@ -56,10 +60,6 @@ export default class Column {
       this.sourceTableInstance.equals(other.sourceTableInstance) &&
       this.sourceColumn.equals(other.sourceColumn)
     );
-  }
-
-  public identifier(): string {
-    return `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`;
   }
 
   public applySourceMapping(

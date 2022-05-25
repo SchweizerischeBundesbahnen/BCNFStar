@@ -2,25 +2,9 @@ import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import ITablePage from '@server/definitions/ITablePage';
-import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
-import {
-  IRequestBodyCreateTableSql,
-  IRequestBodyDataTransferSql,
-  IRequestBodyForeignKeySql,
-} from '@server/definitions/IBackendAPI';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
-import Relationship from '../model/schema/Relationship';
 import { firstValueFrom } from 'rxjs';
-import IForeignKey from '@server/definitions/IForeignKey';
-import IPrimaryKey from '@server/definitions/IPrimaryKey';
-import Column from '../model/schema/Column';
-import IInclusionDependency from '@server/definitions/IInclusionDependency';
-import IRelationship from '@server/definitions/IRelationship';
-import ColumnCombination from '../model/schema/ColumnCombination';
-import SourceColumn from '../model/schema/SourceColumn';
-import SourceRelationship from '../model/schema/SourceRelationship';
-import SourceFunctionalDependency from '../model/schema/SourceFunctionalDependency';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 
@@ -29,8 +13,6 @@ import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 })
 export class DatabaseService {
   public schema?: Schema;
-  /** this is used for looking up existing SourceColumns to cut down on later comparisons and memory */
-  public sourceColumns = new Map<string, SourceColumn>();
 
   /**
    * when using the angular dev server, you need to access another adress
@@ -39,15 +21,11 @@ export class DatabaseService {
    * to be the BCNFStar express server (found in backend/index.ts)
    **/
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
-  private iFks: Array<IForeignKey> = [];
-  private iPks: Array<IPrimaryKey> = [];
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) {}
 
   public async loadTables(): Promise<Array<Table>> {
-    this.iFks = await this.getIFks();
-    this.iPks = await this.getIPks();
     return this.getTables();
   }
 
@@ -61,6 +39,12 @@ export class DatabaseService {
       this.http.get<ITablePage>(
         `${this.baseUrl}/tables/page?schema=${schema}&table=${table}&offset=${offset}&limit=${limit}`
       )
+    );
+  }
+
+  public async getDmbsName(): Promise<string> {
+    return firstValueFrom(
+      this.http.get<string>(`${this.baseUrl}/persist/dbmsname`)
     );
   }
 
@@ -78,146 +62,6 @@ export class DatabaseService {
     return tables;
   }
 
-  private getIPks(): Promise<Array<IPrimaryKey>> {
-    return firstValueFrom(
-      this.http.get<Array<IPrimaryKey>>(this.baseUrl + '/pks')
-    );
-  }
-
-  private resolveIPks(pks: Array<IPrimaryKey>) {
-    pks.forEach((fk) => {
-      let table: Table | undefined = [...this.schema!.tables].find(
-        (table) =>
-          table.schemaName == fk.table_schema && table.name == fk.table_name
-      );
-      if (table) {
-        table!.pk = new ColumnCombination(
-          table!.columns
-            .asArray()
-            .filter((column) =>
-              fk.attributes.includes(column.sourceColumn.name)
-            )
-        );
-      }
-    });
-  }
-
-  private getIFks(): Promise<Array<IForeignKey>> {
-    return firstValueFrom(
-      this.http.get<Array<IForeignKey>>(this.baseUrl + '/fks')
-    );
-  }
-
-  private resolveIFks(iFks: Array<IForeignKey>) {
-    iFks.forEach((iFk) => {
-      let fk = new SourceRelationship();
-      for (const i in iFk.referencing) {
-        let referencingIColumn = iFk.referencing[i];
-        let referencingColumn = this.sourceColumns.get(
-          `${referencingIColumn.schemaIdentifier}.${referencingIColumn.tableIdentifier}.${referencingIColumn.columnIdentifier}`
-        );
-
-        let referencedIColumn = iFk.referenced[i];
-        let referencedColumn = this.sourceColumns.get(
-          `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
-        );
-
-        // in case the foreign key is not fully contained in the selection of tables
-        if (!referencingColumn || !referencedColumn) continue;
-
-        fk.referencing.push(referencingColumn);
-        fk.referenced.push(referencedColumn);
-      }
-      if (fk.referencing.length > 0) this.schema!.addFk(fk);
-    });
-  }
-
-  private resolveInds(iInds: Array<IInclusionDependency>) {
-    iInds.forEach((iInd) => {
-      let ind = new SourceRelationship();
-      for (const i in iInd.dependant.columnIdentifiers) {
-        let dependantIColumn = iInd.dependant.columnIdentifiers[i];
-        let dependantColumn = this.sourceColumns.get(
-          `${dependantIColumn.schemaIdentifier}.${dependantIColumn.tableIdentifier}.${dependantIColumn.columnIdentifier}`
-        );
-
-        let referencedIColumn = iInd.referenced.columnIdentifiers[i];
-        let referencedColumn = this.sourceColumns.get(
-          `${referencedIColumn.schemaIdentifier}.${referencedIColumn.tableIdentifier}.${referencedIColumn.columnIdentifier}`
-        );
-
-        if (!dependantColumn || !referencedColumn) continue;
-
-        ind.referencing.push(dependantColumn!);
-        ind.referenced.push(referencedColumn!);
-      }
-      if (ind.referencing.length > 0) this.schema!.addInd(ind);
-    });
-  }
-
-  public resolveFds(fds: Array<IFunctionalDependency>, table: Table) {
-    for (const fd of fds) {
-      const lhs = fd.lhsColumns.map(
-        (colName) =>
-          this.sourceColumns.get(
-            `${table.schemaName}.${table.name}.${colName}`
-          )!
-      );
-      const rhs = fd.rhsColumns.map(
-        (colName) =>
-          this.sourceColumns.get(
-            `${table.schemaName}.${table.name}.${colName}`
-          )!
-      );
-      this.schema!.addFd(new SourceFunctionalDependency(lhs, rhs));
-    }
-    this.schema!.calculateFdsOf(table);
-  }
-
-  /**
-   * Creates InputSchema for use on edit-schema page with the supplied tables
-   * @param tables used on edit-schema page
-   * @param indFile name of a metanome results file that contains INDs for all the tables
-   * @param fdFiles Record that maps from table.schemaAndName to FD result file name
-   */
-  public async setInputTables(
-    tables: Array<Table>,
-    indFile: string,
-    fdFiles: Record<string, string>
-  ) {
-    const indPromise = this.getMetanomeResult(indFile) as Promise<
-      Array<IInclusionDependency>
-    >;
-    const fdPromises = new Map<Table, Promise<Array<IFunctionalDependency>>>();
-    for (const table of tables)
-      fdPromises.set(
-        table,
-        this.getMetanomeResult(fdFiles[table.fullName]) as Promise<
-          Array<IFunctionalDependency>
-        >
-      );
-
-    this.schema = new Schema(...tables);
-    for (const table of tables) {
-      let sourceTable = [...table.sources][0].table;
-      table.columns
-        .asArray()
-        .forEach((column) =>
-          this.sourceColumns.set(
-            `${sourceTable.fullName}.${column.sourceColumn.name}`,
-            column.sourceColumn
-          )
-        );
-    }
-
-    for (const [table, tableFds] of fdPromises.entries()) {
-      this.resolveFds(await tableFds, table);
-    }
-    this.resolveInds(await indPromise);
-    this.resolveIFks(this.iFks);
-    this.resolveIPks(this.iPks);
-  }
-
   public async runMetanome(entry: IIndexFileEntry) {
     const job: IMetanomeJob = {
       algoClass: entry.algorithm,
@@ -228,129 +72,6 @@ export class DatabaseService {
       this.http.post<{ message: string; fileName: string }>(
         `${this.baseUrl}/metanomeResults/`,
         job
-      )
-    );
-  }
-
-  private getMetanomeResult(fileName: string) {
-    return firstValueFrom(
-      this.http.get(`${this.baseUrl}/metanomeResults/${fileName}`)
-    );
-  }
-
-  public getForeignKeySql(
-    referencing: Table,
-    relationship: Relationship,
-    referenced: Table
-  ): Promise<{ sql: string }> {
-    const fk_name: string = 'fk_' + Math.random().toString(16).slice(2);
-
-    const relationship_: IRelationship = {
-      referencing: referencing.toITable(),
-      referenced: referenced.toITable(),
-      columnRelationships: referenced.pk!.asArray().map((element) => {
-        return {
-          referencingColumn:
-            relationship.referencing[
-              relationship.referenced.indexOf(
-                relationship.referenced.find((c) => c.equals(element))!
-              )
-            ].name,
-          referencedColumn: element.name,
-        };
-      }),
-    };
-
-    const data: IRequestBodyForeignKeySql = {
-      name: fk_name,
-      relationship: relationship_,
-    };
-
-    return firstValueFrom(
-      this.http.post<{ sql: string }>(
-        `${this.baseUrl}/persist/createForeignKey`,
-        data
-      )
-    );
-  }
-
-  public getSchemaPreparationSql(
-    schemaName: string,
-    tables: Table[]
-  ): Promise<{ sql: string }> {
-    const data = {
-      schema: schemaName,
-      tables: tables.map((table) => table.name),
-    };
-    return firstValueFrom(
-      this.http.post<{ sql: string }>(
-        `${this.baseUrl}/persist/schemaPreparation`,
-        data
-      )
-    );
-  }
-
-  public getDataTransferSql(
-    table: Table,
-    attributes: Column[]
-  ): Promise<{ sql: string }> {
-    const data: IRequestBodyDataTransferSql = {
-      newSchema: table.schemaName!,
-      newTable: table.name,
-      relationships: [...table.relationships].map((rel) =>
-        rel.toIRelationship()
-      ),
-      sourceTables: Array.from(table.sources).map(
-        (source) => `${source.table.fullName}`
-      ),
-      attributes: attributes.map((attr) => attr.toIAttribute()),
-    };
-
-    let result = firstValueFrom(
-      this.http.post<{ sql: string }>(
-        `${this.baseUrl}/persist/dataTransfer`,
-        data
-      )
-    );
-    return result;
-  }
-
-  public getPrimaryKeySql(
-    schema: string,
-    table: string,
-    primaryKey: string[]
-  ): Promise<{ sql: string }> {
-    const data = {
-      schema: schema,
-      table: table,
-      primaryKey: primaryKey,
-    };
-    return firstValueFrom(
-      this.http.post<{ sql: string }>(
-        `${this.baseUrl}/persist/createPrimaryKey`,
-        data
-      )
-    );
-  }
-
-  public getCreateTableSql(table: Table): Promise<{ sql: string }> {
-    const [newSchema, newTable]: string[] = [table.schemaName, table.name];
-    let primaryKey: string[] = [];
-    if (table.pk) {
-      primaryKey = table.pk!.columnNames();
-    }
-    const data: IRequestBodyCreateTableSql = {
-      newSchema: newSchema,
-      newTable: newTable,
-      attributes: table.columns
-        .asArray()
-        .map((column) => column.toIAttribute()),
-      primaryKey: primaryKey,
-    };
-    return firstValueFrom(
-      this.http.post<{ sql: string }>(
-        `${this.baseUrl}/persist/createTable`,
-        data
       )
     );
   }

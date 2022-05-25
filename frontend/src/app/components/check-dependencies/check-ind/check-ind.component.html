@@ -1,0 +1,109 @@
+<div>
+  <h3>
+    Check whether a valid foreign key could be created between this table and
+    the one selected below on specific columns.
+  </h3>
+  <div>
+    <sbb-select
+      (ngModelChange)="onTableSelected($event)"
+      [(ngModel)]="referencedTable"
+      placeholder="Referenced Table"
+    >
+      <sbb-option
+        *ngFor="let table of validTables()"
+        [value]="table"
+        [sbbTooltip]="table.fullName"
+        >{{ table.fullName }}</sbb-option
+      >
+    </sbb-select>
+  </div>
+  <div *ngIf="referencedTable">
+    <div *ngFor="let refColumn of referencingColumns(); index as i">
+      <div class="d-flex align-items-center" style="padding-top: 10px">
+        <input
+          disabled="true"
+          style="width: 40%"
+          sbbInput
+          [value]="refColumn.sourceColumn.name"
+        />
+        <input
+          disabled="true"
+          style="width: 40%; margin-left: 5px; margin-right: 5px"
+          sbbInput
+          [value]="referencedColumns()[i].sourceColumn.name"
+        />
+        <button
+          sbb-icon-button
+          style="width: 20%"
+          type="button"
+          (click)="removeColumnRelation(i)"
+        >
+          <sbb-icon svgIcon="kom:cross-small"></sbb-icon>
+        </button>
+      </div>
+    </div>
+    <div class="d-flex align-items-center" style="padding-top: 10px">
+      <sbb-select
+        [(ngModel)]="referencingColumn"
+        placeholder="Referencing Column"
+      >
+        <sbb-option
+          *ngFor="let column of validReferencingColumns()"
+          [value]="column"
+          [sbbTooltip]="column.sourceColumn.name"
+          >{{ column.sourceColumn.name }}
+        </sbb-option>
+      </sbb-select>
+      <sbb-select
+        [(ngModel)]="referencedColumn"
+        placeholder="Referenced Column"
+      >
+        <sbb-option
+          *ngFor="let column of validReferencedColumns()"
+          [value]="column"
+          [sbbTooltip]="column.sourceColumn.name"
+          >{{ column.sourceColumn.name }}
+        </sbb-option>
+      </sbb-select>
+
+      <button
+        style="width: 20%"
+        type="button"
+        sbb-icon-button
+        (click)="addColumnRelation()"
+        [disabled]="!canAddColumnRelation()"
+      >
+        <sbb-icon svgIcon="kom:plus-small"></sbb-icon>
+      </button>
+    </div>
+    <div class="d-flex align-items-center" style="padding-top: 15px">
+      <button
+        sbb-button
+        (click)="checkInd()"
+        [disabled]="!canCheckIND()"
+        style="width: 80%"
+      >
+        Check Inclusion Dependency
+      </button>
+      <button
+        style="width: 20%; margin: 5px"
+        type="button"
+        sbb-icon-button
+        (click)="switchTables()"
+        [disabled]="!tableSelected()"
+      >
+        <sbb-icon svgIcon="kom:arrows-circle-medium"></sbb-icon>
+      </button>
+      <sbb-loading
+        mode="inline"
+        aria-valuetext="Loading, please wait"
+        *ngIf="this.isLoading"
+      ></sbb-loading>
+    </div>
+    <div>
+      <h3 style="position: relative; top: 5px" *ngIf="this.isValid">
+        The suggested IND is valid
+      </h3>
+    </div>
+  </div>
+</div>
