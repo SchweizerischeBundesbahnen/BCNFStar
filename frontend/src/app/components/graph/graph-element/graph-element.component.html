@@ -22,9 +22,9 @@
   </div>
   <div
     *ngFor="let column of schema.displayedColumnsOf(table)"
-    class="grid-container-column table-body"
+    class="table-body"
   >
-    <div
+    <span
       [sbbTooltip]="column.name"
       [ngClass]="{
         pk: isPkColumn(column),
@@ -34,16 +34,16 @@
       data-cy="graph-element-columns"
     >
       {{ column.name }}
-    </div>
-    <div
+    </span>
+    <span
       [sbbTooltip]="column.dataTypeString"
       class="text-end ellipsis"
       data-cy="graph-element-column-datatype"
     >
       {{ column.dataTypeString }}
-    </div>
+    </span>
   </div>
-  <div class="grid-container-silder">
+  <div>
     <sbb-icon
       class="text-end"
       svgIcon="kom:arrows-left-right-down-up-medium"

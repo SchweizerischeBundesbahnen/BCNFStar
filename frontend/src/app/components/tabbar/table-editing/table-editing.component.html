@@ -1,5 +1,5 @@
 <h2
-  class="grid-container-table-heading"
+  class="table-heading"
   id="table-name"
   *ngIf="!isEditingTableName; else editing"
 >
@@ -16,33 +16,31 @@
   </div>
   <div>as</div>
   <div
-    class="grid-container-editing-field"
+    class="editing-field"
     *ngIf="editingColumn !== column; else columnEditingField"
   >
     <div class="item" [sbbTooltip]="column.baseAlias">
       {{ column.baseAlias }}
     </div>
-    <button
-      sbb-icon-button
-      style="float: right"
-      (click)="startColumnEdit(column)"
-    >
-      <sbb-icon svgIcon="kom:pen-small"></sbb-icon>
-    </button>
-    <button sbb-icon-button style="float: right" (click)="deleteColumn(column)">
-      <sbb-icon svgIcon="kom:trash-small"></sbb-icon>
-    </button>
+    <div>
+      <button sbb-icon-button (click)="startColumnEdit(column)">
+        <sbb-icon svgIcon="kom:pen-small"></sbb-icon>
+      </button>
+      <button sbb-icon-button (click)="deleteColumn(column)">
+        <sbb-icon svgIcon="kom:trash-small"></sbb-icon>
+      </button>
+    </div>
   </div>
 </div>
 
 <h3>From</h3>
 <div *ngFor="let source of table.sources" class="grid-container-table mb-3">
-  <div class="item" [sbbTooltip]="source.table.fullName">
+  <span class="item" [sbbTooltip]="source.table.fullName">
     {{ source.table.fullName }}
-  </div>
-  <div>as</div>
+  </span>
+  <span>as</span>
   <div
-    class="grid-container-editing-field"
+    class="editing-field"
     *ngIf="editingSource !== source; else sourceEditingField"
   >
     <div class="item" [sbbTooltip]="source.baseAlias">
@@ -55,7 +53,7 @@
 </div>
 
 <ng-template #editing>
-  <div class="grid-container-table-heading">
+  <h2 class="table-heading">
     <input
       id="rename-table-input"
       type="text"
@@ -66,11 +64,11 @@
     <button sbb-icon-button (click)="changeTableName()">
       <sbb-icon svgIcon="kom:tick-medium"></sbb-icon>
     </button>
-  </div>
+  </h2>
 </ng-template>
 
 <ng-template #columnEditingField>
-  <div class="grid-container-editing-field">
+  <div class="editing-field">
     <input
       id="rename-column-input"
       type="text"
@@ -87,7 +85,7 @@
 </ng-template>
 
 <ng-template #sourceEditingField>
-  <div class="grid-container-editing-field">
+  <div class="editing-field">
     <input
       id="rename-source-input"
       type="text"
