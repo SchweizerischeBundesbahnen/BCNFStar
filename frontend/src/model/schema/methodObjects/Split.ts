@@ -25,13 +25,12 @@ export default class Split {
       this.table,
       this.table.columns.copy().setMinus(this.fd.rhs)
     ).newTable;
-    console.log('remaining', remaining);
-    console.log('generating', generating);
     remaining.pk = this.table.pk?.isSubsetOf(remaining.columns)
       ? this.table.pk.deepCopy()
       : undefined;
     generating.pk =
       this.fd.lhs.cardinality > 0 ? this.fd.lhs.deepCopy() : undefined;
+    this.reorderColumnsOf(generating);
 
     remaining.schemaName = this.table.schemaName;
     generating.schemaName = this.table.schemaName;
@@ -67,5 +66,16 @@ export default class Split {
       fd.lhs.columnSubstitution(mapping);
       fd.rhs.columnSubstitution(mapping);
     });
+  }
+
+  /**
+   * puts pk columns first
+   */
+  private reorderColumnsOf(table: Table) {
+    if (!table.pk) return;
+    const columns = table.columns;
+    table.columns = new ColumnCombination();
+    for (const pkCol of table.pk!) table.columns.add(pkCol);
+    for (const col of columns) table.columns.add(col);
   }
 }

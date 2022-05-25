@@ -29,6 +29,8 @@ export class GraphElementComponent {
   }
 
   public isPkColumn(column: BasicColumn): boolean {
+    if (this.table.implementsSurrogateKey())
+      return column.name == this.table.surrogateKey;
     return (
       column instanceof Column &&
       !!this.table.pk &&

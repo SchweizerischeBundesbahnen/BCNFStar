@@ -474,9 +474,10 @@ export default class Schema {
   }
 
   public displayedColumnsOf(table: Table): Array<BasicColumn> {
-    const columns: Array<BasicColumn> = Array.from(table.columns.asArray());
+    const columns = new Array<BasicColumn>();
     if (table.implementsSurrogateKey())
       columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
+    columns.push(...table.columns);
     for (const fk of this.fksOf(table))
       if (fk.referenced.implementsSurrogateKey()) {
         const name =
