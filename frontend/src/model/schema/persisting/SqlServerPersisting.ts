@@ -8,8 +8,8 @@ export default class SqlServerPersisting extends SQLPersisting {
       `
 IF NOT EXISTS ( SELECT  *
 FROM sys.schemas
-WHERE name = N'${schema.name!}' )
-EXEC('CREATE SCHEMA [${schema.name!}]');
+WHERE name = N'${this.schemaName!}' )
+EXEC('CREATE SCHEMA [${this.schemaName!}]');
 GO
 ` + '\n';
     for (const table of schema.tables) {
