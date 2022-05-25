@@ -166,7 +166,7 @@ export default class Schema {
   ): Array<Array<TableRelationship>> {
     return this.routesFromFactTo(table).filter((route) => {
       if (route.length <= 1) return false;
-      const dd = new DirectDimension(route);
+      const dd = new DirectDimension([route]);
       return dd.newTable.columns.cardinality > dd.oldTable.columns.cardinality;
     });
   }

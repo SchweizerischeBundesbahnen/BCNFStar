@@ -26,15 +26,7 @@ export default class DirectDimensionCommand extends Command {
 
   protected override _do(): void {
     for (const fact of this.oldTables) {
-      const routesToFact = this.routes.get(fact)!;
-      for (const i in routesToFact) {
-        let newTable = new DirectDimension(routesToFact[i]).newTable;
-        console.log(i, newTable);
-        if (+i == routesToFact.length - 1) {
-          this.newTables.push(newTable);
-          console.log(newTable);
-        } else routesToFact[+i + 1][0].referencing = newTable;
-      }
+      this.newTables.push(new DirectDimension(this.routes.get(fact)!).newTable);
     }
     this._redo();
   }
