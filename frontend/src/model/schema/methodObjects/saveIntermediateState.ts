@@ -31,6 +31,7 @@ interface JSONTable {
   schemaName: string;
   columns: JSONColumnCombination;
   pk?: JSONColumnCombination;
+  sk: string;
   relationships: Array<JSONRelationship>;
   sources: Array<JSONSourceTableInstance>;
 }
@@ -121,6 +122,8 @@ export default class SaveSchemaState {
 
     if (jsonTable.pk && jsonTable.pk._columns.length > 0)
       table.pk = this.parseColumnCombination(jsonTable.pk, table);
+
+    table.surrogateKey = jsonTable.sk;
 
     let newRelationships = new Array<Relationship>();
     jsonTable.relationships.forEach((relationship) => {

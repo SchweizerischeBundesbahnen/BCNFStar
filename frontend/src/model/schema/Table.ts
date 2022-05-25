@@ -51,6 +51,7 @@ export default class Table {
       schemaName: this.schemaName,
       columns: this.columns,
       pk: this.pk,
+      sk: this.surrogateKey,
       relationships: this.relationships,
       sources: this.sources,
     };
