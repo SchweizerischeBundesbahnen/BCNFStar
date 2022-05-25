@@ -378,7 +378,11 @@ export default class Table {
         .sort((fd1, fd2) => {
           let score1 = new FdScore(this, fd1).get();
           let score2 = new FdScore(this, fd2).get();
-          return score2 - score1;
+          if (score1 !== score2) return score2 - score1;
+          const [fd1String, fd2String] = [fd1.toString(), fd2.toString()];
+          if (fd1String < fd2String) return 1;
+          if (fd2String < fd1String) return -1;
+          return 0;
         });
     }
     return this._violatingFds;
