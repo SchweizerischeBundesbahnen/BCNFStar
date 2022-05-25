@@ -114,9 +114,9 @@ export default abstract class SQLPersisting {
 
   // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
   public addSkColumnToReferencingSql(fk: TableRelationship): string {
-    return `ALTER TABLE  ${this.tableIdentifier(
+    return `ALTER TABLE ${this.tableIdentifier(
       fk.referencing
-    )}  ADD F${this.fkSurrogateKeyName(fk)} INT;
+    )} ADD ${this.fkSurrogateKeyName(fk)} INT;
     ${this.suffix()}
     `;
   }
