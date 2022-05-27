@@ -54,7 +54,9 @@
         [schema]="schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
+        (deleteColumnEvent)="onDeleteColumn($event)"
         (selectColumns)="onSelectColumns($event)"
+        (setSurrogateKey)="onSetSurrogateKey($event)"
         (autoNormalizeSelectedTable)="onAutoNormalize(selectedTable)"
       ></app-schema-editing-side-bar>
       <h2 *ngIf="!selectedTable" class="table-not-selected">

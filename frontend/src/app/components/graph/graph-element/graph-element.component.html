@@ -21,29 +21,29 @@
     </span>
   </div>
   <div
-    *ngFor="let column of table.columns"
-    class="grid-container-column table-body"
+    *ngFor="let column of schema.displayedColumnsOf(table)"
+    class="table-body"
   >
-    <div
+    <span
       [sbbTooltip]="column.name"
       [ngClass]="{
-        pk: table.pk && table.pk.includes(column),
-        highlighted: selectedColumns && selectedColumns.includes(column)
+        pk: isPkColumn(column),
+        highlighted: isHighlightedColumn(column)
       }"
       class="ellipsis"
       data-cy="graph-element-columns"
     >
       {{ column.name }}
-    </div>
-    <div
-      [sbbTooltip]="column.dataTypeString()"
+    </span>
+    <span
+      [sbbTooltip]="column.dataTypeString"
       class="text-end ellipsis"
       data-cy="graph-element-column-datatype"
     >
-      {{ column.dataTypeString() }}
-    </div>
+      {{ column.dataTypeString }}
+    </span>
   </div>
-  <div class="grid-container-silder">
+  <div>
     <sbb-icon
       class="text-end"
       svgIcon="kom:arrows-left-right-down-up-medium"

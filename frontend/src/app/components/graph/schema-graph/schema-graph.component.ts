@@ -165,7 +165,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       });
       jointjsEl.resize(
         this.elementWidth,
-        60 + this.portDiameter * table.columns.cardinality
+        60 + this.portDiameter * this.schema.displayedColumnsOf(table).length
       );
       this.graphStorage.set(table, {
         // alternative to HtmlElement: joint.shapes.html.Element
@@ -225,24 +225,22 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   private generateLinks() {
     for (const table of this.schema.tables) {
       for (const fk of this.schema.fksOf(table)) {
-        let fkReferenced = fk.relationship.referenced[0];
-        let fkReferencing = fk.relationship.referencing[0];
+        const referencedName = fk.referenced.implementsSurrogateKey()
+          ? fk.referenced.surrogateKey
+          : fk.relationship.referenced[0].name;
+        const referencingName = fk.referenced.implementsSurrogateKey()
+          ? fk.referenced.surrogateKey +
+            '_' +
+            fk.relationship.referencing.map((col) => col.name).join('_')
+          : fk.relationship.referencing[0].name;
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
-            port:
-              fkReferencing.sourceColumn.table.fullName +
-              '.' +
-              fkReferencing.name +
-              '_right',
+            port: referencingName + '_right',
           },
           target: {
             id: this.graphStorage.get(fk.referenced)?.jointjsEl.id,
-            port:
-              fkReferenced.sourceColumn.table.fullName +
-              '.' +
-              fkReferenced.name +
-              '_left',
+            port: referencedName + '_left',
           },
           z: -1,
         });
@@ -281,17 +279,17 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
-    for (let column of table.columns) {
+    for (let column of this.schema.displayedColumnsOf(table)) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
-        id: column.sourceColumn.table.fullName + '.' + column.name + '_left', // generated if `id` value is not present
+        id: column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
       args = { counter, side: PortSide.Right };
       jointjsEl.addPort({
-        id: column.sourceColumn.table.fullName + '.' + column.name + '_right', // generated if `id` value is not present
+        id: column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
         args,
         markup: this.generatePortMarkup(args),
