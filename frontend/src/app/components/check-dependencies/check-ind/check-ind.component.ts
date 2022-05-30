@@ -39,6 +39,9 @@ export class CheckIndComponent implements OnChanges {
 
     this.referencingColumn = undefined;
     this.referencedColumn = undefined;
+
+    this.isValid = false;
+    this.isLoading = false;
   }
 
   public get relationship(): Relationship {

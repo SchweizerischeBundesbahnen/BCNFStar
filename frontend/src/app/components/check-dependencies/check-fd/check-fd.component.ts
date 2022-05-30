@@ -26,6 +26,16 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
   ngOnChanges(): void {
     this.lhs = [];
     this.rhs = [];
+    this.isValid = false;
+    this.isLoading = false;
+  }
+
+  public get lhs() {
+    return this._lhs;
+  }
+
+  public get rhs() {
+    return this._rhs;
   }
 
   public set lhs(columns: Array<Column>) {
@@ -45,7 +55,6 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
   public async checkFd(): Promise<void> {
     // a column always defines itself,
     this.rhs = this._rhs.filter((c) => !this._lhs.includes(c));
-
     const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
       this.table,
       this._lhs,
@@ -60,8 +69,8 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
       this.isValid = true;
       this.table.addFd(
         new FunctionalDependency(
-          new ColumnCombination(this._lhs),
-          new ColumnCombination(this._rhs)
+          new ColumnCombination(Array.from(this.lhs)),
+          new ColumnCombination(Array.from(this.rhs))
         )
       );
     } else {
