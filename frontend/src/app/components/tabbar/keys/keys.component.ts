@@ -17,10 +17,24 @@ export class KeysComponent implements OnChanges {
   @Output() public setSurrogateKey = new EventEmitter<string>();
 
   public surrogateKey = '';
+  public editMode = false;
+  public surrogateKeyExists = false;
 
   constructor() {}
 
   ngOnChanges(): void {
-    this.surrogateKey = this.table?.surrogateKey ?? '';
+    this.surrogateKey = this.table.surrogateKey ?? '';
+    this.surrogateKeyExists = !!this.table.surrogateKey;
+  }
+
+  emitSurrogateKey() {
+    this.setSurrogateKey.emit(this.surrogateKey);
+    this.editMode = false;
+    this.surrogateKeyExists = true;
+  }
+  deleteSurrogateKey() {
+    this.setSurrogateKey.emit('');
+    this.surrogateKeyExists = false;
+    this.surrogateKey = '';
   }
 }
