@@ -38,10 +38,12 @@ export class DatabaseTableViewerComponent implements OnInit {
 
   public async reloadData() {
     this.isLoading = true;
-    const result = await this.dataService.loadTablePage(
-      this.page * this.pageSize,
-      this.pageSize
-    );
+    const result = await this.dataService
+      .loadTablePage(this.page * this.pageSize, this.pageSize)
+      .catch((e) => {
+        console.error(`Could not reload data`);
+        console.error(e);
+      });
     this.isLoading = false;
 
     if (!result) return;
