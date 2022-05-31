@@ -25,6 +25,7 @@ export default class Split {
       this.table,
       this.table.columns.copy().setMinus(this.fd.rhs)
     ).newTable;
+    remaining.surrogateKey = this.table.surrogateKey;
     remaining.pk = this.table.pk?.isSubsetOf(remaining.columns)
       ? this.table.pk.deepCopy()
       : undefined;
