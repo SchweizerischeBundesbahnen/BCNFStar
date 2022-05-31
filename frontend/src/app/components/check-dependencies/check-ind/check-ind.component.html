@@ -37,6 +37,7 @@
           id="columnRelationButton"
           type="button"
           (click)="removeColumnRelation(i)"
+          sbbTooltip="remove match"
         >
           <sbb-icon svgIcon="kom:cross-small"></sbb-icon>
         </button>
@@ -74,6 +75,7 @@
         sbb-icon-button
         (click)="addColumnRelation()"
         [disabled]="!canAddColumnRelation()"
+        sbbTooltip="add match"
       >
         <sbb-icon svgIcon="kom:plus-small"></sbb-icon>
       </button>
@@ -93,6 +95,7 @@
         sbb-icon-button
         (click)="switchTables()"
         [disabled]="!tableSelected()"
+        sbbTooltip="Swap IND direction"
       >
         <sbb-icon svgIcon="kom:arrows-circle-medium"></sbb-icon>
       </button>
