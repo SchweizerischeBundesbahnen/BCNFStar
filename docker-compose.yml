@@ -8,8 +8,8 @@ services:
     environment:
       - DB_HOST=host.docker.internal
       - DB_PORT=5432
-      - DB_DATABASE=testingmodelsaving
-      - DB_USER=mafi
+      - DB_DATABASE=postgres
+      - DB_USER=postgres
       - DB_TYPE=postgres
       - DB_PASSWORD=
       - REDIS_HOST=redis
