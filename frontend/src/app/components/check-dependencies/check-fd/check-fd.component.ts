@@ -53,12 +53,15 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
   }
 
   public async checkFd(): Promise<void> {
-    // a column always defines itself,
-    this.rhs = this._rhs.filter((c) => !this._lhs.includes(c));
+    // only check those columns, which are not defined by existing fds
+    const rhs_copy = this._rhs.filter(
+      (c) => !this.table.hull(new ColumnCombination(this._lhs)).includes(c)
+    );
+
     const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
       this.table,
       this._lhs,
-      this._rhs
+      rhs_copy
     );
 
     this.isLoading = true;
