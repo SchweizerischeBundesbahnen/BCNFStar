@@ -391,16 +391,48 @@ export default class Schema {
   }
 
   private transitiveFksOf(table: Table): Array<TableRelationship> {
-    return table._fks.filter((fk) =>
-      table._fks.some(
-        (otherFk) =>
-          new ColumnCombination(fk.relationship.referencing).isSubsetOf(
-            new ColumnCombination(otherFk.relationship.referencing)
-          ) &&
-          fk.relationship.referencing.length <
-            otherFk.relationship.referencing.length
+    return table._fks.filter((fk) => this.existsPath(fk));
+  }
+
+  private existsPath(
+    targetFk: TableRelationship,
+    terminationFk: TableRelationship = targetFk,
+    firstIteration: boolean = true
+  ): boolean {
+    if (!firstIteration && targetFk.referencing == terminationFk.referencing)
+      return false;
+    if (
+      targetFk.referencing == targetFk.referenced &&
+      new ColumnCombination(targetFk.relationship.referencing).equals(
+        new ColumnCombination(targetFk.relationship.referenced)
       )
-    );
+    )
+      return true;
+    for (const fk of targetFk.referencing._fks) {
+      if (fk == targetFk) continue;
+      const newReferencing = targetFk.relationship.referencing
+        .map((col) => fk.relationship.referencing.indexOf(col))
+        .map((index) =>
+          index != -1 ? fk.relationship.referenced[index] : undefined
+        );
+      if (newReferencing.some((col) => !col)) continue;
+      if (
+        this.existsPath(
+          new TableRelationship(
+            new Relationship(
+              newReferencing as Array<Column>,
+              targetFk.relationship.referenced
+            ),
+            fk.referenced,
+            targetFk.referenced
+          ),
+          terminationFk,
+          false
+        )
+      )
+        return true;
+    }
+    return false;
   }
 
   private starViolatingFksOf(table: Table): Array<TableRelationship> {
