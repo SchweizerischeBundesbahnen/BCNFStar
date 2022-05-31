@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  new_bcnfstar:
+    image: bcnfstar
+    ports:
+    - 80:80
+    environment:
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+      - DB_DATABASE=testingmodelsaving
+      - DB_USER=mafi
+      - DB_TYPE=postgres
+      - DB_PASSWORD=
+      - REDIS_HOST=redis
+    links:
+      - redis
+
+  redis:
+    image: redis:latest
