@@ -1,7 +1,6 @@
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
-import { Component, OnInit } from '@angular/core';
-import * as saveAs from 'file-saver';
+import { Component, ViewChild } from '@angular/core';
 import { DatabaseService } from 'src/app/database.service';
 import Schema from 'src/model/schema/Schema';
 import CommandProcessor from 'src/model/commands/CommandProcessor';
@@ -10,31 +9,31 @@ import AutoNormalizeCommand from '@/src/model/commands/AutoNormalizeCommand';
 import { firstValueFrom, Subject } from 'rxjs';
 import JoinCommand from '@/src/model/commands/JoinCommand';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { SplitDialogComponent } from '../../components/split-dialog/split-dialog.component';
-import { JoinDialogComponent } from '../../components/join-dialog/join-dialog.component';
+import { SplitDialogComponent } from '../../components/operation-dialogs/split-dialog/split-dialog.component';
+import { JoinDialogComponent } from '../../components/operation-dialogs/join-dialog/join-dialog.component';
 import IndToFkCommand from '@/src/model/commands/IndToFkCommand';
 import { Router } from '@angular/router';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersisting';
-import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
-import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import { DirectDimensionDialogComponent } from '../../components/direct-dimension-dialog/direct-dimension-dialog.component';
+import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
+import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
 
 @Component({
   selector: 'app-schema-editing',
   templateUrl: './schema-editing.component.html',
   styleUrls: ['./schema-editing.component.css'],
 })
-export class SchemaEditingComponent implements OnInit {
+export class SchemaEditingComponent {
+  @ViewChild(SchemaGraphComponent, { static: true })
+  public graph!: SchemaGraphComponent;
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
   public selectedTable?: Table;
-  public schemaName: string = '';
   public selectedColumns?: Map<Table, ColumnCombination>;
   public schemaChanged: Subject<void> = new Subject();
-
-  public persisting: SQLPersisting | undefined;
 
   constructor(
     public dataService: DatabaseService,
@@ -45,9 +44,6 @@ export class SchemaEditingComponent implements OnInit {
     this.schema = dataService.schema!;
     if (!this.schema) router.navigate(['']);
     // this.schemaChanged.next();
-  }
-  async ngOnInit(): Promise<void> {
-    this.persisting = await this.initPersisting();
   }
 
   public onSelectColumns(columns: Map<Table, ColumnCombination>) {
@@ -139,11 +135,12 @@ export class SchemaEditingComponent implements OnInit {
     this.schemaChanged.next();
   }
 
-  public onAutoNormalize(): void {
-    let tables = this.selectedTable
-      ? new Array(this.selectedTable)
-      : new Array(...this.schema.tables);
-    let command = new AutoNormalizeCommand(this.schema, ...tables);
+  public onAutoNormalize(selectedTables: Set<Table> | Table): void {
+    const tablesToNormalize =
+      selectedTables.constructor.name == 'Set'
+        ? Array.from(selectedTables as Set<Table>)
+        : [selectedTables as Table];
+    let command = new AutoNormalizeCommand(this.schema, ...tablesToNormalize);
     let self = this;
     let previousSelectedTable = this.selectedTable;
     command.onDo = function () {
@@ -156,6 +153,35 @@ export class SchemaEditingComponent implements OnInit {
     this.schemaChanged.next();
   }
 
+  public setStarMode(radioChange: SbbRadioChange) {
+    this.schema.starMode = radioChange.value;
+    this.schemaChanged.next();
+  }
+
+  public onClickMakeDirectDimension(table: Table): void {
+    const routes = this.schema.filteredRoutesFromFactTo(table);
+    if (routes.length == 1) {
+      this.onMakeDirectDimensions(routes);
+    } else {
+      const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
+        data: { table: table, schema: this.schema },
+      });
+      dialogRef
+        .afterClosed()
+        .subscribe((value: { routes: Array<Array<TableRelationship>> }) => {
+          if (value) this.onMakeDirectDimensions(value.routes);
+        });
+    }
+  }
+
+  public onMakeDirectDimensions(routes: Array<Array<TableRelationship>>) {
+    const command = new DirectDimensionCommand(this.schema, routes);
+    command.onDo = () => (this.selectedTable = command.newTables[0]);
+    command.onUndo = () => (this.selectedTable = command.newTables[0]);
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
   public onUndo() {
     this.commandProcessor.undo();
     this.schemaChanged.next();
@@ -164,33 +190,5 @@ export class SchemaEditingComponent implements OnInit {
   public onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
-  }
-
-  public async initPersisting(): Promise<SQLPersisting> {
-    const dbmsName: string = await this.dataService.getDmbsName();
-
-    if (dbmsName == 'postgres') {
-      return new PostgreSQLPersisting();
-    } else if (dbmsName == 'mssql') {
-      return new SqlServerPersisting();
-    }
-    throw Error('Unknown Dbms-Server');
-  }
-
-  public persistSchema(): string {
-    this.schema.name = this.schemaName;
-    this.schema.tables.forEach((table) => (table.schemaName = this.schemaName));
-    return this.persisting!.createSQL(this.schema);
-  }
-
-  async download(): Promise<void> {
-    const file: File = new File(
-      [this.persistSchema()],
-      this.schemaName + '.sql',
-      {
-        type: 'text/plain;charset=utf-8',
-      }
-    );
-    saveAs(file);
   }
 }

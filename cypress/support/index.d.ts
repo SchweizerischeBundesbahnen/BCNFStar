@@ -33,5 +33,14 @@ declare namespace Cypress {
      * Note: make sure to always test on the data provided in the sql files in the cypress folder
      */
     loadMetanomeConfigAndOk(): Chainable<Element>;
+
+    /**
+     * Goes to the metanome results page and presses delete all if there is at least one entry. Waits for success message
+     */
+    deleteAllMetanomeResults(): void;
+
+    visitContainedSubtableTab(): void;
+
+    visitPossibleForeignKeysTab(): void;
   }
 }

@@ -54,7 +54,7 @@ export function CDSchema(): Schema {
   fk.referenced.push(
     interpretTable.columns.columnFromName("Interpret").sourceColumn
   );
-  schema.addFk(fk);
+  schema.addFks(fk);
 
   schema.addFd(
     new SourceFunctionalDependency(
@@ -161,17 +161,21 @@ export function exampleSchema(): Schema {
   schema.calculateFdsOf(tableB);
   schema.calculateFdsOf(tableC);
 
-  schema.addFk(
+  schema.addFks(
     new SourceRelationship(
       [a2.sourceColumn, a3.sourceColumn],
       [b1.sourceColumn, b2.sourceColumn]
-    )
+    ),
+    new SourceRelationship([b2.sourceColumn], [c1.sourceColumn]),
+    new SourceRelationship([a5.sourceColumn], [c1.sourceColumn])
   );
-  schema.addFk(new SourceRelationship([b2.sourceColumn], [c1.sourceColumn]));
-  schema.addFk(new SourceRelationship([a5.sourceColumn], [c1.sourceColumn]));
-  schema.addInd(new SourceRelationship([a4.sourceColumn], [c1.sourceColumn]));
+  schema.addInds(new SourceRelationship([a4.sourceColumn], [c1.sourceColumn]));
 
   return schema;
+}
+
+export function exampleSchemaToJSON(): string {
+  return JSON.stringify(exampleSchema());
 }
 
 export function multiFkSchema(): Schema {
@@ -203,7 +207,7 @@ export function multiFkSchema(): Schema {
     )
   );
   schema.addTables(tableC, tableA, tableB);
-  schema.addFk(
+  schema.addFks(
     new SourceRelationship(
       tableC.columns
         .columnsFromNames("c_a1", "c_a2")
@@ -211,9 +215,7 @@ export function multiFkSchema(): Schema {
       tableA.columns
         .columnsFromNames("a_a1", "a_a2")
         .map((col) => col.sourceColumn)
-    )
-  );
-  schema.addFk(
+    ),
     new SourceRelationship(
       tableA.columns
         .columnsFromNames("a_b1", "a_b2")
