@@ -60,9 +60,9 @@ export default class ColumnsTree<T> {
     return this.traverse(columns)._content;
   }
 
-  private traverse(lhs: ColumnCombination) {
+  private traverse(columns: ColumnCombination) {
     let current: ColumnsTree<T> = this;
-    for (const column of ColumnsTree.sortedColumns(lhs)) {
+    for (const column of ColumnsTree.sortedColumns(columns)) {
       if (!current._children.has(column))
         current._children.set(column, new ColumnsTree());
       current = current._children.get(column)!;
@@ -88,7 +88,7 @@ export default class ColumnsTree<T> {
         return LhsTree.getSubsets(newLhs);
       })
       .flat();
-    if (this._content) result.push(this._content);
+    if (this._content !== undefined) result.push(this._content);
     return result;
   }
 
@@ -113,7 +113,7 @@ export default class ColumnsTree<T> {
     const result: Array<T> = this.sortedEntries()
       .map(([, columnsTree]) => columnsTree.getAll())
       .flat();
-    if (this._content) result.push(this._content);
+    if (this._content !== undefined) result.push(this._content);
     return result;
   }
 }
