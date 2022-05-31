@@ -10,10 +10,9 @@ import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import SourceRelationship from './SourceRelationship';
 import { FdCluster } from '../types/FdCluster';
+import BasicTable from './BasicTable';
 
-export default class Table {
-  public name = '';
-  public schemaName = '';
+export default class Table extends BasicTable {
   public columns: ColumnCombination;
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
@@ -28,14 +27,6 @@ export default class Table {
     return this.surrogateKey.length > 1;
   }
 
-  /**
-   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
-   */
-  public _fks!: Array<TableRelationship>;
-  /**
-   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
-   */
-  public _references!: Array<TableRelationship>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
@@ -58,6 +49,7 @@ export default class Table {
   }
 
   public constructor(columns?: ColumnCombination) {
+    super();
     this.columns = columns || new ColumnCombination();
   }
 

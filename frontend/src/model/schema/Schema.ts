@@ -14,9 +14,11 @@ import Join from './methodObjects/Join';
 import BasicColumn from '../types/BasicColumn';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
+import UnionedTable from './UnionedTable';
+import BasicTable from './BasicTable';
 
 export default class Schema {
-  public readonly tables = new Set<Table>();
+  public readonly tables = new Set<Table | UnionedTable>();
   public name?: string;
   private _databaseFks = new Array<SourceRelationship>();
   private _fks = new Array<SourceRelationship>();
@@ -151,7 +153,9 @@ export default class Schema {
   }
 
   private set tableIndsValid(valid: boolean) {
-    this.tables.forEach((table) => (table._indsValid = valid));
+    this.tables.forEach((table) => {
+      if (table instanceof Table) table._indsValid = valid;
+    });
   }
 
   public isFact(table: Table): boolean {
@@ -175,7 +179,7 @@ export default class Schema {
   /**
    * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
    */
-  public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
+  public routesFromFactTo(table: BasicTable): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
     for (const rel of this.referencesOf(table)) {
       const routes = this.routesFromFactTo(rel.referencing);
@@ -186,12 +190,12 @@ export default class Schema {
     return result;
   }
 
-  public referencesOf(table: Table): Array<TableRelationship> {
+  public referencesOf(table: BasicTable): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     return table._references;
   }
 
-  public fksOf(table: Table): Array<TableRelationship> {
+  public fksOf(table: BasicTable): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     return table._fks;
   }
@@ -215,6 +219,11 @@ export default class Schema {
 
   private updateFks(): void {
     const currentFks = new Array<TableRelationship>();
+    for (const table of this.tables) {
+      if (!(table instanceof Table)) continue;
+      table._fks = new Array();
+      table._references = new Array();
+    }
     this.calculateFks(currentFks);
     this.calculateTrivialFks(currentFks);
     for (const fk of currentFks) {
@@ -226,19 +235,15 @@ export default class Schema {
   }
 
   private calculateFks(result: Array<TableRelationship>): void {
-    for (const table of this.tables) {
-      table._fks = new Array();
-      table._references = new Array();
-    }
     for (const rel of this._fks) {
-      const referencings = new Map<Table, Array<Array<Column>>>();
+      const referencings = new Map<BasicTable, Array<Array<Column>>>();
       for (const table of this.tables) {
         const columns = table.columnsEquivalentTo(rel.referencing, true);
         if (columns.length > 0) referencings.set(table, columns);
       }
       if ([...referencings.keys()].length == 0) continue;
 
-      const referenceds = new Map<Table, Array<Array<Column>>>();
+      const referenceds = new Map<BasicTable, Array<Array<Column>>>();
       for (const table of this.tables) {
         const columns = table
           .columnsEquivalentTo(rel.referenced, false)

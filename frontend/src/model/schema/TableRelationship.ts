@@ -1,6 +1,6 @@
+import BasicTable from './BasicTable';
 import ColumnCombination from './ColumnCombination';
 import Relationship from './Relationship';
-import Table from './Table';
 
 /**
  * These objects describe a relationship between two different tables.
@@ -13,8 +13,8 @@ export default class TableRelationship {
    */
   public constructor(
     public relationship: Relationship,
-    public referencing: Table,
-    public referenced: Table
+    public referencing: BasicTable,
+    public referenced: BasicTable
   ) {}
 
   public toString() {
