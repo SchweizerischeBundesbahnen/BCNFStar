@@ -11,7 +11,7 @@ export default class Join {
   private referenced: Table;
   private relationship: Relationship;
 
-  private sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
+  public sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
 
   public constructor(fk: TableRelationship, private name?: string) {
     this.referencing = fk.referencing;
@@ -120,8 +120,8 @@ export default class Join {
     ).applySourceMapping(this.sourceMapping);
     return this.newTable.relationships.find(
       (rel) =>
-        new ColumnCombination(rel.referencing).equals(
-          equivalentReferencingColumns
+        equivalentReferencingColumns.isSubsetOf(
+          new ColumnCombination(rel.referencing)
         ) && rel.referenced[0].sourceTableInstance.table.equals(source.table)
     )?.referenced[0].sourceTableInstance;
   }

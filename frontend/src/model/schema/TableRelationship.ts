@@ -24,4 +24,10 @@ export default class TableRelationship {
       this.relationship.referenced
     )}`;
   }
+
+  public equals(other: TableRelationship): boolean {
+    if (this.referenced != other.referenced) return false;
+    if (this.referencing != other.referencing) return false;
+    return this.relationship.equals(other.relationship);
+  }
 }

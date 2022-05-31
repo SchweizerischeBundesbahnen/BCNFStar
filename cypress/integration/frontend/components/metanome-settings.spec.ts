@@ -2,17 +2,13 @@
 
 describe("The metanome settings dialog", () => {
   beforeEach(() => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
-    cy.get("tr").should("have.length.at.least", 1);
-    cy.get(".delete-all-btn").click();
+    cy.deleteAllMetanomeResults();
     cy.visitFrontend();
     cy.selectTablesAndGo();
   });
 
   after(() => {
-    cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
-    cy.get("tr").should("have.length.at.least", 1);
-    cy.get(".delete-all-btn").click();
+    cy.deleteAllMetanomeResults();
   });
 
   it("renders", () => {
@@ -490,18 +486,22 @@ describe("The metanome settings dialog", () => {
     cy.get(
       '.table-head-title:contains("public.nation_region_denormalized")'
     ).click();
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     );
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
     );
     cy.get(
-      '.table-head-title:contains("public.part_partsupp_supplier_denormalized ")'
+      '.table-head-title:contains("public.part_partsupp_supplier_denormalized")'
     ).click({ force: true });
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     ).should("not.exist");
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
     );
@@ -516,20 +516,24 @@ describe("The metanome settings dialog", () => {
     cy.get(
       '.table-head-title:contains("public.nation_region_denormalized")'
     ).click();
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     );
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
     );
     cy.get(
-      '.table-head-title:contains("public.part_partsupp_supplier_denormalized ")'
+      '.table-head-title:contains("public.part_partsupp_supplier_denormalized")'
     ).click({ force: true });
+    cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
     ).should("not.exist");
+    cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
-    );
+    ).should("not.exist");
   });
 });

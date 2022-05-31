@@ -14,7 +14,7 @@
       </div>
     </div>
   </div>
-  <table class="sbb-table">
+  <table *ngIf="!isLoading" class="sbb-table">
     <thead>
       <tr>
         <th>Config</th>
@@ -25,7 +25,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let entry of this.tableData">
+      <tr *ngFor="let entry of tableData">
         <td>
           <div *ngFor="let item of entry.config | keyvalue">
             {{ item.key }}: {{ item.value }}

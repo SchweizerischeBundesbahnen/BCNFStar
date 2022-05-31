@@ -70,23 +70,49 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
 
   public override async loadTablePage(
     offset: number,
-    limit: number
+    limit: number,
+    withSeparators = true
   ): Promise<ITablePage> {
     // currently supports only check on "sourceTables".
     if (this.table.sources.length != 1)
       throw Error('Not Implemented Exception');
 
+    const lhsNames = this.lhs.map((c) => c.sourceColumn.name);
     const data: IRequestBodyFDViolatingRows = {
       schema: this.table.sources[0].table.schemaName,
       table: this.table.sources[0].table.name,
-      lhs: this.lhs.map((c) => c.sourceColumn.name),
+      lhs: lhsNames,
       rhs: this.rhs.map((c) => c.sourceColumn.name),
       offset: offset,
       limit: limit,
     };
-    return firstValueFrom(
+    const result = await firstValueFrom(
       this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
     );
+    if (!withSeparators) return result;
+    // before every new lhs value, add a separator announcing that value
+    let currentLhsValues: Array<string> = [];
+    const newRows: Array<Record<string, any>> = [];
+    for (const row of result.rows) {
+      // = if lhs is differnt from last row
+      if (!lhsNames.every((name) => currentLhsValues.includes(row[name]))) {
+        // = Array<[attribute name, attribute value]>
+        const currentLhs: Array<[string, string]> = lhsNames.map((name) => [
+          name,
+          row[name],
+        ]);
+        newRows.push({
+          isGroupBy: true,
+          title:
+            'Values that violate the key: \n' +
+            currentLhs.map(([key, value]) => `${key}: ${value}`).join('\n '),
+        });
+        currentLhsValues = currentLhs.map(([, value]) => value);
+      }
+      newRows.push(row);
+    }
+    result.rows = newRows;
+    return result;
   }
 
   public override async loadRowCount(): Promise<number> {

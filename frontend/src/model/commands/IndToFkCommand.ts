@@ -11,7 +11,7 @@ export default class IndToFkCommand extends Command {
   }
 
   protected override _do(): void {
-    this.schema.addFk(this.relationship);
+    this.schema.addFks(this.relationship);
   }
 
   protected override _undo(): void {
@@ -19,6 +19,6 @@ export default class IndToFkCommand extends Command {
   }
 
   protected override _redo(): void {
-    this.schema.addFk(this.relationship);
+    this.schema.addFks(this.relationship);
   }
 }

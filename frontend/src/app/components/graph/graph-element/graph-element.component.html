@@ -1,0 +1,52 @@
+<div class="container px-0" [ngStyle]="bbox">
+  <div
+    *ngIf="showMakeDirectDimension"
+    class="extra-button"
+    type="button"
+    (click)="makeDirectDimension.emit(table)"
+  >
+    D
+  </div>
+  <div
+    class="table-head ellipsis"
+    [sbbTooltip]="table.fullName"
+    [ngClass]="{
+      fact: fact,
+      dimension: dimension,
+      'table-head-highlight': selectedTable === table
+    }"
+  >
+    <span class="table-head-title" (click)="select()">
+      {{ table.fullName }}
+    </span>
+  </div>
+  <div
+    *ngFor="let column of table.columns"
+    class="grid-container-column table-body"
+  >
+    <div
+      [sbbTooltip]="column.name"
+      [ngClass]="{
+        pk: table.pk && table.pk.includes(column),
+        highlighted: selectedColumns && selectedColumns.includes(column)
+      }"
+      class="ellipsis"
+      data-cy="graph-element-columns"
+    >
+      {{ column.name }}
+    </div>
+    <div
+      [sbbTooltip]="column.dataTypeString()"
+      class="text-end ellipsis"
+      data-cy="graph-element-column-datatype"
+    >
+      {{ column.dataTypeString() }}
+    </div>
+  </div>
+  <div class="grid-container-silder">
+    <sbb-icon
+      class="text-end"
+      svgIcon="kom:arrows-left-right-down-up-medium"
+    ></sbb-icon>
+  </div>
+</div>

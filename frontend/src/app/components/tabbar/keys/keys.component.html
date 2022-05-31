@@ -1,0 +1,10 @@
+<sbb-accordion [multi]="true">
+  <sbb-expansion-panel [expanded]="true">
+    <sbb-expansion-panel-header>Keys</sbb-expansion-panel-header>
+    <ul>
+      <li *ngFor="let key of table.keys().slice(0, 5)">
+        {{ key.toString() }}
+      </li>
+    </ul>
+  </sbb-expansion-panel>
+</sbb-accordion>

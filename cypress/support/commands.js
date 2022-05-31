@@ -71,6 +71,22 @@ Cypress.Commands.add("loadMetanomeConfigAndOk", { prevSubject: false }, () => {
   cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
 });
 
+Cypress.Commands.add(
+  "visitContainedSubtableTab",
+  { prevSubject: false },
+  () => {
+    cy.contains("Subtables").click({ force: true });
+  }
+);
+
+Cypress.Commands.add(
+  "visitPossibleForeignKeysTab",
+  { prevSubject: false },
+  () => {
+    cy.contains("Foreign Keys").click({ force: true });
+    cy.contains("Possible Foreign Keys").click();
+  }
+);
 Cypress.Commands.add("executeSql", (Sql) => {
   cy.task("dbQuery", { query: Sql });
 });
@@ -81,4 +97,15 @@ Cypress.Commands.add("createSchema", (schemaName) => {
   cy.readFile(`./cypress/downloads/${schemaName}.sql`).then((SQL) =>
     cy.executeSql(SQL)
   );
+});
+
+Cypress.Commands.add("deleteAllMetanomeResults", () => {
+  cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
+  cy.get("table").then((table) => {
+    if (table.find("tr").length > 1) {
+      cy.get(".delete-all-btn").click();
+      cy.get("sbb-simple-notification").contains("Deleted all entries");
+    }
+  });
+  cy.reload();
 });

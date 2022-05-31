@@ -1,0 +1,15 @@
+.keys {
+  font-weight: bold;
+}
+
+ul {
+  margin: 0;
+}
+
+.hull {
+  color: lightgreen;
+}
+
+.violation {
+  color: red;
+}

@@ -1,21 +1,69 @@
+element::-webkit-scrollbar {
+  display: none;
+  /* for Chrome, Safari, and Opera */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: calc(66.66% - 2px) calc(33.33% - 2px);
+  grid-template-rows: calc(var(--sbb-button-height)) auto;
+  background-color: lightgray;
+  height: calc(97vh - var(--sbb-header-lean-height));
+  gap: 4px;
+  padding: 4px;
+}
+
+.grid-container-sidebar {
+  --export-schema-sidebar-height: calc(
+    1.6666666667rem + 2 * var(--sbb-button-height) + 0.25rem +
+      var(--sbb-divider-medium) + var(--sbb-divider-small)
+  );
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: calc(var(--export-schema-sidebar-height)) auto;
+  height: 100%;
+}
+
+.grid-container-graphmenu {
+  display: grid;
+  grid-template-columns: 15% 15% auto min-content;
+  grid-template-rows: auto;
+}
+
+.grid-container > div {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+h2 {
+  text-align: center;
+}
+
+.item-sidebar {
+  grid-row-start: 1;
+  grid-row-end: 3;
+  grid-column-start: 1;
+  grid-column-start: 2;
+}
+
+sbb-toggle {
+  white-space: nowrap;
+}
+
+sbb-toggle-option {
+  height: var(--sbb-button-height);
+}
+
 .schema-editing-side-bar {
+  scrollbar-width: none;
   overflow-y: scroll;
   display: block;
 }
 
-.col-4 {
-  /* 97% to leave some room for border and prevnt scrollbar*/
-  height: calc(97vh - var(--sbb-header-lean-height));
-}
-
-.col-8 {
-  height: calc(97vh - var(--sbb-header-lean-height));
-}
-
-.row > * {
-  padding: 0;
+.table-not-selected {
+  align-self: center
 }
 
 .undo-redo {
-  float: right;
+  width: 100%;
+  white-space: nowrap;
 }
