@@ -6,6 +6,7 @@
     (selectedTableChanged)="selectedTableChange.emit($event)"
     [selectedColumns]="selectedColumns?.get(item.key)"
     [selectedTable]="selectedTable"
+    [schema]="schema"
     [table]="item.key"
     [bbox]="item.value.style"
     [fact]="schema.starMode && schema.isFact(item.key)"
