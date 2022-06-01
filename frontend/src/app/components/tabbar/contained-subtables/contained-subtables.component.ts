@@ -49,7 +49,10 @@ export class ContainedSubtablesComponent implements OnChanges {
   }
 
   public fdClusters(): Array<FdCluster> {
+    console.log(this.table.fdClusters);
+    console.log(this.table.fds);
     const cc = this.fdClusterFilter;
+    console.log(cc);
     return this.table.fdClusters.filter((cluster) =>
       cc.isSubsetOf(cluster.columns)
     );
