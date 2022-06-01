@@ -60,10 +60,11 @@ export default class Join {
   }
 
   private join() {
-    // name, pk
-    this.newTable.pk = this.referencing.pk?.deepCopy();
+    // name, pk, sk
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
+    this.newTable.pk = this.referencing.pk?.deepCopy();
+    this.newTable.surrogateKey = this.referencing.surrogateKey;
 
     // inherit sources, relationships and columns from referencing table
     this.referencing.sources.forEach((source) => {

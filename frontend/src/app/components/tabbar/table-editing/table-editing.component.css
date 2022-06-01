@@ -1,12 +1,6 @@
-.editing-field {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-  gap: 10px
-}
-
-.grid-container-editing-field > button {
-  width: max-content
+.grid-container-edit-column {
+  display: grid;
+  grid-template-columns: auto min-content min-content;
 }
 
 .grid-container-table {
@@ -14,10 +8,9 @@
   grid-template-columns: 60% 5% auto;
 }
 
-.table-heading {
+.grid-container-table-heading {
   display: flex;
   justify-content: space-between;
-  gap: 10px
 }
 
 input {
