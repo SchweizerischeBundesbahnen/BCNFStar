@@ -176,7 +176,7 @@ export default class Schema {
    */
   public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
-    for (const rel of this.referencesOf(table, false)) {
+    for (const rel of this.referencesOf(table)) {
       const routes = this.routesFromFactTo(rel.referencing);
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
