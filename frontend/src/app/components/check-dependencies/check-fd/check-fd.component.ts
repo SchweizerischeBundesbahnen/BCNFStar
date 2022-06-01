@@ -49,23 +49,28 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
   }
 
   public checkNotAllowed(): boolean {
-    return this._lhs.length == 0 || this._rhs.length == 0;
+    return this.lhs.length == 0 || this.rhs.length == 0;
   }
 
   public async checkFd(): Promise<void> {
     // only check those columns, which are not defined by existing fds
-    const rhs_copy = this._rhs.filter(
-      (c) => !this.table.hull(new ColumnCombination(this._lhs)).includes(c)
+    const rhs_copy = this.rhs.filter(
+      (c) => !this.table.hull(new ColumnCombination(this.lhs)).includes(c)
     );
 
     const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
       this.table,
-      this._lhs,
+      this.lhs,
       rhs_copy
     );
 
     this.isLoading = true;
-    const rowCount: number = await dataQuery.loadRowCount();
+    const rowCount: number | void = await dataQuery
+      .loadRowCount()
+      .catch((e) => {
+        console.error(e);
+        this.isLoading = false;
+      });
     this.isLoading = false;
 
     if (rowCount == 0) {
