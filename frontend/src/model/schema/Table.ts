@@ -24,11 +24,19 @@ export default class Table {
   private _fdClusters?: Array<FdCluster>;
 
   /**
-   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
+   */
+  public _filteredFks!: Array<TableRelationship>;
+  /**
+   * cached results of schema.fksOf(this, false). Should not be accessed from outside the schema class
    */
   public _fks!: Array<TableRelationship>;
   /**
-   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
+   */
+  public _filteredReferences!: Array<TableRelationship>;
+  /**
+   * cached results of schema.filteredksOf(this, false). Should not be accessed from outside the schema class
    */
   public _references!: Array<TableRelationship>;
   /**

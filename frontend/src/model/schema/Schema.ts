@@ -176,7 +176,7 @@ export default class Schema {
    */
   public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
-    for (const rel of this.referencesOf(table)) {
+    for (const rel of this.referencesOf(table, false)) {
       const routes = this.routesFromFactTo(rel.referencing);
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
@@ -185,14 +185,20 @@ export default class Schema {
     return result;
   }
 
-  public referencesOf(table: Table): Array<TableRelationship> {
+  public referencesOf(
+    table: Table,
+    filtered: boolean = true
+  ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return table._references;
+    return filtered ? table._filteredReferences : table._references;
   }
 
-  public fksOf(table: Table): Array<TableRelationship> {
+  public fksOf(
+    table: Table,
+    filtered: boolean = true
+  ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return table._fks;
+    return filtered ? table._filteredFks : table._fks;
   }
 
   /**
@@ -214,21 +220,25 @@ export default class Schema {
 
   private updateFks(): void {
     const currentFks = new Array<TableRelationship>();
+    for (const table of this.tables) {
+      table._fks = new Array();
+      table._references = new Array();
+      table._filteredFks = new Array();
+      table._filteredReferences = new Array();
+    }
     this.calculateFks(currentFks);
     this.calculateTrivialFks(currentFks);
     for (const fk of currentFks) {
       fk.referencing._fks.push(fk);
       fk.referenced._references.push(fk);
+      fk.referencing._filteredFks.push(fk);
+      fk.referenced._filteredReferences.push(fk);
     }
     this._tableFksValid = true;
     this.filterFks();
   }
 
   private calculateFks(result: Array<TableRelationship>): void {
-    for (const table of this.tables) {
-      table._fks = new Array();
-      table._references = new Array();
-    }
     for (const rel of this._fks) {
       const referencings = new Map<Table, Array<Array<Column>>>();
       for (const table of this.tables) {
@@ -382,11 +392,12 @@ export default class Schema {
         ? this.starViolatingFksOf(table)
         : this.transitiveFksOf(table);
       for (const badFk of badFks) {
-        badFk.referenced._references = badFk.referenced._references.filter(
-          (fk) => fk != badFk
-        );
+        badFk.referenced._filteredReferences =
+          badFk.referenced._filteredReferences.filter((fk) => fk != badFk);
       }
-      table._fks = table._fks.filter((fk) => !badFks.includes(fk));
+      table._filteredFks = table._filteredFks.filter(
+        (fk) => !badFks.includes(fk)
+      );
     }
   }
 
@@ -401,7 +412,7 @@ export default class Schema {
   ): boolean {
     if (visitedTables.includes(targetFk.referencing)) return false;
     visitedTables.push(targetFk.referencing);
-    for (const fk of this.fksOf(targetFk.referencing)) {
+    for (const fk of targetFk.referencing._fks) {
       if (fk.equals(targetFk)) {
         if (firstIteration) continue;
         else return true;
