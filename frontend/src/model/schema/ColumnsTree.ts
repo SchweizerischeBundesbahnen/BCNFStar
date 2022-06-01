@@ -4,7 +4,9 @@ import ColumnCombination from './ColumnCombination';
 /**
  * Abstract data class that associates ColumnCombinations
  * with some data of type T. You can query with ColumnCombinations
- * to get the stored value of the exact CC or of a subset
+ * to get the stored value of the exact CC or of a subset.
+ * Technically it is like a prefix tree, but unlike in a prefix tree theorder
+ * of the columns doesn't matter here, as all incoming columns are sorted.
  */
 export default class ColumnsTree<T> {
   private _children = new Map<Column, ColumnsTree<T>>();

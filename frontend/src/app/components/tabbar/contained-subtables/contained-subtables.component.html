@@ -20,11 +20,11 @@
       >
     </sbb-select>
     <br />
-    <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
+    <sbb-accordion *ngIf="fdClusters.length > 0; else noClusters">
       <sbb-paginator
         (page)="changePage($event)"
         [pageSize]="pageSize"
-        [length]="fdClusters().length"
+        [length]="fdClusters.length"
       >
       </sbb-paginator>
       <sbb-expansion-panel

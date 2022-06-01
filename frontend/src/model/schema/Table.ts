@@ -392,7 +392,7 @@ export default class Table {
    * @returns FdClusters, which group functional dependencies that have the same right hand side
    * Used in UI to make functional dependencies easier to discover
    */
-  public fdClusters(): Array<FdCluster> {
+  public get fdClusters(): Array<FdCluster> {
     if (!this._fdClusters) {
       const fdClusterTree = new ColumnsTree<FdCluster>();
       if (this.pk)
