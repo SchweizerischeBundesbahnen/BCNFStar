@@ -27,6 +27,17 @@ export default class SourceRelationship {
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
+  public sourceColumnsMapped(
+    referencingCol: SourceColumn,
+    referencedCol: SourceColumn
+  ): boolean {
+    const i = this.referencing.findIndex((otherReferencingCol) =>
+      otherReferencingCol.equals(referencingCol)
+    );
+    if (i == -1) return false;
+    return this.referenced[i].equals(referencedCol);
+  }
+
   public get isTrivial(): boolean {
     for (const i in this.referencing) {
       if (!this.referencing[i].equals(this.referenced[i])) return false;
