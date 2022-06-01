@@ -1,4 +1,5 @@
 import IRequestBodyFDViolatingRows from "@/definitions/IRequestBodyFDViolatingRows";
+import { isIRequestBodyFDViolatingRows } from "@/definitions/IRequestBodyFDViolatingRows.guard";
 import { Request, Response } from "express";
 import { sqlUtils } from "../../db";
 
@@ -7,6 +8,11 @@ export default async function getViolatingRows(
   res: Response
 ): Promise<void> {
   try {
+    if (!isIRequestBodyFDViolatingRows(req.body)) {
+      res.status(422).json({ errrors: "Invalid request body" });
+      return;
+    }
+
     const body: IRequestBodyFDViolatingRows =
       req.body as IRequestBodyFDViolatingRows;
 
