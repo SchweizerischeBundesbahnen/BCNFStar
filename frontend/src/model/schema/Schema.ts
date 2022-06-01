@@ -396,25 +396,19 @@ export default class Schema {
 
   private existsPath(
     targetFk: TableRelationship,
-    terminationFk: TableRelationship = targetFk,
+    visitedTables: Array<Table> = [],
     firstIteration: boolean = true
   ): boolean {
-    if (!firstIteration && targetFk.referencing == terminationFk.referencing)
-      return false;
-    if (
-      targetFk.referencing == targetFk.referenced &&
-      new ColumnCombination(targetFk.relationship.referencing).equals(
-        new ColumnCombination(targetFk.relationship.referenced)
-      )
-    )
-      return true;
-    for (const fk of targetFk.referencing._fks) {
-      if (fk == targetFk) continue;
-      const newReferencing = targetFk.relationship.referencing
-        .map((col) => fk.relationship.referencing.indexOf(col))
-        .map((index) =>
-          index != -1 ? fk.relationship.referenced[index] : undefined
-        );
+    if (visitedTables.includes(targetFk.referencing)) return false;
+    visitedTables.push(targetFk.referencing);
+    for (const fk of this.fksOf(targetFk.referencing)) {
+      if (fk.equals(targetFk)) {
+        if (firstIteration) continue;
+        else return true;
+      }
+      const newReferencing = fk.relationship.columnsReferencedBy(
+        targetFk.relationship.referencing
+      );
       if (newReferencing.some((col) => !col)) continue;
       if (
         this.existsPath(
@@ -426,7 +420,7 @@ export default class Schema {
             fk.referenced,
             targetFk.referenced
           ),
-          terminationFk,
+          visitedTables,
           false
         )
       )
