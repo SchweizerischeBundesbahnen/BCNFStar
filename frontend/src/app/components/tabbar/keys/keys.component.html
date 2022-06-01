@@ -33,6 +33,11 @@
 </sbb-accordion>
 
 <ng-template #editSurrogateKey>
-  <input style="width: 40%" sbbInput [(ngModel)]="surrogateKey" />
+  <input
+    id="surrogate-key-input"
+    style="width: 40%"
+    sbbInput
+    [(ngModel)]="surrogateKey"
+  />
   <button sbb-button (click)="emitSurrogateKey()">Save surrogate key</button>
 </ng-template>
