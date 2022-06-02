@@ -154,17 +154,19 @@ export default class Schema {
   }
 
   public isFact(table: Table): boolean {
-    return this.referencesOf(table).length == 0;
+    return this.referencesOf(table, true).length == 0;
   }
 
   /**
    * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
    * or routes that would add no extra information to the fact table when joined completely
+   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
    */
-  public filteredRoutesFromFactTo(
-    table: Table
+  public directDimensionableRoutes(
+    table: Table,
+    filteredFks: boolean
   ): Array<Array<TableRelationship>> {
-    return this.routesFromFactTo(table).filter((route) => {
+    return this.routesFromFactTo(table, filteredFks).filter((route) => {
       if (route.length <= 1) return false;
       const dd = new DirectDimension([route]);
       return dd.newTable.columns.cardinality > dd.oldTable.columns.cardinality;
@@ -173,11 +175,15 @@ export default class Schema {
 
   /**
    * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
+   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
    */
-  public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
+  public routesFromFactTo(
+    table: Table,
+    filteredFks: boolean
+  ): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
-    for (const rel of this.referencesOf(table)) {
-      const routes = this.routesFromFactTo(rel.referencing);
+    for (const rel of this.referencesOf(table, filteredFks)) {
+      const routes = this.routesFromFactTo(rel.referencing, filteredFks);
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
@@ -187,16 +193,13 @@ export default class Schema {
 
   public referencesOf(
     table: Table,
-    filtered: boolean = true
+    filtered: boolean
   ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     return filtered ? table._filteredReferences : table._references;
   }
 
-  public fksOf(
-    table: Table,
-    filtered: boolean = true
-  ): Array<TableRelationship> {
+  public fksOf(table: Table, filtered: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     return filtered ? table._filteredFks : table._fks;
   }
@@ -219,13 +222,13 @@ export default class Schema {
   }
 
   private updateFks(): void {
-    const currentFks = new Array<TableRelationship>();
     for (const table of this.tables) {
       table._fks = new Array();
       table._references = new Array();
       table._filteredFks = new Array();
       table._filteredReferences = new Array();
     }
+    const currentFks = new Array<TableRelationship>();
     this.calculateFks(currentFks);
     this.calculateTrivialFks(currentFks);
     for (const fk of currentFks) {
@@ -386,8 +389,6 @@ export default class Schema {
 
   private filterFks() {
     const isBad = this.starMode ? this.isStarViolatingFk : this.isTransitiveFk;
-    for (const table of this.tables)
-      table._filteredReferences = new Array<TableRelationship>();
     for (const table of this.tables) {
       table._filteredFks = table._fks.filter((fk) => !isBad.apply(this, [fk]));
       for (const filteredFk of table._filteredFks) {
@@ -432,8 +433,8 @@ export default class Schema {
   }
 
   private isStarViolatingFk(fk: TableRelationship) {
-    if (this.isFact(fk.referencing)) return false;
-    return !this.filteredRoutesFromFactTo(fk.referenced).some(
+    if (fk.referencing._references.length == 0) return false;
+    return !this.directDimensionableRoutes(fk.referenced, false).some(
       (route) => route[route.length - 1] == fk
     );
   }
@@ -606,7 +607,7 @@ export default class Schema {
     fd: FunctionalDependency,
     table: Table
   ): Array<TableRelationship> {
-    return this.fksOf(table).filter(
+    return this.fksOf(table, true).filter(
       (fk) =>
         !table.splitPreservesCC(
           fd,
@@ -619,7 +620,7 @@ export default class Schema {
     fd: FunctionalDependency,
     table: Table
   ): Array<TableRelationship> {
-    return this.referencesOf(table).filter(
+    return this.referencesOf(table, true).filter(
       (ref) =>
         !table.splitPreservesCC(
           fd,

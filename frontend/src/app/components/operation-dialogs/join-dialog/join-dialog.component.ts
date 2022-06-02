@@ -19,7 +19,8 @@ export class JoinDialogComponent {
     @Inject(SBB_DIALOG_DATA) data: { fk: TableRelationship; schema: Schema }
   ) {
     this.fk = data.fk;
-    this.duplicate = data.schema.referencesOf(this.fk.referenced).length > 1;
+    this.duplicate =
+      data.schema.referencesOf(this.fk.referenced, true).length > 1;
   }
 
   public confirm() {
