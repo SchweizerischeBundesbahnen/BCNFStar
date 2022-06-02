@@ -231,8 +231,6 @@ export default class Schema {
     for (const fk of currentFks) {
       fk.referencing._fks.push(fk);
       fk.referenced._references.push(fk);
-      fk.referencing._filteredFks.push(fk);
-      fk.referenced._filteredReferences.push(fk);
     }
     this._tableFksValid = true;
     this.filterFks();
@@ -387,49 +385,42 @@ export default class Schema {
   }
 
   private filterFks() {
+    const isBad = this.starMode ? this.isStarViolatingFk : this.isTransitiveFk;
+    for (const table of this.tables)
+      table._filteredReferences = new Array<TableRelationship>();
     for (const table of this.tables) {
-      const badFks = this.starMode
-        ? this.starViolatingFksOf(table)
-        : this.transitiveFksOf(table);
-      for (const badFk of badFks) {
-        badFk.referenced._filteredReferences =
-          badFk.referenced._filteredReferences.filter((fk) => fk != badFk);
+      table._filteredFks = table._fks.filter((fk) => !isBad.apply(this, [fk]));
+      for (const filteredFk of table._filteredFks) {
+        filteredFk.referenced._filteredReferences.push(filteredFk);
       }
-      table._filteredFks = table._filteredFks.filter(
-        (fk) => !badFks.includes(fk)
-      );
     }
   }
 
-  private transitiveFksOf(table: Table): Array<TableRelationship> {
-    return table._fks.filter((fk) => this.existsPath(fk));
-  }
-
-  private existsPath(
-    targetFk: TableRelationship,
+  private isTransitiveFk(
+    fk: TableRelationship,
     visitedTables: Array<Table> = [],
     firstIteration: boolean = true
   ): boolean {
-    if (visitedTables.includes(targetFk.referencing)) return false;
-    visitedTables.push(targetFk.referencing);
-    for (const fk of targetFk.referencing._fks) {
-      if (fk.equals(targetFk)) {
+    if (visitedTables.includes(fk.referencing)) return false;
+    visitedTables.push(fk.referencing);
+    for (const otherFk of fk.referencing._fks) {
+      if (otherFk.equals(fk)) {
         if (firstIteration) continue;
         else return true;
       }
-      const newReferencing = fk.relationship.columnsReferencedBy(
-        targetFk.relationship.referencing
+      const newReferencing = otherFk.relationship.columnsReferencedBy(
+        fk.relationship.referencing
       );
       if (newReferencing.some((col) => !col)) continue;
       if (
-        this.existsPath(
+        this.isTransitiveFk(
           new TableRelationship(
             new Relationship(
               newReferencing as Array<Column>,
-              targetFk.relationship.referenced
+              fk.relationship.referenced
             ),
-            fk.referenced,
-            targetFk.referenced
+            otherFk.referenced,
+            fk.referenced
           ),
           visitedTables,
           false
@@ -440,13 +431,10 @@ export default class Schema {
     return false;
   }
 
-  private starViolatingFksOf(table: Table): Array<TableRelationship> {
-    if (this.isFact(table)) return new Array();
-    return table._fks.filter(
-      (fk) =>
-        !this.filteredRoutesFromFactTo(fk.referenced).some(
-          (route) => route[route.length - 1] == fk
-        )
+  private isStarViolatingFk(fk: TableRelationship) {
+    if (this.isFact(fk.referencing)) return false;
+    return !this.filteredRoutesFromFactTo(fk.referenced).some(
+      (route) => route[route.length - 1] == fk
     );
   }
 
