@@ -1,0 +1,36 @@
+#referencing {
+    width: 40%;
+}
+
+#referenced {
+    width: 40%;
+    margin-left: 5px; 
+    margin-right: 5px;
+}
+
+#columnRelationButton {
+    width: 20%;
+}
+
+#columnMatch {
+    padding-top: 10px;
+}
+
+#checkInd {
+    padding-top: 15px;
+}
+
+#checkIndButton {
+    width: 80%;
+    margin-right: 5px;
+}
+
+#switchButton {
+    width: 20%;
+    margin: 5px;
+}
+
+#validText {
+    position: relative; 
+    top: 5px;
+}

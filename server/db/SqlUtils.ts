@@ -129,7 +129,7 @@ export default abstract class SqlUtils {
     rhs: Array<string>
   ): string {
     return `
-SELECT ${lhs.concat(rhs).join(",")}
+SELECT ${lhs.concat(rhs).join(",")}, COUNT(*) AS Count
 FROM ${schema}.${table} AS x 
 WHERE EXISTS (
 	SELECT 1 FROM (
@@ -142,6 +142,7 @@ WHERE EXISTS (
 		HAVING COUNT(1) > 1 -- this is violating the fd, as duplicates are removed but the lhs still occures multiple times -> different rhs
 	) AS Y WHERE ${lhs.map((c) => `X.${c} = Y.${c}`).join(" AND ")}
 ) 
+GROUP BY ${lhs.concat(rhs).join(",")}
     `;
   }
   public abstract getViolatingRowsForFDCount(
