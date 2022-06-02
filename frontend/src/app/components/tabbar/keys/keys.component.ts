@@ -6,6 +6,7 @@ import {
   OnChanges,
   Output,
 } from '@angular/core';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
 @Component({
   selector: 'app-keys',
@@ -17,24 +18,30 @@ export class KeysComponent implements OnChanges {
   @Output() public setSurrogateKey = new EventEmitter<string>();
 
   public surrogateKey = '';
-  public editMode = false;
-  public surrogateKeyExists = false;
+  public editMode = true;
 
-  constructor() {}
+  constructor(private notification: SbbNotificationToast) {
+    console.log(this.editMode);
+  }
 
   ngOnChanges(): void {
     this.surrogateKey = this.table.surrogateKey ?? '';
-    this.surrogateKeyExists = !!this.table.surrogateKey;
+    this.editMode = !this.surrogateKey;
+    console.log(this.editMode);
   }
 
   emitSurrogateKey() {
-    this.setSurrogateKey.emit(this.surrogateKey);
-    this.editMode = false;
-    this.surrogateKeyExists = true;
+    if (this.surrogateKey) {
+      this.setSurrogateKey.emit(this.surrogateKey);
+      this.editMode = false;
+    } else
+      this.notification.open('Cannot set an empty surrogate key name', {
+        type: 'warn',
+      });
   }
   deleteSurrogateKey() {
-    this.setSurrogateKey.emit('');
-    this.surrogateKeyExists = false;
     this.surrogateKey = '';
+    this.setSurrogateKey.emit(this.surrogateKey);
+    this.editMode = true;
   }
 }
