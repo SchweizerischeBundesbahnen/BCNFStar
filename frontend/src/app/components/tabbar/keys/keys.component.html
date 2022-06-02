@@ -22,10 +22,13 @@
       </div>
       <div>
         <button sbb-icon-button (click)="editMode = true">
-          <sbb-icon svgIcon="kom:pen-small"></sbb-icon>
+          <sbb-icon id="edit-surrkey-btn" svgIcon="kom:pen-small"></sbb-icon>
         </button>
         <button sbb-icon-button (click)="deleteSurrogateKey()">
-          <sbb-icon svgIcon="kom:trash-small"></sbb-icon>
+          <sbb-icon
+            id="delete-surrkey-btn"
+            svgIcon="kom:trash-small"
+          ></sbb-icon>
         </button>
       </div>
     </div>
