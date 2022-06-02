@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
 import ITablePage from '@server/definitions/ITablePage';
@@ -9,7 +9,7 @@ import { DataQuery } from '../../../dataquery';
   templateUrl: './database-table-viewer.component.html',
   styleUrls: ['./database-table-viewer.component.css'],
 })
-export class DatabaseTableViewerComponent implements OnInit {
+export class DatabaseTableViewerComponent implements OnInit, OnChanges {
   public pageSize: number = 20;
   public page: number = 0;
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
@@ -24,6 +24,10 @@ export class DatabaseTableViewerComponent implements OnInit {
   constructor() {}
 
   public async ngOnInit(): Promise<void> {
+    this.reloadData();
+  }
+
+  ngOnChanges(): void {
     this.reloadData();
   }
 

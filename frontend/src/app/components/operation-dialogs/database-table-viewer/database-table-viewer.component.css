@@ -1,3 +1,38 @@
-.groupby-cell{
-    white-space: pre-line;
+.groupby-cell {
+  white-space: pre-line;
+}
+
+.grid-container-paginator {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+  background-color: white;
+}
+
+.table-checkbox {
+  display: block;
+}
+
+td {
+  white-space: nowrap;
+}
+
+.table-parent {
+  position: relative;
+  height: 100%;
+}
+
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.table-wrapper {
+  height: 100%;
+}
+
+.align-right {
+  text-align: right;
 }

@@ -22,13 +22,53 @@ export abstract class DataQuery {
   ): Promise<ITablePage>;
 
   public abstract loadRowCount(): Promise<number>;
+
+  /**
+   *
+   * @returns an object where a key is an attribute and the value is
+   *  the styling which should be applied to cells in this column
+   */
+  public get cellStyle(): Record<string, Record<string, any>> {
+    return {};
+  }
+}
+
+export class TablePreviewDataQuery extends DataQuery {
+  constructor(protected table: Table) {
+    super();
+  }
+  public loadTablePage(offset: number, limit: number): Promise<ITablePage> {
+    return firstValueFrom(
+      this.http.get<ITablePage>(
+        `${this.baseUrl}/tables/page?schema=${this.table.schemaName}&table=${this.table.name}&offset=${offset}&limit=${limit}`
+      )
+    );
+  }
+  public loadRowCount(): Promise<number> {
+    return Promise.reject(
+      'not implemented. use loadTableRowCounts from database-service instead'
+    );
+  }
+  public override get cellStyle(): Record<string, Record<string, any>> {
+    function isNumeric(dataType: string): boolean {
+      return (
+        !!dataType &&
+        (dataType.toLowerCase().startsWith('numeric') ||
+          dataType.toLowerCase().startsWith('int'))
+      );
+    }
+    const result: Record<string, Record<string, any>> = {};
+    for (const column of this.table.columns)
+      result[column.name] = isNumeric(column.dataType)
+        ? { 'text-align': 'end' }
+        : {};
+    return result;
+  }
 }
 
 export class ViolatingINDRowsDataQuery extends DataQuery {
-  protected relationship: Relationship;
-  constructor(relationship: Relationship) {
+  constructor(protected relationship: Relationship) {
     super();
-    this.relationship = relationship;
   }
 
   public override async loadTablePage(

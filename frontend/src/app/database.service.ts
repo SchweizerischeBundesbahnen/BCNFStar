@@ -1,7 +1,6 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
-import ITablePage from '@server/definitions/ITablePage';
 import Table from '../model/schema/Table';
 import Schema from '../model/schema/Schema';
 import { firstValueFrom } from 'rxjs';
@@ -27,19 +26,6 @@ export class DatabaseService {
 
   public async loadTables(): Promise<Array<Table>> {
     return this.getTables();
-  }
-
-  public loadTablePage(
-    schema: string,
-    table: string,
-    offset: number,
-    limit: number
-  ): Promise<ITablePage> {
-    return firstValueFrom(
-      this.http.get<ITablePage>(
-        `${this.baseUrl}/tables/page?schema=${schema}&table=${table}&offset=${offset}&limit=${limit}`
-      )
-    );
   }
 
   public async getDmbsName(): Promise<string> {

@@ -10,15 +10,15 @@ import {
 } from '@angular/core';
 import ITablePage from '@server/definitions/ITablePage';
 import { DatabaseService } from 'src/app/database.service';
-import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
+import { SbbTable } from '@sbb-esta/angular/table';
 import { Router } from '@angular/router';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { MetanomeSettingsComponent } from '../metanome-settings/metanome-settings.component';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { firstValueFrom } from 'rxjs';
-import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 import { SchemaCreationService } from '../../schema-creation.service';
 import Schema from '@/src/model/schema/Schema';
+import { DataQuery, TablePreviewDataQuery } from '../../dataquery';
 
 @Component({
   selector: 'app-table-selection',
@@ -33,18 +33,14 @@ export class TableSelectionComponent implements OnInit {
   @Input() public withContentPreview: boolean = true;
   @Output() public schema = new EventEmitter<Schema>();
 
-  public tablePages: Map<Table, ITablePage> = new Map();
   public tableRowCounts: Map<Table, number> = new Map();
-
-  public pageLimit = 20;
-  public page: number = 0;
 
   public loadingStatus: Map<IIndexFileEntry, 'done' | 'error' | 'loading'> =
     new Map();
 
   public hoveredTable?: Table;
   public tableColumns: Array<string> = [];
-  public dataSource = new SbbTableDataSource<Record<string, any>>([]);
+  public dataQuery?: DataQuery;
 
   public tables: Array<Table> = [];
   public selectedTables = new Map<Table, Boolean>();
@@ -63,6 +59,7 @@ export class TableSelectionComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    const rowCountPromise = this.dataService.loadTableRowCounts();
     this.tables = await this.dataService.loadTables();
 
     for (const table of this.tables) {
@@ -71,29 +68,9 @@ export class TableSelectionComponent implements OnInit {
         this.tablesInSchema[table.schemaName] = [];
       this.tablesInSchema[table.schemaName].push(table);
     }
-
-    await this.initTable();
-  }
-
-  private async initTable() {
-    const rowCountPromise = this.dataService.loadTableRowCounts();
-
-    const tablePagePromises: Record<string, Promise<ITablePage>> = {};
-    for (const table of this.tables) {
-      tablePagePromises[table.fullName] = this.dataService.loadTablePage(
-        table.schemaName,
-        table.name,
-        0,
-        this.pageLimit
-      );
-    }
-
-    const rowCounts: Record<string, number> = await rowCountPromise;
-
-    for (const table of this.tables) {
+    const rowCounts = await rowCountPromise;
+    for (const table of this.tables)
       this.tableRowCounts.set(table, rowCounts[table.fullName]);
-      this.tablePages.set(table, await tablePagePromises[table.fullName]);
-    }
   }
 
   public hasSelectedTables(): boolean {
@@ -120,16 +97,6 @@ export class TableSelectionComponent implements OnInit {
   public areZeroSelectedIn(schema: string) {
     return !this.tablesInSchema[schema].some((table) =>
       this.selectedTables.get(table)
-    );
-  }
-  public isNumeric(columnName: string): boolean {
-    const type = this.hoveredTable?.columns
-      .asArray()
-      .find((c) => c.name == columnName)?.dataType;
-    return (
-      !!type &&
-      (type.toLowerCase().startsWith('numeric') ||
-        type.toLowerCase().startsWith('int'))
     );
   }
 
@@ -195,31 +162,8 @@ export class TableSelectionComponent implements OnInit {
     }
   }
 
-  changePage(evt: SbbPageEvent) {
-    this.page = evt.pageIndex;
-    this.reloadData();
-  }
-
   public mouseEnter(table: Table) {
-    this.page = 0;
     this.hoveredTable = table;
-    this.reloadData();
-  }
-
-  public async reloadData() {
-    if (!this.hoveredTable) return;
-    const result =
-      this.page === 0
-        ? this.tablePages.get(this.hoveredTable)
-        : await this.dataService.loadTablePage(
-            this.hoveredTable.schemaName,
-            this.hoveredTable.name,
-            this.page * this.pageLimit,
-            this.pageLimit
-          );
-    if (!result) return;
-    this.tableColumns = result.attributes;
-    this.dataSource.data = result.rows;
-    this.table?.renderRows();
+    this.dataQuery = new TablePreviewDataQuery(table);
   }
 }
