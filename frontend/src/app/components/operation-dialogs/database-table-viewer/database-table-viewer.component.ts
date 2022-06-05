@@ -47,8 +47,10 @@ export class DatabaseTableViewerComponent implements OnInit, OnChanges {
       .catch((e) => {
         console.error(`Could not reload data`);
         console.error(e);
+      })
+      .finally(() => {
+        setTimeout(() => (this.isLoading = false), 100);
       });
-    this.isLoading = false;
 
     if (!result) return;
     this.tableColumns = result.attributes;
