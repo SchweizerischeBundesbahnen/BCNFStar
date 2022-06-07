@@ -38,6 +38,7 @@ export default class SourceTableInstance {
   }
 
   public equals(other: SourceTableInstance): boolean {
+    if (this === other) return true;
     return this.alias == other.alias;
   }
 }
