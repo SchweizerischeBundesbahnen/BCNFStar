@@ -1,16 +1,9 @@
+import { SchemaService } from '@/src/app/schema.service';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import IndScore from '@/src/model/schema/methodObjects/IndScore';
-import Schema from '@/src/model/schema/Schema';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import Table from '@/src/model/schema/Table';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnChanges, ViewChild } from '@angular/core';
 import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 
 @Component({
@@ -19,30 +12,29 @@ import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
   styleUrls: ['./foreign-keys.component.css'],
 })
 export class ForeignKeysComponent implements OnChanges {
-  @Input() public schema!: Schema;
-  @Input() public table!: Table;
-  @Output() public selectColumns = new EventEmitter<
-    Map<Table, ColumnCombination>
-  >();
-  @Output() public indToFk = new EventEmitter<SourceRelationship>();
   public indFilter = new Array<Table>();
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
 
-  constructor() {}
+  constructor(public schemaService: SchemaService) {}
 
   ngOnChanges(): void {
-    this.indFilter = Array.from(this.schema.tables);
+    this.indFilter = this.tablesAsArray();
+  }
+
+  public get table() {
+    return this.schemaService.selectedTable!;
   }
 
   public selectedInd(): SourceRelationship | undefined {
-    if (!this.indSelectionGroup) return undefined;
-    return this.indSelectionGroup.value;
+    return this.indSelectionGroup?.value;
   }
 
   public emitHighlightedInd(rel: SourceRelationship) {
     const map = new Map<Table, ColumnCombination>();
-    for (const tableRel of this.schema.indsOf(this.table).get(rel)!) {
+    for (const tableRel of this.schemaService.schema
+      .indsOf(this.schemaService.selectedTable!)
+      .get(rel)!) {
       if (!map.has(tableRel.referencing)) {
         map.set(tableRel.referencing, new ColumnCombination());
       }
@@ -56,15 +48,15 @@ export class ForeignKeysComponent implements OnChanges {
         .get(tableRel.referenced)!
         .union(new ColumnCombination(tableRel.relationship.referenced));
     }
-    this.selectColumns.emit(map);
+    this.schemaService.highlightedColumns = map;
   }
 
   public tablesAsArray() {
-    return [...this.schema.tables];
+    return [...this.schemaService.schema.tables];
   }
 
   public inds(): Array<SourceRelationship> {
-    const inds = this.schema.indsOf(this.table);
+    const inds = this.schemaService.schema.indsOf(this.table);
 
     return Array.from(inds.keys())
       .filter((sourceRel) =>
@@ -85,7 +77,6 @@ export class ForeignKeysComponent implements OnChanges {
 
   public transformIndToFk(): void {
     const ind = this.selectedInd();
-    if (!ind) return;
-    this.indToFk.emit(ind);
+    if (ind) this.schemaService.indToFk(ind);
   }
 }

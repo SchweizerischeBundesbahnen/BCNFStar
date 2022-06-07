@@ -1,11 +1,5 @@
-import Table from '@/src/model/schema/Table';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-} from '@angular/core';
+import { SchemaService } from '@/src/app/schema.service';
+import { Component, OnChanges } from '@angular/core';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
 @Component({
@@ -14,25 +8,22 @@ import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
   styleUrls: ['./keys.component.css'],
 })
 export class KeysComponent implements OnChanges {
-  @Input() public table!: Table;
-  @Output() public setSurrogateKey = new EventEmitter<string>();
-
   public surrogateKey = '';
   public editMode = true;
 
-  constructor(private notification: SbbNotificationToast) {
-    console.log(this.editMode);
-  }
+  constructor(
+    public schemaService: SchemaService,
+    private notification: SbbNotificationToast
+  ) {}
 
   ngOnChanges(): void {
-    this.surrogateKey = this.table.surrogateKey ?? '';
+    this.surrogateKey = this.schemaService.selectedTable?.surrogateKey ?? '';
     this.editMode = !this.surrogateKey;
-    console.log(this.editMode);
   }
 
   emitSurrogateKey() {
     if (this.surrogateKey) {
-      this.setSurrogateKey.emit(this.surrogateKey);
+      this.schemaService.setSurrogateKey(this.surrogateKey);
       this.editMode = false;
     } else
       this.notification.open('Cannot set an empty surrogate key name', {
@@ -41,7 +32,7 @@ export class KeysComponent implements OnChanges {
   }
   deleteSurrogateKey() {
     this.surrogateKey = '';
-    this.setSurrogateKey.emit(this.surrogateKey);
+    this.schemaService.setSurrogateKey(this.surrogateKey);
     this.editMode = true;
   }
 }

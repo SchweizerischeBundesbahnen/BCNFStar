@@ -9,7 +9,7 @@
         [available]="tablesAsArray()"
       ></app-sbb-option-all>
       <sbb-option
-        *ngFor="let table of schema.tables"
+        *ngFor="let table of tablesAsArray()"
         [value]="table"
         [sbbTooltip]="table.fullName"
         >{{ table.fullName }}</sbb-option
@@ -20,7 +20,7 @@
       <!-- (mouseleave)="selectColumns.emit(new Map())" -->
       <sbb-radio-button
         (mouseenter)="emitHighlightedInd(rel)"
-        (mouseleave)="selectColumns.emit()"
+        (mouseleave)="schemaService.highlightedColumns = undefined"
         *ngFor="let rel of inds()"
         [value]="rel"
         style="display: block"
@@ -46,9 +46,6 @@
 
   <sbb-expansion-panel [hidden]="table.sources.length !== 1">
     <sbb-expansion-panel-header>Suggest Foreign Key</sbb-expansion-panel-header>
-    <app-check-ind
-      [referencingTable]="table"
-      [tables]="schema.tables!"
-    ></app-check-ind>
+    <app-check-ind></app-check-ind>
   </sbb-expansion-panel>
 </sbb-accordion>

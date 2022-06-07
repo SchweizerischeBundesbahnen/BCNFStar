@@ -35,7 +35,7 @@
           )
         "
         (mouseenter)="emitHighlightedCluster(cluster)"
-        (mouseleave)="selectColumns.emit()"
+        (mouseleave)="schemaService.highlightedColumns = undefined"
       >
         <sbb-expansion-panel-header style="padding: 0.2rem">
           <span>
@@ -57,7 +57,7 @@
           type="button"
           sbb-button
           style="margin: 3px"
-          (click)="splitFd.emit(fd)"
+          (click)="schemaService.split(fd)"
           [sbbTooltip]="fd.lhs.toString()"
         >
           {{ fd.lhs }}

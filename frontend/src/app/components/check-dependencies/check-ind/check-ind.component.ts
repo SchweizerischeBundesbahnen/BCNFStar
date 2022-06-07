@@ -1,12 +1,12 @@
 import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, OnChanges } from '@angular/core';
 import { SbbTableDataSource } from '@sbb-esta/angular/table';
-import { DatabaseService } from '@/src/app/database.service';
 import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { ViolatingINDRowsDataQuery } from '../../../dataquery';
+import { SchemaService } from '@/src/app/schema.service';
 
 @Component({
   selector: 'app-check-ind',
@@ -14,8 +14,13 @@ import { ViolatingINDRowsDataQuery } from '../../../dataquery';
   styleUrls: ['./check-ind.component.css'],
 })
 export class CheckIndComponent implements OnChanges {
-  @Input() referencingTable!: Table;
-  @Input() tables!: Set<Table>;
+  public get referencingTable() {
+    return this.schemaService.selectedTable!;
+  }
+
+  public get tables() {
+    return Array.from(this.schemaService.schema.tables);
+  }
 
   public rowCount: number = 0;
 
@@ -28,7 +33,7 @@ export class CheckIndComponent implements OnChanges {
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
   public tableColumns: Array<string> = [];
 
-  constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
+  constructor(public schemaService: SchemaService, public dialog: SbbDialog) {}
 
   ngOnChanges() {
     this.referencedTable = undefined;
