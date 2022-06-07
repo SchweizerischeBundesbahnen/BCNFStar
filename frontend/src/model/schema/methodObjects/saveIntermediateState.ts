@@ -84,7 +84,7 @@ export default class SaveSchemaState {
     this.parseTableFds(schema._fds).forEach((sfd) => {
       this.newSchema.addFd(sfd);
     });
-    this.newSchema.tables.forEach((table) => {
+    this.newSchema.regularTables.forEach((table) => {
       this.newSchema.calculateFdsOf(table);
     });
     return this.newSchema;

@@ -28,6 +28,14 @@ export default class Table extends BasicTable {
   }
 
   /**
+   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   */
+  public _fks!: Array<TableRelationship>;
+  /**
+   * cached results of schema.fksOf(this). Should not be accessed from outside the schema class
+   */
+  public _references!: Array<TableRelationship>;
+  /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
@@ -171,13 +179,6 @@ export default class Table extends BasicTable {
     this.sources.push(newSource);
     this.resolveSourceNameDuplicates();
     return newSource;
-  }
-
-  /**
-   * returns the name of the table in the format "{schemaName}.{tableName}"
-   */
-  public get fullName(): string {
-    return this.schemaName + '.' + this.name;
   }
 
   public get numColumns(): number {

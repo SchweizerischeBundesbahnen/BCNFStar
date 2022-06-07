@@ -11,8 +11,5 @@
     [bbox]="item.value.style"
     [fact]="schema.starMode && schema.isFact(item.key)"
     [dimension]="schema.starMode && !schema.isFact(item.key)"
-    [showMakeDirectDimension]="
-      schema.starMode && schema.filteredRoutesFromFactTo(item.key).length > 0
-    "
   ></app-graph-element>
 </div>

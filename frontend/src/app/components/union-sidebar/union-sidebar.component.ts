@@ -22,7 +22,7 @@ export class UnionSidebarComponent implements OnInit {
   }
 
   public filteredTables(): Array<Table> {
-    return [...this.schema.tables].filter((t) => t !== this.table);
+    return this.schema.regularTables.filter((t) => t !== this.table);
   }
 
   async openDialog(): Promise<void> {

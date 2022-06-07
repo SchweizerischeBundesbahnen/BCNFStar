@@ -22,6 +22,7 @@ import Column from '@/src/model/schema/Column';
 import DeleteColumnCommand from '@/src/model/commands/DeleteColumnCommand';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
+import BasicTable from '@/src/model/schema/BasicTable';
 
 @Component({
   selector: 'app-schema-editing',
@@ -33,7 +34,7 @@ export class SchemaEditingComponent {
   public graph!: SchemaGraphComponent;
   public readonly schema!: Schema;
   public readonly commandProcessor = new CommandProcessor();
-  public selectedTable?: Table;
+  public selectedTable?: BasicTable;
   public selectedColumns?: Map<Table, ColumnCombination>;
   public schemaChanged: Subject<void> = new Subject();
 
@@ -46,6 +47,10 @@ export class SchemaEditingComponent {
     this.schema = dataService.schema!;
     if (!this.schema) router.navigate(['']);
     // this.schemaChanged.next();
+  }
+
+  public showSidebar() {
+    return this.selectedTable && this.selectedTable instanceof Table;
   }
 
   public onSelectColumns(columns: Map<Table, ColumnCombination>) {
@@ -116,6 +121,7 @@ export class SchemaEditingComponent {
   }
 
   public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
+    if (!(this.selectedTable instanceof Table)) throw Error;
     let command = new SplitCommand(
       this.schema,
       this.selectedTable!,
@@ -138,6 +144,7 @@ export class SchemaEditingComponent {
   }
 
   public onDeleteColumn(column: Column): void {
+    if (!(this.selectedTable instanceof Table)) throw Error;
     let command = new DeleteColumnCommand(
       this.schema,
       this.selectedTable!,
@@ -150,12 +157,8 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onAutoNormalize(selectedTables: Set<Table> | Table): void {
-    const tablesToNormalize =
-      selectedTables.constructor.name == 'Set'
-        ? Array.from(selectedTables as Set<Table>)
-        : [selectedTables as Table];
-    let command = new AutoNormalizeCommand(this.schema, ...tablesToNormalize);
+  public onAutoNormalize(tables: Array<Table>): void {
+    let command = new AutoNormalizeCommand(this.schema, ...tables);
     let self = this;
     let previousSelectedTable = this.selectedTable;
     command.onDo = function () {
@@ -190,6 +193,7 @@ export class SchemaEditingComponent {
   }
 
   public onSetSurrogateKey(name: string) {
+    if (!(this.selectedTable instanceof Table)) throw Error;
     this.selectedTable!.surrogateKey = name;
     this.schemaChanged.next();
   }
@@ -210,5 +214,9 @@ export class SchemaEditingComponent {
   public onRedo() {
     this.commandProcessor.redo();
     this.schemaChanged.next();
+  }
+
+  public get selectedTableAsTable() {
+    return this.selectedTable as Table;
   }
 }

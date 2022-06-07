@@ -1,3 +1,4 @@
+import BasicTable from '@/src/model/schema/BasicTable';
 import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import Schema from '@/src/model/schema/Schema';
@@ -11,15 +12,14 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./graph-element.component.css'],
 })
 export class GraphElementComponent {
-  @Input() public table!: Table;
+  @Input() public table!: BasicTable;
   @Input() public schema!: Schema;
   @Input() public bbox!: Record<string, string>;
   @Input() public selectedColumns?: ColumnCombination;
   @Input() public fact!: boolean;
   @Input() public dimension!: boolean;
-  @Input() public showMakeDirectDimension!: boolean;
-  @Input() selectedTable?: Table;
-  @Output() public selectedTableChanged = new EventEmitter<Table>();
+  @Input() selectedTable?: BasicTable;
+  @Output() public selectedTableChanged = new EventEmitter<BasicTable>();
   @Output() public makeDirectDimension = new EventEmitter<Table>();
 
   constructor() {}
@@ -29,6 +29,7 @@ export class GraphElementComponent {
   }
 
   public isPkColumn(column: BasicColumn): boolean {
+    if (!(this.table instanceof Table)) return false;
     if (this.table.implementsSurrogateKey())
       return column.name == this.table.surrogateKey;
     return (
@@ -43,6 +44,19 @@ export class GraphElementComponent {
       column instanceof Column &&
       !!this.selectedColumns &&
       this.selectedColumns.includes(column as Column)
+    );
+  }
+
+  public onMakeDirectDimension() {
+    if (!(this.table instanceof Table)) throw Error;
+    this.makeDirectDimension.emit(this.table);
+  }
+
+  public get showMakeDirectDimension() {
+    return (
+      this.table instanceof Table &&
+      this.schema.starMode &&
+      this.schema.filteredRoutesFromFactTo(this.table).length > 0
     );
   }
 }

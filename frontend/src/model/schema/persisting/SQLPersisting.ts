@@ -3,6 +3,7 @@ import Column from '../Column';
 import Schema from '../Schema';
 import SourceTable from '../SourceTable';
 import Table from '../Table';
+import BasicTable from '../BasicTable';
 
 export default abstract class SQLPersisting {
   public constructor() {}
@@ -12,9 +13,9 @@ export default abstract class SQLPersisting {
   public createSQL(schema: Schema): string {
     let SQL = '';
     SQL += this.schemaPreparation(schema);
-    SQL += this.tableCreation([...schema.tables]);
-    SQL += this.dataTransfer([...schema.tables]);
-    SQL += this.primaryKeys([...schema.tables]);
+    SQL += this.tableCreation([...schema.regularTables]);
+    SQL += this.dataTransfer([...schema.regularTables]);
+    SQL += this.primaryKeys([...schema.regularTables]);
     SQL += this.foreignKeys(schema);
     return SQL;
   }
@@ -169,7 +170,7 @@ ALTER TABLE ${this.tableIdentifier(
     return columns.map((c) => this.escape(c.name)).join(', ');
   }
 
-  public tableIdentifier(table: Table): string {
+  public tableIdentifier(table: BasicTable): string {
     return `${this.escape(table.schemaName)}.${this.escape(table.name)}`;
   }
 

@@ -32,7 +32,7 @@ export class ForeignKeysComponent implements OnChanges {
   constructor() {}
 
   ngOnChanges(): void {
-    this.indFilter = Array.from(this.schema.tables);
+    this.indFilter = this.schema.regularTables;
   }
 
   public selectedInd(): SourceRelationship | undefined {
