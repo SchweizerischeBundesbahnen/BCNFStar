@@ -5,7 +5,7 @@ import SourceTable from '../SourceTable';
 import Table from '../Table';
 
 export default abstract class SQLPersisting {
-  public constructor() {}
+  public constructor(protected schemaName: string) {}
 
   public abstract escape(str: string): string;
 
@@ -170,7 +170,7 @@ ALTER TABLE ${this.tableIdentifier(
   }
 
   public tableIdentifier(table: Table): string {
-    return `${this.escape(table.schemaName)}.${this.escape(table.name)}`;
+    return `${this.escape(this.schemaName)}.${this.escape(table.name)}`;
   }
 
   public sourceTableIdentifier(table: SourceTable): string {
@@ -194,7 +194,7 @@ ALTER TABLE ${this.tableIdentifier(
   public abstract surrogateKeyString(name: string): string;
 
   public schemaWideColumnIdentifier(table: Table, column: Column): string {
-    return `${this.escape(table.schemaName)}.${this.escape(
+    return `${this.escape(this.schemaName)}.${this.escape(
       table.name
     )}.${this.escape(column.name)}`;
   }
