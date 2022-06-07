@@ -2,7 +2,7 @@ import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersis
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
 import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
 import Schema from '@/src/model/schema/Schema';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import * as saveAs from 'file-saver';
 import { DatabaseService } from '../../../database.service';
 
@@ -11,14 +11,9 @@ import { DatabaseService } from '../../../database.service';
   templateUrl: './persist-schema.component.html',
   styleUrls: ['./persist-schema.component.css'],
 })
-export class PersistSchemaComponent implements OnInit {
+export class PersistSchemaComponent {
   @Input() public schema!: Schema;
   public schemaName: string = '';
-  public persisting: SQLPersisting | undefined;
-
-  async ngOnInit(): Promise<void> {
-    this.persisting = await this.initPersisting();
-  }
 
   constructor(public dataService: DatabaseService) {}
 
@@ -26,24 +21,21 @@ export class PersistSchemaComponent implements OnInit {
     const dbmsName: string = await this.dataService.getDmbsName();
 
     if (dbmsName == 'postgres') {
-      return new PostgreSQLPersisting();
+      return new PostgreSQLPersisting(this.schemaName);
     } else if (dbmsName == 'mssql') {
-      return new SqlServerPersisting();
+      return new SqlServerPersisting(this.schemaName);
     }
     throw Error('Unknown Dbms-Server');
   }
 
-  public persistSchema(): string {
-    this.schema.name = this.schemaName.toLowerCase();
-    this.schema.tables.forEach(
-      (table) => (table.schemaName = this.schemaName.toLowerCase())
-    );
-    return this.persisting!.createSQL(this.schema);
+  public async persistSchema(): Promise<string> {
+    const persisting = await this.initPersisting();
+    return persisting!.createSQL(this.schema);
   }
 
   async download(): Promise<void> {
     const file: File = new File(
-      [this.persistSchema()],
+      [await this.persistSchema()],
       this.schemaName.toLowerCase() + '.sql',
       {
         type: 'text/plain;charset=utf-8',
