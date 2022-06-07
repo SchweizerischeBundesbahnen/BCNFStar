@@ -53,6 +53,10 @@ export default class Join {
       source,
       this.newTable.addSource(source.table, this.newUserAlias(source.baseAlias))
     );
+    this.replaceUnnecessarySources(
+      this.sourceMapping.get(source)!,
+      relToSource
+    );
     this.newTable.relationships.push(
       relToSource.applySourceMapping(this.sourceMapping)
     );
@@ -65,7 +69,7 @@ export default class Join {
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
 
-    // inherit sources, relationships and columns from referencing table
+    // inherit sources and relationships from referencing table
     this.referencing.sources.forEach((source) => {
       this.sourceMapping.set(
         source,
@@ -76,9 +80,6 @@ export default class Join {
       ...this.referencing.relationships.map((rel) =>
         rel.applySourceMapping(this.sourceMapping)
       )
-    );
-    this.newTable.addColumns(
-      ...this.referencing.columns.applySourceMapping(this.sourceMapping)
     );
 
     // sources and relationships from referenced table
@@ -97,10 +98,14 @@ export default class Join {
       this.addSourcesAndRels(referencedRootSource, this.relationship, false);
     }
 
-    // columns from referenced table
+    // columns
+    this.newTable.addColumns(
+      ...this.referencing.columns.applySourceMapping(this.sourceMapping)
+    );
     this.newTable.addColumns(
       ...this.referenced.columns.applySourceMapping(this.sourceMapping)
     );
+
     this.newTable.establishIdentities();
     if (!this.relationship.sourceRelationship().isTrivial) {
       this.newTable.removeColumns(
@@ -120,10 +125,42 @@ export default class Join {
     ).applySourceMapping(this.sourceMapping);
     return this.newTable.relationships.find(
       (rel) =>
+        rel.referenced[0].sourceTableInstance.table.equals(source.table) &&
         equivalentReferencingColumns.isSubsetOf(
           new ColumnCombination(rel.referencing)
-        ) && rel.referenced[0].sourceTableInstance.table.equals(source.table)
+        )
     )?.referenced[0].sourceTableInstance;
+  }
+
+  private replaceUnnecessarySources(
+    newSource: SourceTableInstance,
+    relToSource: Relationship
+  ) {
+    const equivalentReferencingColumns = new ColumnCombination(
+      relToSource.referencing
+    ).applySourceMapping(this.sourceMapping);
+    const replaceableRels = this.newTable.relationships.filter(
+      (rel) =>
+        rel.referenced[0].sourceTableInstance.table.equals(newSource.table) &&
+        new ColumnCombination(rel.referencing).isSubsetOf(
+          equivalentReferencingColumns
+        )
+    );
+    if (replaceableRels.length == 0) return;
+    const replaceableSources = replaceableRels.map(
+      (rel) => rel.referenced[0].sourceTableInstance
+    );
+    this.newTable.relationships = this.newTable.relationships.filter(
+      (rel) => !replaceableRels.includes(rel)
+    );
+    this.newTable.sources = this.newTable.sources.filter(
+      (source) => !replaceableSources.includes(source)
+    );
+    for (const [oldSource, mappedSource] of Array.from(
+      this.sourceMapping.entries()
+    ))
+      if (replaceableSources.includes(mappedSource))
+        this.sourceMapping.set(oldSource, newSource);
   }
 
   private newUserAlias(prevName: string): string {
