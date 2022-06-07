@@ -121,8 +121,8 @@ export default class Join {
     ).applySourceMapping(this.sourceMapping);
     return this.newTable.relationships.find(
       (rel) =>
-        new ColumnCombination(rel.referencing).equals(
-          equivalentReferencingColumns
+        equivalentReferencingColumns.isSubsetOf(
+          new ColumnCombination(rel.referencing)
         ) && rel.referenced[0].sourceTableInstance.table.equals(source.table)
     )?.referenced[0].sourceTableInstance;
   }

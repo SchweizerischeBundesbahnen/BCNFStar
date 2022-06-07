@@ -18,9 +18,10 @@ export class CheckIndComponent implements OnChanges {
   @Input() tables!: Set<Table>;
 
   public rowCount: number = 0;
+  public isLoading: boolean = false;
 
   public referencedTable: Table | undefined;
-  public relationship: Relationship = new Relationship([], []);
+  private _relationship: Relationship = new Relationship([], []);
 
   public referencingColumn: Column | undefined;
   public referencedColumn: Column | undefined;
@@ -28,14 +29,24 @@ export class CheckIndComponent implements OnChanges {
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
   public tableColumns: Array<string> = [];
 
+  public isValid: boolean = false;
+
   constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
 
   ngOnChanges() {
     this.referencedTable = undefined;
-    this.relationship = new Relationship([], []);
+    this._relationship = new Relationship([], []);
 
     this.referencingColumn = undefined;
     this.referencedColumn = undefined;
+
+    this.isValid = false;
+    this.isLoading = false;
+  }
+
+  public get relationship(): Relationship {
+    this.isValid = false;
+    return this._relationship;
   }
 
   public canAddColumnRelation(): boolean {
@@ -45,8 +56,8 @@ export class CheckIndComponent implements OnChanges {
     )
       return false;
     return !(
-      this.relationship.referencing.includes(this.referencingColumn!) ||
-      this.relationship.referenced.includes(this.referencedColumn)
+      this._relationship.referencing.includes(this.referencingColumn!) ||
+      this._relationship.referenced.includes(this.referencedColumn)
     );
   }
 
@@ -57,18 +68,34 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public async checkInd(): Promise<void> {
-    const dataQuery = new ViolatingINDRowsDataQuery(this.relationship);
+    if (this.canAddColumnRelation()) this.addColumnRelation();
+
+    const dataQuery = new ViolatingINDRowsDataQuery(this._relationship);
+
+    this.isLoading = true;
     const rowCount: number = await dataQuery.loadRowCount();
+    this.isLoading = false;
 
     if (rowCount == 0) {
-      // valid Inclusion Dependency
+      this.isValid = true;
     } else {
       this.dialog.open(ViolatingRowsViewIndsComponent, {
         data: {
           dataService: dataQuery,
+          rowCount: rowCount,
         },
       });
     }
+  }
+
+  public switchTables(): void {
+    const copy: Column[] = this.relationship.referenced;
+    this.relationship.referenced = this.relationship.referencing;
+    this.relationship.referencing = copy;
+
+    const copy2: Table = this.referencedTable!;
+    this.referencedTable = this.referencingTable;
+    this.referencingTable = copy2;
   }
 
   public onTableSelected(table: Table) {
@@ -90,20 +117,19 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public canCheckIND(): boolean {
-    return this.referencingColumns().length != 0;
+    return this.referencingColumns().length != 0 || this.canAddColumnRelation();
   }
 
   public removeColumnRelation(index: number): void {
-    this.referencingColumns().splice(index, 1);
-    this.referencedColumns().splice(index, 1);
+    this.relationship.removeByIndex(index);
   }
 
   public referencingColumns(): Array<Column> {
-    return this.relationship.referencing;
+    return this._relationship.referencing;
   }
 
   public referencedColumns(): Array<Column> {
-    return this.relationship.referenced;
+    return this._relationship.referenced;
   }
 
   public validReferencingColumns(): Array<Column> {

@@ -411,6 +411,16 @@ export default class Table {
     return this._fdClusters;
   }
 
+  public hull(columns: ColumnCombination): ColumnCombination {
+    const rhs = columns.copy();
+    for (const fd of this.fds) {
+      if (fd.lhs.isSubsetOf(columns)) {
+        rhs.union(fd.rhs);
+      }
+    }
+    return rhs;
+  }
+
   public toTestString(): string {
     let str = `${this.name}(${this.columns.toString()})\n`;
     str += this.fds.map((fd) => fd.toString()).join('\n');

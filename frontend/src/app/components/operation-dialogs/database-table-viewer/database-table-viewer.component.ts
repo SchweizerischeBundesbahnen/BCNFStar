@@ -14,16 +14,16 @@ export class DatabaseTableViewerComponent implements OnInit {
   public page: number = 0;
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
   public tableColumns: Array<string> = [];
+  public isLoading = false;
 
   @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
   @Input() dataService!: DataQuery;
-  public rowCount: number = 0;
+  @Input() rowCount!: number;
 
   constructor() {}
 
   public async ngOnInit(): Promise<void> {
-    this.rowCount = await this.dataService.loadRowCount();
     this.reloadData();
   }
 
@@ -37,10 +37,14 @@ export class DatabaseTableViewerComponent implements OnInit {
   }
 
   public async reloadData() {
-    const result = await this.dataService.loadTablePage(
-      this.page * this.pageSize,
-      this.pageSize
-    );
+    this.isLoading = true;
+    const result = await this.dataService
+      .loadTablePage(this.page * this.pageSize, this.pageSize)
+      .catch((e) => {
+        console.error(`Could not reload data`);
+        console.error(e);
+      });
+    this.isLoading = false;
 
     if (!result) return;
     this.tableColumns = result.attributes;

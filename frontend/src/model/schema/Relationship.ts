@@ -40,6 +40,11 @@ export default class Relationship {
     this._referenced.push(referenced);
   }
 
+  public removeByIndex(index: number) {
+    this._referencing.splice(index, 1);
+    this._referenced.splice(index, 1);
+  }
+
   public sourceRelationship(): SourceRelationship {
     const sourceRel = new SourceRelationship();
     for (const i in this._referencing) {
