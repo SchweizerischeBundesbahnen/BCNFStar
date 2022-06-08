@@ -82,6 +82,7 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
         )
       );
     } else {
+      this.isValid = false;
       this.dialog.open(ViolatingRowsViewComponent, {
         data: {
           dataService: dataQuery,
