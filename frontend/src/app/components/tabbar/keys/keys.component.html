@@ -49,7 +49,7 @@
 
       <button
         sbb-button
-        *ngIf="table.implementsSurrogateKey()"
+        *ngIf="schemaService.selectedTable!.implementsSurrogateKey()"
         (click)="(reset)"
       >
         Cancel
