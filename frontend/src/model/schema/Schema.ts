@@ -388,9 +388,13 @@ export default class Schema {
   }
 
   private filterFks() {
-    const isBad = this.starMode ? this.isStarViolatingFk : this.isTransitiveFk;
+    const shouldBeFiltered = this.starMode
+      ? this.isStarViolatingFk
+      : this.isTransitiveFk;
     for (const table of this.tables) {
-      table._filteredFks = table._fks.filter((fk) => !isBad.apply(this, [fk]));
+      table._filteredFks = table._fks.filter(
+        (fk) => !shouldBeFiltered.apply(this, [fk])
+      );
       for (const filteredFk of table._filteredFks) {
         filteredFk.referenced._filteredReferences.push(filteredFk);
       }
