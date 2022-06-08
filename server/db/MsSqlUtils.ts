@@ -96,6 +96,12 @@ export default class MsSqlUtils extends SqlUtils {
     }
   }
 
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select name from sys.types";
+    const result: sql.IResult<any> = await sql.query<{ name: string }>(_sql);
+    return result.recordset.map((record) => record.name);
+  }
+
   public override async testTypeCasting(
     s: IRequestBodyTypeCasting
   ): Promise<TypeCasting> {

@@ -1,14 +1,20 @@
 import { sqlUtils } from "@/db";
 import { IRequestBodyTypeCasting as IRequestBodyTypeCasting } from "@/definitions/TypeCasting";
-import { isIRequestBodyTypeConversion as isIRequestBodyTypeCasting } from "@/definitions/TypeCasting.guard";
+import { isIRequestBodyTypeCasting } from "@/definitions/TypeCasting.guard";
 import { Request, Response } from "express";
+import { validationResult } from "express-validator";
 
 export default async function getTypeCasting(
   req: Request,
   res: Response
 ): Promise<void> {
   try {
-    console.log("here");
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(422).json({ errors: errors.mapped() });
+      return;
+    }
+
     if (!isIRequestBodyTypeCasting(req.body)) {
       res.status(422).json({ errors: "Invalid request body." });
       return;

@@ -104,6 +104,12 @@ export default class PostgresSqlUtils extends SqlUtils {
     }
   }
 
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select typname from pg_type";
+    const result = await this.pool.query(_sql);
+    return result.rows.map((row) => row.typname);
+  }
+
   public override async testTypeCasting(
     s: IRequestBodyTypeCasting
   ): Promise<TypeCasting> {
@@ -113,7 +119,6 @@ export default class PostgresSqlUtils extends SqlUtils {
     SELECT CAST(CAST(${s.column} AS ${s.targetDatatype}) AS ${s.currentDatatype} ) FROM  ${s.schema}.${s.table} 
     `;
     try {
-      console.log(_sql);
       const queryResult = await this.pool.query(_sql);
       if (queryResult.rowCount == 0) return TypeCasting.allowed;
       return TypeCasting.informationloss;

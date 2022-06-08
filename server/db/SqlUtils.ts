@@ -71,6 +71,8 @@ export default abstract class SqlUtils {
   public abstract getJdbcPath(): string;
   public abstract getDbmsName(): DbmsType;
 
+  public abstract getDatatypes(): Promise<string[]>;
+
   public abstract testTypeCasting(
     s: IRequestBodyTypeCasting
   ): Promise<TypeCasting>;

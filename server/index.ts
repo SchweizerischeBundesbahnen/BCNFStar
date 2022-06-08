@@ -11,8 +11,11 @@ import getPksFunction from "./routes/pks";
 import testTypeCasting from "./routes/checkTypeConversion";
 
 import { getTablePage } from "./routes/tablePage";
-import { check } from "express-validator";
-import isValidFileName from "./routes/validation/parameterValidation";
+import { check, body } from "express-validator";
+import {
+  isValidFileName,
+  isValidDatatype,
+} from "./routes/validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
 
@@ -85,7 +88,14 @@ app.post("/metanomeResults", runMetanome);
 
 app.get("/persist/dbmsname", getDbmsName);
 
-app.post("/typecasting", testTypeCasting);
+app.post(
+  "/typecasting",
+  [
+    body("currentDatatype").trim().custom(isValidDatatype()),
+    body("targetDatatype").trim().custom(isValidDatatype()),
+  ],
+  testTypeCasting
+);
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
 app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
