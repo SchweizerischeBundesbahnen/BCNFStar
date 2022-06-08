@@ -11,6 +11,8 @@ import getPksFunction from "./routes/pks";
 import testTypeCasting from "./routes/checkTypeConversion";
 
 import { getTablePage } from "./routes/tablePage";
+import { check } from "express-validator";
+import isValidFileName from "./routes/validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
 
@@ -58,15 +60,27 @@ createQueueMonitor(app);
 
 app.get("/tables", getTablesFunction);
 app.get("/tables/rows", getTableRowCounts);
-app.get("/tables/page", getTablePage);
+app.get(
+  "/tables/page",
+  [check("limit").isNumeric(), check("offset").isNumeric()],
+  getTablePage
+);
 
 app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
 
 // Metanome
 app.get("/metanomeResults", getMetanomeIndex);
-app.get("/metanomeResults/:fileName", getMetanomeResults);
-app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
+app.get(
+  "/metanomeResults/:fileName",
+  [check("fileName").custom(isValidFileName())],
+  getMetanomeResults
+);
+app.delete(
+  "/metanomeResults/:fileName",
+  [check("fileName").custom(isValidFileName())],
+  deleteMetanomeResults
+);
 app.post("/metanomeResults", runMetanome);
 
 app.get("/persist/dbmsname", getDbmsName);
