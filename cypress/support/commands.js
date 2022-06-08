@@ -71,6 +71,22 @@ Cypress.Commands.add("loadMetanomeConfigAndOk", { prevSubject: false }, () => {
   cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
 });
 
+Cypress.Commands.add(
+  "visitContainedSubtableTab",
+  { prevSubject: false },
+  () => {
+    cy.contains("Subtables").click({ force: true });
+  }
+);
+
+Cypress.Commands.add(
+  "visitPossibleForeignKeysTab",
+  { prevSubject: false },
+  () => {
+    cy.contains("Foreign Keys").click({ force: true });
+    cy.contains("Possible Foreign Keys").click();
+  }
+);
 Cypress.Commands.add("executeSql", (Sql) => {
   cy.task("dbQuery", { query: Sql });
 });

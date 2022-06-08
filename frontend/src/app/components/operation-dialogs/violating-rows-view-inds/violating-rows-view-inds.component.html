@@ -1,0 +1,12 @@
+<div sbbDialogTitle>Violating Rows for suggested Contained Subtable</div>
+<div sbbDialogContent>
+  <p>
+    The suggested Foreign Key Reference is not valid because the chosen columns
+    are not fully included in the other columns. These are the
+    {{ rowCount }} violating records:
+  </p>
+  <app-database-table-viewer
+    [dataService]="dataService"
+    [rowCount]="rowCount"
+  ></app-database-table-viewer>
+</div>

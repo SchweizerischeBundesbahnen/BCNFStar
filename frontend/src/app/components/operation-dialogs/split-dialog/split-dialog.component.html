@@ -1,0 +1,58 @@
+<div sbbDialogTitle>Split Options</div>
+<div sbbDialogContent>
+  Name of the generated table
+  <input
+    type="text"
+    sbbInput
+    [(ngModel)]="tableName"
+    placeholder="if empty: column names of the chosen subtable key"
+  />
+
+  <div>
+    Which of these attributes are determined by
+    <span class="keys">{{ fd.lhs.toString() }}</span
+    >:
+  </div>
+  <div class="sbb-checkbox-group-vertical">
+    <sbb-checkbox
+      [ngModel]="selectedColumns.get(column)"
+      (ngModelChange)="setColumnSelection(column, $event)"
+      *ngFor="let column of selectedColumns.keys()"
+    >
+      {{ column.name }}
+    </sbb-checkbox>
+  </div>
+
+  <div *ngIf="pkViolation" class="violation">
+    The primary key {{ table.pk }} would be destroyed when splitting.
+  </div>
+
+  <div *ngIf="fkViolations.length > 0" class="violation">
+    These foreign keys would be destroyed when splitting:
+    <ul>
+      <li *ngFor="let fk of fkViolations">
+        {{ fk }}
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="referenceViolations.length > 0" class="violation">
+    These referenced keys would be destroyed when splitting:
+    <ul>
+      <li *ngFor="let ref of referenceViolations">
+        {{ ref }}
+      </li>
+    </ul>
+  </div>
+</div>
+<div sbbDialogActions>
+  <button
+    sbb-button
+    [disabled]="!canConfirm()"
+    (click)="confirm()"
+    cdkFocusInitial
+  >
+    Ok
+  </button>
+  <button sbb-secondary-button sbbDialogClose>Cancel</button>
+</div>

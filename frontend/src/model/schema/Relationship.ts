@@ -40,6 +40,11 @@ export default class Relationship {
     this._referenced.push(referenced);
   }
 
+  public removeByIndex(index: number) {
+    this._referencing.splice(index, 1);
+    this._referenced.splice(index, 1);
+  }
+
   public sourceRelationship(): SourceRelationship {
     const sourceRel = new SourceRelationship();
     for (const i in this._referencing) {
@@ -112,5 +117,13 @@ export default class Relationship {
       )
       .sort();
     return pairs.every((pair, index) => pair == otherPairs[index]);
+  }
+
+  public columnsMapped(referencingCol: Column, referencedCol: Column): boolean {
+    const i = this.referencing.findIndex((otherReferencingCol) =>
+      otherReferencingCol.equals(referencingCol)
+    );
+    if (i == -1) return false;
+    return this.referenced[i].equals(referencedCol);
   }
 }

@@ -35,6 +35,7 @@ export default class MsSqlUtils extends SqlUtils {
         encrypt: true, // for azure
         trustServerCertificate: true, // change to true for local dev / self-signed certs
       },
+      requestTimeout: 180000,
     };
   }
 
@@ -293,7 +294,7 @@ export default class MsSqlUtils extends SqlUtils {
     }
 
     const result: sql.IResult<any> = await sql.query(
-      `SELECT COUNT (*) as count FROM 
+      `SELECT ISNULL (SUM(Count), 0) as count FROM 
       (
       ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
       ) AS X

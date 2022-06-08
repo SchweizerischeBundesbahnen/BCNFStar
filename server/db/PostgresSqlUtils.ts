@@ -203,7 +203,7 @@ from
       throw Error("Columns don't exist in table.");
     }
     const count = await this.pool.query<{ count: number }>(
-      `SELECT COUNT (*) as count FROM 
+      `SELECT COALESCE(SUM(Count), 0) as count FROM 
       (
       ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
       ) AS X
