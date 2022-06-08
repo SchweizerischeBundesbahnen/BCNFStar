@@ -3,7 +3,7 @@ import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import Table from '@/src/model/schema/Table';
 import { FdCluster } from '@/src/model/types/FdCluster';
-import { Component, OnChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 
 @Component({
@@ -11,15 +11,16 @@ import { SbbPageEvent } from '@sbb-esta/angular/pagination';
   templateUrl: './contained-subtables.component.html',
   styleUrls: ['./contained-subtables.component.css'],
 })
-export class ContainedSubtablesComponent implements OnChanges {
+export class ContainedSubtablesComponent {
   public _fdClusterFilter = new Array<Column>();
   public page: number = 0;
   public pageSize = 5;
 
-  constructor(public schemaService: SchemaService) {}
-
-  ngOnChanges(): void {
-    this._fdClusterFilter = [];
+  constructor(public schemaService: SchemaService) {
+    this.schemaService.selectedTableChanged;
+    this.schemaService.selectedTableChanged.subscribe(() => {
+      this._fdClusterFilter = [];
+    });
   }
 
   public get table() {
@@ -43,8 +44,8 @@ export class ContainedSubtablesComponent implements OnChanges {
 
   public fdClusters(): Array<FdCluster> {
     const cc = this.fdClusterFilter;
-    return this.table
-      .fdClusters()
-      .filter((cluster) => cc.isSubsetOf(cluster.columns));
+    return this.table.fdClusters.filter((cluster) =>
+      cc.isSubsetOf(cluster.columns)
+    );
   }
 }

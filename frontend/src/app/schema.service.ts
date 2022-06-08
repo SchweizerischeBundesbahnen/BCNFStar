@@ -29,12 +29,26 @@ export class SchemaService {
     this.hasSchema = true;
     this.notifyAboutSchemaChanges();
   }
+
   public get schema() {
     return this._schema;
   }
 
   public hasSchema = false;
-  public selectedTable?: Table;
+
+  private _selectedTableChanged = new EventEmitter<void>();
+  public get selectedTableChanged() {
+    return this._selectedTableChanged.asObservable();
+  }
+  private _selectedTable?: Table;
+  public get selectedTable() {
+    return this._selectedTable;
+  }
+  public set selectedTable(val: Table | undefined) {
+    this._selectedTable = val;
+    this._selectedTableChanged.emit();
+  }
+
   public highlightedColumns?: Map<Table, ColumnCombination>;
 
   public get starMode() {
@@ -56,7 +70,7 @@ export class SchemaService {
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
-      data: { fk: fk, schema: this._schema },
+      data: { fk: fk },
     });
 
     const value: {
@@ -153,7 +167,7 @@ export class SchemaService {
     const routes = this._schema.filteredRoutesFromFactTo(table);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
-        data: { table: table, schema: this._schema },
+        data: { table: table },
       });
 
       const routes: Array<Array<TableRelationship>> = await firstValueFrom(

@@ -1,4 +1,4 @@
-import Schema from '@/src/model/schema/Schema';
+import { SchemaService } from '@/src/app/schema.service';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
@@ -15,11 +15,13 @@ export class JoinDialogComponent {
   public fk: TableRelationship;
 
   constructor(
+    private schemaService: SchemaService,
     public dialogRef: SbbDialogRef<JoinDialogComponent>,
-    @Inject(SBB_DIALOG_DATA) data: { fk: TableRelationship; schema: Schema }
+    @Inject(SBB_DIALOG_DATA) data: { fk: TableRelationship }
   ) {
     this.fk = data.fk;
-    this.duplicate = data.schema.referencesOf(this.fk.referenced).length > 1;
+    this.duplicate =
+      this.schemaService.schema.referencesOf(this.fk.referenced).length > 1;
   }
 
   public confirm() {

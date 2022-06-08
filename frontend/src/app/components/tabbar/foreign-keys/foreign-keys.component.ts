@@ -3,7 +3,7 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import IndScore from '@/src/model/schema/methodObjects/IndScore';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import Table from '@/src/model/schema/Table';
-import { Component, OnChanges, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
 
 @Component({
@@ -11,15 +11,15 @@ import { SbbRadioGroup } from '@sbb-esta/angular/radio-button';
   templateUrl: './foreign-keys.component.html',
   styleUrls: ['./foreign-keys.component.css'],
 })
-export class ForeignKeysComponent implements OnChanges {
-  public indFilter = new Array<Table>();
+export class ForeignKeysComponent {
+  public indFilter = this.tablesAsArray();
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
 
-  constructor(public schemaService: SchemaService) {}
-
-  ngOnChanges(): void {
-    this.indFilter = this.tablesAsArray();
+  constructor(public schemaService: SchemaService) {
+    this.schemaService.schemaChanged.subscribe(() => {
+      this.indFilter = this.tablesAsArray();
+    });
   }
 
   public get table() {

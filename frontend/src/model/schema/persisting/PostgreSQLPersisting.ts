@@ -5,7 +5,7 @@ import TableRelationship from '../TableRelationship';
 export default class PostgreSQLPersisting extends SQLPersisting {
   public schemaPreparation(schema: Schema): string {
     let Sql: string = '';
-    Sql += `CREATE SCHEMA IF NOT EXISTS "${schema.name!}";` + '\n';
+    Sql += `CREATE SCHEMA IF NOT EXISTS "${this.schemaName!}";` + '\n';
     for (const table of schema.tables) {
       Sql +=
         `DROP TABLE IF EXISTS ${this.tableIdentifier(table)} CASCADE;` + '\n';

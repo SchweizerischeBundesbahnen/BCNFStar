@@ -10,6 +10,7 @@ import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import SourceRelationship from './SourceRelationship';
 import { FdCluster } from '../types/FdCluster';
+import ColumnsTree from './ColumnsTree';
 
 export default class Table {
   public name = '';
@@ -383,32 +384,54 @@ export default class Table {
         .sort((fd1, fd2) => {
           let score1 = new FdScore(this, fd1).get();
           let score2 = new FdScore(this, fd2).get();
-          return score2 - score1;
+          if (score1 !== score2) return score2 - score1;
+          const [fd1String, fd2String] = [fd1.toString(), fd2.toString()];
+          if (fd1String < fd2String) return 1;
+          if (fd2String < fd1String) return -1;
+          return 0;
         });
     }
     return this._violatingFds;
   }
 
-  public fdClusters(): Array<FdCluster> {
+  /**
+   * @returns FdClusters, which group functional dependencies that have the same right hand side
+   * Used in UI to make functional dependencies easier to discover
+   */
+  public get fdClusters(): Array<FdCluster> {
     if (!this._fdClusters) {
-      this._fdClusters = new Array<FdCluster>();
+      const fdClusterTree = new ColumnsTree<FdCluster>();
       if (this.pk)
-        this._fdClusters.push({
-          columns: this.columns.copy(),
-          fds: new Array(
-            new FunctionalDependency(this.pk!.copy(), this.columns.copy())
-          ),
-        });
+        fdClusterTree.add(
+          {
+            columns: this.columns.copy(),
+            fds: new Array(
+              new FunctionalDependency(this.pk!.copy(), this.columns.copy())
+            ),
+          },
+          this.columns.copy()
+        );
       for (let fd of this.violatingFds()) {
-        let cluster = this._fdClusters.find((c) => c.columns.equals(fd.rhs));
+        let cluster = fdClusterTree.get(fd.rhs);
         if (!cluster) {
           cluster = { columns: fd.rhs.copy(), fds: new Array() };
-          this._fdClusters.push(cluster);
+          fdClusterTree.add(cluster, cluster.columns);
         }
         cluster.fds.push(fd);
       }
+      this._fdClusters = fdClusterTree.getAll();
     }
     return this._fdClusters;
+  }
+
+  public hull(columns: ColumnCombination): ColumnCombination {
+    const rhs = columns.copy();
+    for (const fd of this.fds) {
+      if (fd.lhs.isSubsetOf(columns)) {
+        rhs.union(fd.rhs);
+      }
+    }
+    return rhs;
   }
 
   public toTestString(): string {

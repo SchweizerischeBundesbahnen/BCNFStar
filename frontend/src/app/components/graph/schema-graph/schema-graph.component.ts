@@ -1,9 +1,4 @@
-import {
-  Component,
-  AfterContentInit,
-  SimpleChanges,
-  OnChanges,
-} from '@angular/core';
+import { Component, AfterContentInit } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
@@ -28,7 +23,7 @@ enum PortSide {
   templateUrl: './schema-graph.component.html',
   styleUrls: ['./schema-graph.component.css'],
 })
-export class SchemaGraphComponent implements AfterContentInit, OnChanges {
+export class SchemaGraphComponent implements AfterContentInit {
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
   protected portDiameter = 22.5;
@@ -71,14 +66,11 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     this.addPanzoomHandler();
     this.schemaService.schemaChanged.subscribe(() => {
       this.updateGraph();
+    });
+    this.schemaService.selectedTableChanged.subscribe(() => {
       this.centerOnSelectedTable();
     });
     this.updateGraph();
-    this.centerOnSelectedTable();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedTable']) this.centerOnSelectedTable();
   }
 
   public updateGraph() {
@@ -101,6 +93,8 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     setTimeout(() => {
       this.updateAllBBoxes();
     }, 10);
+
+    this.centerOnSelectedTable();
   }
 
   protected panzoomHandler?: PanZoom;

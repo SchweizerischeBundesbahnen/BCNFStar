@@ -3,6 +3,7 @@ import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
+import { SchemaService } from '../../schema.service';
 
 @Component({
   selector: 'app-direct-dimension-dialog',
@@ -16,10 +17,12 @@ export class DirectDimensionDialogComponent {
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<DirectDimensionDialogComponent>,
-    // eslint-disable-next-line no-unused-vars
-    @Inject(SBB_DIALOG_DATA) data: { table: Table; schema: Schema }
+    schemaService: SchemaService,
+    @Inject(SBB_DIALOG_DATA) data: { table: Table }
   ) {
-    for (const route of data.schema.filteredRoutesFromFactTo(data.table)) {
+    for (const route of schemaService.schema.filteredRoutesFromFactTo(
+      data.table
+    )) {
       this.routes.set(route, false);
     }
     this.table = data.table;

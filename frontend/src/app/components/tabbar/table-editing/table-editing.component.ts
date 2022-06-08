@@ -1,13 +1,13 @@
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import SourceTableInstance from '@/src/model/schema/SourceTableInstance';
-import { Component, OnChanges } from '@angular/core';
+import { Component } from '@angular/core';
 @Component({
   selector: 'app-table-editing',
   templateUrl: './table-editing.component.html',
   styleUrls: ['./table-editing.component.css'],
 })
-export class TableEditingComponent implements OnChanges {
+export class TableEditingComponent {
   /** Is the table name being edited? */
   public isEditingTableName = false;
   /** The string inside the schema editing field */
@@ -23,12 +23,12 @@ export class TableEditingComponent implements OnChanges {
   /** The string inside the source editing field */
   public sourceNameEditString: string = '';
 
-  constructor(public schemaService: SchemaService) {}
-
-  ngOnChanges(): void {
-    this.resetTableEdit();
-    this.resetColumnEdit();
-    this.resetSourceEdit();
+  constructor(public schemaService: SchemaService) {
+    this.schemaService.selectedTableChanged.subscribe(() => {
+      this.resetTableEdit();
+      this.resetColumnEdit();
+      this.resetSourceEdit();
+    });
   }
 
   public get table() {

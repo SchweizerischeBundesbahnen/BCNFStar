@@ -1,5 +1,5 @@
 import { SchemaService } from '@/src/app/schema.service';
-import { Component, OnChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
 @Component({
@@ -7,18 +7,18 @@ import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
   templateUrl: './keys.component.html',
   styleUrls: ['./keys.component.css'],
 })
-export class KeysComponent implements OnChanges {
+export class KeysComponent {
   public surrogateKey = '';
   public editMode = true;
 
   constructor(
     public schemaService: SchemaService,
     private notification: SbbNotificationToast
-  ) {}
-
-  ngOnChanges(): void {
-    this.surrogateKey = this.schemaService.selectedTable?.surrogateKey ?? '';
-    this.editMode = !this.surrogateKey;
+  ) {
+    this.schemaService.selectedTableChanged.subscribe(() => {
+      this.surrogateKey = this.schemaService.selectedTable?.surrogateKey ?? '';
+      this.editMode = !this.surrogateKey;
+    });
   }
 
   emitSurrogateKey() {
