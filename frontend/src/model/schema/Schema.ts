@@ -193,11 +193,14 @@ export default class Schema {
 
   public referencesOf(
     table: Table,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     filtered: boolean
   ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return table._references;
+    if (!filtered) return Array.from(table._references.keys());
+    else
+      return Array.from(table._references.keys()).filter(
+        (ref) => !table._references.get(ref)!
+      ); // cache?
   }
 
   public fksOf(table: Table, filtered: boolean): Array<TableRelationship> {
@@ -235,7 +238,7 @@ export default class Schema {
         table._fks || new Map<TableRelationship, Array<boolean>>()
       );
       table._fks = new Map<TableRelationship, Array<boolean>>();
-      table._references = new Array();
+      table._references = new Map<TableRelationship, boolean>();
     }
     const currentFks = new Array<TableRelationship>();
     this.calculateFks(currentFks);
@@ -248,13 +251,18 @@ export default class Schema {
       if (oldFkEntry)
         table._fks.set(fk, [false, oldFkEntry[1][1], oldFkEntry[1][2]]);
       else table._fks.set(fk, [false, false, false]);
-      fk.referenced._references.push(fk);
+      fk.referenced._references.set(fk, false);
     }
+    this._tableFksValid = true;
     for (const table of this.tables)
       for (const [fk, bools] of table._fks.entries())
         bools[0] = this.shouldBeFiltered(fk);
-
-    this._tableFksValid = true;
+    for (const table of this.tables)
+      for (const fk of table._references.keys())
+        table._references.set(fk, true);
+    for (const table of this.tables)
+      for (const fk of this.fksOf(table, true))
+        fk.referenced._references.set(fk, false);
   }
 
   private calculateFks(result: Array<TableRelationship>): void {
@@ -446,7 +454,7 @@ export default class Schema {
   }
 
   private isStarViolatingFk(fk: TableRelationship) {
-    if (fk.referencing._references.length == 0) return false;
+    if (fk.referencing._references.size == 0) return false;
     return !this.directDimensionableRoutes(fk.referenced, false).some(
       (route) => route[route.length - 1] == fk
     );
