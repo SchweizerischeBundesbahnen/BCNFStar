@@ -1,10 +1,10 @@
-import TableRelationship from '../../schema/TableRelationship';
+import TableRelationship from '../TableRelationship';
 import Column from '../Column';
 import Schema from '../Schema';
 import Table from '../Table';
 import SQLPersisting from './SQLPersisting';
 
-export default class SqlServerPersisting extends SQLPersisting {
+export default class MsSqlPersisting extends SQLPersisting {
   public schemaPreparation(schema: Schema): string {
     let Sql: string = '';
     Sql +=
