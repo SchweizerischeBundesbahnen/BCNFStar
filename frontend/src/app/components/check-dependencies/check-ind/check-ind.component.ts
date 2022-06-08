@@ -7,6 +7,7 @@ import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { ViolatingINDRowsDataQuery } from '../../../dataquery';
+import IRowCounts from '@server/definitions/IRowCounts';
 
 @Component({
   selector: 'app-check-ind',
@@ -73,10 +74,10 @@ export class CheckIndComponent implements OnChanges {
     const dataQuery = new ViolatingINDRowsDataQuery(this._relationship);
 
     this.isLoading = true;
-    const rowCount: number = await dataQuery.loadRowCount();
+    const rowCount: IRowCounts = await dataQuery.loadRowCount();
     this.isLoading = false;
 
-    if (rowCount == 0) {
+    if (rowCount && rowCount.entries == 0) {
       this.isValid = true;
     } else {
       this.dialog.open(ViolatingRowsViewIndsComponent, {

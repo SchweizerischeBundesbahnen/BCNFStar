@@ -6,6 +6,7 @@ import Schema from '../model/schema/Schema';
 import { firstValueFrom } from 'rxjs';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
+import IRowCounts from '@server/definitions/IRowCounts';
 
 @Injectable({
   providedIn: 'root',
@@ -34,9 +35,9 @@ export class DatabaseService {
     );
   }
 
-  public loadTableRowCounts(): Promise<Record<string, number>> {
+  public loadTableRowCounts(): Promise<Record<string, IRowCounts>> {
     return firstValueFrom(
-      this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
+      this.http.get<Record<string, IRowCounts>>(`${this.baseUrl}/tables/rows`)
     );
   }
 

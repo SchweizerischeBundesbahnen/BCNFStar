@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 import { SbbTable, SbbTableDataSource } from '@sbb-esta/angular/table';
+import IRowCounts from '@server/definitions/IRowCounts';
 import ITablePage from '@server/definitions/ITablePage';
 import { DataQuery } from '../../../dataquery';
 
@@ -19,7 +20,7 @@ export class DatabaseTableViewerComponent implements OnInit, OnChanges {
   @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
   @Input() dataService!: DataQuery;
-  @Input() rowCount!: number;
+  @Input() rowCount!: IRowCounts;
 
   constructor() {}
 
@@ -38,6 +39,10 @@ export class DatabaseTableViewerComponent implements OnInit, OnChanges {
 
   public isGroup(_index: number, item: { isGroupBy: boolean }): boolean {
     return item.isGroupBy;
+  }
+
+  public currentPageLength(): number {
+    return this._dataSource.data.filter((item) => !item['isGroupBy']).length;
   }
 
   public async reloadData() {
