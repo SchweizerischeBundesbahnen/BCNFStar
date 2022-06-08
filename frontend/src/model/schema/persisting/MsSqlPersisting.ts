@@ -22,6 +22,8 @@ GO
     return Sql;
   }
 
+  /** In MsSql you don't have to specify the columns, you want to insert into, explicitly.
+   * IDENTITY-Columns are filled automatically. */
   public override dataTransferSql(table: Table): string {
     let Sql = '';
 
@@ -81,6 +83,8 @@ GO
     return `${this.escape(name)} INT IDENTITY(1,1)`;
   }
 
+  /** Necessary if you use schema-editing commands and queries that require those in one batch.
+   * e.g.: Adding a column to a table and selecting this column in a following query  */
   public override suffix(): string {
     return '\n GO \n';
   }

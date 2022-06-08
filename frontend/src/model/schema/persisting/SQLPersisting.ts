@@ -121,6 +121,9 @@ export default abstract class SQLPersisting {
     `;
   }
 
+  /** Updates the FK-Column of the referencing table by joining referencing and referenced table
+   * on the multi-column foreign key. Different Syntax for MsSql and Postgres.
+   */
   public abstract updateSurrogateKeySql(fk: TableRelationship): string;
 
   public foreignSurrogateKeySql(fk: TableRelationship) {
@@ -133,10 +136,14 @@ export default abstract class SQLPersisting {
     });`;
   }
 
+  /** Creating unique names, that aren't longer than 128 Chars (DBMS-Constraint).
+   * Those aren't visible to the user */
   public randomFkName(): string {
     return `fk_${Math.random().toString(16).slice(2)}`;
   }
 
+  /** Relevant if you want to reference columns, which aren't the primary key.
+   */
   public uniqueConstraint(fk: TableRelationship): string {
     return `
 ALTER TABLE ${this.tableIdentifier(
@@ -173,6 +180,9 @@ ALTER TABLE ${this.tableIdentifier(
     return columns.map((c) => this.escape(c.name)).join(', ');
   }
 
+  /** Returns the Identifier of the persisted-table
+   * For example: If you want to update the Surrogate-Key columns, you want to reference the already created tables.
+   */
   public tableIdentifier(table: Table): string {
     return `${this.escape(this.schemaName)}.${this.escape(table.name)}`;
   }
@@ -187,6 +197,7 @@ ALTER TABLE ${this.tableIdentifier(
     )}`;
   }
 
+  /** Name of the referencing column for a surrogate key. */
   public fkSurrogateKeyName(fk: TableRelationship): string {
     return (
       fk.referenced.surrogateKey +
