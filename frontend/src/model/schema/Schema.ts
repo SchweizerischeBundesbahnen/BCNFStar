@@ -193,15 +193,21 @@ export default class Schema {
 
   public referencesOf(
     table: Table,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     filtered: boolean
   ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return filtered ? table._filteredReferences : table._references;
+    return table._references;
   }
 
   public fksOf(table: Table, filtered: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return filtered ? table._filteredFks : table._fks;
+    if (!filtered) return Array.from(table._fks.keys());
+    else
+      return Array.from(table._fks.keys()).filter((fk) => {
+        const bools = table._fks.get(fk)!;
+        return bools[2] || !(bools[0] || bools[1]);
+      }); // cache?
   }
 
   /**
@@ -223,20 +229,21 @@ export default class Schema {
 
   private updateFks(): void {
     for (const table of this.tables) {
-      table._fks = new Array();
+      table._fks = new Map<TableRelationship, Array<boolean>>();
       table._references = new Array();
-      table._filteredFks = new Array();
-      table._filteredReferences = new Array();
     }
     const currentFks = new Array<TableRelationship>();
     this.calculateFks(currentFks);
     this.calculateTrivialFks(currentFks);
     for (const fk of currentFks) {
-      fk.referencing._fks.push(fk);
+      fk.referencing._fks.set(fk, [false, false, false]);
       fk.referenced._references.push(fk);
     }
+    for (const table of this.tables)
+      for (const [fk, bools] of table._fks.entries())
+        bools[0] = this.shouldBeFiltered(fk);
+
     this._tableFksValid = true;
-    this.filterFks();
   }
 
   private calculateFks(result: Array<TableRelationship>): void {
@@ -373,7 +380,7 @@ export default class Schema {
               referencedTable
             );
             if (
-              !referencingTable._fks.some(
+              !Array.from(referencingTable._fks.keys()).some(
                 (otherRel) =>
                   otherRel.referenced == relationship.referenced &&
                   otherRel.relationship.equals(relationship.relationship)
@@ -387,18 +394,9 @@ export default class Schema {
     }
   }
 
-  private filterFks() {
-    const shouldBeFiltered = this.starMode
-      ? this.isStarViolatingFk
-      : this.isTransitiveFk;
-    for (const table of this.tables) {
-      table._filteredFks = table._fks.filter(
-        (fk) => !shouldBeFiltered.apply(this, [fk])
-      );
-      for (const filteredFk of table._filteredFks) {
-        filteredFk.referenced._filteredReferences.push(filteredFk);
-      }
-    }
+  private shouldBeFiltered(fk: TableRelationship) {
+    if (this.starMode) return this.isStarViolatingFk(fk);
+    else return this.isTransitiveFk(fk);
   }
 
   private isTransitiveFk(
@@ -408,7 +406,7 @@ export default class Schema {
   ): boolean {
     if (visitedTables.includes(fk.referencing)) return false;
     visitedTables.push(fk.referencing);
-    for (const otherFk of fk.referencing._fks) {
+    for (const otherFk of fk.referencing._fks.keys()) {
       if (otherFk.equals(fk)) {
         if (firstIteration) continue;
         else return true;

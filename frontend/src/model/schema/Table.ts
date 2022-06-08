@@ -24,17 +24,10 @@ export default class Table {
   private _fdClusters?: Array<FdCluster>;
 
   /**
-   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
-   */
-  public _filteredFks!: Array<TableRelationship>;
-  /**
    * cached results of schema.fksOf(this, false). Should not be accessed from outside the schema class
+   * specifies for each fk whether it is filtered, blacklisted, whitelisted
    */
-  public _fks!: Array<TableRelationship>;
-  /**
-   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
-   */
-  public _filteredReferences!: Array<TableRelationship>;
+  public _fks!: Map<TableRelationship, Array<boolean>>;
   /**
    * cached results of schema.filteredksOf(this, false). Should not be accessed from outside the schema class
    */
