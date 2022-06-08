@@ -1,4 +1,3 @@
-import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
