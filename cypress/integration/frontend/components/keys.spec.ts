@@ -1,8 +1,6 @@
 /// <reference types="cypress" />
 
-import { contains } from "cypress/types/jquery";
-
-describe("The schema editing side bar", () => {
+describe("The keys tab", () => {
   beforeEach(() => {
     cy.visitFrontend();
 
@@ -25,13 +23,13 @@ describe("The schema editing side bar", () => {
   });
 
   it("displays surrogate keys", () => {
-    addFkandSurrkey();
+    addFkAndSurrkey();
     cy.get(".pk").contains("surrkey");
     cy.get("app-graph-element").contains("surrkey_s_nationkey");
   });
 
   it("allows to delete surrogate keys", () => {
-    addFkandSurrkey();
+    addFkAndSurrkey();
     cy.get("#delete-surrkey-btn").click();
     cy.get(".pk").should("not.contain.text", "surrkey");
     cy.get("app-graph-element").should(
@@ -41,7 +39,7 @@ describe("The schema editing side bar", () => {
   });
 
   it("allows to rename surrogate keys", () => {
-    addFkandSurrkey();
+    addFkAndSurrkey();
     cy.get("#edit-surrkey-btn").click();
     cy.get("#surrogate-key-input").clear().type("renamed");
 
@@ -56,7 +54,7 @@ describe("The schema editing side bar", () => {
   });
 });
 
-function addFkandSurrkey() {
+function addFkAndSurrkey() {
   cy.get(".table-head-title")
     .contains("public.part_partsupp_supplier")
     // because we have multiple UI layers with CSS, Cypress may think the element is obstructed
@@ -64,7 +62,6 @@ function addFkandSurrkey() {
     .click({ force: true });
 
   cy.visitPossibleForeignKeysTab();
-  cy.contains("Possible Foreign Keys").click();
   cy.contains(
     "(public.part_partsupp_supplier_denormalized) s_nationkey -> (public.nation_region_denormalized) n_nationkey"
   ).click();

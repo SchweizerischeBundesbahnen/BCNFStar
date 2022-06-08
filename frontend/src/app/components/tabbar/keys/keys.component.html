@@ -20,7 +20,7 @@
         <span>Current surrogate key: </span>
         <span class="bold"> {{ surrogateKey }}</span>
       </div>
-      <div>
+      <div class="buttons">
         <button sbb-icon-button (click)="editMode = true">
           <sbb-icon id="edit-surrkey-btn" svgIcon="kom:pen-small"></sbb-icon>
         </button>
@@ -36,11 +36,24 @@
 </sbb-accordion>
 
 <ng-template #editSurrogateKey>
-  <input
-    id="surrogate-key-input"
-    style="width: 40%"
-    sbbInput
-    [(ngModel)]="surrogateKey"
-  />
-  <button sbb-button (click)="emitSurrogateKey()">Save surrogate key</button>
+  <div class="d-flex justify-content-between">
+    <input id="surrogate-key-input" sbbInput [(ngModel)]="surrogateKey" />
+    <div class="buttons">
+      <button
+        sbb-button
+        (click)="emitSurrogateKey()"
+        [disabled]="!surrogateKey"
+      >
+        Save surrogate key
+      </button>
+
+      <button
+        sbb-button
+        *ngIf="table.implementsSurrogateKey()"
+        (click)="(reset)"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
 </ng-template>

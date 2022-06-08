@@ -1,10 +1,10 @@
-import TableRelationship from '../../schema/TableRelationship';
+import TableRelationship from '../TableRelationship';
 import Column from '../Column';
 import Schema from '../Schema';
 import Table from '../Table';
 import SQLPersisting from './SQLPersisting';
 
-export default class SqlServerPersisting extends SQLPersisting {
+export default class MsSqlPersisting extends SQLPersisting {
   public schemaPreparation(schema: Schema): string {
     let Sql: string = '';
     Sql +=
@@ -22,27 +22,8 @@ GO
     return Sql;
   }
 
-  public override createTableSql(table: Table): string {
-    let columnStrings: string[] = [];
-
-    if (table.implementsSurrogateKey()) {
-      columnStrings.push(`${table.surrogateKey} INT IDENTITY(1,1)`);
-    }
-
-    for (const column of table.columns) {
-      let columnString: string = `${column.name} ${column.dataType} `;
-      if (table.pk?.includes(column) || !column.nullable) {
-        columnString += 'NOT ';
-      }
-      columnString += 'NULL';
-      columnStrings.push(columnString);
-    }
-
-    return `CREATE TABLE ${this.tableIdentifier(table)} (${columnStrings.join(
-      ', '
-    )});`;
-  }
-
+  /** In MsSql you don't have to specify the columns, you want to insert into, explicitly.
+   * IDENTITY-Columns are filled automatically. */
   public override dataTransferSql(table: Table): string {
     let Sql = '';
 
@@ -102,6 +83,8 @@ GO
     return `${this.escape(name)} INT IDENTITY(1,1)`;
   }
 
+  /** Necessary if you use schema-editing commands and queries that require those in one batch.
+   * e.g.: Adding a column to a table and selecting this column in a following query  */
   public override suffix(): string {
     return '\n GO \n';
   }

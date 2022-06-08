@@ -1,6 +1,5 @@
 import { SchemaService } from '@/src/app/schema.service';
 import { Component } from '@angular/core';
-import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
 @Component({
   selector: 'app-keys',
@@ -11,26 +10,20 @@ export class KeysComponent {
   public surrogateKey = '';
   public editMode = true;
 
-  constructor(
-    public schemaService: SchemaService,
-    private notification: SbbNotificationToast
-  ) {
-    this.schemaService.selectedTableChanged.subscribe(() => {
-      this.surrogateKey = this.schemaService.selectedTable?.surrogateKey ?? '';
-      this.editMode = !this.surrogateKey;
-    });
+  constructor(public schemaService: SchemaService) {
+    this.schemaService.selectedTableChanged.subscribe(this.reset);
   }
 
-  emitSurrogateKey() {
-    if (this.surrogateKey) {
-      this.schemaService.setSurrogateKey(this.surrogateKey);
-      this.editMode = false;
-    } else
-      this.notification.open('Cannot set an empty surrogate key name', {
-        type: 'warn',
-      });
+  public reset() {
+    this.surrogateKey = this.schemaService.selectedTable?.surrogateKey ?? '';
+    this.editMode = !this.surrogateKey;
   }
-  deleteSurrogateKey() {
+
+  public emitSurrogateKey() {
+    this.schemaService.setSurrogateKey(this.surrogateKey);
+    this.editMode = false;
+  }
+  public deleteSurrogateKey() {
     this.surrogateKey = '';
     this.schemaService.setSurrogateKey(this.surrogateKey);
     this.editMode = true;

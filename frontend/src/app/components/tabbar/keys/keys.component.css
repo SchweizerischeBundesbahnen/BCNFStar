@@ -1,3 +1,21 @@
 .bold {
     font-weight: bold;
 }
+
+button {
+    margin-left: 5px
+}
+
+#surrogate-key-input {
+    width: 100%;
+}
+
+.editing {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.buttons {
+    white-space: nowrap;
+}
