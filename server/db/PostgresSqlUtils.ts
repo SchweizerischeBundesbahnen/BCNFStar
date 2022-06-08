@@ -9,6 +9,11 @@ import { Pool, QueryConfig, PoolConfig } from "pg";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import { query } from "express";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -96,6 +101,25 @@ export default class PostgresSqlUtils extends SqlUtils {
       };
     } else {
       throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = `
+    SELECT ${s.column} FROM  ${s.schema}.${s.table}
+    EXCEPT 
+    SELECT CAST(CAST(${s.column} AS ${s.targetDatatype}) AS ${s.currentDatatype} ) FROM  ${s.schema}.${s.table} 
+    `;
+    try {
+      console.log(_sql);
+      const queryResult = await this.pool.query(_sql);
+      if (queryResult.rowCount == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      console.log(Error.toString());
+      return TypeCasting.forbidden;
     }
   }
 

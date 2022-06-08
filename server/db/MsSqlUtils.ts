@@ -8,6 +8,10 @@ import SqlUtils, {
 } from "./SqlUtils";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -89,6 +93,26 @@ export default class MsSqlUtils extends SqlUtils {
       };
     } else {
       throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = `
+    SELECT [${s.column}] FROM  [${s.schema}].[${s.table}] 
+    EXCEPT 
+    SELECT CAST(CAST([${s.column}] AS ${s.targetDatatype}) AS ${s.currentDatatype})  FROM  [${s.schema}].[${s.table}] 
+    `;
+
+    try {
+      console.log(_sql);
+      const result: sql.IResult<any> = await sql.query(_sql);
+      if (result.recordset.length == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      console.log(Error.toString());
+      return TypeCasting.forbidden;
     }
   }
 

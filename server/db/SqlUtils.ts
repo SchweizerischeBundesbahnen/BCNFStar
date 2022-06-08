@@ -1,6 +1,10 @@
 import { IColumnRelationship } from "../definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -66,6 +70,10 @@ export default abstract class SqlUtils {
   public abstract getPrimaryKeys(): Promise<PrimaryKeyResult[]>;
   public abstract getJdbcPath(): string;
   public abstract getDbmsName(): DbmsType;
+
+  public abstract testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting>;
 
   public abstract getViolatingRowsForFD(
     schema: string,

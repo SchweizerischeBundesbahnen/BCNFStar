@@ -7,6 +7,9 @@ import morgan from "morgan";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
 import getPksFunction from "./routes/pks";
+
+import testTypeCasting from "./routes/checkTypeConversion";
+
 import { getTablePage } from "./routes/tablePage";
 
 import { getDbmsName } from "./routes/dbserver";
@@ -67,6 +70,8 @@ app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
 app.post("/metanomeResults", runMetanome);
 
 app.get("/persist/dbmsname", getDbmsName);
+
+app.post("/typecasting", testTypeCasting);
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
 app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
