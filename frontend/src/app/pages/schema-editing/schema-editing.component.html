@@ -11,6 +11,12 @@
     >
       {{ "Auto-normalize all tables" }}
     </button>
+    <sbb-checkbox
+      [checked]="schema.fkFiltering"
+      (change)="setFkFiltering($event)"
+    >
+      Filtered Fks
+    </sbb-checkbox>
     <sbb-toggle (change)="setStarMode($event)" class="me-1">
       <sbb-toggle-option label="Normal Mode" [value]="false">
       </sbb-toggle-option>

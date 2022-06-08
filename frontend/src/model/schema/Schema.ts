@@ -23,6 +23,7 @@ export default class Schema {
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
   private _starMode = false;
+  private _fkFiltering = true;
 
   public toJSON() {
     return {
@@ -144,6 +145,26 @@ export default class Schema {
     this._tableFksValid = false;
   }
 
+  public get fkFiltering(): boolean {
+    return this._fkFiltering;
+  }
+
+  public set fkFiltering(value: boolean) {
+    this.updateDisplayedReferences();
+    this._fkFiltering = value;
+  }
+
+  public updateDisplayedReferences() {
+    for (const table of this.tables) {
+      table._displayedReferences = new Array<TableRelationship>();
+    }
+    for (const table of this.tables) {
+      for (const fk of this.fksOf(table, true)) {
+        fk.referenced._displayedReferences.push(fk);
+      }
+    }
+  }
+
   private set relationshipsValid(valid: boolean) {
     this._tableFksValid = valid;
     this.tableIndsValid = valid;
@@ -205,7 +226,8 @@ export default class Schema {
     else
       return Array.from(table._fks.keys()).filter((fk) => {
         const bools = table._fks.get(fk)!;
-        return bools[2] || !(bools[0] || bools[1]);
+        if (this._fkFiltering) return bools[2] || !(bools[0] || bools[1]);
+        else return !bools[1];
       }); // cache?
   }
 

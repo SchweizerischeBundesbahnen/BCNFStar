@@ -20,6 +20,7 @@ import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand'
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
+import { SbbCheckboxChange } from '@sbb-esta/angular/checkbox';
 
 @Component({
   selector: 'app-schema-editing',
@@ -155,6 +156,11 @@ export class SchemaEditingComponent {
 
   public setStarMode(radioChange: SbbRadioChange) {
     this.schema.starMode = radioChange.value;
+    this.schemaChanged.next();
+  }
+
+  public setFkFiltering(checkboxChange: SbbCheckboxChange) {
+    this.schema.fkFiltering = checkboxChange.checked;
     this.schemaChanged.next();
   }
 
