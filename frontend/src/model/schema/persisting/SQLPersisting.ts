@@ -126,11 +126,15 @@ export default abstract class SQLPersisting {
   public foreignSurrogateKeySql(fk: TableRelationship) {
     return `
     ALTER TABLE ${this.tableIdentifier(fk.referencing)}
-    ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
+    ADD CONSTRAINT ${this.randomFkName()}
     FOREIGN KEY (${this.fkSurrogateKeyName(fk)})
     REFERENCES ${this.tableIdentifier(fk.referenced)} (${
       fk.referenced.surrogateKey
     });`;
+  }
+
+  public randomFkName(): string {
+    return `fk_${Math.random().toString(16).slice(2)}`;
   }
 
   public uniqueConstraint(fk: TableRelationship): string {
@@ -143,7 +147,7 @@ ALTER TABLE ${this.tableIdentifier(
 
   public foreignKeySql(fk: TableRelationship): string {
     return `ALTER TABLE ${this.tableIdentifier(fk.referencing)}
-      ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
+      ADD CONSTRAINT ${this.randomFkName()}
       FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
       REFERENCES ${this.tableIdentifier(
         fk.referenced
