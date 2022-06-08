@@ -108,7 +108,6 @@ export default abstract class SQLPersisting {
         }
       }
     }
-    console.log(Sql);
     return Sql;
   }
 
