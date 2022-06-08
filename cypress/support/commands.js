@@ -84,7 +84,6 @@ Cypress.Commands.add(
   { prevSubject: false },
   () => {
     cy.contains("Foreign Keys").click({ force: true });
-    cy.contains("Possible Foreign Keys").click();
   }
 );
 Cypress.Commands.add("executeSql", (Sql) => {
