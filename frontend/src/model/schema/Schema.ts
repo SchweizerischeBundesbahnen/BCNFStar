@@ -329,6 +329,7 @@ export default class Schema {
     fk: TableRelationship,
     result: Array<TableRelationship>
   ) {
+    if (fk.referencing == fk.referenced) return false;
     if (!result.some((existingFk) => existingFk.equals(fk))) {
       result.push(fk);
       return true;
@@ -336,11 +337,12 @@ export default class Schema {
     return false;
   }
 
-  private isRelationshipValid(relationship: TableRelationship): boolean {
+  public isRelationshipValid(relationship: TableRelationship): boolean {
     const newTable = new Join(relationship).newTable;
     return (
       newTable.columns.cardinality >
-      relationship.referencing.columns.cardinality
+        relationship.referencing.columns.cardinality &&
+      relationship.referenced != relationship.referencing
     );
   }
 
