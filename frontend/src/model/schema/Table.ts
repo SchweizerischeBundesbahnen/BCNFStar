@@ -30,9 +30,12 @@ export default class Table {
   public _fks!: Map<TableRelationship, Array<boolean>>;
   /**
    * cache of schema.referencesOf(this). Should not be accessed from outside the schema class
-   * specifies for each reference whether it is not displayed
    */
-  public _references!: Map<TableRelationship, boolean>;
+  public _references!: Array<TableRelationship>;
+  /**
+   * cache of schema.referencesOf(this). Should not be accessed from outside the schema class
+   */
+  public _displayedReferences!: Array<TableRelationship>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
