@@ -228,7 +228,12 @@ export default class Schema {
   }
 
   private updateFks(): void {
+    const oldFks = new Map<Table, Map<TableRelationship, Array<boolean>>>();
     for (const table of this.tables) {
+      oldFks.set(
+        table,
+        table._fks || new Map<TableRelationship, Array<boolean>>()
+      );
       table._fks = new Map<TableRelationship, Array<boolean>>();
       table._references = new Array();
     }
@@ -236,7 +241,13 @@ export default class Schema {
     this.calculateFks(currentFks);
     this.calculateTrivialFks(currentFks);
     for (const fk of currentFks) {
-      fk.referencing._fks.set(fk, [false, false, false]);
+      const table = fk.referencing;
+      const oldFkEntry = Array.from(oldFks.get(table)!.entries()).find(
+        (oldFk) => oldFk[0].equals(fk)
+      );
+      if (oldFkEntry)
+        table._fks.set(fk, [false, oldFkEntry[1][1], oldFkEntry[1][2]]);
+      else table._fks.set(fk, [false, false, false]);
       fk.referenced._references.push(fk);
     }
     for (const table of this.tables)
