@@ -28,17 +28,15 @@ function columnIdentifier(table: Table, col: Column) {
  */
 function buildPCG(graphLeft: Graph<string>, graphRight: Graph<string>) {
   const pcg: Graph<string> = {};
-  for (const [startLeft, startObjLeft] of Object.entries(graphLeft))
-    for (const [endLeft, labelLeft] of Object.entries(startObjLeft))
-      for (const [startRight, startObjRight] of Object.entries(graphRight))
-        for (const [endRight, labelRight] of Object.entries(startObjRight)) {
-          if (labelRight !== labelLeft) continue;
-
-          const start = `${startLeft}:${startRight}`;
-          const end = `${endLeft}:${endRight}`;
-          const startObj = init(pcg, start);
-          startObj[end] = labelLeft;
-        }
+  iterateGraph(graphLeft, (startLeft, endLeft, labelLeft) => {
+    iterateGraph(graphRight, (startRight, endRight, labelRight) => {
+      if (labelRight !== labelLeft) return;
+      const start = `${startLeft}:${startRight}`;
+      const end = `${endLeft}:${endRight}`;
+      const startObj = init(pcg, start);
+      startObj[end] = labelLeft;
+    });
+  });
   return pcg;
 }
 /**
@@ -50,21 +48,18 @@ function buildIPG(pcg: Graph<string>) {
   const ipg: Graph<number> = {};
   const startCounts: Record<string, Record<string, number>> = {};
   const endCounts: Record<string, Record<string, number>> = {};
-  for (const [start, startObj] of Object.entries(pcg))
-    for (const [end, label] of Object.entries(startObj)) {
-      init(startCounts, label);
-      increment(startCounts[label], start);
-      init(endCounts, label);
-      increment(endCounts[label], end);
-    }
-  for (const [start, startObj] of Object.entries(pcg)) {
+  iterateGraph(pcg, (start, end, label) => {
+    init(startCounts, label);
+    increment(startCounts[label], start);
+    init(endCounts, label);
+    increment(endCounts[label], end);
+  });
+  iterateGraph(pcg, (start, end, label) => {
     init(ipg, start);
-    for (const [end, label] of Object.entries(startObj)) {
-      init(ipg, end);
-      increment(ipg[start], end, 1.0 / startCounts[label][start]);
-      increment(ipg[end], start, 1.0 / endCounts[label][end]);
-    }
-  }
+    init(ipg, end);
+    increment(ipg[start], end, 1.0 / startCounts[label][start]);
+    increment(ipg[end], start, 1.0 / endCounts[label][end]);
+  });
   return ipg;
 }
 
@@ -92,16 +87,22 @@ function propagate(
   for (const key in result) result[key] /= normalizationFactor;
   return result;
 }
-function filter(flooded: Record<string, number>, selectThreshold = 0.99999) {
+function filter(flooded: Record<string, number>, selectThreshold = 0.975) {
+  const semanticallyFiltered: Record<string, number> = {};
+  for (const [name, sim] of Object.entries(flooded)) {
+    const [left, right] = name.split(':');
+    if (name.startsWith('_'))
+      semanticallyFiltered[`${left.slice(1)}:${right.slice(1)}`] = sim;
+  }
   // leftName, rightName, score
   const maxSimilarity: Record<string, number> = {};
-  for (const [name, sim] of Object.entries(flooded)) {
+  for (const [name, sim] of Object.entries(semanticallyFiltered)) {
     const [left, right] = name.split(':');
     maxSimilarity[left] = Math.max(maxSimilarity[left] || 0, sim);
     maxSimilarity[right] = Math.max(maxSimilarity[right] || 0, sim);
   }
   const relativeSimilarities: Record<string, Record<string, number>> = {};
-  for (const [name, sim] of Object.entries(flooded)) {
+  for (const [name, sim] of Object.entries(semanticallyFiltered)) {
     const [left, right] = name.split(':');
     init(relativeSimilarities, left);
     if (
@@ -115,12 +116,33 @@ function filter(flooded: Record<string, number>, selectThreshold = 0.99999) {
   return relativeSimilarities;
 }
 
+function iterateGraph<T>(
+  graph: Graph<T>,
+  cb: (start: string, end: string, val: T) => void
+) {
+  for (const [start, startObj] of Object.entries(graph))
+    for (const [end, val] of Object.entries(startObj)) {
+      cb(start, end, val);
+    }
+}
+
+export function nodeCount(graph: Graph<any>) {
+  const nodes = new Set<string>();
+  iterateGraph(graph, (start, end) => {
+    nodes.add(start);
+    nodes.add(end);
+  });
+  return nodes.size;
+}
+
 export default function matchSchemas(
   tablesLeft: Array<Table>,
   tablesRight: Array<Table>
 ) {
   const graphLeft = createGraph(tablesLeft);
   const graphRight = createGraph(tablesRight);
+  debugger;
+  // currently overridden by just levenstein for everything
   const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
   const flooded = similarityFlood(graphLeft, graphRight, initialSimliarity);
   const filtered = filter(flooded);
@@ -141,8 +163,8 @@ function similarityFlood(
   initial: Record<string, number>
 ) {
   const pcg = buildPCG(graphLeft, graphRight);
-  // const newInitial = buildNewInitial(pcg)
-  // initial = newInitial;
+  const newInitial = buildNewInitial(pcg);
+  initial = newInitial;
 
   const ipg = buildIPG(pcg);
   const threshold = 1e-9;
@@ -164,20 +186,28 @@ function similarityFlood(
 }
 
 function createGraph(tables: Table[]): Graph<string> {
-  const graph: Graph<string> = {
-    schema: {},
-    // name: {},
-    // SQLType: {},
+  const initStart = (start: string) => {
+    if (!graph[start]) graph[start] = {};
   };
+  const graph: Graph<string> = {};
+
+  // to denote name nodes
+  const _ = '_';
 
   for (const table of tables) {
-    graph['schema'][table.fullName] = 'table';
-    graph[table.fullName] = {};
+    initStart(table.fullName);
+    graph[table.fullName]['table'] = 'type';
+    graph[table.fullName][_ + table.name] = 'name';
     for (const column of table.columns) {
       const colNode = columnIdentifier(table, column);
-      graph[colNode] = {};
+      initStart(colNode);
       graph[table.fullName][colNode] = 'column';
-      graph[colNode][colNode + column.dataType] = 'type';
+      graph[colNode]['column'] = 'type';
+      graph[colNode][_ + column.name] = 'name';
+      graph[colNode][column.dataType] = 'SQLType';
+      initStart(column.dataType);
+      graph[column.dataType]['SQLType'] = 'type';
+      graph[column.dataType][_ + column.dataType] = 'name';
     }
   }
   return graph;
@@ -258,7 +288,8 @@ function buildNewInitial(pcg: Graph<string>): Record<string, number> {
 
   for (const node of nodes) {
     const [left, right] = node.split(':');
-    result[node] = levenshteinDistance(left, right);
+    if (left.startsWith('_') && right.startsWith('_'))
+      result[node] = levenshteinDistance(left.slice(1), right.slice(1));
   }
   return result;
 }

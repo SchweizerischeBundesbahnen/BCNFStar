@@ -35,6 +35,7 @@
   <!-- WIP -->
   <sbb-tab label="Schema Integration">
     <h2>Choose which tables to integrate into the current schema</h2>
+    <button sbb-button (click)="matchExamples()">Match example schemas</button>
     <app-table-selection
       (schema)="matchSchemas($event)"
       [withContentPreview]="false"

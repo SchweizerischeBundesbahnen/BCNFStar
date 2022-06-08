@@ -34,7 +34,6 @@ export class ContainedSubtablesComponent implements OnChanges {
   }
 
   public emitHighlightedCluster(cluster: FdCluster) {
-    console.log('highlight');
     const map = new Map<Table, ColumnCombination>();
     map.set(this.table, cluster.columns);
     this.selectColumns.emit(map);
@@ -49,10 +48,7 @@ export class ContainedSubtablesComponent implements OnChanges {
   }
 
   public fdClusters(): Array<FdCluster> {
-    console.log(this.table.fdClusters);
-    console.log(this.table.fds);
     const cc = this.fdClusterFilter;
-    console.log(cc);
     return this.table.fdClusters.filter((cluster) =>
       cc.isSubsetOf(cluster.columns)
     );
