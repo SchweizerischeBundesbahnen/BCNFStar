@@ -18,7 +18,7 @@ import SourceColumn from './SourceColumn';
 export default class Schema {
   public readonly tables = new Set<Table>();
   public name?: string;
-  private _databaseFks = new Array<SourceRelationship>();
+  private _baseFks = new Array<SourceRelationship>();
   private _fks = new Array<SourceRelationship>();
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
@@ -29,7 +29,7 @@ export default class Schema {
   public toJSON() {
     return {
       tables: Array.from(this.tables),
-      _databaseFks: Array.from(this._databaseFks),
+      _baseFks: Array.from(this._baseFks),
       _inds: Array.from(this._inds),
       _fds: [...this._fds.values()].flat(),
     };
@@ -54,7 +54,7 @@ export default class Schema {
   }
 
   public addFks(...fks: SourceRelationship[]) {
-    this._databaseFks.push(...fks);
+    this._baseFks.push(...fks);
     this.deriveFks();
     this.relationshipsValid = false;
   }
@@ -81,7 +81,7 @@ export default class Schema {
 
   private deriveFks() {
     this._fks = new Array();
-    for (const fk of this._databaseFks) this.addFkAndDerive(fk);
+    for (const fk of this._baseFks) this.addFkAndDerive(fk);
   }
 
   private addFkAndDerive(fk: SourceRelationship) {
@@ -140,7 +140,7 @@ export default class Schema {
   }
 
   public deleteFk(fk: SourceRelationship) {
-    this._databaseFks = this._databaseFks.filter((fk1) => fk1 != fk);
+    this._baseFks = this._baseFks.filter((fk1) => fk1 != fk);
     this.deriveFks();
     this.relationshipsValid = false;
   }
@@ -202,13 +202,13 @@ export default class Schema {
   /**
    * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
    * or routes that would add no extra information to the fact table when joined completely
-   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
+   * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public directDimensionableRoutes(
     table: Table,
-    filteredFks: boolean
+    onlyDisplayedFks: boolean
   ): Array<Array<TableRelationship>> {
-    return this.routesFromFactTo(table, filteredFks).filter((route) => {
+    return this.routesFromFactTo(table, onlyDisplayedFks).filter((route) => {
       if (route.length <= 1) return false;
       const dd = new DirectDimension([route]);
       return dd.newTable.columns.cardinality > dd.oldTable.columns.cardinality;
@@ -217,15 +217,15 @@ export default class Schema {
 
   /**
    * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
-   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
+   * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public routesFromFactTo(
     table: Table,
-    filteredFks: boolean
+    onlyDisplayedFks: boolean
   ): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
-    for (const rel of this.referencesOf(table, filteredFks)) {
-      const routes = this.routesFromFactTo(rel.referencing, filteredFks);
+    for (const rel of this.referencesOf(table, onlyDisplayedFks)) {
+      const routes = this.routesFromFactTo(rel.referencing, onlyDisplayedFks);
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
@@ -233,17 +233,23 @@ export default class Schema {
     return result;
   }
 
+  /**
+   * @param onlyDisplayed whether to use only the displayed fks or all fks
+   */
   public referencesOf(
     table: Table,
-    filtered: boolean
+    onlyDisplayed: boolean
   ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return filtered ? table._displayedReferences : table._references;
+    return onlyDisplayed ? table._displayedReferences : table._references;
   }
 
-  public fksOf(table: Table, filtered: boolean): Array<TableRelationship> {
+  /**
+   * @param onlyDisplayed whether to use only the displayed fks or all fks
+   */
+  public fksOf(table: Table, onlyDisplayed: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    if (!filtered) return Array.from(table._fks.keys());
+    if (!onlyDisplayed) return Array.from(table._fks.keys());
     else
       return Array.from(table._fks.keys()).filter((fk) => {
         const bools = table._fks.get(fk)!;
