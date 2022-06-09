@@ -647,7 +647,12 @@ export default class Schema {
     if (table instanceof Table) {
       const columns = new Array<BasicColumn>();
       if (table.implementsSurrogateKey())
-        columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
+        columns.push({
+          name: table.surrogateKey,
+          dataType: 'integer',
+          nullable: false,
+          dataTypeString: '(integer, not null)',
+        });
       columns.push(...table.columns);
       for (const fk of this.fksOf(table))
         if (fk.referenced.implementsSurrogateKey()) {
@@ -657,7 +662,9 @@ export default class Schema {
             fk.relationship.referencing.map((col) => col.name).join('_');
           columns.push({
             name: name,
-            dataTypeString: 'integer',
+            dataType: 'integer',
+            nullable: false,
+            dataTypeString: '(integer, not null)',
           });
         }
       return columns;

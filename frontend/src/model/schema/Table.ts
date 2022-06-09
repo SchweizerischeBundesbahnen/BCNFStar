@@ -25,7 +25,7 @@ export default class Table extends BasicTable {
 
   public surrogateKey: string = '';
   public implementsSurrogateKey(): boolean {
-    return this.surrogateKey.length > 1;
+    return this.surrogateKey.length >= 1;
   }
 
   /**
