@@ -13,7 +13,7 @@
   </sbb-select>
 </div>
 <div>
-  <sbb-select [(ngModel)]="_rhs" multiple placeholder="Other Columns">
+  <sbb-select [(ngModel)]="rhs" multiple placeholder="Other Columns">
     <app-sbb-option-all
       [(current)]="_rhs"
       [available]="table.columns.asArray()"
@@ -29,3 +29,6 @@
 <button sbb-button [disabled]="checkNotAllowed()" (click)="checkFd()">
   Check Functional Dependency
 </button>
+<div *ngIf="isValid">
+  <h3>FD is valid</h3>
+</div>

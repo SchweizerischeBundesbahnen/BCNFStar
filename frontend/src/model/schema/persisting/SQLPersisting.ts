@@ -6,7 +6,7 @@ import Table from '../Table';
 import BasicTable from '../BasicTable';
 
 export default abstract class SQLPersisting {
-  public constructor() {}
+  public constructor(protected schemaName: string) {}
 
   public abstract escape(str: string): string;
 
@@ -171,7 +171,7 @@ ALTER TABLE ${this.tableIdentifier(
   }
 
   public tableIdentifier(table: BasicTable): string {
-    return `${this.escape(table.schemaName)}.${this.escape(table.name)}`;
+    return `${this.escape(this.schemaName)}.${this.escape(table.name)}`;
   }
 
   public sourceTableIdentifier(table: SourceTable): string {
