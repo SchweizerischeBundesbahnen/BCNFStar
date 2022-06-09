@@ -41,6 +41,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Output() public selectedTableChange = new EventEmitter<Table>();
   @Output() public joinFk = new EventEmitter<TableRelationship>();
   @Output() public makeDirectDimension = new EventEmitter<Table>();
+  @Output() public hideFk = new EventEmitter<TableRelationship>();
 
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
@@ -178,14 +179,18 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     }
   }
 
-  private addJoinButton(
+  private addJoinButtonAndRemoveButton(
     link: joint.shapes.standard.Link,
     fk: TableRelationship
   ) {
     let joinTablesOnFks = () => {
       this.joinFk.emit(fk);
     };
+    let deleteFk = () => {
+      this.hideFk.emit(fk);
+    };
 
+    let removeButton = new joint.linkTools.Remove({ action: deleteFk });
     let joinButton = new joint.linkTools.Button({
       markup: [
         {
@@ -215,7 +220,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     });
 
     var toolsView = new joint.dia.ToolsView({
-      tools: [joinButton],
+      tools: [joinButton, removeButton],
     });
 
     var linkView = link.findView(this.paper!);
@@ -259,7 +264,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
         });
         this.graphStorage.get(table)?.links.set(fk.referenced, link);
         this.graph.addCell(link);
-        this.addJoinButton(link, fk);
+        this.addJoinButtonAndRemoveButton(link, fk);
       }
     }
   }

@@ -21,6 +21,8 @@ import TableRelationship from '@/src/model/schema/TableRelationship';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
 import { SbbCheckboxChange } from '@sbb-esta/angular/checkbox';
+import HideFkCommand from '@/src/model/commands/HideFkCommand';
+import ShowFkCommand from '@/src/model/commands/ShowFkCommand';
 
 @Component({
   selector: 'app-schema-editing',
@@ -184,6 +186,20 @@ export class SchemaEditingComponent {
     const command = new DirectDimensionCommand(this.schema, routes);
     command.onDo = () => (this.selectedTable = command.newTables[0]);
     command.onUndo = () => (this.selectedTable = command.newTables[0]);
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onClickHideFk(fk: TableRelationship) {
+    let command = new HideFkCommand(this.schema, fk);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onClickShowFk(fk: TableRelationship) {
+    let command = new ShowFkCommand(this.schema, fk);
+
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }

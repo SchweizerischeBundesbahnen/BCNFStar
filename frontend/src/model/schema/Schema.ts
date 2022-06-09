@@ -58,6 +58,26 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
+  public addFkToBlacklist(fk: TableRelationship) {
+    let bools = fk.referencing._fks.get(fk)!;
+    bools[1] = true;
+    bools[2] = false;
+  }
+
+  public deleteFkFromBlacklist(fk: TableRelationship) {
+    let bools = fk.referencing._fks.get(fk)!;
+    bools[1] = false;
+    bools[2] = true;
+  }
+
+  public getFkBoolsOf(fk: TableRelationship) {
+    return fk.referencing._fks.get(fk)!;
+  }
+
+  public setFkBoolsOf(fk: TableRelationship, newBools: Array<boolean>) {
+    fk.referencing._fks.set(fk, newBools);
+  }
+
   private deriveFks() {
     this._fks = new Array();
     for (const fk of this._databaseFks) this.addFkAndDerive(fk);
@@ -231,6 +251,14 @@ export default class Schema {
       }); // cache?
   }
 
+  public hiddenFksOf(table: Table): Array<TableRelationship> {
+    return this.fksOf(table, false).filter((fk) => {
+      const bools = table._fks.get(fk)!;
+      if (this._fkFiltering) return !(bools[2] || !(bools[0] || bools[1]));
+      else return bools[1];
+    });
+  }
+
   /**
    * Returns the inds from the given table to other tables. The inds are contained inside a map
    * to keep the information which source-ind caused which concrete inds to appear in the current
@@ -249,6 +277,7 @@ export default class Schema {
   }
 
   private updateFks(): void {
+    console.log('update fks');
     const oldFks = this.oldTableFks();
     this.initializeFks();
     const currentFks = new Array<TableRelationship>();
