@@ -23,6 +23,7 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
+import getSchemaMatching from "./routes/schemaMatching";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -65,6 +66,8 @@ app.get("/metanomeResults", getMetanomeIndex);
 app.get("/metanomeResults/:fileName", getMetanomeResults);
 app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
 app.post("/metanomeResults", runMetanome);
+
+app.post("/schemaMatching", getSchemaMatching);
 
 app.get("/persist/dbmsname", getDbmsName);
 
