@@ -11,7 +11,7 @@ import Table from '../Table';
 
 interface JSONSchema {
   tables: Array<JSONTable>;
-  _fks: Array<JSONSourceRelationship>;
+  _databaseFks: Array<JSONSourceRelationship>;
   _inds: Array<JSONSourceRelationship>;
   _fds: Array<JSONSourceFunctionalDependency>;
 }
@@ -78,7 +78,9 @@ export default class SaveSchemaState {
 
   public parseSchema(schema: JSONSchema) {
     this.newSchema.addTables(...this.parseTableArray(schema.tables));
-    this.newSchema.addFks(...this.parseSourceRelationshipArray(schema._fks));
+    this.newSchema.addFks(
+      ...this.parseSourceRelationshipArray(schema._databaseFks)
+    );
     this.newSchema.addInds(...this.parseSourceRelationshipArray(schema._inds));
     this.parseTableFds(schema._fds).forEach((sfd) => {
       this.newSchema.addFd(sfd);

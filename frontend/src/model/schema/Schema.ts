@@ -29,7 +29,7 @@ export default class Schema {
   public toJSON() {
     return {
       tables: Array.from(this.tables),
-      _fks: Array.from(this._databaseFks),
+      _databaseFks: Array.from(this._databaseFks),
       _inds: Array.from(this._inds),
       _fds: [...this._fds.values()].flat(),
     };
@@ -278,7 +278,6 @@ export default class Schema {
   }
 
   private updateFks(): void {
-    console.log('update fks');
     const oldFks = this.oldTableFks();
     this.initializeFks();
     const currentFks = new Array<TableRelationship>();
