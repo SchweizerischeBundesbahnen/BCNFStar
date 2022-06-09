@@ -206,22 +206,14 @@ export class SchemaGraphComponent implements AfterContentInit {
   private generateLinks() {
     for (const table of this.schemaService.schema.tables) {
       for (const fk of this.schemaService.schema.fksOf(table)) {
-        const referencedName = fk.referenced.implementsSurrogateKey()
-          ? fk.referenced.surrogateKey
-          : fk.relationship.referenced[0].name;
-        const referencingName = fk.referenced.implementsSurrogateKey()
-          ? fk.referenced.surrogateKey +
-            '_' +
-            fk.relationship.referencing.map((col) => col.name).join('_')
-          : fk.relationship.referencing[0].name;
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
-            port: referencingName + '_right',
+            port: fk.referencingName + '_right',
           },
           target: {
             id: this.graphStorage.get(fk.referenced)?.jointjsEl.id,
-            port: referencedName + '_left',
+            port: fk.referencedName + '_left',
           },
           z: -1,
         });

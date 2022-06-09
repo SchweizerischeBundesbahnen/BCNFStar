@@ -639,12 +639,8 @@ export default class Schema {
     columns.push(...table.columns);
     for (const fk of this.fksOf(table))
       if (fk.referenced.implementsSurrogateKey()) {
-        const name =
-          fk.referenced.surrogateKey +
-          '_' +
-          fk.relationship.referencing.map((col) => col.name).join('_');
         columns.push({
-          name: name,
+          name: fk.referencingName,
           dataTypeString: 'integer',
         });
       }
