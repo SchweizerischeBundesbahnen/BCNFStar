@@ -32,6 +32,10 @@ export default abstract class SQLPersisting {
   public createTableSql(table: Table): string {
     let columnStrings: string[] = [];
 
+    if (table.implementsSurrogateKey()) {
+      columnStrings.push(this.surrogateKeyString(table.surrogateKey));
+    }
+
     for (const column of table.columns) {
       let columnString: string = `${column.name} ${column.dataType} `;
       if (table.pk?.includes(column) || !column.nullable) {
@@ -59,7 +63,9 @@ export default abstract class SQLPersisting {
 
     Sql = `INSERT INTO ${this.tableIdentifier(
       table
-    )} SELECT DISTINCT ${table.columns
+    )} (${this.generateColumnString(
+      table.columns.asArray()
+    )}) SELECT DISTINCT ${table.columns
       .asArray()
       .map((col) => `${this.columnIdentifier(col)}`)
       .join(', ')} FROM ${table.sources
@@ -92,14 +98,51 @@ export default abstract class SQLPersisting {
 
     for (const referencingTable of schema.tables) {
       for (const fk of schema.fksOf(referencingTable)) {
-        Sql += this.uniqueConstraint(fk);
-        Sql += this.foreignKeySql(fk);
+        if (fk.referenced.implementsSurrogateKey()) {
+          Sql += this.addSkColumnToReferencingSql(fk);
+          Sql += this.updateSurrogateKeySql(fk);
+          Sql += this.foreignSurrogateKeySql(fk);
+        } else {
+          Sql += this.uniqueConstraint(fk);
+          Sql += this.foreignKeySql(fk);
+        }
       }
     }
-
     return Sql;
   }
 
+  // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
+  public addSkColumnToReferencingSql(fk: TableRelationship): string {
+    return `ALTER TABLE ${this.tableIdentifier(
+      fk.referencing
+    )} ADD ${this.fkSurrogateKeyName(fk)} INT;
+    ${this.suffix()}
+    `;
+  }
+
+  /** Updates the FK-Column of the referencing table by joining referencing and referenced table
+   * on the multi-column foreign key. Different Syntax for MsSql and Postgres.
+   */
+  public abstract updateSurrogateKeySql(fk: TableRelationship): string;
+
+  public foreignSurrogateKeySql(fk: TableRelationship) {
+    return `
+    ALTER TABLE ${this.tableIdentifier(fk.referencing)}
+    ADD CONSTRAINT ${this.randomFkName()}
+    FOREIGN KEY (${this.fkSurrogateKeyName(fk)})
+    REFERENCES ${this.tableIdentifier(fk.referenced)} (${
+      fk.referenced.surrogateKey
+    });`;
+  }
+
+  /** Creating unique names, that aren't longer than 128 Chars (DBMS-Constraint).
+   * Those aren't visible to the user */
+  public randomFkName(): string {
+    return `fk_${Math.random().toString(16).slice(2)}`;
+  }
+
+  /** Relevant if you want to reference columns, which aren't the primary key.
+   */
   public uniqueConstraint(fk: TableRelationship): string {
     return `
 ALTER TABLE ${this.tableIdentifier(
@@ -110,7 +153,7 @@ ALTER TABLE ${this.tableIdentifier(
 
   public foreignKeySql(fk: TableRelationship): string {
     return `ALTER TABLE ${this.tableIdentifier(fk.referencing)}
-      ADD CONSTRAINT fk_${Math.random().toString(16).slice(2)}
+      ADD CONSTRAINT ${this.randomFkName()}
       FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
       REFERENCES ${this.tableIdentifier(
         fk.referenced
@@ -122,11 +165,11 @@ ALTER TABLE ${this.tableIdentifier(
     for (const table of tables) {
       if (table.pk) {
         Sql +=
-          `ALTER TABLE ${this.tableIdentifier(
-            table
-          )} ADD PRIMARY KEY (${this.generateColumnString(
-            table.pk.asArray()
-          )});` + '\n';
+          `ALTER TABLE ${this.tableIdentifier(table)} ADD PRIMARY KEY (${
+            table.implementsSurrogateKey()
+              ? table.surrogateKey
+              : this.generateColumnString(table.pk.asArray())
+          });` + '\n';
       }
     }
     return Sql;
@@ -136,6 +179,9 @@ ALTER TABLE ${this.tableIdentifier(
     return columns.map((c) => this.escape(c.name)).join(', ');
   }
 
+  /** Returns the Identifier of the persisted-table
+   * For example: If you want to update the Surrogate-Key columns, you want to reference the already created tables.
+   */
   public tableIdentifier(table: Table): string {
     return `${this.escape(this.schemaName)}.${this.escape(table.name)}`;
   }
@@ -149,4 +195,23 @@ ALTER TABLE ${this.tableIdentifier(
       column.sourceColumn.name
     )}`;
   }
+
+  /** Name of the referencing column for a surrogate key. */
+  public fkSurrogateKeyName(fk: TableRelationship): string {
+    return (
+      fk.referenced.surrogateKey +
+      '_' +
+      fk.relationship.referencing.map((col) => col.name).join('_')
+    );
+  }
+
+  public abstract surrogateKeyString(name: string): string;
+
+  public schemaWideColumnIdentifier(table: Table, column: Column): string {
+    return `${this.escape(this.schemaName)}.${this.escape(
+      table.name
+    )}.${this.escape(column.name)}`;
+  }
+
+  public abstract suffix(): string;
 }

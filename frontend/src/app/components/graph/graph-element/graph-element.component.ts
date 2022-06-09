@@ -1,5 +1,7 @@
-import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { SchemaService } from '@/src/app/schema.service';
+import Column from '@/src/model/schema/Column';
+import BasicColumn from '@/src/model/types/BasicColumn';
+import { Component, Input } from '@angular/core';
 import Table from 'src/model/schema/Table';
 
 @Component({
@@ -10,17 +12,51 @@ import Table from 'src/model/schema/Table';
 export class GraphElementComponent {
   @Input() public table!: Table;
   @Input() public bbox!: Record<string, string>;
-  @Input() public selectedColumns?: ColumnCombination;
-  @Input() public fact!: boolean;
-  @Input() public dimension!: boolean;
-  @Input() public showMakeDirectDimension!: boolean;
-  @Input() selectedTable?: Table;
-  @Output() public selectedTableChanged = new EventEmitter<Table>();
-  @Output() public makeDirectDimension = new EventEmitter<Table>();
 
-  constructor() {}
+  constructor(public schemaService: SchemaService) {}
 
   select() {
-    this.selectedTableChanged.emit(this.table);
+    this.schemaService.selectedTable = this.table;
+  }
+
+  public isPkColumn(column: BasicColumn): boolean {
+    if (this.table.implementsSurrogateKey())
+      return column.name == this.table.surrogateKey;
+    return (
+      column instanceof Column &&
+      !!this.table.pk &&
+      this.table.pk!.includes(column as Column)
+    );
+  }
+
+  public isHighlightedColumn(column: BasicColumn): boolean {
+    if (!(column instanceof Column) || !this.schemaService.highlightedColumns)
+      return false;
+    const highlightedCols = this.schemaService.highlightedColumns.get(
+      this.table
+    );
+    if (!highlightedCols) return false;
+    return highlightedCols.includes(column);
+  }
+
+  public isFact(): boolean {
+    return (
+      this.schemaService.starMode &&
+      this.schemaService.schema.isFact(this.table)
+    );
+  }
+
+  public isDimension(): boolean {
+    return (
+      this.schemaService.starMode &&
+      !this.schemaService.schema.isFact(this.table)
+    );
+  }
+
+  public showMakeDirectDimension(): boolean {
+    return (
+      this.schemaService.starMode &&
+      this.schemaService.schema.filteredRoutesFromFactTo(this.table).length > 0
+    );
   }
 }

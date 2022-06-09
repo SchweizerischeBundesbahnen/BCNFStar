@@ -1,33 +1,34 @@
 import Column from '@/src/model/schema/Column';
-import Table from '@/src/model/schema/Table';
-import { DatabaseService } from 'src/app/database.service';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewComponent } from '../../operation-dialogs/violating-rows-view/violating-rows-view.component';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import { ViolatingFDRowsDataQuery } from '../../../dataquery';
+import { SchemaService } from '@/src/app/schema.service';
 
 @Component({
   selector: 'app-check-fd',
   templateUrl: './check-fd.component.html',
   styleUrls: ['./check-fd.component.css'],
 })
-export class CustomFunctionalDependencySideBarComponent implements OnChanges {
-  @Input() table!: Table;
-
+export class CustomFunctionalDependencySideBarComponent {
   public _lhs: Array<Column> = new Array<Column>();
   public _rhs: Array<Column> = new Array<Column>();
   public isLoading: boolean = false;
 
   public isValid: boolean = false;
-  constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
+  constructor(public schemaService: SchemaService, public dialog: SbbDialog) {
+    this.schemaService.selectedTableChanged.subscribe(() => {
+      this.lhs = [];
+      this.rhs = [];
+      this.isValid = false;
+      this.isLoading = false;
+    });
+  }
 
-  ngOnChanges(): void {
-    this.lhs = [];
-    this.rhs = [];
-    this.isValid = false;
-    this.isLoading = false;
+  public get table() {
+    return this.schemaService.selectedTable!;
   }
 
   public get lhs() {

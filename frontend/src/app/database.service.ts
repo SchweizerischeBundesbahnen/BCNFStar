@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import ITablePage from '@server/definitions/ITablePage';
 import Table from '../model/schema/Table';
-import Schema from '../model/schema/Schema';
 import { firstValueFrom } from 'rxjs';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
@@ -12,8 +11,6 @@ import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
   providedIn: 'root',
 })
 export class DatabaseService {
-  public schema?: Schema;
-
   /**
    * when using the angular dev server, you need to access another adress
    * for the BCNFStar express server. It is assumed that this server is
