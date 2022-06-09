@@ -161,7 +161,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
         body: {
           strokeWidth: 0,
         },
-        '.': { magnet: true },
+        '.': { magnet: false },
       });
       jointjsEl.resize(
         this.elementWidth,
@@ -274,9 +274,18 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     side: PortSide;
   }) {
     const cx = side == PortSide.Left ? 0 : this.elementWidth;
-    return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
-      this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5)
-    }" strokegit ="green" fill="white"/>`;
+    return [
+      {
+        tagName: 'circle',
+        attributes: {
+          r: this.portDiameter / 2,
+          cx,
+          cy:
+            this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5),
+          fill: 'white',
+        },
+      },
+    ];
   }
 
   private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
