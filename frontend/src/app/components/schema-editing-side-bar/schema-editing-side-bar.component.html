@@ -41,6 +41,7 @@
     <app-union-sidebar
       [schema]="this.schema"
       [table]="this.table"
+      (union)="union.emit($event)"
     ></app-union-sidebar>
   </sbb-tab>
   <!-- WIP -->

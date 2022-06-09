@@ -10,7 +10,7 @@
     />
     <div class="row">
       <h2 class="col-3">Columns of {{ tableLeft.fullName }}</h2>
-      <h2 class="col-6">Matched Columns</h2>
+      <h2 class="col-6 centered">Matched Columns</h2>
       <h2 class="col-3">Columns of {{ tableRight.fullName }}</h2>
     </div>
 
@@ -82,7 +82,7 @@
   <div sbbDialogActions>
     <button
       sbb-button
-      [sbbDialogClose]="true"
+      [sbbDialogClose]="result()"
       cdkFocusInitial
       [disabled]="!unionPossible()"
     >

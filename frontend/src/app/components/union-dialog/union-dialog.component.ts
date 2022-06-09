@@ -41,7 +41,9 @@ export class UnionDialogComponent {
     return (
       this.tableLeftMatched.length === this.tableRightMatched.length &&
       this.tableLeftMatched.length != 0 &&
-      this.tableRightMatched.length != 0
+      this.tableLeftMatched.every(
+        (col1, index) => col1 || this.tableRightMatched[index]
+      )
     );
   }
 
@@ -67,5 +69,12 @@ export class UnionDialogComponent {
         event.currentIndex
       );
     }
+  }
+
+  result() {
+    return {
+      columns: [this.tableLeftMatched, this.tableRightMatched],
+      newTableName: this.newTableName,
+    };
   }
 }

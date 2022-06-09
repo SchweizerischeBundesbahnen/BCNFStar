@@ -58,6 +58,7 @@
         (selectColumns)="onSelectColumns($event)"
         (setSurrogateKey)="onSetSurrogateKey($event)"
         (autoNormalizeSelectedTable)="onAutoNormalize([selectedTableAsTable])"
+        (union)="onUnion($event)"
       ></app-schema-editing-side-bar>
       <h2 *ngIf="!selectedTable" class="table-not-selected">
         Select a table in the graph to start editing

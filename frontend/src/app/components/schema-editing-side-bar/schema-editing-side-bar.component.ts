@@ -5,6 +5,7 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import Column from '@/src/model/schema/Column';
+import { unionSpec } from '../union-sidebar/union-sidebar.component';
 
 @Component({
   selector: 'app-schema-editing-side-bar',
@@ -22,6 +23,7 @@ export class SchemaEditingSideBarComponent {
     Map<Table, ColumnCombination>
   >();
   @Output() public autoNormalizeSelectedTable = new EventEmitter();
+  @Output() public union = new EventEmitter<unionSpec>();
 
   constructor() {}
 }

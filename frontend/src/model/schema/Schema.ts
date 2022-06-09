@@ -40,14 +40,14 @@ export default class Schema {
     this.addTables(...tables);
   }
 
-  public addTables(...tables: Array<Table>) {
+  public addTables(...tables: Array<Table | UnionedTable>) {
     tables.forEach((table) => {
       this.tables.add(table);
     });
     this.relationshipsValid = false;
   }
 
-  public deleteTables(...tables: Array<Table>) {
+  public deleteTables(...tables: Array<Table | UnionedTable>) {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
@@ -664,7 +664,7 @@ export default class Schema {
         }
       return columns;
     } else if (table instanceof UnionedTable) {
-      return table.columns.get(table.tables[0])!;
+      return table.displayedColumns();
     } else {
       throw Error;
     }
