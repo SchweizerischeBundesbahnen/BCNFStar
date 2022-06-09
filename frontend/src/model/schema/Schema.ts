@@ -11,6 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
+import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
 
@@ -584,8 +585,11 @@ export default class Schema {
   }
 
   public calculateFdsOf(table: Table): void {
-    const fds = new Map<SourceTableInstance, Array<FunctionalDependency>>();
-    table.sources.forEach((source) => fds.set(source, new Array()));
+    const fds = new Map<
+      SourceTableInstance,
+      ColumnsTree<FunctionalDependency>
+    >();
+    table.sources.forEach((source) => fds.set(source, new ColumnsTree()));
     const columnsByInstance = table.columnsBySource();
 
     for (const source of table.sourcesTopological()) {
@@ -613,20 +617,14 @@ export default class Schema {
           new ColumnCombination(rhs)
         );
         if (fd.isFullyTrivial()) continue;
-        const existingFd = fds
-          .get(source)!
-          .find((other) => other.lhs.equals(fd.lhs));
+        const existingFd = fds.get(source)!.get(fd.lhs);
         if (existingFd) existingFd.rhs.union(fd.rhs);
-        else fds.get(source)!.push(fd);
+        else fds.get(source)!.add(fd, fd.lhs);
       }
       //extension
-      const fkFds = fds
-        .get(source)!
-        .filter((fd) => fd.lhs.isSubsetOf(referencingColumns));
-      for (const fd of fds.get(source)!) {
-        const extensions = fkFds
-          .filter((fkFd) => fkFd.lhs.isSubsetOf(fd.rhs))
-          .map((fkFd) => fkFd.rhs);
+      const fkFds = fds.get(source)!.getSubtree(referencingColumns);
+      for (const fd of fds.get(source)!.getAll()) {
+        const extensions = fkFds.getSubsets(fd.rhs).map((fkFd) => fkFd.rhs);
         extensions.forEach((extension) => fd.rhs.union(extension));
       }
 
@@ -643,7 +641,7 @@ export default class Schema {
             nextRelationship.referencing[i]
           );
 
-      for (const fd of fds.get(source)!) {
+      for (const fd of fds.get(source)!.getAll()) {
         if (
           !fd.lhs
             .asArray()
@@ -671,7 +669,7 @@ export default class Schema {
         } else if (nextRelationship) {
           fd.lhs.columnSubstitution(nextRelationshipMap);
           fd.rhs.columnSubstitution(nextRelationshipMap);
-          fds.get(nextSource!)!.push(fd);
+          fds.get(nextSource!)!.add(fd, fd.lhs);
         }
       }
     }
