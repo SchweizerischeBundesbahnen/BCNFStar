@@ -8,7 +8,8 @@ import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
 import getPksFunction from "./routes/pks";
 
-import testTypeCasting from "./routes/checkTypeConversion";
+import testTypeCasting from "./routes/unionability/checkTypeConversion";
+import checkUnionedKeys from "./routes/unionability/checkUniqueConstraint";
 
 import { getTablePage } from "./routes/tablePage";
 import { check, body } from "express-validator";
@@ -96,6 +97,8 @@ app.post(
   ],
   testTypeCasting
 );
+
+app.post("/unionedkeys", checkUnionedKeys);
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
 app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);

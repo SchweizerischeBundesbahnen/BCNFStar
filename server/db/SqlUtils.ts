@@ -5,6 +5,10 @@ import {
   IRequestBodyTypeCasting,
   TypeCasting,
 } from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -72,6 +76,64 @@ export default abstract class SqlUtils {
   public abstract getDbmsName(): DbmsType;
 
   public abstract getDatatypes(): Promise<string[]>;
+
+  public abstract testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability>;
+
+  public abstract escape(str: string): string;
+
+  public generateColumnString(columns: string[]): string {
+    return columns.map((c) => this.escape(c)).join(", ");
+  }
+
+  public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
+    const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
+    return `
+    SELECT ${this.escape(tc.column)} FROM ${tableString} 
+    EXCEPT 
+    SELECT CAST(CAST(${this.escape(tc.column)} AS ${tc.targetDatatype}) AS ${
+      tc.currentDatatype
+    }) FROM ${tableString} 
+    `;
+  }
+
+  /** Expects two get two keys respectively. Otherwise, this Sql won't work correctly, i.e. return wrong results */
+  public testKeyUnionabilitySql(uk: IRequestBodyUnionedKeys): string {
+    const table1Identifier: string = `${this.escape(
+      uk.key1.table_schema
+    )}.${this.escape(uk.key1.table_name)}`;
+    const table2Identifier: string = `${this.escape(
+      uk.key2.table_schema
+    )}.${this.escape(uk.key2.table_name)}`;
+
+    return `
+  SELECT 
+    (SELECT COUNT(*) as unionedCount
+    FROM
+    (
+    SELECT ${this.generateColumnString(
+      uk.unionedColumns[0]
+    )} FROM ${table1Identifier} 
+    UNION
+    SELECT ${this.generateColumnString(
+      uk.unionedColumns[1]
+    )} FROM ${table2Identifier} 
+    ) as unionedCount)
+  -
+    (SELECT COUNT(*) as unionedCountKey
+    FROM
+    (
+      SELECT ${this.generateColumnString(
+        uk.key1.attributes
+      )} FROM ${table1Identifier}
+      UNION
+      SELECT ${this.generateColumnString(
+        uk.key2.attributes
+      )} FROM ${table2Identifier}
+    ) as unionedcount) as count
+`;
+  }
 
   public abstract testTypeCasting(
     s: IRequestBodyTypeCasting

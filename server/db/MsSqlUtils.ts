@@ -12,6 +12,10 @@ import {
   IRequestBodyTypeCasting,
   TypeCasting,
 } from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -96,6 +100,20 @@ export default class MsSqlUtils extends SqlUtils {
     }
   }
 
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `[${str}]`;
+  }
+
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result: sql.IResult<any> = await sql.query(_sql);
+    if (result.recordset[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
   public override async getDatatypes(): Promise<string[]> {
     const _sql: string = "select name from sys.types";
     const result: sql.IResult<any> = await sql.query<{ name: string }>(_sql);
@@ -105,19 +123,13 @@ export default class MsSqlUtils extends SqlUtils {
   public override async testTypeCasting(
     s: IRequestBodyTypeCasting
   ): Promise<TypeCasting> {
-    const _sql: string = `
-    SELECT [${s.column}] FROM  [${s.schema}].[${s.table}] 
-    EXCEPT 
-    SELECT CAST(CAST([${s.column}] AS ${s.targetDatatype}) AS ${s.currentDatatype})  FROM  [${s.schema}].[${s.table}] 
-    `;
+    const _sql: string = this.testTypeCastingSql(s);
 
     try {
-      console.log(_sql);
       const result: sql.IResult<any> = await sql.query(_sql);
       if (result.recordset.length == 0) return TypeCasting.allowed;
       return TypeCasting.informationloss;
     } catch (Error) {
-      console.log(Error.toString());
       return TypeCasting.forbidden;
     }
   }

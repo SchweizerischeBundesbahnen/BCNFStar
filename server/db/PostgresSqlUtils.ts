@@ -13,7 +13,10 @@ import {
   IRequestBodyTypeCasting,
   TypeCasting,
 } from "@/definitions/TypeCasting";
-import { query } from "express";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -104,6 +107,20 @@ export default class PostgresSqlUtils extends SqlUtils {
     }
   }
 
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result = await this.pool.query<{ count: number }>(_sql);
+    if (result.rows[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `"${str}"`;
+  }
+
   public override async getDatatypes(): Promise<string[]> {
     const _sql: string = "select typname from pg_type";
     const result = await this.pool.query(_sql);
@@ -113,17 +130,12 @@ export default class PostgresSqlUtils extends SqlUtils {
   public override async testTypeCasting(
     s: IRequestBodyTypeCasting
   ): Promise<TypeCasting> {
-    const _sql: string = `
-    SELECT ${s.column} FROM  ${s.schema}.${s.table}
-    EXCEPT 
-    SELECT CAST(CAST(${s.column} AS ${s.targetDatatype}) AS ${s.currentDatatype} ) FROM  ${s.schema}.${s.table} 
-    `;
+    const _sql: string = this.testTypeCastingSql(s);
     try {
       const queryResult = await this.pool.query(_sql);
       if (queryResult.rowCount == 0) return TypeCasting.allowed;
       return TypeCasting.informationloss;
     } catch (Error) {
-      console.log(Error.toString());
       return TypeCasting.forbidden;
     }
   }
