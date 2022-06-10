@@ -49,6 +49,8 @@ import { KeysComponent } from './components/tabbar/keys/keys.component';
 import { ContainedSubtablesComponent } from './components/tabbar/contained-subtables/contained-subtables.component';
 import { ForeignKeysComponent } from './components/tabbar/foreign-keys/foreign-keys.component';
 import { SbbOptionAllComponent } from './components/ui/sbb-option-all/sbb-option-all.component';
+import { IntegrationStartComponent } from './integration/integration-start/integration-start.component';
+import { MatchingEditorComponent } from './integration/matching-editor/matching-editor.component';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -80,6 +82,8 @@ export let InjectorInstance: Injector;
     ContainedSubtablesComponent,
     ForeignKeysComponent,
     SbbOptionAllComponent,
+    IntegrationStartComponent,
+    MatchingEditorComponent,
   ],
   imports: [
     BrowserModule,

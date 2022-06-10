@@ -1,5 +1,6 @@
 import { sqlUtils } from "@/db";
 import { DbmsType } from "@/db/SqlUtils";
+import ISchemaMatchingResponse from "@/definitions/ISchemaMatchingResponse";
 import { ensureDirExists } from "@/utils/files";
 import { exec } from "child_process";
 import { randomUUID } from "crypto";
@@ -27,7 +28,9 @@ export default async function getSchemaMatching(
   await execAsync(
     `java -cp "coma/*" de.wdilab.coma.integration.COMA_API ${srcFile} ${targetFile} ${resultFile}`
   );
-  const result = JSON.parse(await readFile(resultFile, { encoding: "utf-8" }));
+  const result: Array<ISchemaMatchingResponse> = JSON.parse(
+    await readFile(resultFile, { encoding: "utf-8" })
+  );
 
   for (const file of [srcFile, targetFile, resultFile]) await rm(file);
   return result;

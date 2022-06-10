@@ -1,17 +1,13 @@
 import getSchemaMatching from "@/coma/schemaMatching";
+import ISchemaMatchingRequest from "@/definitions/ISchemaMatchingRequest";
 import { Request, Response } from "express";
-
-interface ISchemaMatching {
-  src: string[];
-  target: string[];
-}
 
 export default async function getSchemaMatchingRoute(
   req: Request,
   res: Response
 ): Promise<void> {
   try {
-    const request: ISchemaMatching = req.body;
+    const request: ISchemaMatchingRequest = req.body;
     res.json(await getSchemaMatching(request.src, request.target));
   } catch (error) {
     console.error(error);

@@ -25,7 +25,7 @@ export interface LinkEndDefinititon {
 export interface LinkDefinition {
   source: LinkEndDefinititon;
   target: LinkEndDefinititon;
-  tool: joint.dia.ToolsView;
+  tool?: joint.dia.ToolsView;
 }
 
 @Component({
@@ -50,13 +50,16 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   constructor(private schemaService: SchemaService) {}
 
   ngOnChanges() {
-    console.log('updating graph');
-    console.log(this.links);
+    console.log('onchagnes');
     console.log(this.tables);
+    console.log(this.links);
     this.updateGraph();
   }
 
   ngAfterContentInit(): void {
+    console.log('contentinit');
+    console.log(this.tables);
+    console.log(this.links);
     this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
@@ -90,6 +93,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   }
 
   public updateGraph() {
+    if (!this.paper) return;
     for (const item of this.graphStorage.keys()) {
       this.graphStorage.get(item)?.jointjsEl.remove();
     }

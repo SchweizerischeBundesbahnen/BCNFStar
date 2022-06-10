@@ -1,0 +1,25 @@
+<div class="grid">
+  <h2>Schema to be integrated</h2>
+  <h2>Existing schema</h2>
+  <app-table-selection
+    *ngIf="!newSchema"
+    [withContentPreview]="false"
+    (schema)="newSchema = $event"
+  ></app-table-selection>
+  <h2 *ngIf="newSchema" class="centered">Done</h2>
+
+  <app-table-selection
+    *ngIf="!existingSchema"
+    [withContentPreview]="false"
+    (schema)="existingSchema = $event"
+  ></app-table-selection>
+  <h2 *ngIf="existingSchema" class="centered">Done</h2>
+  <button
+    sbb-button
+    (click)="startIntegration()"
+    class="centered start-btn"
+    [disabled]="!(existingSchema && newSchema)"
+  >
+    Start integration
+  </button>
+</div>

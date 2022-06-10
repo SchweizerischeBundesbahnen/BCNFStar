@@ -22,6 +22,7 @@ export class SchemaEditingComponent {
 
   constructor(router: Router, public schemaService: SchemaService) {
     if (!schemaService.hasSchema) router.navigate(['']);
+    this.generateLinks();
     this.schemaService.schemaChanged.subscribe(() => this.generateLinks());
   }
 
