@@ -63,9 +63,7 @@ export default abstract class SQLPersisting {
 
     Sql = `INSERT INTO ${this.tableIdentifier(
       table
-    )} (${this.generateColumnString(
-      table.columns.asArray()
-    )}) SELECT DISTINCT ${table.columns
+    )} ${this.transferTargetColumns(table)} SELECT DISTINCT ${table.columns
       .asArray()
       .map((col) => `${this.columnIdentifier(col)}`)
       .join(', ')} FROM ${table.sources
@@ -91,6 +89,10 @@ export default abstract class SQLPersisting {
         .join(' AND ')}`;
     Sql += ';';
     return Sql;
+  }
+
+  public transferTargetColumns(table: Table) {
+    return `(${this.generateColumnString(table.columns.asArray())})`;
   }
 
   public foreignKeys(schema: Schema): string {
@@ -123,7 +125,32 @@ export default abstract class SQLPersisting {
   /** Updates the FK-Column of the referencing table by joining referencing and referenced table
    * on the multi-column foreign key. Different Syntax for MsSql and Postgres.
    */
-  public abstract updateSurrogateKeySql(fk: TableRelationship): string;
+  public updateSurrogateKeySql(fk: TableRelationship): string {
+    return `
+    UPDATE ${this.tableIdentifier(fk.referencing)}
+    SET ${fk.referencingName} = ${this.tableIdentifier(fk.referenced)}.${
+      fk.referenced.surrogateKey
+    }
+    FROM ${this.updateSurrogateKeySource(fk)}
+    WHERE ${fk.relationship.referencing
+      .map(
+        (c: Column, i: number) =>
+          `${this.schemaWideColumnIdentifier(
+            fk.referencing,
+            c
+          )} = ${this.schemaWideColumnIdentifier(
+            fk.referenced,
+            fk.relationship.referenced[i]
+          )}`
+      )
+      .join(' AND ')};`;
+  }
+
+  public updateSurrogateKeySource(fk: TableRelationship): string {
+    return `${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
+      fk.referenced
+    )}`;
+  }
 
   public foreignSurrogateKeySql(fk: TableRelationship) {
     return `
