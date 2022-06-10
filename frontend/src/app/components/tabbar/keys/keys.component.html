@@ -16,11 +16,11 @@
       *ngIf="!editMode; else editSurrogateKey"
       class="d-flex justify-content-between"
     >
-      <div>
+      <div class="name-field">
         <span>Current surrogate key: </span>
-        <span class="bold"> {{ surrogateKey }}</span>
+        <span class="surrogate-key-name"> {{ surrogateKey }}</span>
       </div>
-      <div class="buttons">
+      <div class="buttons buttons-field">
         <button sbb-icon-button (click)="editMode = true">
           <sbb-icon id="edit-surrkey-btn" svgIcon="kom:pen-small"></sbb-icon>
         </button>
@@ -50,7 +50,7 @@
       <button
         sbb-button
         *ngIf="table.implementsSurrogateKey()"
-        (click)="(reset)"
+        (click)="reset()"
       >
         Cancel
       </button>
