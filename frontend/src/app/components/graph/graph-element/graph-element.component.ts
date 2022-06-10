@@ -34,7 +34,7 @@ export class GraphElementComponent {
     return (
       column instanceof Column &&
       !!this.table.pk &&
-      this.table.pk!.includes(column as Column)
+      this.table.pk.includes(column as Column)
     );
   }
 
