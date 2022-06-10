@@ -63,6 +63,14 @@ export default class Relationship {
     );
   }
 
+  public columnsReferencedBy(
+    referencing: Array<Column>
+  ): Array<Column | undefined> {
+    return referencing
+      .map((col) => this._referencing.indexOf(col))
+      .map((index) => (index != -1 ? this._referenced[index] : undefined));
+  }
+
   public toString(): string {
     return this.referencing.toString() + '->' + this.referenced.toString();
   }

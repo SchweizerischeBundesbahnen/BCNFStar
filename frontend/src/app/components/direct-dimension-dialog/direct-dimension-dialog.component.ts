@@ -19,7 +19,10 @@ export class DirectDimensionDialogComponent {
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA) data: { table: Table; schema: Schema }
   ) {
-    for (const route of data.schema.filteredRoutesFromFactTo(data.table)) {
+    for (const route of data.schema.directDimensionableRoutes(
+      data.table,
+      true
+    )) {
       this.routes.set(route, false);
     }
     this.table = data.table;
