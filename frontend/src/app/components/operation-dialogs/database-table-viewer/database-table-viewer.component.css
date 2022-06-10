@@ -1,5 +1,6 @@
-.groupby-cell {
-  white-space: pre-line;
+
+.align-right {
+  text-align: right;
 }
 
 .grid-container-paginator {
@@ -9,17 +10,8 @@
   background-color: white;
 }
 
-.table-checkbox {
-  display: block;
-}
-
-td {
-  white-space: nowrap;
-}
-
-.table-parent {
-  position: relative;
-  height: 100%;
+.groupby-cell {
+  white-space: pre-line;
 }
 
 .loading {
@@ -29,10 +21,19 @@ td {
   transform: translate(-50%, -50%);
 }
 
-.table-wrapper {
+.table-checkbox {
+  display: block;
+}
+
+.table-parent {
+  position: relative;
   height: 100%;
 }
 
-.align-right {
-  text-align: right;
+td {
+  white-space: nowrap;
+}
+
+.table-wrapper {
+  height: 100%;
 }
