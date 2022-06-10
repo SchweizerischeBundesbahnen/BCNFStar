@@ -22,11 +22,9 @@ describe("Schema", () => {
   });
 
   it("fds of joined tables contain right fds", () => {
-    const relAC = schema.fksOf(tableA).find((rel) => rel.referenced == tableC)!;
-
     let join = new JoinCommand(
       schema,
-      schema.fksOf(tableA).find((rel) => rel.referenced == tableB)!,
+      schema.fksOf(tableA, true).find((rel) => rel.referenced == tableB)!,
       false
     );
     join.do();
@@ -35,15 +33,14 @@ describe("Schema", () => {
     join = new JoinCommand(
       schema,
       schema
-        .fksOf(table)
+        .fksOf(table, true)
         .find((rel) => rel.relationship.referencing[0].name != "A5")!,
-      false
+      true
     );
     join.do();
     table = join.newTable!;
 
-    relAC.referencing = table;
-    join = new JoinCommand(schema, relAC, false);
+    join = new JoinCommand(schema, schema.fksOf(table, true)[0], false);
     join.do();
     table = join.newTable!;
 
@@ -148,7 +145,7 @@ describe("Schema", () => {
   });
 
   it("calculates fks of a table correctly", () => {
-    let fks = schema.fksOf(tableA);
+    let fks = schema.fksOf(tableA, true);
     expect(fks.length).to.equal(2);
     let fk = [...fks][0];
     expect(fk.referencing).to.equal(tableA);

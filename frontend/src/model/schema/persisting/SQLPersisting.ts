@@ -91,7 +91,7 @@ export default abstract class SQLPersisting {
     let Sql: string = '';
 
     for (const referencingTable of schema.tables) {
-      for (const fk of schema.fksOf(referencingTable)) {
+      for (const fk of schema.fksOf(referencingTable, true)) {
         Sql += this.uniqueConstraint(fk);
         Sql += this.foreignKeySql(fk);
       }

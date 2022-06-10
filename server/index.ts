@@ -25,6 +25,7 @@ import getViolatingRowsForFD from "./routes/violatingRows/fds";
 import getViolatingRowsForFDCount from "./routes/violatingRows/fdRowCounts";
 import getViolatingRowsForSuggestedIND from "./routes/violatingRows/inds";
 import getViolatingRowsForSuggestedINDCount from "./routes/violatingRows/indsRowCounts";
+import bodyParser from "body-parser";
 
 import {
   deleteMetanomeResults,
@@ -46,6 +47,16 @@ const corsOptions: CorsOptions = {
 };
 
 const app = express();
+
+app.use(bodyParser.json({ strict: true }));
+app.use((error, request, response, next) => {
+  if (error !== null) {
+    return response
+      .status(400)
+      .json({ errors: "The request body does not contain valid JSON" });
+  }
+  return next();
+});
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(

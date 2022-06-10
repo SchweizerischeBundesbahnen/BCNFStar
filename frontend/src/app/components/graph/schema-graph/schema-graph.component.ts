@@ -224,7 +224,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   private generateLinks() {
     for (const table of this.schema.tables) {
-      for (const fk of this.schema.fksOf(table)) {
+      for (const fk of this.schema.fksOf(table, true)) {
         let fkReferenced = fk.relationship.referenced[0];
         let fkReferencing = fk.relationship.referencing[0];
         let link = new joint.shapes.standard.Link({
