@@ -116,6 +116,7 @@ export default class PostgresSqlUtils extends SqlUtils {
     return KeyUnionability.forbidden;
   }
 
+  /** The "null"-check is relevant for unionability-checks. */
   public override escape(str: string): string {
     if (str.toLowerCase() == "null") return "null";
     return `"${str}"`;

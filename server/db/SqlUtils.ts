@@ -87,6 +87,7 @@ export default abstract class SqlUtils {
     return columns.map((c) => this.escape(c)).join(", ");
   }
 
+  /** Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int) */
   public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
     const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
     return `
@@ -98,7 +99,10 @@ export default abstract class SqlUtils {
     `;
   }
 
-  /** Expects two get two keys respectively. Otherwise, this Sql won't work correctly, i.e. return wrong results */
+  /** Expects to get two keys respectively. Otherwise, this Sql won't work correctly, i.e. return wrong results
+   * The SQL calculates the number of rows of the unioned tables and the number of rows of the unioned key-columns and takes the difference
+   * difference > 0 means, that the key is invalid as the unioned table contains different rows with the same key. (SQL-UNION is implemented as a SET-Operation)
+   */
   public testKeyUnionabilitySql(uk: IRequestBodyUnionedKeys): string {
     const table1Identifier: string = `${this.escape(
       uk.key1.table_schema
