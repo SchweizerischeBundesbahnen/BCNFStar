@@ -7,6 +7,7 @@ import { ViolatingRowsViewComponent } from '../../operation-dialogs/violating-ro
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import { ViolatingFDRowsDataQuery } from '../../../dataquery';
+import IRowCounts from '@server/definitions/IRowCounts';
 
 @Component({
   selector: 'app-check-fd',
@@ -65,7 +66,7 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
     );
 
     this.isLoading = true;
-    const rowCount: number | void = await dataQuery
+    const rowCount: IRowCounts | void = await dataQuery
       .loadRowCount()
       .catch((e) => {
         console.error(e);
@@ -73,7 +74,7 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
       });
     this.isLoading = false;
 
-    if (rowCount == 0) {
+    if (rowCount && rowCount.entries == 0) {
       this.isValid = true;
       this.table.addFd(
         new FunctionalDependency(

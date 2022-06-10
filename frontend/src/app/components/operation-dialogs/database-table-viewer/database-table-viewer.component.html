@@ -42,14 +42,13 @@
       (page)="changePage($event)"
       [pageIndex]="page"
       [pageSize]="pageSize"
-      [length]="rowCount"
+      [length]="rowCount.groups"
       class="mt-2"
     >
     </sbb-paginator>
     <div class="text-aling-right mt-2 align-right">
-      {{ pageSize * page + 1 }} -
-      {{ pageSize * page + _dataSource.data.length }} /
-      {{ rowCount }}
+      {{ pageSize * page + 1 }} - {{ pageSize * page + currentPageLength() }} /
+      {{ rowCount.groups }}
     </div>
   </div>
 </div>

@@ -19,6 +19,7 @@ import { firstValueFrom } from 'rxjs';
 import { SchemaCreationService } from '../../schema-creation.service';
 import Schema from '@/src/model/schema/Schema';
 import { DataQuery, TablePreviewDataQuery } from '../../dataquery';
+import IRowCounts from '@server/definitions/IRowCounts';
 
 @Component({
   selector: 'app-table-selection',
@@ -33,7 +34,7 @@ export class TableSelectionComponent implements OnInit {
   @Input() public withContentPreview: boolean = true;
   @Output() public schema = new EventEmitter<Schema>();
 
-  public tableRowCounts: Map<Table, number> = new Map();
+  public tableRowCounts: Map<Table, IRowCounts> = new Map();
 
   public loadingStatus: Map<IIndexFileEntry, 'done' | 'error' | 'loading'> =
     new Map();

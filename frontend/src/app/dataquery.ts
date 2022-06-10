@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import IRequestBodyINDViolatingRows from '@server/definitions/IRequestBodyINDViolatingRows';
+import IRowCounts from '@server/definitions/IRowCounts';
 import ITablePage from '@server/definitions/ITablePage';
 import { firstValueFrom } from 'rxjs';
 import Column from '../model/schema/Column';
@@ -21,7 +22,7 @@ export abstract class DataQuery {
     limit: number
   ): Promise<ITablePage>;
 
-  public abstract loadRowCount(): Promise<number>;
+  public abstract loadRowCount(): Promise<IRowCounts>;
 
   /**
    *
@@ -44,7 +45,7 @@ export class TablePreviewDataQuery extends DataQuery {
       )
     );
   }
-  public loadRowCount(): Promise<number> {
+  public loadRowCount(): Promise<IRowCounts> {
     return Promise.reject(
       'not implemented. use loadTableRowCounts from database-service instead'
     );
@@ -85,14 +86,17 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     );
   }
 
-  public override async loadRowCount(): Promise<number> {
+  public override async loadRowCount(): Promise<IRowCounts> {
     const data: IRequestBodyINDViolatingRows = {
       relationship: this.relationship.toIRelationship(),
       offset: 0,
       limit: 0,
     };
     return firstValueFrom(
-      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/ind`, data)
+      this.http.post<IRowCounts>(
+        `${this.baseUrl}/violatingRows/rowcount/ind`,
+        data
+      )
     );
   }
 }
@@ -155,7 +159,7 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     return result;
   }
 
-  public override async loadRowCount(): Promise<number> {
+  public override async loadRowCount(): Promise<IRowCounts> {
     // currently supports only check on "sourceTables".
     if (this.table.sources.length != 1)
       throw Error('Not Implemented Exception');
@@ -168,7 +172,10 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
       limit: 0,
     };
     return firstValueFrom(
-      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/fd`, data)
+      this.http.post<IRowCounts>(
+        `${this.baseUrl}/violatingRows/rowcount/fd`,
+        data
+      )
     );
   }
 }
