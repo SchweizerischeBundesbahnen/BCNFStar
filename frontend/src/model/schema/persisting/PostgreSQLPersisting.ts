@@ -27,10 +27,6 @@ export default class PostgreSQLPersisting extends SQLPersisting {
     return `${name} INT GENERATED ALWAYS AS IDENTITY`;
   }
 
-  public override suffix(): string {
-    return '';
-  }
-
   public escape(str: string) {
     return `"${str}"`;
   }

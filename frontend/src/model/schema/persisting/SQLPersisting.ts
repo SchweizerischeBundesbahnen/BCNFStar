@@ -231,5 +231,7 @@ ALTER TABLE ${this.tableIdentifier(
     )}.${this.escape(column.name)}`;
   }
 
-  public abstract suffix(): string;
+  public suffix(): string {
+    return '';
+  }
 }
