@@ -11,7 +11,7 @@ export class KeysComponent {
   public editMode = true;
 
   constructor(public schemaService: SchemaService) {
-    this.schemaService.selectedTableChanged.subscribe(this.reset);
+    this.schemaService.selectedTableChanged.subscribe(() => this.reset());
   }
 
   public reset() {

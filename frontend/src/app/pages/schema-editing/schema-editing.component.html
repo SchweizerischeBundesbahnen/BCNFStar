@@ -20,7 +20,10 @@
     <app-undo-redo class="undo-redo"></app-undo-redo>
   </div>
   <div>
-    <app-schema-graph></app-schema-graph>
+    <app-schema-graph
+      [tables]="schemaService.schema.tables"
+      [links]="links"
+    ></app-schema-graph>
   </div>
 
   <div class="item-sidebar">

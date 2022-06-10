@@ -1,10 +1,9 @@
-import { Component, AfterContentInit } from '@angular/core';
+import { Component, AfterContentInit, Input, OnChanges } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
-import TableRelationship from '@/src/model/schema/TableRelationship';
 import { SchemaService } from '@/src/app/schema.service';
 
 type GraphStorageItem = {
@@ -13,9 +12,20 @@ type GraphStorageItem = {
   links: Map<Table, joint.dia.Link>;
 };
 
-enum PortSide {
+export enum PortSide {
   Left,
   Right,
+}
+
+export interface LinkEndDefinititon {
+  table: Table;
+  columnName: string;
+  side: PortSide;
+}
+export interface LinkDefinition {
+  source: LinkEndDefinititon;
+  target: LinkEndDefinititon;
+  tool: joint.dia.ToolsView;
 }
 
 @Component({
@@ -23,7 +33,9 @@ enum PortSide {
   templateUrl: './schema-graph.component.html',
   styleUrls: ['./schema-graph.component.css'],
 })
-export class SchemaGraphComponent implements AfterContentInit {
+export class SchemaGraphComponent implements AfterContentInit, OnChanges {
+  @Input() public tables: Iterable<Table> = [];
+  @Input() public links: Iterable<LinkDefinition> = [];
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
   protected portDiameter = 22.5;
@@ -36,6 +48,13 @@ export class SchemaGraphComponent implements AfterContentInit {
   protected elementWidth = 300;
 
   constructor(private schemaService: SchemaService) {}
+
+  ngOnChanges() {
+    console.log('updating graph');
+    console.log(this.links);
+    console.log(this.tables);
+    this.updateGraph();
+  }
 
   ngAfterContentInit(): void {
     this.graph = new joint.dia.Graph();
@@ -64,9 +83,6 @@ export class SchemaGraphComponent implements AfterContentInit {
     });
 
     this.addPanzoomHandler();
-    this.schemaService.schemaChanged.subscribe(() => {
-      this.updateGraph();
-    });
     this.schemaService.selectedTableChanged.subscribe(() => {
       this.centerOnSelectedTable();
     });
@@ -136,7 +152,7 @@ export class SchemaGraphComponent implements AfterContentInit {
   }
 
   private generateElements() {
-    for (const table of this.schemaService.schema.tables) {
+    for (const table of this.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
         attrs: { root: { id: '__jointel__' + table.fullName } },
       });
@@ -163,74 +179,35 @@ export class SchemaGraphComponent implements AfterContentInit {
     }
   }
 
-  private addJoinButton(
-    link: joint.shapes.standard.Link,
-    fk: TableRelationship
-  ) {
-    let joinButton = new joint.linkTools.Button({
-      markup: [
-        {
-          tagName: 'circle',
-          selector: 'button',
-          attributes: {
-            r: 11,
-            fill: '#2d327d',
-            cursor: 'pointer',
-          },
-        },
-        {
-          tagName: 'path',
-          selector: 'icon',
-          attributes: {
-            d: 'M 0.715 2.327 L 0.715 -3.9 L 1.95 -3.9 L 1.95 2.197 A 6.396 6.396 90 0 1 1.9201 2.834 Q 1.8759 3.2721 1.768 3.627 A 3.1213 3.1213 90 0 1 1.5704 4.1249 A 2.2802 2.2802 90 0 1 1.248 4.6085 Q 0.91 4.992 0.442 5.174 A 2.6767 2.6767 90 0 1 -0.2509 5.3378 A 3.3124 3.3124 90 0 1 -0.598 5.356 Q -1.196 5.356 -1.7225 5.148 A 2.9679 2.9679 90 0 1 -2.2321 4.8906 A 2.3634 2.3634 90 0 1 -2.6 4.602 L -2.002 3.653 A 2.1918 2.1918 90 0 0 -1.4729 4.0586 A 2.5259 2.5259 90 0 0 -1.378 4.108 Q -1.014 4.29 -0.637 4.29 A 1.4196 1.4196 90 0 0 -0.1898 4.2224 A 1.1609 1.1609 90 0 0 0.351 3.848 A 1.2519 1.2519 90 0 0 0.5512 3.4892 Q 0.715 3.0524 0.715 2.327 Z',
-            fill: 'white',
-            stroke: '#FFFFFF',
-            'stroke-width': 2,
-            'pointer-events': 'none',
-          },
-        },
-      ],
-      distance: '50%',
-      offset: 0,
-      action: () => this.schemaService.join(fk),
-    });
-
-    var toolsView = new joint.dia.ToolsView({
-      tools: [joinButton],
-    });
-
-    var linkView = link.findView(this.paper!);
-    linkView.addTools(toolsView);
-  }
-
   private generateLinks() {
-    for (const table of this.schemaService.schema.tables) {
-      for (const fk of this.schemaService.schema.fksOf(table)) {
-        let link = new joint.shapes.standard.Link({
-          source: {
-            id: this.graphStorage.get(table)?.jointjsEl.id,
-            port: fk.referencingName + '_right',
+    const toLinkEnd = (def: LinkEndDefinititon) => {
+      return {
+        id: this.graphStorage.get(def.table)?.jointjsEl.id,
+        port: def.table + (def.side == PortSide.Left ? '_left' : '_right'),
+      };
+    };
+    for (const linkDef of this.links) {
+      let link = new joint.shapes.standard.Link({
+        source: toLinkEnd(linkDef.source),
+        target: toLinkEnd(linkDef.target),
+        z: -1,
+      });
+      // reversed arrowhead to align with powerbi
+      link.attr({
+        line: {
+          sourceMarker: {
+            type: 'path',
+            d: 'M 10 -5 0 0 10 5 Z',
           },
-          target: {
-            id: this.graphStorage.get(fk.referenced)?.jointjsEl.id,
-            port: fk.referencedName + '_left',
+          targetMarker: {
+            type: 'none',
           },
-          z: -1,
-        });
-        link.attr({
-          line: {
-            sourceMarker: {
-              type: 'path',
-              d: 'M 10 -5 0 0 10 5 Z',
-            },
-            targetMarker: {
-              type: 'none',
-            },
-          },
-        });
-        this.graphStorage.get(table)?.links.set(fk.referenced, link);
-        this.graph.addCell(link);
-        this.addJoinButton(link, fk);
+        },
+      });
+      this.graph.addCell(link);
+      if (linkDef.tool) {
+        var linkView = link.findView(this.paper!);
+        linkView.addTools(linkDef.tool);
       }
     }
   }
