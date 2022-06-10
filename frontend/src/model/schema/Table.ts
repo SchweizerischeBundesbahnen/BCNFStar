@@ -4,13 +4,13 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
-import TableRelationship from './TableRelationship';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
-import SourceRelationship from './SourceRelationship';
 import { FdCluster } from '../types/FdCluster';
 import ColumnsTree from './ColumnsTree';
+import SourceRelationship from './SourceRelationship';
+import TableRelationship from './TableRelationship';
 
 export default class Table {
   public name = '';
@@ -23,20 +23,6 @@ export default class Table {
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
-
-  /**
-   * cache of schema.fksOf(this). Should not be accessed from outside the schema class
-   * specifies for each fk whether it is filtered, blacklisted, whitelisted
-   */
-  public _fks!: Map<TableRelationship, Array<boolean>>;
-  /**
-   * cache of schema.referencesOf(this). Should not be accessed from outside the schema class
-   */
-  public _references!: Array<TableRelationship>;
-  /**
-   * cache of schema.referencesOf(this). Should not be accessed from outside the schema class
-   */
-  public _displayedReferences!: Array<TableRelationship>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
