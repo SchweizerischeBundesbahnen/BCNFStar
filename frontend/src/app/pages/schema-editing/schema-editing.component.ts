@@ -18,6 +18,8 @@ import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import { DirectDimensionDialogComponent } from '../../components/direct-dimension-dialog/direct-dimension-dialog.component';
 import DirectDimensionCommand from '@/src/model/commands/DirectDimensionCommand';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import Column from '@/src/model/schema/Column';
+import DeleteColumnCommand from '@/src/model/commands/DeleteColumnCommand';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
 
@@ -135,6 +137,19 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
+  public onDeleteColumn(column: Column): void {
+    let command = new DeleteColumnCommand(
+      this.schema,
+      this.selectedTable!,
+      column
+    );
+    command.onDo = () => (this.selectedTable = command.newTable!);
+    command.onUndo = () => (this.selectedTable = command.table);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
   public onAutoNormalize(selectedTables: Set<Table> | Table): void {
     const tablesToNormalize =
       selectedTables.constructor.name == 'Set'
@@ -172,6 +187,11 @@ export class SchemaEditingComponent {
           if (value) this.onMakeDirectDimensions(value.routes);
         });
     }
+  }
+
+  public onSetSurrogateKey(name: string) {
+    this.selectedTable!.surrogateKey = name;
+    this.schemaChanged.next();
   }
 
   public onMakeDirectDimensions(routes: Array<Array<TableRelationship>>) {

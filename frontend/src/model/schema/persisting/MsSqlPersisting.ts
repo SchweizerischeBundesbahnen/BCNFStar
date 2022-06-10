@@ -1,7 +1,7 @@
 import Schema from '../Schema';
 import SQLPersisting from './SQLPersisting';
 
-export default class SqlServerPersisting extends SQLPersisting {
+export default class MsSqlPersisting extends SQLPersisting {
   public schemaPreparation(schema: Schema): string {
     let Sql: string = '';
     Sql +=
@@ -17,6 +17,16 @@ GO
         `DROP TABLE IF EXISTS ${this.tableIdentifier(table)};` + '\n GO \n';
     }
     return Sql;
+  }
+
+  public override surrogateKeyString(name: string): string {
+    return `${this.escape(name)} INT IDENTITY(1,1)`;
+  }
+
+  /** Necessary if you use schema-editing commands and queries that require those in one batch.
+   * e.g.: Adding a column to a table and selecting this column in a following query  */
+  public override suffix(): string {
+    return '\n GO \n';
   }
 
   public escape(str: string) {

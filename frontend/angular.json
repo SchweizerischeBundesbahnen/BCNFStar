@@ -38,7 +38,12 @@
               "node_modules/backbone/backbone.js",
               "node_modules/jointjs/dist/joint.js"
             ],
-            "allowedCommonJsDependencies": ["panzoom", "graphlib", "dagre"]
+            "allowedCommonJsDependencies": [
+              "panzoom",
+              "graphlib",
+              "dagre",
+              "zipson"
+            ]
           },
           "configurations": {
             "production": {

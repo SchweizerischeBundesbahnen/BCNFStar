@@ -45,15 +45,6 @@
   font-style: italic;
 }
 
-.grid-container-column {
-  display: grid;
-  grid-template-columns: auto auto;
-}
-
-.grid-container-silder {
-  display: grid;
-  grid-template-columns: auto;
-}
 
 .highlighted {
   font-weight: bold;
@@ -89,6 +80,8 @@
 .table-body {
   font-size: 1rem;
   pointer-events: visibleFill;
+  display: flex;
+  justify-content: space-between;
   font-weight: normal;
 }
 
