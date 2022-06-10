@@ -99,7 +99,7 @@ export default abstract class SQLPersisting {
     let Sql: string = '';
 
     for (const referencingTable of schema.tables) {
-      for (const fk of schema.fksOf(referencingTable)) {
+      for (const fk of schema.fksOf(referencingTable, true)) {
         if (fk.referenced.implementsSurrogateKey()) {
           Sql += this.addSkColumnToReferencingSql(fk);
           Sql += this.updateSurrogateKeySql(fk);

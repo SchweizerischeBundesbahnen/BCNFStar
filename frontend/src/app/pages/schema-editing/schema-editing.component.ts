@@ -174,7 +174,7 @@ export class SchemaEditingComponent {
   }
 
   public onClickMakeDirectDimension(table: Table): void {
-    const routes = this.schema.filteredRoutesFromFactTo(table);
+    const routes = this.schema.directDimensionableRoutes(table, true);
     if (routes.length == 1) {
       this.onMakeDirectDimensions(routes);
     } else {
