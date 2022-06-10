@@ -25,6 +25,14 @@ export default class TableRelationship {
     )}`;
   }
 
+  public toJSON() {
+    return {
+      relationship: this.relationship,
+      referencing: this.referencing.fullName,
+      referenced: this.referenced.fullName,
+    };
+  }
+
   public equals(other: TableRelationship): boolean {
     if (this.referenced != other.referenced) return false;
     if (this.referencing != other.referencing) return false;

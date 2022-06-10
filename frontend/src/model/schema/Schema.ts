@@ -35,6 +35,9 @@ export default class Schema {
     return {
       tables: Array.from(this.tables),
       _baseFks: Array.from(this._baseFks),
+      _tableFks: Array.from(this._tableFks.entries()).filter(
+        ([, bools]) => bools[1] || bools[2]
+      ),
       _inds: Array.from(this._inds),
       _fds: [...this._fds.values()].flat(),
     };
@@ -168,7 +171,7 @@ export default class Schema {
 
   public set starMode(value: boolean) {
     this._starMode = value;
-    this._tableFksValid = false;
+    this._tableFksValid = false; //optimize
   }
 
   public get fkFiltering(): boolean {
@@ -286,8 +289,7 @@ export default class Schema {
     table._indsValid = true;
   }
 
-  private updateFks(): void {
-    const oldFks = this._tableFks;
+  public updateFks(oldFks = this._tableFks): void {
     this._tableFks = new Map<TableRelationship, Array<boolean>>();
     this.calculateFks();
     this.calculateTrivialFks();

@@ -8,10 +8,12 @@ import SourceRelationship from '../SourceRelationship';
 import SourceTable from '../SourceTable';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
+import TableRelationship from '../TableRelationship';
 
 interface JSONSchema {
   tables: Array<JSONTable>;
   _baseFks: Array<JSONSourceRelationship>;
+  _tableFks: Array<[JSONTableRelationship, Array<boolean>]>;
   _inds: Array<JSONSourceRelationship>;
   _fds: Array<JSONSourceFunctionalDependency>;
 }
@@ -24,6 +26,12 @@ interface JSONSourceFunctionalDependency {
 interface JSONSourceRelationship {
   referencing: Array<JSONSourceColumn>;
   referenced: Array<JSONSourceColumn>;
+}
+
+interface JSONTableRelationship {
+  relationship: JSONRelationship;
+  referencing: string;
+  referenced: string;
 }
 
 interface JSONTable {
@@ -88,7 +96,36 @@ export default class SaveSchemaState {
     this.newSchema.tables.forEach((table) => {
       this.newSchema.calculateFdsOf(table);
     });
+    this.newSchema.updateFks(
+      this.parseTableFks(schema._tableFks, Array.from(this.newSchema.tables))
+    );
     return this.newSchema;
+  }
+
+  private parseTableFks(
+    tableFks: Array<[JSONTableRelationship, Array<boolean>]>,
+    tables: Array<Table>
+  ): Map<TableRelationship, Array<boolean>> {
+    const result = new Map<TableRelationship, Array<boolean>>();
+    for (const [tableFk, bools] of tableFks) {
+      const referencingTable = tables.find(
+        (table) => table.fullName == tableFk.referencing
+      )!;
+      const referencedTable = tables.find(
+        (table) => table.fullName == tableFk.referenced
+      )!;
+      const newTableFk = new TableRelationship(
+        this.parseRelationship(
+          tableFk.relationship,
+          referencingTable,
+          referencedTable
+        ),
+        referencingTable,
+        referencedTable
+      );
+      result.set(newTableFk, bools);
+    }
+    return result;
   }
 
   private existingSourceTables = new Array<SourceTable>();
@@ -122,7 +159,7 @@ export default class SaveSchemaState {
 
     let newRelationships = new Array<Relationship>();
     jsonTable.relationships.forEach((relationship) => {
-      newRelationships.push(this.parseRelationship(relationship, table));
+      newRelationships.push(this.parseRelationship(relationship, table, table));
     });
     table.relationships = newRelationships;
 
@@ -215,16 +252,20 @@ export default class SaveSchemaState {
     return newSourceColumn;
   }
 
-  private parseRelationship(relationship: JSONRelationship, table: Table) {
+  private parseRelationship(
+    relationship: JSONRelationship,
+    referencingTable: Table,
+    referencedTable: Table
+  ) {
     let newReferencingColumns: Array<Column> = [];
     relationship._referencing.forEach((col) => {
-      newReferencingColumns.push(this.parseColumn(col, table));
+      newReferencingColumns.push(this.parseColumn(col, referencingTable));
     });
     let newReferencing = newReferencingColumns;
 
     let newReferencedColumns: Array<Column> = [];
     relationship._referenced.forEach((col) => {
-      newReferencedColumns.push(this.parseColumn(col, table));
+      newReferencedColumns.push(this.parseColumn(col, referencedTable));
     });
     let newReferenced = newReferencedColumns;
 
