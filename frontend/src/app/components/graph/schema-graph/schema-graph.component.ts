@@ -187,10 +187,12 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     const toLinkEnd = (def: LinkEndDefinititon) => {
       return {
         id: this.graphStorage.get(def.table)?.jointjsEl.id,
-        port: def.table + (def.side == PortSide.Left ? '_left' : '_right'),
+        port: def.columnName + (def.side == PortSide.Left ? '_left' : '_right'),
       };
     };
     for (const linkDef of this.links) {
+      console.log(toLinkEnd(linkDef.source));
+      console.log(linkDef.target.columnName);
       let link = new joint.shapes.standard.Link({
         source: toLinkEnd(linkDef.source),
         target: toLinkEnd(linkDef.target),
