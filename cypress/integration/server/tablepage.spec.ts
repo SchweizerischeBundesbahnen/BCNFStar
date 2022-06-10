@@ -68,6 +68,6 @@ describe("The /tables/page route", () => {
         Cypress.env("BACKEND_BASEURL") +
         `/tables/page?schema=public&table=nation_region_denormalized&offset=0`,
       failOnStatusCode: false,
-    }).should((result) => expect(result.status).to.eq(400));
+    }).should((result) => expect(result.status).to.eq(422));
   });
 });
