@@ -43,14 +43,12 @@ import { HomeComponent } from './pages/home/home.component';
 import { SaveSchemaEditingComponent } from './components/export/save-schema-editing/save-schema-editing.component';
 import { LoadSavedSchemaComponent } from './components/export/load-saved-schema/load-saved-schema.component';
 import { SbbFileSelectorModule } from '@sbb-esta/angular/file-selector';
-import { MatchingViewerComponent } from './components/matching-viewer/matching-viewer.component';
 import { PersistSchemaComponent } from './components/export/persist-schema/persist-schema.component';
 import { KeysComponent } from './components/tabbar/keys/keys.component';
 import { ContainedSubtablesComponent } from './components/tabbar/contained-subtables/contained-subtables.component';
 import { ForeignKeysComponent } from './components/tabbar/foreign-keys/foreign-keys.component';
 import { SbbOptionAllComponent } from './components/ui/sbb-option-all/sbb-option-all.component';
-import { IntegrationStartComponent } from './integration/integration-start/integration-start.component';
-import { MatchingEditorComponent } from './integration/matching-editor/matching-editor.component';
+import { MatchingGraphComponent } from './components/integration/matching-graph/matching-graph.component';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -76,14 +74,12 @@ export let InjectorInstance: Injector;
     LoadSavedSchemaComponent,
     TableEditingComponent,
     HomeComponent,
-    MatchingViewerComponent,
     PersistSchemaComponent,
     KeysComponent,
     ContainedSubtablesComponent,
     ForeignKeysComponent,
     SbbOptionAllComponent,
-    IntegrationStartComponent,
-    MatchingEditorComponent,
+    MatchingGraphComponent,
   ],
   imports: [
     BrowserModule,

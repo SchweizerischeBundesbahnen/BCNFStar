@@ -5,40 +5,48 @@ import {
   PortSide,
 } from '@/src/app/components/graph/schema-graph/schema-graph.component';
 import { IntegrationService } from '@/src/app/integration.service';
+import { SchemaService } from '../../../schema.service';
 
 @Component({
-  selector: 'app-matching-editor',
-  templateUrl: './matching-editor.component.html',
-  styleUrls: ['./matching-editor.component.css'],
+  selector: 'app-matching-graphp',
+  templateUrl: './matching-graph.component.html',
+  styleUrls: ['./matching-graph.component.css'],
 })
-export class MatchingEditorComponent {
+export class MatchingGraphComponent {
   public links: Array<LinkDefinition> = [];
   public tables: Array<Table> = [];
 
   // <newColumn, oldColumn>
-  private matchings: Record<string, string[]> = {};
+  private matchings?: Record<string, string[]>;
 
-  constructor(private intService: IntegrationService) {
-    if (!this.intService.isIntegrating)
-      throw Error(
-        'Trying to view matchings while not in schema integration mode'
-      );
-    this.intService.newSchema.tables.forEach((t) => this.tables.push(t));
+  constructor(
+    private intService: IntegrationService,
+    private schemaService: SchemaService
+  ) {
+    this.reset();
+    this.schemaService.schemaChanged.subscribe(() => this.reset());
+  }
+
+  private async reset() {
+    this.tables = [];
+    this.schemaService.schema.tables.forEach((t) => this.tables.push(t));
     this.intService.existingSchema.tables.forEach((t) => this.tables.push(t));
-    this.getMatchings();
+    await this.generateLinks();
   }
   private async getMatchings() {
-    const result = await this.intService.getIniti2alMatching();
+    const matchings: Record<string, string[]> = {};
+    const result = await this.intService.getMatching();
     for (const entry of result) {
-      if (!this.matchings[entry.source]) this.matchings[entry.source] = [];
-      this.matchings[entry.source].push(entry.target);
+      if (!matchings[entry.source]) matchings[entry.source] = [];
+      matchings[entry.source].push(entry.target);
     }
-    this.generateLinks();
+    return matchings;
   }
 
-  private generateLinks() {
+  private async generateLinks() {
+    if (!this.matchings) this.matchings = await this.getMatchings();
     const newLinks: Array<LinkDefinition> = [];
-    for (const table of this.intService.newSchema.tables)
+    for (const table of this.schemaService.schema.tables)
       for (const column of table.columns) {
         const sourceIdent = `${column.sourceColumn.table.fullName}.${column.sourceColumn.name}`;
         if (!this.matchings[sourceIdent]) continue;
