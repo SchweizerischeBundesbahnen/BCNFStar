@@ -8,6 +8,8 @@ import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
 import getPksFunction from "./routes/pks";
 import { getTablePage } from "./routes/tablePage";
+import { check } from "express-validator";
+import isValidFileName from "./routes/validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
 
@@ -16,6 +18,7 @@ import getViolatingRowsForFD from "./routes/violatingRows/fds";
 import getViolatingRowsForFDCount from "./routes/violatingRows/fdRowCounts";
 import getViolatingRowsForSuggestedIND from "./routes/violatingRows/inds";
 import getViolatingRowsForSuggestedINDCount from "./routes/violatingRows/indsRowCounts";
+import bodyParser from "body-parser";
 
 import {
   deleteMetanomeResults,
@@ -38,6 +41,16 @@ const corsOptions: CorsOptions = {
 };
 
 const app = express();
+
+app.use(bodyParser.json({ strict: true }));
+app.use((error, request, response, next) => {
+  if (error !== null) {
+    return response
+      .status(400)
+      .json({ errors: "The request body does not contain valid JSON" });
+  }
+  return next();
+});
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(
@@ -56,15 +69,27 @@ createQueueMonitor(app);
 
 app.get("/tables", getTablesFunction);
 app.get("/tables/rows", getTableRowCounts);
-app.get("/tables/page", getTablePage);
+app.get(
+  "/tables/page",
+  [check("limit").isNumeric(), check("offset").isNumeric()],
+  getTablePage
+);
 
 app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
 
 // Metanome
 app.get("/metanomeResults", getMetanomeIndex);
-app.get("/metanomeResults/:fileName", getMetanomeResults);
-app.delete("/metanomeResults/:fileName", deleteMetanomeResults);
+app.get(
+  "/metanomeResults/:fileName",
+  [check("fileName").custom(isValidFileName())],
+  getMetanomeResults
+);
+app.delete(
+  "/metanomeResults/:fileName",
+  [check("fileName").custom(isValidFileName())],
+  deleteMetanomeResults
+);
 app.post("/metanomeResults", runMetanome);
 
 app.post("/schemaMatching", getSchemaMatching);

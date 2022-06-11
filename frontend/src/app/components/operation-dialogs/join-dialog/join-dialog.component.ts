@@ -21,7 +21,8 @@ export class JoinDialogComponent {
   ) {
     this.fk = data.fk;
     this.duplicate =
-      this.schemaService.schema.referencesOf(this.fk.referenced).length > 1;
+      this.schemaService.schema.referencesOf(this.fk.referenced, true).length >
+      1;
   }
 
   public confirm() {

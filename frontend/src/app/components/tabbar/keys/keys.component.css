@@ -1,13 +1,23 @@
-.bold {
+#surrogate-key-input {
+    width: 100%;
+}
+
+.surrogate-key-name {
     font-weight: bold;
+    word-wrap: break-word;
+    display: block;
 }
 
 button {
-    margin-left: 5px
+    margin-left: 5px;
 }
 
-#surrogate-key-input {
-    width: 100%;
+.buttons {
+    white-space: nowrap;
+}
+
+.buttons-field {
+    width: 15%;
 }
 
 .editing {
@@ -16,6 +26,6 @@ button {
     justify-content: space-between;
 }
 
-.buttons {
-    white-space: nowrap;
+.name-field {
+    width: 85%;
 }

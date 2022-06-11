@@ -33,7 +33,7 @@ export class SchemaEditingComponent {
   public generateLinks() {
     const newLinks: Array<LinkDefinition> = [];
     for (const table of this.schemaService.schema.tables)
-      for (const fk of this.schemaService.schema.fksOf(table))
+      for (const fk of this.schemaService.schema.fksOf(table, true))
         newLinks.push({
           tool: this.generateJoinButton(fk),
           source: {

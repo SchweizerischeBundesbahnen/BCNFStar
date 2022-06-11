@@ -25,7 +25,7 @@ export class GraphElementComponent {
     return (
       column instanceof Column &&
       !!this.table.pk &&
-      this.table.pk!.includes(column as Column)
+      this.table.pk.includes(column as Column)
     );
   }
 
@@ -56,7 +56,8 @@ export class GraphElementComponent {
   public showMakeDirectDimension(): boolean {
     return (
       this.schemaService.starMode &&
-      this.schemaService.schema.filteredRoutesFromFactTo(this.table).length > 0
+      this.schemaService.schema.directDimensionableRoutes(this.table, true)
+        .length > 0
     );
   }
 }

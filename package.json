@@ -13,6 +13,7 @@
     "test:prod": "cross-env CYPRESS_FRONTEND_BASEURL=http://localhost CYPRESS_BACKEND_BASEURL=http://localhost run-p start:coverage cypress:open",
     "start:coverage": "nyc npm run start",
     "prebuild": "npm run generateTypeGuards",
+    "postinstall": "npm run generateTypeGuards",
     "install:server": "cd server && npm install",
     "install:frontend": "cd frontend && npm install",
     "build:frontend": "cd frontend && npm run build",

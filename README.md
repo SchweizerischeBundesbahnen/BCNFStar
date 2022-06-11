@@ -43,6 +43,37 @@ from the project root, which will build both the server and the frontend. After 
 npm run start
 ```
 
+### Docker
+
+If want to use a docker container for deployment you can skip the steps bellow. Just follow the next commands.
+
+First set up your personal DB configuration in [](docker-compose.yml). By default we use a standard postgres database configuration.
+
+```yml
+- DB_HOST=host.docker.internal
+- DB_PORT=5432
+- DB_DATABASE=postgres
+- DB_USER=postgres
+- DB_TYPE=postgres
+- DB_PASSWORD=
+```
+
+To build your docker container run
+
+```bash
+docker build . -t bcnfstar
+```
+
+to create bcnfstar docker image and run
+
+```bash
+docker-compose up
+```
+
+to create docker containers for redis and BCNFStar.
+
+You can open BCNFStar on `http://localhost/#/`.
+
 ### Troubleshooting
 
 Something doesn't work? Always try to run `npm install && npm run build` first.

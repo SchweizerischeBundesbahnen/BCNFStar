@@ -175,7 +175,7 @@ export class SchemaService {
   }
 
   public async makeDirectDimension(table: Table): Promise<void> {
-    const routes = this._schema.filteredRoutesFromFactTo(table);
+    const routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
         data: { table: table },

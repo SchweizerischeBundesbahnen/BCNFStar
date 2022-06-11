@@ -3,13 +3,20 @@ import { rm } from "fs/promises";
 import { join } from "path";
 import { deleteFromIndex } from "@/metanome/IndexFile";
 import MetanomeAlgorithm from "@/metanome/metanomeAlgorithm";
+import { validationResult } from "express-validator";
 /**
  * First tries to delete the metanome result identified by its file name (containing an UUID)
  * from the index file. Only if that was successful, also try to delete the actual file
  */
 export async function deleteMetanomeResults(req: Request, res: Response) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(422).json({ errors: errors.mapped() });
+      return;
+    }
     const fileName = req.params.fileName;
+
     const wasDeletedFromIndex = await deleteFromIndex(fileName).catch((e) => {
       console.error(
         `Error while deleting ${fileName} from metanome index file:`
