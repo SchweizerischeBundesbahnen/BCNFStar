@@ -12,7 +12,7 @@ export default abstract class SQLPersisting {
   public createSQL(schema: Schema): string {
     let SQL = '';
     SQL += this.schemaPreparation(schema);
-    SQL += this.tableCreation([...schema.tables]);
+    SQL += this.tableCreation(schema);
     SQL += this.dataTransfer([...schema.tables]);
     SQL += this.primaryKeys([...schema.tables]);
     SQL += this.foreignKeys(schema);
@@ -21,15 +21,15 @@ export default abstract class SQLPersisting {
 
   public abstract schemaPreparation(schema: Schema): string;
 
-  public tableCreation(tables: Array<Table>): string {
+  public tableCreation(schema: Schema): string {
     let Sql: string = '';
-    for (const table of tables) {
-      Sql += this.createTableSql(table) + '\n';
+    for (const table of schema.tables) {
+      Sql += this.createTableSql(schema, table) + '\n';
     }
     return Sql;
   }
 
-  public createTableSql(table: Table): string {
+  public createTableSql(schema: Schema, table: Table): string {
     let columnStrings: string[] = [];
 
     if (table.implementsSurrogateKey()) {
@@ -44,7 +44,11 @@ export default abstract class SQLPersisting {
       columnString += 'NULL';
       columnStrings.push(columnString);
     }
-
+    for (const fk of schema.fksOf(table, true)) {
+      if (fk.referenced.implementsSurrogateKey()) {
+        columnStrings.push(`${fk.referencingName} INT NOT NULL`);
+      }
+    }
     return `CREATE TABLE ${this.tableIdentifier(table)} (
 ${columnStrings.join(',\n')});\n`;
   }
@@ -100,7 +104,6 @@ ${columnStrings.join(',\n')});\n`;
     for (const referencingTable of schema.tables) {
       for (const fk of schema.fksOf(referencingTable, true)) {
         if (fk.referenced.implementsSurrogateKey()) {
-          Sql += this.addSkColumnToReferencingSql(fk);
           Sql += this.updateSurrogateKeySql(fk);
           Sql += this.foreignSurrogateKeySql(fk);
         } else {
@@ -111,16 +114,6 @@ ${columnStrings.join(',\n')});\n`;
     }
     return Sql;
   }
-
-  // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
-  public addSkColumnToReferencingSql(fk: TableRelationship): string {
-    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)} ADD ${
-      fk.referencingName
-    } INT;
-    ${this.suffix()}
-    `;
-  }
-
   /** Updates the FK-Column of the referencing table by joining referencing and referenced table
    * on the multi-column foreign key. Different Syntax for MsSql and Postgres.
    */
