@@ -45,9 +45,8 @@ export default abstract class SQLPersisting {
       columnStrings.push(columnString);
     }
 
-    return `CREATE TABLE ${this.tableIdentifier(table)} (${columnStrings.join(
-      ', '
-    )});`;
+    return `CREATE TABLE ${this.tableIdentifier(table)} (
+${columnStrings.join(',\n')});\n`;
   }
 
   public dataTransfer(tables: Array<Table>): string {
