@@ -6,9 +6,10 @@ import {
 } from '@/src/app/components/graph/schema-graph/schema-graph.component';
 import { IntegrationService } from '@/src/app/integration.service';
 import { SchemaService } from '../../../schema.service';
+import Schema from '@/src/model/schema/Schema';
 
 @Component({
-  selector: 'app-matching-graphp',
+  selector: 'app-matching-graph',
   templateUrl: './matching-graph.component.html',
   styleUrls: ['./matching-graph.component.css'],
 })
@@ -20,17 +21,22 @@ export class MatchingGraphComponent {
   private matchings?: Record<string, string[]>;
 
   constructor(
-    private intService: IntegrationService,
+    public intService: IntegrationService,
     private schemaService: SchemaService
   ) {
     this.reset();
     this.schemaService.schemaChanged.subscribe(() => this.reset());
   }
 
+  public setSchema(schema: Schema) {
+    this.intService.existingSchema = schema;
+    this.reset();
+  }
+
   private async reset() {
     this.tables = [];
     this.schemaService.schema.tables.forEach((t) => this.tables.push(t));
-    this.intService.existingSchema.tables.forEach((t) => this.tables.push(t));
+    this.intService.existingSchema?.tables.forEach((t) => this.tables.push(t));
     await this.generateLinks();
   }
   private async getMatchings() {
@@ -51,7 +57,7 @@ export class MatchingGraphComponent {
         const sourceIdent = `${column.sourceColumn.table.fullName}.${column.sourceColumn.name}`;
         if (!this.matchings[sourceIdent]) continue;
         for (const target of this.matchings[sourceIdent])
-          for (const existingTable of this.intService.existingSchema.tables)
+          for (const existingTable of this.intService.existingSchema!.tables)
             for (const existingColumn of existingTable.columns) {
               const sC = existingColumn.sourceColumn;
               const existingSourceIdent = `${sC.table.fullName}.${sC.name}`;

@@ -7,7 +7,7 @@ import {
   PortSide,
   SchemaGraphComponent,
 } from '../../components/graph/schema-graph/schema-graph.component';
-import { SchemaService } from '../../schema.service';
+import { EditingMode, SchemaService } from '../../schema.service';
 
 @Component({
   selector: 'app-schema-editing',
@@ -19,6 +19,10 @@ export class SchemaEditingComponent {
   public graph!: SchemaGraphComponent;
 
   public links: Array<LinkDefinition> = [];
+
+  public get EditingMode() {
+    return EditingMode;
+  }
 
   constructor(router: Router, public schemaService: SchemaService) {
     if (!schemaService.hasSchema) router.navigate(['']);

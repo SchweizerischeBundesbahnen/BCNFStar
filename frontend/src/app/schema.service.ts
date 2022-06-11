@@ -19,31 +19,37 @@ import { DirectDimensionDialogComponent } from './components/direct-dimension-di
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
 
+export enum EditingMode {
+  star,
+  normal,
+  integration,
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class SchemaService {
+  public hasSchema = false;
   private _schema: Schema = new Schema();
   public setSchema(schema: Schema) {
     this._schema = schema;
     this.hasSchema = true;
     this.notifyAboutSchemaChanges();
   }
-
   public get schema() {
     return this._schema;
   }
-
-  public hasSchema = false;
 
   private _selectedTableChanged = new EventEmitter<void>();
   public get selectedTableChanged() {
     return this._selectedTableChanged.asObservable();
   }
+
   private _selectedTable?: Table;
   public get selectedTable() {
     return this._selectedTable;
   }
+
   public set selectedTable(val: Table | undefined) {
     this._selectedTable = val;
     this._selectedTableChanged.emit();
@@ -51,11 +57,16 @@ export class SchemaService {
 
   public highlightedColumns?: Map<Table, ColumnCombination>;
 
+  private _mode: EditingMode = EditingMode.normal;
   public get starMode() {
-    return this._schema.starMode;
+    return this._mode === EditingMode.star;
   }
-  public set starMode(val: boolean) {
-    this._schema.starMode = val;
+  public get mode() {
+    return this._mode;
+  }
+  public set mode(mode: EditingMode) {
+    this._mode = mode;
+    this.schema.starMode = this.starMode;
     this.notifyAboutSchemaChanges();
   }
 

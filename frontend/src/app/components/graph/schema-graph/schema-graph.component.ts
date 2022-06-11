@@ -4,7 +4,7 @@ import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
-import { SchemaService } from '@/src/app/schema.service';
+import { EditingMode, SchemaService } from '@/src/app/schema.service';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -50,16 +50,10 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   constructor(private schemaService: SchemaService) {}
 
   ngOnChanges() {
-    console.log('onchagnes');
-    console.log(this.tables);
-    console.log(this.links);
     this.updateGraph();
   }
 
   ngAfterContentInit(): void {
-    console.log('contentinit');
-    console.log(this.tables);
-    console.log(this.links);
     this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.Paper({
       el: document.getElementById('paper') || undefined,
@@ -106,6 +100,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       nodeSep: 40,
       // prevent left ports from being cut off
       marginX: this.portDiameter / 2,
+      rankSep: this.schemaService.mode == EditingMode.integration ? 150 : 60,
       edgeSep: 80,
       rankDir: 'LR',
     });
@@ -191,8 +186,6 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       };
     };
     for (const linkDef of this.links) {
-      console.log(toLinkEnd(linkDef.source));
-      console.log(linkDef.target.columnName);
       let link = new joint.shapes.standard.Link({
         source: toLinkEnd(linkDef.source),
         target: toLinkEnd(linkDef.target),

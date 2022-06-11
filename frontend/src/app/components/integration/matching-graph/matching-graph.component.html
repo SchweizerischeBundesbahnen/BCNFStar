@@ -1,1 +1,10 @@
-<app-schema-graph [tables]="tables" [links]="links"></app-schema-graph>
+<div *ngIf="!intService.existingSchema">
+  <h3>Choose which schema you want to compare to while editing</h3>
+  <app-table-selection (schema)="setSchema($event)"></app-table-selection>
+</div>
+
+<app-schema-graph
+  *ngIf="intService.existingSchema"
+  [tables]="tables"
+  [links]="links"
+></app-schema-graph>

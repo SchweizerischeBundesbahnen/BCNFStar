@@ -13,13 +13,7 @@ import Table from '../model/schema/Table';
 })
 export class IntegrationService {
   private baseUrl: string;
-  private _existingSchema: Schema = new Schema();
-  public set existingSchema(schema) {
-    this._existingSchema = schema;
-  }
-  public get existingSchema() {
-    return this._existingSchema;
-  }
+  public existingSchema?: Schema;
 
   constructor(
     private http: HttpClient,
@@ -31,7 +25,7 @@ export class IntegrationService {
 
   public getMatching(
     src: Array<Table> = [...this.schemaService.schema.tables],
-    target: Array<Table> = [...this.existingSchema.tables]
+    target: Array<Table> = [...(this.existingSchema?.tables ?? [])]
   ) {
     const body: ISchemaMatchingRequest = {
       src: src.map((t) => t.fullName),

@@ -137,10 +137,6 @@ export default class Schema {
     this._fds.get(fd.rhs[0].table)!.push(fd);
   }
 
-  public get starMode(): boolean {
-    return this._starMode;
-  }
-
   public set starMode(value: boolean) {
     this._starMode = value;
     this._tableFksValid = false;
@@ -632,18 +628,31 @@ export default class Schema {
     return resultingTables;
   }
 
+  /**
+   * @returns columns to display for the given `table`.
+   * This may be different from the table's actual column
+   * because of surrogate keys.
+   *
+   * If `table` is not part of the schema, this just returns
+   * the table's columns (used to display tables in the graph
+   * which are not part of the schema in integration mode).
+   */
   public displayedColumnsOf(table: Table): Array<BasicColumn> {
-    const columns = new Array<BasicColumn>();
-    if (table.implementsSurrogateKey())
-      columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
-    columns.push(...table.columns);
-    for (const fk of this.fksOf(table))
-      if (fk.referenced.implementsSurrogateKey()) {
-        columns.push({
-          name: fk.referencingName,
+    const columns = new Array<BasicColumn>(...table.columns);
+    if (this.tables.has(table)) {
+      if (table.implementsSurrogateKey())
+        columns.unshift({
+          name: table.surrogateKey,
           dataTypeString: 'integer',
         });
-      }
+      for (const fk of this.fksOf(table))
+        if (fk.referenced.implementsSurrogateKey()) {
+          columns.push({
+            name: fk.referencingName,
+            dataTypeString: 'integer',
+          });
+        }
+    }
     return columns;
   }
 }

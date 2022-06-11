@@ -11,20 +11,27 @@
     >
       {{ "Auto-normalize all tables" }}
     </button>
-    <sbb-toggle [(ngModel)]="schemaService.starMode" class="me-1">
-      <sbb-toggle-option label="Normal Mode" [value]="false">
+    <sbb-toggle [(ngModel)]="schemaService.mode" class="me-1">
+      <sbb-toggle-option label="Normal Mode" [value]="EditingMode.normal">
       </sbb-toggle-option>
-      <sbb-toggle-option label="Star Schema Mode" [value]="true">
+      <sbb-toggle-option label="Star Schema Mode" [value]="EditingMode.star">
+      </sbb-toggle-option>
+      <sbb-toggle-option
+        label="Integration Mode"
+        [value]="EditingMode.integration"
+      >
       </sbb-toggle-option>
     </sbb-toggle>
     <app-undo-redo class="undo-redo"></app-undo-redo>
   </div>
-  <div>
-    <app-schema-graph
-      [tables]="schemaService.schema.tables"
-      [links]="links"
-    ></app-schema-graph>
-  </div>
+  <app-schema-graph
+    *ngIf="schemaService.mode !== EditingMode.integration"
+    [tables]="schemaService.schema.tables"
+    [links]="links"
+  ></app-schema-graph>
+  <app-matching-graph
+    *ngIf="schemaService.mode === EditingMode.integration"
+  ></app-matching-graph>
 
   <div class="item-sidebar">
     <div class="grid-container-sidebar">
