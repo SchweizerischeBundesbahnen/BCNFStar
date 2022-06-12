@@ -13,13 +13,8 @@ export default class ShowFkCommand extends Command {
   }
 
   protected override _do(): void {
-    if (this.schema.fkFiltering) {
-      this.newBools[1] = false;
-      this.newBools[2] = true;
-    } else {
-      if (this.newBools[1]) this.newBools[1] = false;
-      else this.newBools[2] = true;
-    }
+    this.newBools[1] = false;
+    if (this.schema.fkFiltering && this.priorBools[0]) this.newBools[2] = true;
     this._redo();
   }
 

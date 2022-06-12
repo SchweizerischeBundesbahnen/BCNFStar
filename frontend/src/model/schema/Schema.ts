@@ -67,23 +67,34 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
+  private findEquivalentFks(fk: TableRelationship) {
+    if (this._tableFks.has(fk)) return fk;
+    return Array.from(this._tableFks.keys()).find((otherFk) =>
+      otherFk.equals(fk)
+    )!;
+  }
+
   public addFkToBlacklist(fk: TableRelationship) {
+    fk = this.findEquivalentFks(fk);
     let bools = this._tableFks.get(fk)!;
     bools[1] = true;
     bools[2] = false;
   }
 
   public deleteFkFromBlacklist(fk: TableRelationship) {
+    fk = this.findEquivalentFks(fk);
     let bools = this._tableFks.get(fk)!;
     bools[1] = false;
     bools[2] = true;
   }
 
   public getFkBoolsOf(fk: TableRelationship) {
+    fk = this.findEquivalentFks(fk);
     return this._tableFks.get(fk)!;
   }
 
   public setFkBoolsOf(fk: TableRelationship, newBools: Array<boolean>) {
+    fk = this.findEquivalentFks(fk);
     this._tableFks.set(fk, newBools);
   }
 
@@ -171,7 +182,8 @@ export default class Schema {
 
   public set starMode(value: boolean) {
     this._starMode = value;
-    this._tableFksValid = false; //optimize
+    for (const [fk, bools] of this._tableFks.entries())
+      bools[0] = this.shouldBeFiltered(fk);
   }
 
   public get fkFiltering(): boolean {
