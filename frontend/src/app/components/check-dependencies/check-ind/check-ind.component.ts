@@ -7,6 +7,8 @@ import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { ViolatingINDRowsDataQuery } from '../../../dataquery';
+import IRowCounts from '@server/definitions/IRowCounts';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
 @Component({
   selector: 'app-check-ind',
@@ -31,7 +33,11 @@ export class CheckIndComponent implements OnChanges {
 
   public isValid: boolean = false;
 
-  constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
+  constructor(
+    public dataService: DatabaseService,
+    private notification: SbbNotificationToast,
+    public dialog: SbbDialog
+  ) {}
 
   ngOnChanges() {
     this.referencedTable = undefined;
@@ -73,10 +79,21 @@ export class CheckIndComponent implements OnChanges {
     const dataQuery = new ViolatingINDRowsDataQuery(this._relationship);
 
     this.isLoading = true;
-    const rowCount: number = await dataQuery.loadRowCount();
+    const rowCount: IRowCounts | void = await dataQuery
+      .loadRowCount()
+      .catch((e) => {
+        console.error(e);
+      });
     this.isLoading = false;
+    if (!rowCount) {
+      this.notification.open(
+        'There was a backend error while checking this IND. Check the browser and server logs for details',
+        { type: 'error' }
+      );
+      return;
+    }
 
-    if (rowCount == 0) {
+    if (rowCount && rowCount.entries == 0) {
       this.isValid = true;
     } else {
       this.dialog.open(ViolatingRowsViewIndsComponent, {

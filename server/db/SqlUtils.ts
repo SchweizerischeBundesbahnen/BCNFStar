@@ -1,6 +1,7 @@
 import { IColumnRelationship } from "../definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
+import IRowCounts from "@/definitions/IRowCounts";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -43,7 +44,7 @@ export default abstract class SqlUtils {
   public abstract getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public abstract tableExistsInSchema(
     schema: string,
@@ -80,7 +81,7 @@ export default abstract class SqlUtils {
     referencingTable: ITable,
     referencedTable: ITable,
     columnRelationships: IColumnRelationship[]
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public abstract getViolatingRowsForSuggestedIND(
     referencingTable: ITable,
@@ -150,5 +151,5 @@ GROUP BY ${lhs.concat(rhs).join(",")}
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 }

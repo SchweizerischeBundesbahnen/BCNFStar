@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { sqlUtils } from "@/db";
+import IRowCounts from "@/definitions/IRowCounts";
 
 export async function getTableRowCounts(
   req: Request,
@@ -7,7 +8,7 @@ export async function getTableRowCounts(
 ): Promise<void> {
   try {
     const query_result_tables = await sqlUtils.getSchema();
-    let rowCounts: Record<string, Promise<number | void>> = {};
+    let rowCounts: Record<string, Promise<IRowCounts | void>> = {};
 
     for (const row of query_result_tables) {
       const complete_name = `${row.table_schema}.${row.table_name}`;
@@ -23,9 +24,12 @@ export async function getTableRowCounts(
       }
     }
 
-    const result: Record<string, number> = {};
+    const result: Record<string, IRowCounts> = {};
     for (const tablename in rowCounts) {
-      result[tablename] = (await rowCounts[tablename]) || 0;
+      result[tablename] = (await rowCounts[tablename]) || {
+        entries: 0,
+        groups: 0,
+      };
     }
     res.json(result);
   } catch (error) {
