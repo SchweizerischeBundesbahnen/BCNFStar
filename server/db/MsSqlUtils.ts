@@ -8,6 +8,14 @@ import SqlUtils, {
 } from "./SqlUtils";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
@@ -90,6 +98,41 @@ export default class MsSqlUtils extends SqlUtils {
       };
     } else {
       throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  /** The "null"-check is relevant for unionability-checks. */
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `[${str}]`;
+  }
+
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result: sql.IResult<any> = await sql.query(_sql);
+    if (result.recordset[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select name from sys.types";
+    const result: sql.IResult<any> = await sql.query<{ name: string }>(_sql);
+    return result.recordset.map((record) => record.name);
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = this.testTypeCastingSql(s);
+
+    try {
+      const result: sql.IResult<any> = await sql.query(_sql);
+      if (result.recordset.length == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      return TypeCasting.forbidden;
     }
   }
 

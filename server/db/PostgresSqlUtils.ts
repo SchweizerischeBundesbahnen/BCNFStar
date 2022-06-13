@@ -9,6 +9,14 @@ import { Pool, QueryConfig, PoolConfig } from "pg";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
@@ -97,6 +105,40 @@ export default class PostgresSqlUtils extends SqlUtils {
       };
     } else {
       throw { error: "Table or schema doesn't exist" };
+    }
+  }
+
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result = await this.pool.query<{ count: number }>(_sql);
+    if (result.rows[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
+  /** The "null"-check is relevant for unionability-checks. */
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `"${str}"`;
+  }
+
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select typname from pg_type";
+    const result = await this.pool.query(_sql);
+    return result.rows.map((row) => row.typname);
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = this.testTypeCastingSql(s);
+    try {
+      const queryResult = await this.pool.query(_sql);
+      if (queryResult.rowCount == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      return TypeCasting.forbidden;
     }
   }
 
