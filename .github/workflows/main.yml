@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   test-cypress:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # Service containers to run with `test-cypress`
     services:
       # Label used to access the service container
