@@ -87,10 +87,10 @@ export default abstract class SqlUtils {
     return columns.map((c) => this.escape(c)).join(", ");
   }
 
-  /** Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int) */
   public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
     const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
-    return `
+    // Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int)
+	return `
     SELECT ${this.escape(tc.column)} FROM ${tableString} 
     EXCEPT 
     SELECT CAST(CAST(${this.escape(tc.column)} AS ${tc.targetDatatype}) AS ${
