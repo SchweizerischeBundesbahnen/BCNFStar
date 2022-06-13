@@ -1,9 +1,6 @@
 <div class="table-parent">
   <div class="loading" *ngIf="this.isLoading">
-    <sbb-loading
-      mode="large"
-      aria-valuetext="Loading, please wait"
-    ></sbb-loading>
+    <sbb-loading mode="large"></sbb-loading>
   </div>
   <sbb-table-wrapper class="table-wrapper">
     <table sbb-table [dataSource]="_dataSource">
