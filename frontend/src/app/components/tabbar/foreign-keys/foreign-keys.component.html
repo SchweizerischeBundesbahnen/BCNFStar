@@ -4,16 +4,11 @@
       >Dismissed Foreign Key</sbb-expansion-panel-header
     >
     <div
-      class="d-flex align-items-center"
+      class="d-flex align-items-center justify-content-between"
       *ngFor="let fk of schema.hiddenFksOf(table)"
     >
       <div>{{ fk.toString() }}</div>
-      <button
-        type="button"
-        class="algin-right"
-        sbb-icon-button
-        (click)="showFk.emit(fk)"
-      >
+      <button type="button" sbb-icon-button (click)="showFk.emit(fk)">
         <sbb-icon svgIcon="kom:plus-small"></sbb-icon>
       </button>
     </div>
