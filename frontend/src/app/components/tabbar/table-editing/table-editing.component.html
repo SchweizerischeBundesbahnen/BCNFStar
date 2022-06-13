@@ -38,7 +38,7 @@
   </span>
   <span>as</span>
   <div
-    class="grid-container-editing-field"
+    class="grid-container-edit-column"
     *ngIf="editingSource !== source; else sourceEditingField"
   >
     <div class="item" [sbbTooltip]="source.baseAlias">
@@ -66,7 +66,7 @@
 </ng-template>
 
 <ng-template #columnEditingField>
-  <div class="grid-container-editing-field">
+  <div class="grid-container-edit-column">
     <input
       id="rename-column-input"
       type="text"
@@ -83,7 +83,7 @@
 </ng-template>
 
 <ng-template #sourceEditingField>
-  <div class="grid-container-editing-field">
+  <div class="grid-container-edit-column">
     <input
       id="rename-source-input"
       type="text"

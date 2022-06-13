@@ -35,7 +35,7 @@ export class GraphElementComponent {
     return (
       column instanceof Column &&
       !!this.table.pk &&
-      this.table.pk!.includes(column as Column)
+      this.table.pk.includes(column as Column)
     );
   }
 
@@ -56,7 +56,7 @@ export class GraphElementComponent {
     return (
       this.table instanceof Table &&
       this.schema.starMode &&
-      this.schema.filteredRoutesFromFactTo(this.table).length > 0
+      this.schema.directDimensionableRoutes(this.table, true).length > 0
     );
   }
 }

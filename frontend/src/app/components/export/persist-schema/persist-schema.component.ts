@@ -1,6 +1,6 @@
 import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersisting';
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
-import SqlServerPersisting from '@/src/model/schema/persisting/SqlServerPersisting';
+import MsSqlPersisting from '@/src/model/schema/persisting/MsSqlPersisting';
 import Schema from '@/src/model/schema/Schema';
 import { Component, Input } from '@angular/core';
 import * as saveAs from 'file-saver';
@@ -23,7 +23,7 @@ export class PersistSchemaComponent {
     if (dbmsName == 'postgres') {
       return new PostgreSQLPersisting(this.schemaName);
     } else if (dbmsName == 'mssql') {
-      return new SqlServerPersisting(this.schemaName);
+      return new MsSqlPersisting(this.schemaName);
     }
     throw Error('Unknown Dbms-Server');
   }

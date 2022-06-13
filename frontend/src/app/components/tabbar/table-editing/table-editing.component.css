@@ -1,8 +1,3 @@
-.grid-container-editing-field {
-  display: grid;
-  grid-template-columns: auto min-content;
-}
-
 .grid-container-edit-column {
   display: grid;
   grid-template-columns: auto min-content min-content;
@@ -14,8 +9,8 @@
 }
 
 .grid-container-table-heading {
-  display: grid;
-  grid-template-columns: 90% auto;
+  display: flex;
+  justify-content: space-between;
 }
 
 input {
