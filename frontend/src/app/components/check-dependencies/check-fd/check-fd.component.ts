@@ -6,6 +6,8 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import { ViolatingFDRowsDataQuery } from '../../../dataquery';
 import { SchemaService } from '@/src/app/schema.service';
+import IRowCounts from '@server/definitions/IRowCounts';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
 @Component({
   selector: 'app-check-fd',
@@ -18,7 +20,11 @@ export class CustomFunctionalDependencySideBarComponent {
   public isLoading: boolean = false;
 
   public isValid: boolean = false;
-  constructor(public schemaService: SchemaService, public dialog: SbbDialog) {
+  constructor(
+    public schemaService: SchemaService,
+    public dialog: SbbDialog,
+    private notification: SbbNotificationToast
+  ) {
     this.schemaService.selectedTableChanged.subscribe(() => {
       this.lhs = [];
       this.rhs = [];
@@ -66,15 +72,21 @@ export class CustomFunctionalDependencySideBarComponent {
     );
 
     this.isLoading = true;
-    const rowCount: number | void = await dataQuery
+    const rowCount: IRowCounts | void = await dataQuery
       .loadRowCount()
       .catch((e) => {
         console.error(e);
-        this.isLoading = false;
       });
     this.isLoading = false;
+    if (!rowCount) {
+      this.notification.open(
+        'There was a backend error while checking this IND. Check the browser and server logs for details',
+        { type: 'error' }
+      );
+      return;
+    }
 
-    if (rowCount == 0) {
+    if (rowCount.entries == 0) {
       this.isValid = true;
       this.table.addFd(
         new FunctionalDependency(
@@ -83,6 +95,7 @@ export class CustomFunctionalDependencySideBarComponent {
         )
       );
     } else {
+      this.isValid = false;
       this.dialog.open(ViolatingRowsViewComponent, {
         data: {
           dataService: dataQuery,

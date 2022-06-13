@@ -9,7 +9,7 @@ export default async function getViolatingRows(
 ): Promise<void> {
   try {
     if (!isIRequestBodyINDViolatingRows(req.body)) {
-      res.status(400).json("Wrong request argument.");
+      res.status(422).json({ errrors: "Invalid request body" });
       return;
     }
 

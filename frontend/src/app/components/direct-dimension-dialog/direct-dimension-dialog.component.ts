@@ -19,8 +19,9 @@ export class DirectDimensionDialogComponent {
     schemaService: SchemaService,
     @Inject(SBB_DIALOG_DATA) data: { table: Table }
   ) {
-    for (const route of schemaService.schema.filteredRoutesFromFactTo(
-      data.table
+    for (const route of schemaService.schema.directDimensionableRoutes(
+      data.table,
+      true
     )) {
       this.routes.set(route, false);
     }

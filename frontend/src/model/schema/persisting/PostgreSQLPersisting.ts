@@ -17,35 +17,14 @@ export default class PostgreSQLPersisting extends SQLPersisting {
   /** The FROM-Clause is different to the MsSQl-Implementation.
    * In Postgres, you don't have to specify both tables but use the table you already specified in the UPDATE-Clause.
    */
-  public override updateSurrogateKeySql(fk: TableRelationship): string {
-    return `
-    UPDATE  ${this.tableIdentifier(fk.referencing)}
-    SET ${this.fkSurrogateKeyName(fk)} = ${this.tableIdentifier(
-      fk.referenced
-    )}.${fk.referenced.surrogateKey}
-    FROM  ${this.tableIdentifier(fk.referenced)}
-    WHERE ${fk.relationship.referencing
-      .map(
-        (c, i) =>
-          `${this.schemaWideColumnIdentifier(
-            fk.referencing,
-            c
-          )} = ${this.schemaWideColumnIdentifier(
-            fk.referenced,
-            fk.relationship.referenced[i]
-          )}`
-      )
-      .join(' AND ')};`;
+  public override updateSurrogateKeySource(fk: TableRelationship): string {
+    return this.tableIdentifier(fk.referenced);
   }
 
   /** The column is only necessary for the data transfer. We don't want to insert data later.
    * Thus, GENERATED ALWAYS options is sufficient */
   public override surrogateKeyString(name: string): string {
     return `${name} INT GENERATED ALWAYS AS IDENTITY`;
-  }
-
-  public override suffix(): string {
-    return '';
   }
 
   public escape(str: string) {

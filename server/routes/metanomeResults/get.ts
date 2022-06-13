@@ -3,9 +3,15 @@ import { Request, Response } from "express";
 import { createReadStream } from "fs";
 import { join } from "path";
 import readline from "readline";
+import { validationResult } from "express-validator";
 
 export async function getMetanomeResults(req: Request, res: Response) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(422).json({ errors: errors.mapped() });
+      return;
+    }
     await sendMetanomeResult(res, req.params.fileName);
   } catch (e) {
     console.error(e);

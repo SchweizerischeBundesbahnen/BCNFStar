@@ -63,9 +63,7 @@ export default abstract class SQLPersisting {
 
     Sql = `INSERT INTO ${this.tableIdentifier(
       table
-    )} (${this.generateColumnString(
-      table.columns.asArray()
-    )}) SELECT DISTINCT ${table.columns
+    )} ${this.transferTargetColumns(table)} SELECT DISTINCT ${table.columns
       .asArray()
       .map((col) => `${this.columnIdentifier(col)}`)
       .join(', ')} FROM ${table.sources
@@ -93,11 +91,15 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
+  public transferTargetColumns(table: Table) {
+    return `(${this.generateColumnString(table.columns.asArray())})`;
+  }
+
   public foreignKeys(schema: Schema): string {
     let Sql: string = '';
 
     for (const referencingTable of schema.tables) {
-      for (const fk of schema.fksOf(referencingTable)) {
+      for (const fk of schema.fksOf(referencingTable, true)) {
         if (fk.referenced.implementsSurrogateKey()) {
           Sql += this.addSkColumnToReferencingSql(fk);
           Sql += this.updateSurrogateKeySql(fk);
@@ -113,9 +115,9 @@ export default abstract class SQLPersisting {
 
   // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
   public addSkColumnToReferencingSql(fk: TableRelationship): string {
-    return `ALTER TABLE ${this.tableIdentifier(
-      fk.referencing
-    )} ADD ${this.fkSurrogateKeyName(fk)} INT;
+    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)} ADD ${
+      fk.referencingName
+    } INT;
     ${this.suffix()}
     `;
   }
@@ -123,13 +125,38 @@ export default abstract class SQLPersisting {
   /** Updates the FK-Column of the referencing table by joining referencing and referenced table
    * on the multi-column foreign key. Different Syntax for MsSql and Postgres.
    */
-  public abstract updateSurrogateKeySql(fk: TableRelationship): string;
+  public updateSurrogateKeySql(fk: TableRelationship): string {
+    return `
+    UPDATE ${this.tableIdentifier(fk.referencing)}
+    SET ${fk.referencingName} = ${this.tableIdentifier(fk.referenced)}.${
+      fk.referenced.surrogateKey
+    }
+    FROM ${this.updateSurrogateKeySource(fk)}
+    WHERE ${fk.relationship.referencing
+      .map(
+        (c: Column, i: number) =>
+          `${this.schemaWideColumnIdentifier(
+            fk.referencing,
+            c
+          )} = ${this.schemaWideColumnIdentifier(
+            fk.referenced,
+            fk.relationship.referenced[i]
+          )}`
+      )
+      .join(' AND ')};`;
+  }
+
+  public updateSurrogateKeySource(fk: TableRelationship): string {
+    return `${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
+      fk.referenced
+    )}`;
+  }
 
   public foreignSurrogateKeySql(fk: TableRelationship) {
     return `
     ALTER TABLE ${this.tableIdentifier(fk.referencing)}
     ADD CONSTRAINT ${this.randomFkName()}
-    FOREIGN KEY (${this.fkSurrogateKeyName(fk)})
+    FOREIGN KEY (${fk.referencingName})
     REFERENCES ${this.tableIdentifier(fk.referenced)} (${
       fk.referenced.surrogateKey
     });`;
@@ -196,15 +223,6 @@ ALTER TABLE ${this.tableIdentifier(
     )}`;
   }
 
-  /** Name of the referencing column for a surrogate key. */
-  public fkSurrogateKeyName(fk: TableRelationship): string {
-    return (
-      fk.referenced.surrogateKey +
-      '_' +
-      fk.relationship.referencing.map((col) => col.name).join('_')
-    );
-  }
-
   public abstract surrogateKeyString(name: string): string;
 
   public schemaWideColumnIdentifier(table: Table, column: Column): string {
@@ -213,5 +231,7 @@ ALTER TABLE ${this.tableIdentifier(
     )}.${this.escape(column.name)}`;
   }
 
-  public abstract suffix(): string;
+  public suffix(): string {
+    return '';
+  }
 }

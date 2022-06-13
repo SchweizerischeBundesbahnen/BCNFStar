@@ -9,6 +9,15 @@ import { Pool, QueryConfig, PoolConfig } from "pg";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -99,10 +108,44 @@ export default class PostgresSqlUtils extends SqlUtils {
     }
   }
 
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result = await this.pool.query<{ count: number }>(_sql);
+    if (result.rows[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
+  /** The "null"-check is relevant for unionability-checks. */
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `"${str}"`;
+  }
+
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select typname from pg_type";
+    const result = await this.pool.query(_sql);
+    return result.rows.map((row) => row.typname);
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = this.testTypeCastingSql(s);
+    try {
+      const queryResult = await this.pool.query(_sql);
+      if (queryResult.rowCount == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      return TypeCasting.forbidden;
+    }
+  }
+
   public async getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
       // from https://stackoverflow.com/questions/7943233/fast-way-to-discover-the-row-count-of-a-table-in-postgresql
@@ -120,7 +163,8 @@ export default class PostgresSqlUtils extends SqlUtils {
         this.pool.query(`VACUUM ${schema}.${table}`);
         queryResult = await this.pool.query(rowCountQuery);
       }
-      return queryResult.rows[0].count;
+      const count = queryResult.rows[0].count;
+      return { entries: count, groups: count };
     } else {
       throw {
         error: "Table or schema does not exist in database",
@@ -198,18 +242,18 @@ from
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<number> {
+  ): Promise<{ entries: number; groups: number }> {
     if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
       throw Error("Columns don't exist in table.");
     }
-    const count = await this.pool.query<{ count: number }>(
-      `SELECT COALESCE(SUM(Count), 0) as count FROM 
-      (
-      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+
+    const result = await this.pool.query<{ entries: number; groups: number }>(
+      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups FROM 
+      (${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
       ) AS X
       `
     );
-    return count.rows[0].count;
+    return result.rows[0];
   }
 
   public async getViolatingRowsForSuggestedIND(
@@ -261,7 +305,7 @@ from
     referencingTable: ITable,
     referencedTable: ITable,
     columnRelationships: IColumnRelationship[]
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     if (
       !this.columnsExistInTable(
         referencingTable.schemaName,
@@ -281,18 +325,16 @@ from
       throw Error("Columns don't exist in referenced.");
     }
 
-    const count = await this.pool.query<{ count: number }>(
-      `SELECT COUNT (*) as count FROM 
-      (
-        ${this.violatingRowsForSuggestedIND_SQL(
-          referencingTable,
-          referencedTable,
-          columnRelationships
-        )}
-      ) AS X
-      `
+    const count = await this.pool.query<IRowCounts>(
+      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
+      FROM ( ${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}
+      ) AS X`
     );
-    return count.rows[0].count;
+    return count.rows[0];
   }
 
   public async columnsExistInTable(
