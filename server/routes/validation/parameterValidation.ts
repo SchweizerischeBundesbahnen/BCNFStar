@@ -27,7 +27,7 @@ export function isValidDatatype(): CustomValidator {
       /^integer$/i, 
       /^datetime$/i,
     ];
-    const serverDatatypes: string[] = await sqlUtils.getDatatypes(); // those could include user defined data-types as well
+    const serverDatatypes: string[] = await sqlUtils.getDatatypes(); 
     if (
       !serverDatatypes.includes(datatype) &&
       patterns.every((pattern) => pattern.test(datatype) == false)
