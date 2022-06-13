@@ -17,7 +17,6 @@ export class ContainedSubtablesComponent {
   public pageSize = 5;
 
   constructor(public schemaService: SchemaService) {
-    this.schemaService.selectedTableChanged;
     this.schemaService.selectedTableChanged.subscribe(() => {
       this._fdClusterFilter = [];
     });

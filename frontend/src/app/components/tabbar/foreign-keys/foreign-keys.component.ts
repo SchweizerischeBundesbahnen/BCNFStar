@@ -30,10 +30,10 @@ export class ForeignKeysComponent {
     return this.indSelectionGroup?.value;
   }
 
-  public emitHighlightedInd(rel: SourceRelationship) {
+  public setHighlightedInd(rel: SourceRelationship) {
     const map = new Map<Table, ColumnCombination>();
     for (const tableRel of this.schemaService.schema
-      .indsOf(this.schemaService.selectedTable!)
+      .indsOf(this.table)
       .get(rel)!) {
       if (!map.has(tableRel.referencing)) {
         map.set(tableRel.referencing, new ColumnCombination());

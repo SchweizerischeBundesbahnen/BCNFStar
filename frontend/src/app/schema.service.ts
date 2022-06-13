@@ -59,7 +59,7 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public commandProcessor = new CommandProcessor();
+  private commandProcessor = new CommandProcessor();
 
   private _schemaChanged = new EventEmitter<void>();
   get schemaChanged() {
@@ -186,6 +186,14 @@ export class SchemaService {
   public setSurrogateKey(key: string) {
     this.selectedTable!.surrogateKey = key;
     this.notifyAboutSchemaChanges();
+  }
+
+  public canUndo() {
+    return this.commandProcessor.canUndo();
+  }
+
+  public canRedo() {
+    return this.commandProcessor.canRedo();
   }
 
   public undo() {

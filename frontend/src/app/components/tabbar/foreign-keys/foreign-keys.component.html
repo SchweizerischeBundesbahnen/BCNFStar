@@ -19,7 +19,7 @@
     <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">
       <!-- (mouseleave)="selectColumns.emit(new Map())" -->
       <sbb-radio-button
-        (mouseenter)="emitHighlightedInd(rel)"
+        (mouseenter)="setHighlightedInd(rel)"
         (mouseleave)="schemaService.highlightedColumns = undefined"
         *ngFor="let rel of inds()"
         [value]="rel"
