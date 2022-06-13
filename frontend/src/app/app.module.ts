@@ -27,6 +27,9 @@ import { UndoRedoComponent } from './components/undo-redo/undo-redo.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
+import { UnionSidebarComponent } from './components/union-sidebar/union-sidebar.component';
+import { UnionDialogComponent } from './components/union-dialog/union-dialog.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MetanomeSettingsComponent } from './components/metanome-settings/metanome-settings.component';
 import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
 import { SbbToggleModule } from '@sbb-esta/angular/toggle';
@@ -63,6 +66,8 @@ export let InjectorInstance: Injector;
     JoinDialogComponent,
     DirectDimensionDialogComponent,
     MetanomeResultsViewerComponent,
+    UnionSidebarComponent,
+    UnionDialogComponent,
     MetanomeSettingsComponent,
     CustomFunctionalDependencySideBarComponent,
     ViolatingRowsViewComponent,
@@ -95,6 +100,7 @@ export let InjectorInstance: Injector;
     SbbPaginationModule,
     SbbDialogModule,
     SbbTableModule,
+    DragDropModule,
     SbbFormFieldModule,
     SbbToggleModule,
     SbbFileSelectorModule,

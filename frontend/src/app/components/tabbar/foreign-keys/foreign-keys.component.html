@@ -6,10 +6,10 @@
     <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
       <app-sbb-option-all
         [(current)]="indFilter"
-        [available]="tablesAsArray()"
+        [available]="schema.regularTables"
       ></app-sbb-option-all>
       <sbb-option
-        *ngFor="let table of schema.tables"
+        *ngFor="let table of schema.regularTables"
         [value]="table"
         [sbbTooltip]="table.fullName"
         >{{ table.fullName }}</sbb-option
@@ -48,7 +48,7 @@
     <sbb-expansion-panel-header>Suggest Foreign Key</sbb-expansion-panel-header>
     <app-check-ind
       [referencingTable]="table"
-      [tables]="schema.tables!"
+      [tables]="schema.regularTables"
     ></app-check-ind>
   </sbb-expansion-panel>
 </sbb-accordion>

@@ -10,11 +10,10 @@ import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import SourceRelationship from './SourceRelationship';
 import { FdCluster } from '../types/FdCluster';
+import BasicTable from './BasicTable';
 import ColumnsTree from './ColumnsTree';
 
-export default class Table {
-  public name = '';
-  public schemaName = '';
+export default class Table extends BasicTable {
   public columns: ColumnCombination;
   public pk?: ColumnCombination = undefined;
   public fds: Array<FunctionalDependency> = [];
@@ -26,7 +25,7 @@ export default class Table {
 
   public surrogateKey: string = '';
   public implementsSurrogateKey(): boolean {
-    return this.surrogateKey.length > 1;
+    return this.surrogateKey.length >= 1;
   }
 
   /**
@@ -67,6 +66,7 @@ export default class Table {
   }
 
   public constructor(columns?: ColumnCombination) {
+    super();
     this.columns = columns || new ColumnCombination();
   }
 
@@ -188,13 +188,6 @@ export default class Table {
     this.sources.push(newSource);
     this.resolveSourceNameDuplicates();
     return newSource;
-  }
-
-  /**
-   * returns the name of the table in the format "{schemaName}.{tableName}"
-   */
-  public get fullName(): string {
-    return this.schemaName + '.' + this.name;
   }
 
   public get numColumns(): number {

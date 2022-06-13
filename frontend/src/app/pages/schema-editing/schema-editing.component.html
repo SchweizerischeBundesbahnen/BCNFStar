@@ -6,7 +6,7 @@
     <button
       type="button"
       sbb-button
-      (click)="onAutoNormalize(schema.tables)"
+      (click)="onAutoNormalize(schema.regularTables)"
       class="me-1"
     >
       {{ "Auto-normalize all tables" }}
@@ -49,15 +49,16 @@
       </div>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
-        *ngIf="selectedTable"
-        [table]="selectedTable"
+        *ngIf="showSidebar()"
+        [table]="selectedTableAsTable"
         [schema]="schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
         (deleteColumnEvent)="onDeleteColumn($event)"
         (selectColumns)="onSelectColumns($event)"
         (setSurrogateKey)="onSetSurrogateKey($event)"
-        (autoNormalizeSelectedTable)="onAutoNormalize(selectedTable)"
+        (autoNormalizeSelectedTable)="onAutoNormalize([selectedTableAsTable])"
+        (union)="onUnion($event)"
       ></app-schema-editing-side-bar>
       <h2 *ngIf="!selectedTable" class="table-not-selected">
         Select a table in the graph to start editing

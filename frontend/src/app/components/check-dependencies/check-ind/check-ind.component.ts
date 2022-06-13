@@ -15,7 +15,7 @@ import { ViolatingINDRowsDataQuery } from '../../../dataquery';
 })
 export class CheckIndComponent implements OnChanges {
   @Input() referencingTable!: Table;
-  @Input() tables!: Set<Table>;
+  @Input() tables!: Array<Table>;
 
   public rowCount: number = 0;
   public isLoading: boolean = false;
@@ -113,7 +113,7 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public validTables(): Array<Table> {
-    return [...this.tables].filter((table) => table.sources.length == 1);
+    return this.tables.filter((table) => table.sources.length == 1);
   }
 
   public canCheckIND(): boolean {

@@ -37,6 +37,13 @@
       (deleteColumnEvent)="deleteColumnEvent.emit($event)"
     ></app-table-editing>
   </sbb-tab>
+  <sbb-tab label="Union">
+    <app-union-sidebar
+      [schema]="this.schema"
+      [table]="this.table"
+      (union)="union.emit($event)"
+    ></app-union-sidebar>
+  </sbb-tab>
   <!-- WIP -->
   <!-- <sbb-tab label="Schema Integration">
     <h2>Choose which tables to integrate into the current schema</h2>

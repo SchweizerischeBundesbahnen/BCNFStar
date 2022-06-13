@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import Schema from '@/src/model/schema/Schema';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import BasicTable from '@/src/model/schema/BasicTable';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -35,10 +36,10 @@ enum PortSide {
 })
 export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Input() public schema!: Schema;
-  @Input() public selectedTable?: Table;
-  @Input() public selectedColumns?: Map<Table, ColumnCombination>;
+  @Input() public selectedTable?: BasicTable;
+  @Input() public selectedColumns?: Map<BasicTable, ColumnCombination>;
   @Input() public schemaChanged!: Observable<void>;
-  @Output() public selectedTableChange = new EventEmitter<Table>();
+  @Output() public selectedTableChange = new EventEmitter<BasicTable>();
   @Output() public joinFk = new EventEmitter<TableRelationship>();
   @Output() public makeDirectDimension = new EventEmitter<Table>();
 
@@ -46,7 +47,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   protected portDiameter = 22.5;
 
-  public graphStorage = new Map<Table, GraphStorageItem>();
+  public graphStorage = new Map<BasicTable, GraphStorageItem>();
 
   protected graph!: joint.dia.Graph;
   protected paper!: joint.dia.Paper;
@@ -269,7 +270,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     }" strokegit ="green" fill="white"/>`;
   }
 
-  private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
+  private generatePorts(jointjsEl: joint.dia.Element, table: BasicTable) {
     let counter = 0;
     for (let column of this.schema.displayedColumnsOf(table)) {
       let args = { counter, side: PortSide.Left };

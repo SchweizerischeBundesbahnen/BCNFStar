@@ -15,9 +15,11 @@ import BasicColumn from '../types/BasicColumn';
 import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
+import UnionedTable from './UnionedTable';
+import BasicTable from './BasicTable';
 
 export default class Schema {
-  public readonly tables = new Set<Table>();
+  public readonly tables = new Set<Table | UnionedTable>();
   public name?: string;
   private _databaseFks = new Array<SourceRelationship>();
   private _fks = new Array<SourceRelationship>();
@@ -39,18 +41,24 @@ export default class Schema {
     this.addTables(...tables);
   }
 
-  public addTables(...tables: Array<Table>) {
+  public addTables(...tables: Array<Table | UnionedTable>) {
     tables.forEach((table) => {
       this.tables.add(table);
     });
     this.relationshipsValid = false;
   }
 
-  public deleteTables(...tables: Array<Table>) {
+  public deleteTables(...tables: Array<Table | UnionedTable>) {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
     this.relationshipsValid = false;
+  }
+
+  public get regularTables(): Array<Table> {
+    return [...this.tables].filter(
+      (table) => table instanceof Table
+    ) as Array<Table>;
   }
 
   public addFks(...fks: SourceRelationship[]) {
@@ -152,10 +160,12 @@ export default class Schema {
   }
 
   private set tableIndsValid(valid: boolean) {
-    this.tables.forEach((table) => (table._indsValid = valid));
+    this.tables.forEach((table) => {
+      if (table instanceof Table) table._indsValid = valid;
+    });
   }
 
-  public isFact(table: Table): boolean {
+  public isFact(table: BasicTable): boolean {
     return this.referencesOf(table, true).length == 0;
   }
 
@@ -194,14 +204,16 @@ export default class Schema {
   }
 
   public referencesOf(
-    table: Table,
+    table: BasicTable,
     filtered: boolean
   ): Array<TableRelationship> {
+    if (!(table instanceof Table)) return [];
     if (!this._tableFksValid) this.updateFks();
     return filtered ? table._filteredReferences : table._references;
   }
 
-  public fksOf(table: Table, filtered: boolean): Array<TableRelationship> {
+  public fksOf(table: BasicTable, filtered: boolean): Array<TableRelationship> {
+    if (!(table instanceof Table)) return [];
     if (!this._tableFksValid) this.updateFks();
     return filtered ? table._filteredFks : table._fks;
   }
@@ -224,13 +236,18 @@ export default class Schema {
   }
 
   private updateFks(): void {
-    for (const table of this.tables) {
+    for (const table of this.regularTables) {
       table._fks = new Array();
       table._references = new Array();
       table._filteredFks = new Array();
       table._filteredReferences = new Array();
     }
     const currentFks = new Array<TableRelationship>();
+    for (const table of this.tables) {
+      if (!(table instanceof Table)) continue;
+      table._fks = new Array();
+      table._references = new Array();
+    }
     this.calculateFks(currentFks);
     this.calculateTrivialFks(currentFks);
     for (const fk of currentFks) {
@@ -244,14 +261,14 @@ export default class Schema {
   private calculateFks(result: Array<TableRelationship>): void {
     for (const rel of this._fks) {
       const referencings = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.tables) {
+      for (const table of this.regularTables) {
         const columns = table.columnsEquivalentTo(rel.referencing, true);
         if (columns.length > 0) referencings.set(table, columns);
       }
       if ([...referencings.keys()].length == 0) continue;
 
       const referenceds = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.tables) {
+      for (const table of this.regularTables) {
         const columns = table
           .columnsEquivalentTo(rel.referenced, false)
           .filter((possibleColumns) =>
@@ -362,8 +379,8 @@ export default class Schema {
    * This method adds these relationships to the tables.
    */
   private calculateTrivialFks(result: Array<TableRelationship>): void {
-    for (const referencingTable of this.tables) {
-      for (const referencedTable of this.tables) {
+    for (const referencingTable of this.regularTables) {
+      for (const referencedTable of this.regularTables) {
         if (referencedTable == referencingTable || !referencedTable.pk)
           continue;
         const pk = referencedTable.pk!.asArray();
@@ -395,7 +412,7 @@ export default class Schema {
     const shouldBeFiltered = this.starMode
       ? this.isStarViolatingFk
       : this.isTransitiveFk;
-    for (const table of this.tables) {
+    for (const table of this.regularTables) {
       table._filteredFks = table._fks.filter(
         (fk) => !shouldBeFiltered.apply(this, [fk])
       );
@@ -482,7 +499,7 @@ export default class Schema {
       let ccs = table.columnsEquivalentTo(rel.referencing, true);
       if (ccs.length == 0) continue;
 
-      for (const otherTable of this.tables) {
+      for (const otherTable of this.regularTables) {
         if (otherTable == table) continue;
         let otherCCs = otherTable
           .columnsEquivalentTo(rel.referenced, false)
@@ -662,18 +679,35 @@ export default class Schema {
     return resultingTables;
   }
 
-  public displayedColumnsOf(table: Table): Array<BasicColumn> {
-    const columns = new Array<BasicColumn>();
-    if (table.implementsSurrogateKey())
-      columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
-    columns.push(...table.columns);
-    for (const fk of this.fksOf(table, true))
-      if (fk.referenced.implementsSurrogateKey()) {
+  public displayedColumnsOf(table: BasicTable): Array<BasicColumn> {
+    if (table instanceof Table) {
+      const columns = new Array<BasicColumn>();
+      if (table.implementsSurrogateKey())
         columns.push({
-          name: fk.referencingName,
-          dataTypeString: 'integer',
+          name: table.surrogateKey,
+          dataType: 'integer',
+          nullable: false,
+          dataTypeString: '(integer, not null)',
         });
-      }
-    return columns;
+      columns.push(...table.columns);
+      for (const fk of this.fksOf(table, true))
+        if (fk.referenced.implementsSurrogateKey()) {
+          const name =
+            fk.referenced.surrogateKey +
+            '_' +
+            fk.relationship.referencing.map((col) => col.name).join('_');
+          columns.push({
+            name: name,
+            dataType: 'integer',
+            nullable: false,
+            dataTypeString: '(integer, not null)',
+          });
+        }
+      return columns;
+    } else if (table instanceof UnionedTable) {
+      return table.displayedColumns();
+    } else {
+      throw Error;
+    }
   }
 }

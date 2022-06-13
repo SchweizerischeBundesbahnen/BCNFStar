@@ -3,6 +3,9 @@ import Column from '../Column';
 import Schema from '../Schema';
 import SourceTable from '../SourceTable';
 import Table from '../Table';
+import BasicTable from '../BasicTable';
+import UnionedTable from '../UnionedTable';
+import BasicColumn from '../../types/BasicColumn';
 
 export default abstract class SQLPersisting {
   public constructor(protected schemaName: string) {}
@@ -14,14 +17,14 @@ export default abstract class SQLPersisting {
     SQL += this.schemaPreparation(schema);
     SQL += this.tableCreation([...schema.tables]);
     SQL += this.dataTransfer([...schema.tables]);
-    SQL += this.primaryKeys([...schema.tables]);
+    SQL += this.primaryKeys([...schema.regularTables]);
     SQL += this.foreignKeys(schema);
     return SQL;
   }
 
   public abstract schemaPreparation(schema: Schema): string;
 
-  public tableCreation(tables: Array<Table>): string {
+  public tableCreation(tables: Array<BasicTable>): string {
     let Sql: string = '';
     for (const table of tables) {
       Sql += this.createTableSql(table) + '\n';
@@ -29,16 +32,23 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
-  public createTableSql(table: Table): string {
+  public createTableSql(table: BasicTable): string {
     let columnStrings: string[] = [];
 
-    if (table.implementsSurrogateKey()) {
-      columnStrings.push(this.surrogateKeyString(table.surrogateKey));
+    let columns: Array<BasicColumn> = [];
+
+    if (table instanceof Table) {
+      if (table.implementsSurrogateKey()) {
+        columnStrings.push(this.surrogateKeyString(table.surrogateKey));
+      }
+      columns = Array.from(table.columns);
+    } else if (table instanceof UnionedTable) {
+      columns = table.displayedColumns();
     }
 
-    for (const column of table.columns) {
+    for (const column of columns) {
       let columnString: string = `${column.name} ${column.dataType} `;
-      if (table.pk?.includes(column) || !column.nullable) {
+      if (!column.nullable) {
         columnString += 'NOT ';
       }
       columnString += 'NULL';
@@ -50,7 +60,7 @@ export default abstract class SQLPersisting {
     )});`;
   }
 
-  public dataTransfer(tables: Array<Table>): string {
+  public dataTransfer(tables: Array<Table | UnionedTable>): string {
     let Sql: string = '';
     for (const table of tables) {
       Sql += this.dataTransferSql(table) + '\n';
@@ -58,13 +68,37 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
-  public dataTransferSql(table: Table): string {
+  public dataTransferSql(table: Table | UnionedTable): string {
     let Sql = '';
+
+    let columns: Column[] = [];
+    if (table instanceof UnionedTable) {
+      columns = table.displayedColumns();
+    } else {
+      columns = table.columns.asArray();
+    }
 
     Sql = `INSERT INTO ${this.tableIdentifier(
       table
-    )} ${this.transferTargetColumns(table)} SELECT DISTINCT ${table.columns
-      .asArray()
+    )} (${this.generateColumnString(columns)}) `;
+
+    if (table instanceof UnionedTable) {
+      Sql += 'SELECT * FROM (';
+      Sql += this.selectStatement(table.tables[0], table.columns[0]);
+      Sql += '\n UNION \n';
+      Sql += this.selectStatement(table.tables[1], table.columns[1]);
+      Sql += ') as X';
+    } else {
+      Sql += this.selectStatement(table, table.columns.asArray());
+    }
+
+    Sql += ';';
+    return Sql;
+  }
+
+  public selectStatement(table: Table, columns: Array<Column | null>) {
+    let Sql = '';
+    Sql += `SELECT DISTINCT ${columns
       .map((col) => `${this.columnIdentifier(col)}`)
       .join(', ')} FROM ${table.sources
       .map((source) => {
@@ -87,12 +121,7 @@ export default abstract class SQLPersisting {
             .join(' AND ')
         )
         .join(' AND ')}`;
-    Sql += ';';
     return Sql;
-  }
-
-  public transferTargetColumns(table: Table) {
-    return `(${this.generateColumnString(table.columns.asArray())})`;
   }
 
   public foreignKeys(schema: Schema): string {
@@ -209,7 +238,7 @@ ALTER TABLE ${this.tableIdentifier(
   /** Returns the Identifier of the persisted-table
    * For example: If you want to update the Surrogate-Key columns, you want to reference the already created tables.
    */
-  public tableIdentifier(table: Table): string {
+  public tableIdentifier(table: BasicTable): string {
     return `${this.escape(this.schemaName)}.${this.escape(table.name)}`;
   }
 
@@ -217,7 +246,8 @@ ALTER TABLE ${this.tableIdentifier(
     return `${this.escape(table.schemaName)}.${this.escape(table.name)}`;
   }
 
-  public columnIdentifier(column: Column): string {
+  public columnIdentifier(column: Column | null): string {
+    if (column == null) return ' null ';
     return `${this.escape(column.sourceTableInstance.alias)}.${this.escape(
       column.sourceColumn.name
     )}`;
