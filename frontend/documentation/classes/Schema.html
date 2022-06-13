@@ -1,0 +1,4242 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>bcnfstar-frontend documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">bcnfstar-frontend documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content class">
+                   <div class="content-data">
+
+
+
+
+
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Classes</li>
+  <li >Schema</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/model/schema/Schema.ts</code>
+        </p>
+
+
+
+
+
+
+            <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_databaseFks" >_databaseFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_fds" >_fds</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_fks" >_fks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_inds" >_inds</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_starMode" >_starMode</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_tableFksValid" >_tableFksValid</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Optional</span>
+                                <a href="#name" >name</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Readonly</span>
+                                <a href="#tables" >tables</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#addCurrentFkAndDerive" >addCurrentFkAndDerive</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#addFd" >addFd</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#addFkAndDerive" >addFkAndDerive</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#addFks" >addFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#addInds" >addInds</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#addTables" >addTables</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#autoNormalize" >autoNormalize</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#basicAddCurrentFk" >basicAddCurrentFk</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#basicAddFk" >basicAddFk</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#calculateFdsOf" >calculateFdsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#calculateFks" >calculateFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#calculateIndsOf" >calculateIndsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#calculateTrivialFks" >calculateTrivialFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#deleteFk" >deleteFk</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#deleteTables" >deleteTables</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#deriveFks" >deriveFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#directDimensionableRoutes" >directDimensionableRoutes</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#displayedColumnsOf" >displayedColumnsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#fdSplitFKViolationsOf" >fdSplitFKViolationsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#fdSplitPKViolationOf" >fdSplitPKViolationOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#fdSplitReferenceViolationsOf" >fdSplitReferenceViolationsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#filterFks" >filterFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#fksOf" >fksOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#indsOf" >indsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#isFact" >isFact</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#isFdSplittable" >isFdSplittable</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#isRelationshipValid" >isRelationshipValid</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#isStarViolatingFk" >isStarViolatingFk</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#isTransitiveFk" >isTransitiveFk</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#matchSourceRelationships" >matchSourceRelationships</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#referencesOf" >referencesOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#routesFromFactTo" >routesFromFactTo</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#sourceColumnSubset" >sourceColumnSubset</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#splittableFdsOf" >splittableFdsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#toJSON" >toJSON</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#updateFks" >updateFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#updateIndsOf" >updateIndsOf</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <h6><b>Accessors</b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <ul class="index-list">
+                                <li>
+                                    <a href="#starMode" >starMode</a>
+                                </li>
+                                <li>
+                                    <a href="#relationshipsValid" >relationshipsValid</a>
+                                </li>
+                                <li>
+                                    <a href="#tableIndsValid" >tableIndsValid</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+        </tbody>
+    </table>
+</section>
+
+            <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                                <span class="modifier">Public</span>
+                        <code>constructor(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="36" class="link-to-prism">src/model/schema/Schema.ts:36</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>tables</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section>
+    
+    <h3 id="inputs">
+        Properties
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_databaseFks"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_databaseFks</b></span>
+                        <a href="#_databaseFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Array&lt;SourceRelationship&gt;()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="22" class="link-to-prism">src/model/schema/Schema.ts:22</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_fds"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_fds</b></span>
+                        <a href="#_fds"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Map&lt;SourceTable, Array&lt;SourceFunctionalDependency&gt;&gt;()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/model/schema/Schema.ts:25</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_fks"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_fks</b></span>
+                        <a href="#_fks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Array&lt;SourceRelationship&gt;()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="23" class="link-to-prism">src/model/schema/Schema.ts:23</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_inds"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_inds</b></span>
+                        <a href="#_inds"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Array&lt;SourceRelationship&gt;()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="24" class="link-to-prism">src/model/schema/Schema.ts:24</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_starMode"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_starMode</b></span>
+                        <a href="#_starMode"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>false</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/model/schema/Schema.ts:27</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_tableFksValid"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_tableFksValid</b></span>
+                        <a href="#_tableFksValid"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>false</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/model/schema/Schema.ts:26</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="name"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Optional</span>
+                        <span ><b>name</b></span>
+                        <a href="#name"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="21" class="link-to-prism">src/model/schema/Schema.ts:21</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="tables"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Readonly</span>
+                        <span ><b>tables</b></span>
+                        <a href="#tables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Set&lt;Table&gt;()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/model/schema/Schema.ts:20</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addCurrentFkAndDerive"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>addCurrentFkAndDerive</b></span>
+                        <a href="#addCurrentFkAndDerive"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addCurrentFkAndDerive(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>, result: Array<TableRelationship>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="280"
+                            class="link-to-prism">src/model/schema/Schema.ts:280</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>result</td>
+                                    <td>
+                                            <code>Array&lt;TableRelationship&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addFd"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>addFd</b></span>
+                        <a href="#addFd"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addFd(fd: <a href="../classes/SourceFunctionalDependency.html" target="_self">SourceFunctionalDependency</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="133"
+                            class="link-to-prism">src/model/schema/Schema.ts:133</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fd</td>
+                                    <td>
+                                                <code><a href="../classes/SourceFunctionalDependency.html" target="_self" >SourceFunctionalDependency</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addFkAndDerive"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>addFkAndDerive</b></span>
+                        <a href="#addFkAndDerive"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addFkAndDerive(fk: <a href="../classes/SourceRelationship.html" target="_self">SourceRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="67"
+                            class="link-to-prism">src/model/schema/Schema.ts:67</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/SourceRelationship.html" target="_self" >SourceRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addFks"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>addFks</b></span>
+                        <a href="#addFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addFks(...fks: SourceRelationship[])</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="56"
+                            class="link-to-prism">src/model/schema/Schema.ts:56</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fks</td>
+                                    <td>
+                                            <code>SourceRelationship[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addInds"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>addInds</b></span>
+                        <a href="#addInds"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addInds(...inds: SourceRelationship[])</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="128"
+                            class="link-to-prism">src/model/schema/Schema.ts:128</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>inds</td>
+                                    <td>
+                                            <code>SourceRelationship[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addTables"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>addTables</b></span>
+                        <a href="#addTables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addTables(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="42"
+                            class="link-to-prism">src/model/schema/Schema.ts:42</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>tables</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="autoNormalize"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>autoNormalize</b></span>
+                        <a href="#autoNormalize"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>autoNormalize(table: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="645"
+                            class="link-to-prism">src/model/schema/Schema.ts:645</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="basicAddCurrentFk"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>basicAddCurrentFk</b></span>
+                        <a href="#basicAddCurrentFk"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>basicAddCurrentFk(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>, result: Array<TableRelationship>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="339"
+                            class="link-to-prism">src/model/schema/Schema.ts:339</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>result</td>
+                                    <td>
+                                            <code>Array&lt;TableRelationship&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="basicAddFk"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>basicAddFk</b></span>
+                        <a href="#basicAddFk"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>basicAddFk(fk: <a href="../classes/SourceRelationship.html" target="_self">SourceRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="103"
+                            class="link-to-prism">src/model/schema/Schema.ts:103</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/SourceRelationship.html" target="_self" >SourceRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="calculateFdsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>calculateFdsOf</b></span>
+                        <a href="#calculateFdsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>calculateFdsOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="512"
+                            class="link-to-prism">src/model/schema/Schema.ts:512</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="calculateFks"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>calculateFks</b></span>
+                        <a href="#calculateFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>calculateFks(result: Array<TableRelationship>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="244"
+                            class="link-to-prism">src/model/schema/Schema.ts:244</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>result</td>
+                                    <td>
+                                            <code>Array&lt;TableRelationship&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="calculateIndsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>calculateIndsOf</b></span>
+                        <a href="#calculateIndsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>calculateIndsOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="454"
+                            class="link-to-prism">src/model/schema/Schema.ts:454</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Fills table._inds with all inds where table is referencing,
+except for the ones that are already foreign keys</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="calculateTrivialFks"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>calculateTrivialFks</b></span>
+                        <a href="#calculateTrivialFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>calculateTrivialFks(result: Array<TableRelationship>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="364"
+                            class="link-to-prism">src/model/schema/Schema.ts:364</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>A table which has the same columns as another tables pk has a relationship with this table.
+This method adds these relationships to the tables.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>result</td>
+                                    <td>
+                                            <code>Array&lt;TableRelationship&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="deleteFk"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>deleteFk</b></span>
+                        <a href="#deleteFk"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>deleteFk(fk: <a href="../classes/SourceRelationship.html" target="_self">SourceRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="122"
+                            class="link-to-prism">src/model/schema/Schema.ts:122</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/SourceRelationship.html" target="_self" >SourceRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="deleteTables"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>deleteTables</b></span>
+                        <a href="#deleteTables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>deleteTables(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="49"
+                            class="link-to-prism">src/model/schema/Schema.ts:49</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>tables</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="deriveFks"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>deriveFks</b></span>
+                        <a href="#deriveFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>deriveFks()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="62"
+                            class="link-to-prism">src/model/schema/Schema.ts:62</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="directDimensionableRoutes"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>directDimensionableRoutes</b></span>
+                        <a href="#directDimensionableRoutes"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>directDimensionableRoutes(table: <a href="../classes/Table.html" target="_self">Table</a>, filteredFks: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="167"
+                            class="link-to-prism">src/model/schema/Schema.ts:167</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
+or routes that would add no extra information to the fact table when joined completely</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>filteredFks</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>whether or not to use filteredFks as a basis for route calculation</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;Array&lt;TableRelationship&gt;&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="displayedColumnsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>displayedColumnsOf</b></span>
+                        <a href="#displayedColumnsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>displayedColumnsOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="665"
+                            class="link-to-prism">src/model/schema/Schema.ts:665</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="../interfaces/BasicColumn.html" target="_self" >Array&lt;BasicColumn&gt;</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="fdSplitFKViolationsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>fdSplitFKViolationsOf</b></span>
+                        <a href="#fdSplitFKViolationsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>fdSplitFKViolationsOf(fd: <a href="../classes/FunctionalDependency.html" target="_self">FunctionalDependency</a>, table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="611"
+                            class="link-to-prism">src/model/schema/Schema.ts:611</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fd</td>
+                                    <td>
+                                                <code><a href="../classes/FunctionalDependency.html" target="_self" >FunctionalDependency</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;TableRelationship&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="fdSplitPKViolationOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>fdSplitPKViolationOf</b></span>
+                        <a href="#fdSplitPKViolationOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>fdSplitPKViolationOf(fd: <a href="../classes/FunctionalDependency.html" target="_self">FunctionalDependency</a>, table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="607"
+                            class="link-to-prism">src/model/schema/Schema.ts:607</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fd</td>
+                                    <td>
+                                                <code><a href="../classes/FunctionalDependency.html" target="_self" >FunctionalDependency</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="fdSplitReferenceViolationsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>fdSplitReferenceViolationsOf</b></span>
+                        <a href="#fdSplitReferenceViolationsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>fdSplitReferenceViolationsOf(fd: <a href="../classes/FunctionalDependency.html" target="_self">FunctionalDependency</a>, table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="624"
+                            class="link-to-prism">src/model/schema/Schema.ts:624</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fd</td>
+                                    <td>
+                                                <code><a href="../classes/FunctionalDependency.html" target="_self" >FunctionalDependency</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;TableRelationship&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="filterFks"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>filterFks</b></span>
+                        <a href="#filterFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>filterFks()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="394"
+                            class="link-to-prism">src/model/schema/Schema.ts:394</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="fksOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>fksOf</b></span>
+                        <a href="#fksOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>fksOf(table: <a href="../classes/Table.html" target="_self">Table</a>, filtered: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="204"
+                            class="link-to-prism">src/model/schema/Schema.ts:204</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>filtered</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;TableRelationship&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="indsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>indsOf</b></span>
+                        <a href="#indsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>indsOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="214"
+                            class="link-to-prism">src/model/schema/Schema.ts:214</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Returns the inds from the given table to other tables. The inds are contained inside a map
+to keep the information which source-ind caused which concrete inds to appear in the current
+state of the schema.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Map&lt;SourceRelationship, Array&lt;TableRelationship&gt;&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isFact"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>isFact</b></span>
+                        <a href="#isFact"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isFact(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="158"
+                            class="link-to-prism">src/model/schema/Schema.ts:158</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isFdSplittable"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>isFdSplittable</b></span>
+                        <a href="#isFdSplittable"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isFdSplittable(fd: <a href="../classes/FunctionalDependency.html" target="_self">FunctionalDependency</a>, table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="637"
+                            class="link-to-prism">src/model/schema/Schema.ts:637</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fd</td>
+                                    <td>
+                                                <code><a href="../classes/FunctionalDependency.html" target="_self" >FunctionalDependency</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isRelationshipValid"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>isRelationshipValid</b></span>
+                        <a href="#isRelationshipValid"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isRelationshipValid(relationship: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="351"
+                            class="link-to-prism">src/model/schema/Schema.ts:351</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>relationship</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isStarViolatingFk"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>isStarViolatingFk</b></span>
+                        <a href="#isStarViolatingFk"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isStarViolatingFk(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="443"
+                            class="link-to-prism">src/model/schema/Schema.ts:443</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isTransitiveFk"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>isTransitiveFk</b></span>
+                        <a href="#isTransitiveFk"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isTransitiveFk(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>, visitedTables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>, firstIteration: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="408"
+                            class="link-to-prism">src/model/schema/Schema.ts:408</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Default value</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>visitedTables</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>[]</code>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>firstIteration</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>true</code>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="matchSourceRelationships"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>matchSourceRelationships</b></span>
+                        <a href="#matchSourceRelationships"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>matchSourceRelationships(table: <a href="../classes/Table.html" target="_self">Table</a>, relationships: Array<SourceRelationship>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="476"
+                            class="link-to-prism">src/model/schema/Schema.ts:476</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Finds all valid relationships in the current state of the schema in which the parameter table
+is referencing some other table. Uses a list of relationships that apply to the datasource</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>relationships</td>
+                                    <td>
+                                            <code>Array&lt;SourceRelationship&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Map&lt;SourceRelationship, Array&lt;TableRelationship&gt;&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="referencesOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>referencesOf</b></span>
+                        <a href="#referencesOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>referencesOf(table: <a href="../classes/Table.html" target="_self">Table</a>, filtered: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="196"
+                            class="link-to-prism">src/model/schema/Schema.ts:196</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>filtered</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;TableRelationship&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="routesFromFactTo"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>routesFromFactTo</b></span>
+                        <a href="#routesFromFactTo"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>routesFromFactTo(table: <a href="../classes/Table.html" target="_self">Table</a>, filteredFks: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="182"
+                            class="link-to-prism">src/model/schema/Schema.ts:182</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>filteredFks</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>whether or not to use filteredFks as a basis for route calculation</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;Array&lt;TableRelationship&gt;&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>all routes (in the form of an array of TableRelationships) from a fact table to this table</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="sourceColumnSubset"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>sourceColumnSubset</b></span>
+                        <a href="#sourceColumnSubset"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>sourceColumnSubset(subset: Array<SourceColumn>, superset: Array<SourceColumn>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="111"
+                            class="link-to-prism">src/model/schema/Schema.ts:111</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>subset</td>
+                                    <td>
+                                            <code>Array&lt;SourceColumn&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>superset</td>
+                                    <td>
+                                            <code>Array&lt;SourceColumn&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="splittableFdsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>splittableFdsOf</b></span>
+                        <a href="#splittableFdsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>splittableFdsOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="603"
+                            class="link-to-prism">src/model/schema/Schema.ts:603</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="../classes/FunctionalDependency.html" target="_self" >Array&lt;FunctionalDependency&gt;</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="toJSON"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>toJSON</b></span>
+                        <a href="#toJSON"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>toJSON()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="29"
+                            class="link-to-prism">src/model/schema/Schema.ts:29</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{ tables: any; _fks: any; _inds: any; _fds: any; }</code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateFks"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>updateFks</b></span>
+                        <a href="#updateFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>updateFks()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="226"
+                            class="link-to-prism">src/model/schema/Schema.ts:226</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateIndsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>updateIndsOf</b></span>
+                        <a href="#updateIndsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>updateIndsOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="221"
+                            class="link-to-prism">src/model/schema/Schema.ts:221</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+
+
+
+
+            <section>
+    <h3 id="accessors">
+        Accessors
+    </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="starMode"></a>
+                        <span class="name"><b>starMode</b><a href="#starMode"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>starMode()</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="140" class="link-to-prism">src/model/schema/Schema.ts:140</a></div>
+                                </td>
+                            </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>set</b><code>starMode(value: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="144" class="link-to-prism">src/model/schema/Schema.ts:144</a></div>
+                                </td>
+                            </tr>
+                    <tr>
+                        <td class="col-md-4">
+
+                                <div class="io-description">
+                                        <b>Parameters :</b>
+                                        <table class="params">
+                                            <thead>
+                                                <tr>
+                                                    <td>Name</td>
+                                                        <td>Type</td>
+                                                    <td>Optional</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                    <tr>
+                                                            <td>value</td>
+                                                    
+                                                            <td>
+                                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                                            </td>
+                                                    
+                                                        <td>
+                                                                No
+                                                        </td>
+                                                        
+                                                    </tr>
+                                            </tbody>
+                                        </table>
+                                </div>
+                                <div>
+                                </div>
+                                <div class="io-description">
+                                    <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                                </div>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="relationshipsValid"></a>
+                        <span class="name"><b>relationshipsValid</b><a href="#relationshipsValid"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>set</b><code>relationshipsValid(valid: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="149" class="link-to-prism">src/model/schema/Schema.ts:149</a></div>
+                                </td>
+                            </tr>
+                    <tr>
+                        <td class="col-md-4">
+
+                                <div class="io-description">
+                                        <b>Parameters :</b>
+                                        <table class="params">
+                                            <thead>
+                                                <tr>
+                                                    <td>Name</td>
+                                                        <td>Type</td>
+                                                    <td>Optional</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                    <tr>
+                                                            <td>valid</td>
+                                                    
+                                                            <td>
+                                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                                            </td>
+                                                    
+                                                        <td>
+                                                                No
+                                                        </td>
+                                                        
+                                                    </tr>
+                                            </tbody>
+                                        </table>
+                                </div>
+                                <div>
+                                </div>
+                                <div class="io-description">
+                                    <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                                </div>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="tableIndsValid"></a>
+                        <span class="name"><b>tableIndsValid</b><a href="#tableIndsValid"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>set</b><code>tableIndsValid(valid: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="154" class="link-to-prism">src/model/schema/Schema.ts:154</a></div>
+                                </td>
+                            </tr>
+                    <tr>
+                        <td class="col-md-4">
+
+                                <div class="io-description">
+                                        <b>Parameters :</b>
+                                        <table class="params">
+                                            <thead>
+                                                <tr>
+                                                    <td>Name</td>
+                                                        <td>Type</td>
+                                                    <td>Optional</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                    <tr>
+                                                            <td>valid</td>
+                                                    
+                                                            <td>
+                                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                                            </td>
+                                                    
+                                                        <td>
+                                                                No
+                                                        </td>
+                                                        
+                                                    </tr>
+                                            </tbody>
+                                        </table>
+                                </div>
+                                <div>
+                                </div>
+                                <div class="io-description">
+                                    <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                                </div>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+</section>
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import TableRelationship from &#x27;./TableRelationship&#x27;;
+import SplitCommand from &#x27;../commands/SplitCommand&#x27;;
+import FunctionalDependency from &#x27;./FunctionalDependency&#x27;;
+import IndScore from &#x27;./methodObjects/IndScore&#x27;;
+import Relationship from &#x27;./Relationship&#x27;;
+import SourceRelationship from &#x27;./SourceRelationship&#x27;;
+import Table from &#x27;./Table&#x27;;
+import ColumnCombination from &#x27;./ColumnCombination&#x27;;
+import SourceFunctionalDependency from &#x27;./SourceFunctionalDependency&#x27;;
+import SourceTable from &#x27;./SourceTable&#x27;;
+import SourceTableInstance from &#x27;./SourceTableInstance&#x27;;
+import Column from &#x27;./Column&#x27;;
+import Join from &#x27;./methodObjects/Join&#x27;;
+import BasicColumn from &#x27;../types/BasicColumn&#x27;;
+import ColumnsTree from &#x27;./ColumnsTree&#x27;;
+import DirectDimension from &#x27;./methodObjects/DirectDimension&#x27;;
+import SourceColumn from &#x27;./SourceColumn&#x27;;
+
+export default class Schema {
+  public readonly tables &#x3D; new Set&lt;Table&gt;();
+  public name?: string;
+  private _databaseFks &#x3D; new Array&lt;SourceRelationship&gt;();
+  private _fks &#x3D; new Array&lt;SourceRelationship&gt;();
+  private _inds &#x3D; new Array&lt;SourceRelationship&gt;();
+  private _fds &#x3D; new Map&lt;SourceTable, Array&lt;SourceFunctionalDependency&gt;&gt;();
+  private _tableFksValid &#x3D; false;
+  private _starMode &#x3D; false;
+
+  public toJSON() {
+    return {
+      tables: Array.from(this.tables),
+      _fks: Array.from(this._databaseFks),
+      _inds: Array.from(this._inds),
+      _fds: [...this._fds.values()].flat(),
+    };
+  }
+
+  public constructor(...tables: Array&lt;Table&gt;) {
+    this.addTables(...tables);
+  }
+
+  public addTables(...tables: Array&lt;Table&gt;) {
+    tables.forEach((table) &#x3D;&gt; {
+      this.tables.add(table);
+    });
+    this.relationshipsValid &#x3D; false;
+  }
+
+  public deleteTables(...tables: Array&lt;Table&gt;) {
+    tables.forEach((table) &#x3D;&gt; {
+      this.tables.delete(table);
+    });
+    this.relationshipsValid &#x3D; false;
+  }
+
+  public addFks(...fks: SourceRelationship[]) {
+    this._databaseFks.push(...fks);
+    this.deriveFks();
+    this.relationshipsValid &#x3D; false;
+  }
+
+  private deriveFks() {
+    this._fks &#x3D; new Array();
+    for (const fk of this._databaseFks) this.addFkAndDerive(fk);
+  }
+
+  private addFkAndDerive(fk: SourceRelationship) {
+    if (!this.basicAddFk(fk)) return;
+    const fksToReferencing &#x3D; this._fks.filter(
+      (otherFk) &#x3D;&gt;
+        otherFk &#x3D;&#x3D; fk ||
+        this.sourceColumnSubset(fk.referencing, otherFk.referenced)
+    );
+    const fksFromReferenced &#x3D; this._fks.filter(
+      (otherFk) &#x3D;&gt;
+        otherFk &#x3D;&#x3D; fk ||
+        this.sourceColumnSubset(otherFk.referencing, fk.referenced)
+    );
+    for (const fkToReferencing of fksToReferencing) {
+      for (const fkFromReferenced of fksFromReferenced) {
+        if (fkToReferencing &#x3D;&#x3D; fkFromReferenced) continue;
+        const newRelReferencing &#x3D; new Array();
+        for (const referencedCol of fkFromReferenced.referencing) {
+          const i &#x3D; fkToReferencing.referenced.findIndex((referencingCol) &#x3D;&gt; {
+            if (fkToReferencing &#x3D;&#x3D; fk || fkFromReferenced &#x3D;&#x3D; fk)
+              return referencingCol.equals(referencedCol);
+            else return fk.sourceColumnsMapped(referencingCol, referencedCol);
+          });
+          if (i &#x3D;&#x3D; -1) break;
+          newRelReferencing.push(fkToReferencing.referencing[i]);
+        }
+        if (newRelReferencing.length &#x3D;&#x3D; fkFromReferenced.referenced.length)
+          this.basicAddFk(
+            new SourceRelationship(
+              newRelReferencing,
+              Array.from(fkFromReferenced.referenced)
+            )
+          );
+      }
+    }
+  }
+
+  private basicAddFk(fk: SourceRelationship): boolean {
+    if (!this._fks.some((existingFk) &#x3D;&gt; existingFk.equals(fk))) {
+      this._fks.push(fk);
+      return true;
+    }
+    return false;
+  }
+
+  private sourceColumnSubset(
+    subset: Array&lt;SourceColumn&gt;,
+    superset: Array&lt;SourceColumn&gt;
+  ): boolean {
+    for (const subsetCol of subset) {
+      if (!superset.some((supersetCol) &#x3D;&gt; supersetCol.equals(subsetCol)))
+        return false;
+    }
+    return true;
+  }
+
+  public deleteFk(fk: SourceRelationship) {
+    this._databaseFks &#x3D; this._databaseFks.filter((fk1) &#x3D;&gt; fk1 !&#x3D; fk);
+    this.deriveFks();
+    this.relationshipsValid &#x3D; false;
+  }
+
+  public addInds(...inds: SourceRelationship[]) {
+    this._inds.push(...inds);
+    this.tableIndsValid &#x3D; false;
+  }
+
+  public addFd(fd: SourceFunctionalDependency) {
+    if (!this._fds.has(fd.rhs[0].table)) {
+      this._fds.set(fd.rhs[0].table, new Array());
+    }
+    this._fds.get(fd.rhs[0].table)!.push(fd);
+  }
+
+  public get starMode(): boolean {
+    return this._starMode;
+  }
+
+  public set starMode(value: boolean) {
+    this._starMode &#x3D; value;
+    this._tableFksValid &#x3D; false;
+  }
+
+  private set relationshipsValid(valid: boolean) {
+    this._tableFksValid &#x3D; valid;
+    this.tableIndsValid &#x3D; valid;
+  }
+
+  private set tableIndsValid(valid: boolean) {
+    this.tables.forEach((table) &#x3D;&gt; (table._indsValid &#x3D; valid));
+  }
+
+  public isFact(table: Table): boolean {
+    return this.referencesOf(table, true).length &#x3D;&#x3D; 0;
+  }
+
+  /**
+   * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
+   * or routes that would add no extra information to the fact table when joined completely
+   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
+   */
+  public directDimensionableRoutes(
+    table: Table,
+    filteredFks: boolean
+  ): Array&lt;Array&lt;TableRelationship&gt;&gt; {
+    return this.routesFromFactTo(table, filteredFks).filter((route) &#x3D;&gt; {
+      if (route.length &lt;&#x3D; 1) return false;
+      const dd &#x3D; new DirectDimension([route]);
+      return dd.newTable.columns.cardinality &gt; dd.oldTable.columns.cardinality;
+    });
+  }
+
+  /**
+   * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
+   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
+   */
+  public routesFromFactTo(
+    table: Table,
+    filteredFks: boolean
+  ): Array&lt;Array&lt;TableRelationship&gt;&gt; {
+    const result &#x3D; new Array&lt;Array&lt;TableRelationship&gt;&gt;();
+    for (const rel of this.referencesOf(table, filteredFks)) {
+      const routes &#x3D; this.routesFromFactTo(rel.referencing, filteredFks);
+      routes.forEach((route) &#x3D;&gt; route.push(rel));
+      result.push(...routes);
+    }
+    if (result.length &#x3D;&#x3D; 0) result.push(new Array&lt;TableRelationship&gt;());
+    return result;
+  }
+
+  public referencesOf(
+    table: Table,
+    filtered: boolean
+  ): Array&lt;TableRelationship&gt; {
+    if (!this._tableFksValid) this.updateFks();
+    return filtered ? table._filteredReferences : table._references;
+  }
+
+  public fksOf(table: Table, filtered: boolean): Array&lt;TableRelationship&gt; {
+    if (!this._tableFksValid) this.updateFks();
+    return filtered ? table._filteredFks : table._fks;
+  }
+
+  /**
+   * Returns the inds from the given table to other tables. The inds are contained inside a map
+   * to keep the information which source-ind caused which concrete inds to appear in the current
+   * state of the schema.
+   */
+  public indsOf(
+    table: Table
+  ): Map&lt;SourceRelationship, Array&lt;TableRelationship&gt;&gt; {
+    if (!table._indsValid) this.updateIndsOf(table);
+    return table._inds;
+  }
+
+  private updateIndsOf(table: Table): void {
+    this.calculateIndsOf(table);
+    table._indsValid &#x3D; true;
+  }
+
+  private updateFks(): void {
+    for (const table of this.tables) {
+      table._fks &#x3D; new Array();
+      table._references &#x3D; new Array();
+      table._filteredFks &#x3D; new Array();
+      table._filteredReferences &#x3D; new Array();
+    }
+    const currentFks &#x3D; new Array&lt;TableRelationship&gt;();
+    this.calculateFks(currentFks);
+    this.calculateTrivialFks(currentFks);
+    for (const fk of currentFks) {
+      fk.referencing._fks.push(fk);
+      fk.referenced._references.push(fk);
+    }
+    this._tableFksValid &#x3D; true;
+    this.filterFks();
+  }
+
+  private calculateFks(result: Array&lt;TableRelationship&gt;): void {
+    for (const rel of this._fks) {
+      const referencings &#x3D; new Map&lt;Table, Array&lt;Array&lt;Column&gt;&gt;&gt;();
+      for (const table of this.tables) {
+        const columns &#x3D; table.columnsEquivalentTo(rel.referencing, true);
+        if (columns.length &gt; 0) referencings.set(table, columns);
+      }
+      if ([...referencings.keys()].length &#x3D;&#x3D; 0) continue;
+
+      const referenceds &#x3D; new Map&lt;Table, Array&lt;Array&lt;Column&gt;&gt;&gt;();
+      for (const table of this.tables) {
+        const columns &#x3D; table
+          .columnsEquivalentTo(rel.referenced, false)
+          .filter((possibleColumns) &#x3D;&gt;
+            table.isKey(new ColumnCombination(possibleColumns))
+          );
+        if (columns.length &gt; 0) referenceds.set(table, columns);
+      }
+
+      for (const referencedTable of referenceds.keys())
+        for (const referencedColumns of referenceds.get(referencedTable)!)
+          for (const referencingTable of referencings.keys())
+            for (const referencingColumns of referencings.get(
+              referencingTable
+            )!) {
+              const relationship &#x3D; new TableRelationship(
+                new Relationship(referencingColumns, referencedColumns),
+                referencingTable,
+                referencedTable
+              );
+              if (this.isRelationshipValid(relationship))
+                this.addCurrentFkAndDerive(relationship, result);
+            }
+    }
+  }
+
+  private addCurrentFkAndDerive(
+    fk: TableRelationship,
+    result: Array&lt;TableRelationship&gt;
+  ) {
+    if (!this.basicAddCurrentFk(fk, result)) return;
+    const fksToReferencing &#x3D; result.filter(
+      (otherFk) &#x3D;&gt;
+        otherFk &#x3D;&#x3D; fk ||
+        (fk.referencing &#x3D;&#x3D; otherFk.referenced &amp;&amp;
+          new ColumnCombination(fk.relationship.referencing).isSubsetOf(
+            new ColumnCombination(otherFk.relationship.referenced)
+          ))
+    );
+    const fksFromReferenced &#x3D; result.filter(
+      (otherFk) &#x3D;&gt;
+        otherFk &#x3D;&#x3D; fk ||
+        (otherFk.referencing &#x3D;&#x3D; fk.referenced &amp;&amp;
+          new ColumnCombination(otherFk.relationship.referencing).isSubsetOf(
+            new ColumnCombination(fk.relationship.referenced)
+          ))
+    );
+    for (const fkToReferencing of fksToReferencing) {
+      for (const fkFromReferenced of fksFromReferenced) {
+        if (fkToReferencing &#x3D;&#x3D; fkFromReferenced) continue;
+        const newRelReferencing &#x3D; new Array();
+        for (const referencedCol of fkFromReferenced.relationship.referencing) {
+          const i &#x3D; fkToReferencing.relationship.referenced.findIndex(
+            (referencingCol) &#x3D;&gt; {
+              if (fkToReferencing &#x3D;&#x3D; fk || fkFromReferenced &#x3D;&#x3D; fk)
+                return referencingCol.equals(referencedCol);
+              else
+                return fk.relationship.columnsMapped(
+                  referencingCol,
+                  referencedCol
+                );
+            }
+          );
+          if (i &#x3D;&#x3D; -1) break;
+          newRelReferencing.push(fkToReferencing.relationship.referencing[i]);
+        }
+        if (
+          newRelReferencing.length &#x3D;&#x3D;
+          fkFromReferenced.relationship.referenced.length
+        )
+          this.basicAddCurrentFk(
+            new TableRelationship(
+              new Relationship(
+                newRelReferencing,
+                Array.from(fkFromReferenced.relationship.referenced)
+              ),
+              fkToReferencing.referencing,
+              fkFromReferenced.referenced
+            ),
+            result
+          );
+      }
+    }
+  }
+
+  private basicAddCurrentFk(
+    fk: TableRelationship,
+    result: Array&lt;TableRelationship&gt;
+  ) {
+    if (fk.referencing &#x3D;&#x3D; fk.referenced) return false;
+    if (!result.some((existingFk) &#x3D;&gt; existingFk.equals(fk))) {
+      result.push(fk);
+      return true;
+    }
+    return false;
+  }
+
+  public isRelationshipValid(relationship: TableRelationship): boolean {
+    const newTable &#x3D; new Join(relationship).newTable;
+    return (
+      newTable.columns.cardinality &gt;
+        relationship.referencing.columns.cardinality &amp;&amp;
+      relationship.referenced !&#x3D; relationship.referencing
+    );
+  }
+
+  /**
+   * A table which has the same columns as another tables pk has a relationship with this table.
+   * This method adds these relationships to the tables.
+   */
+  private calculateTrivialFks(result: Array&lt;TableRelationship&gt;): void {
+    for (const referencingTable of this.tables) {
+      for (const referencedTable of this.tables) {
+        if (referencedTable &#x3D;&#x3D; referencingTable || !referencedTable.pk)
+          continue;
+        const pk &#x3D; referencedTable.pk!.asArray();
+        const pkSourceColumns &#x3D; pk.map((column) &#x3D;&gt; column.sourceColumn);
+        referencingTable
+          .columnsEquivalentTo(pkSourceColumns, true)
+          .forEach((referencingColumns) &#x3D;&gt; {
+            const relationship &#x3D; new TableRelationship(
+              new Relationship(referencingColumns, pk),
+              referencingTable,
+              referencedTable
+            );
+            if (
+              !referencingTable._fks.some(
+                (otherRel) &#x3D;&gt;
+                  otherRel.referenced &#x3D;&#x3D; relationship.referenced &amp;&amp;
+                  otherRel.relationship.equals(relationship.relationship)
+              ) &amp;&amp;
+              this.isRelationshipValid(relationship)
+            ) {
+              this.addCurrentFkAndDerive(relationship, result);
+            }
+          });
+      }
+    }
+  }
+
+  private filterFks() {
+    const shouldBeFiltered &#x3D; this.starMode
+      ? this.isStarViolatingFk
+      : this.isTransitiveFk;
+    for (const table of this.tables) {
+      table._filteredFks &#x3D; table._fks.filter(
+        (fk) &#x3D;&gt; !shouldBeFiltered.apply(this, [fk])
+      );
+      for (const filteredFk of table._filteredFks) {
+        filteredFk.referenced._filteredReferences.push(filteredFk);
+      }
+    }
+  }
+
+  private isTransitiveFk(
+    fk: TableRelationship,
+    visitedTables: Array&lt;Table&gt; &#x3D; [],
+    firstIteration: boolean &#x3D; true
+  ): boolean {
+    if (visitedTables.includes(fk.referencing)) return false;
+    visitedTables.push(fk.referencing);
+    for (const otherFk of fk.referencing._fks) {
+      if (otherFk.equals(fk)) {
+        if (firstIteration) continue;
+        else return true;
+      }
+      const newReferencing &#x3D; otherFk.relationship.columnsReferencedBy(
+        fk.relationship.referencing
+      );
+      if (newReferencing.some((col) &#x3D;&gt; !col)) continue;
+      if (
+        this.isTransitiveFk(
+          new TableRelationship(
+            new Relationship(
+              newReferencing as Array&lt;Column&gt;,
+              fk.relationship.referenced
+            ),
+            otherFk.referenced,
+            fk.referenced
+          ),
+          visitedTables,
+          false
+        )
+      )
+        return true;
+    }
+    return false;
+  }
+
+  private isStarViolatingFk(fk: TableRelationship) {
+    if (fk.referencing._references.length &#x3D;&#x3D; 0) return false;
+    return !this.directDimensionableRoutes(fk.referenced, false).some(
+      (route) &#x3D;&gt; route[route.length - 1] &#x3D;&#x3D; fk
+    );
+  }
+
+  /**
+   * Fills table._inds with all inds where table is referencing,
+   * except for the ones that are already foreign keys
+   */
+  private calculateIndsOf(table: Table): void {
+    const onlyInds &#x3D; this._inds.filter(
+      (ind) &#x3D;&gt; !this._fks.find((fk) &#x3D;&gt; fk.equals(ind))
+    );
+
+    table._inds &#x3D; this.matchSourceRelationships(table, onlyInds);
+    for (const rels of table._inds.values()) {
+      rels.sort((ind1, ind2) &#x3D;&gt; {
+        const score1 &#x3D; new IndScore(ind1.relationship).get();
+        const score2 &#x3D; new IndScore(ind2.relationship).get();
+        return score2 - score1;
+      });
+    }
+  }
+
+  /**
+   * Finds all valid relationships in the current state of the schema in which the parameter table
+   * is referencing some other table. Uses a list of relationships that apply to the datasource
+   * @param table
+   * @param relationships
+   * @returns
+   */
+  private matchSourceRelationships(
+    table: Table,
+    relationships: Array&lt;SourceRelationship&gt;
+  ): Map&lt;SourceRelationship, Array&lt;TableRelationship&gt;&gt; {
+    let result &#x3D; new Map&lt;SourceRelationship, Array&lt;TableRelationship&gt;&gt;();
+    for (const rel of relationships) {
+      let ccs &#x3D; table.columnsEquivalentTo(rel.referencing, true);
+      if (ccs.length &#x3D;&#x3D; 0) continue;
+
+      for (const otherTable of this.tables) {
+        if (otherTable &#x3D;&#x3D; table) continue;
+        let otherCCs &#x3D; otherTable
+          .columnsEquivalentTo(rel.referenced, false)
+          .filter((otherCC) &#x3D;&gt;
+            otherTable.isKey(new ColumnCombination(otherCC))
+          );
+        if (otherCCs.length &#x3D;&#x3D; 0) continue;
+        if (!result.has(rel)) result.set(rel, []);
+        ccs.forEach((cc) &#x3D;&gt; {
+          otherCCs.forEach((otherCC) &#x3D;&gt; {
+            result
+              .get(rel)!
+              .push(
+                new TableRelationship(
+                  new Relationship(cc, otherCC),
+                  table,
+                  otherTable
+                )
+              );
+          });
+        });
+      }
+    }
+    return result;
+  }
+
+  public calculateFdsOf(table: Table): void {
+    const fds &#x3D; new Map&lt;
+      SourceTableInstance,
+      ColumnsTree&lt;FunctionalDependency&gt;
+    &gt;();
+    table.sources.forEach((source) &#x3D;&gt; fds.set(source, new ColumnsTree()));
+    const columnsByInstance &#x3D; table.columnsBySource();
+
+    for (const source of table.sourcesTopological()) {
+      const referencingColumns &#x3D; new ColumnCombination();
+      table.relationships
+        .filter((rel) &#x3D;&gt; rel.referencing[0].sourceTableInstance &#x3D;&#x3D; source)
+        .forEach((rel) &#x3D;&gt; referencingColumns.add(...rel.referencing));
+      const referencedColumns &#x3D; new ColumnCombination(
+        table.relationships.find(
+          (rel) &#x3D;&gt; rel.referenced[0].sourceTableInstance &#x3D;&#x3D; source
+        )?.referenced
+      );
+      const relevantColumns &#x3D; columnsByInstance
+        .get(source)!
+        .union(referencingColumns)
+        .union(referencedColumns);
+
+      //matching (sourceFd -&gt; Fd) and selection
+      for (const sourceFd of this._fds.get(source.table)!) {
+        const lhs &#x3D; relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
+        if (!lhs) continue;
+        const rhs &#x3D; relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;
+        const fd &#x3D; new FunctionalDependency(
+          new ColumnCombination(lhs),
+          new ColumnCombination(rhs)
+        );
+        if (fd.isFullyTrivial()) continue;
+        const existingFd &#x3D; fds.get(source)!.get(fd.lhs);
+        if (existingFd) existingFd.rhs.union(fd.rhs);
+        else fds.get(source)!.add(fd, fd.lhs);
+      }
+      //extension
+      const fkFds &#x3D; fds.get(source)!.getSubtree(referencingColumns);
+      for (const fd of fds.get(source)!.getAll()) {
+        const extensions &#x3D; fkFds.getSubsets(fd.rhs).map((fkFd) &#x3D;&gt; fkFd.rhs);
+        extensions.forEach((extension) &#x3D;&gt; fd.rhs.union(extension));
+      }
+
+      //referenced to referencing
+      const nextRelationship &#x3D; table.relationships.find(
+        (rel) &#x3D;&gt; rel.referenced[0].sourceTableInstance &#x3D;&#x3D; source
+      );
+      const nextSource &#x3D; nextRelationship?.referencing[0].sourceTableInstance;
+      const nextRelationshipMap &#x3D; new Map&lt;Column, Column&gt;();
+      if (nextRelationship)
+        for (const i in nextRelationship.referenced)
+          nextRelationshipMap.set(
+            nextRelationship.referenced[i],
+            nextRelationship.referencing[i]
+          );
+
+      for (const fd of fds.get(source)!.getAll()) {
+        if (
+          !fd.lhs
+            .asArray()
+            .every(
+              (column) &#x3D;&gt;
+                table.columns.includes(column) ||
+                referencedColumns.includes(column)
+            )
+        )
+          continue;
+        fd.rhs &#x3D; new ColumnCombination(
+          fd.rhs
+            .asArray()
+            .filter(
+              (column) &#x3D;&gt;
+                table.columns.includes(column) ||
+                referencedColumns.includes(column)
+            )
+        );
+        if (fd.isFullyTrivial()) continue;
+        if (
+          fd.rhs.asArray().every((column) &#x3D;&gt; table.columns.includes(column))
+        ) {
+          table.addFd(fd);
+        } else if (nextRelationship) {
+          fd.lhs.columnSubstitution(nextRelationshipMap);
+          fd.rhs.columnSubstitution(nextRelationshipMap);
+          fds.get(nextSource!)!.add(fd, fd.lhs);
+        }
+      }
+    }
+  }
+
+  public splittableFdsOf(table: Table): Array&lt;FunctionalDependency&gt; {
+    return table.violatingFds().filter((fd) &#x3D;&gt; this.isFdSplittable(fd, table));
+  }
+
+  public fdSplitPKViolationOf(fd: FunctionalDependency, table: Table): boolean {
+    return !!table.pk &amp;&amp; !table.splitPreservesCC(fd, table.pk);
+  }
+
+  public fdSplitFKViolationsOf(
+    fd: FunctionalDependency,
+    table: Table
+  ): Array&lt;TableRelationship&gt; {
+    return this.fksOf(table, true).filter(
+      (fk) &#x3D;&gt;
+        !table.splitPreservesCC(
+          fd,
+          new ColumnCombination(fk.relationship.referencing)
+        )
+    );
+  }
+
+  public fdSplitReferenceViolationsOf(
+    fd: FunctionalDependency,
+    table: Table
+  ): Array&lt;TableRelationship&gt; {
+    return this.referencesOf(table, true).filter(
+      (ref) &#x3D;&gt;
+        !table.splitPreservesCC(
+          fd,
+          new ColumnCombination(ref.relationship.referenced)
+        )
+    );
+  }
+
+  private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
+    return (
+      this.fdSplitFKViolationsOf(fd, table).length &#x3D;&#x3D; 0 &amp;&amp;
+      this.fdSplitReferenceViolationsOf(fd, table).length &#x3D;&#x3D; 0 &amp;&amp;
+      !this.fdSplitPKViolationOf(fd, table)
+    );
+  }
+
+  public autoNormalize(...table: Array&lt;Table&gt;): Array&lt;Table&gt; {
+    let queue &#x3D; new Array(...table);
+    let resultingTables &#x3D; new Array&lt;Table&gt;();
+    while (queue.length &gt; 0) {
+      let current &#x3D; queue.shift()!;
+      if (this.splittableFdsOf(current).length &gt; 0) {
+        let split &#x3D; new SplitCommand(
+          this,
+          current,
+          this.splittableFdsOf(current)[0]
+        );
+        split.do();
+        queue.push(...split.children!);
+      } else {
+        resultingTables.push(current);
+      }
+    }
+    return resultingTables;
+  }
+
+  public displayedColumnsOf(table: Table): Array&lt;BasicColumn&gt; {
+    const columns &#x3D; new Array&lt;BasicColumn&gt;();
+    if (table.implementsSurrogateKey())
+      columns.push({ name: table.surrogateKey, dataTypeString: &#x27;integer&#x27; });
+    columns.push(...table.columns);
+    for (const fk of this.fksOf(table, true))
+      if (fk.referenced.implementsSurrogateKey()) {
+        columns.push({
+          name: fk.referencingName,
+          dataTypeString: &#x27;integer&#x27;,
+        });
+      }
+    return columns;
+  }
+}
+</code></pre>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'class';
+            var COMPODOC_CURRENT_PAGE_URL = 'Schema.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
