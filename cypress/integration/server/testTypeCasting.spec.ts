@@ -2,6 +2,7 @@ import { IRequestBodyTypeCasting } from "./../../../server/definitions/TypeCasti
 
 describe("The /typecasting route", () => {
   const route: string = Cypress.env("BACKEND_BASEURL") + "/typecasting";
+
   const body: IRequestBodyTypeCasting = {
     schema: "public",
     table: "nation_region_denormalized",
@@ -34,6 +35,15 @@ describe("The /typecasting route", () => {
     body.targetDatatype = "datetime";
     cy.request("post", route, body).should((result) => {
       expect(result.body).equal("forbidden");
+    });
+  });
+
+  it("returns 'allowed' on null-column", () => {
+    body.column = "null";
+    body.targetDatatype = "integer";
+    cy.log(JSON.stringify(body));
+    cy.request("post", route, body).should((result) => {
+      expect(result.body).equal("allowed");
     });
   });
 

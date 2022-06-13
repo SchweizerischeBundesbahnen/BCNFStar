@@ -52,4 +52,17 @@ describe("The /unionedkeys route", () => {
       expect(result.body).equal("forbidden");
     });
   });
+
+  it("returns 'forbidden' on null-columns", () => {
+    body.key1.attributes = ["n_nationkey"];
+    body.key2.attributes = ["null"];
+
+    body.unionedColumns = [
+      ["n_nationkey", "n_regionkey", "r_comment"],
+      ["null", "n_nationkey", "r_comment"],
+    ];
+    cy.request("post", route, body).should((result) => {
+      expect(result.body).equal("forbidden");
+    });
+  });
 });
