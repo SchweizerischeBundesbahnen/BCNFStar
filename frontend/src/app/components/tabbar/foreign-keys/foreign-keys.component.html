@@ -1,6 +1,8 @@
 <sbb-accordion>
   <sbb-expansion-panel [disabled]="schema.hiddenFksOf(table).length === 0">
-    <sbb-expansion-panel-header>Hidden Foreign Key</sbb-expansion-panel-header>
+    <sbb-expansion-panel-header
+      >Dismissed Foreign Key</sbb-expansion-panel-header
+    >
     <div
       class="d-flex align-items-center"
       *ngFor="let fk of schema.hiddenFksOf(table)"
