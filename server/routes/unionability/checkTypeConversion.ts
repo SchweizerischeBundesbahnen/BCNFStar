@@ -4,7 +4,7 @@ import { isIRequestBodyTypeCasting } from "@/definitions/TypeCasting.guard";
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 
-export default async function getTypeCasting(
+export default async function checkTypeCasting(
   req: Request,
   res: Response
 ): Promise<void> {
