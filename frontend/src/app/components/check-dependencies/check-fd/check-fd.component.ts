@@ -58,11 +58,8 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
       (c) => !this.table.hull(new ColumnCombination(this.lhs)).includes(c)
     );
 
-    const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
-      this.table,
-      this.lhs,
-      rhs_copy
-    );
+    const dataQuery: ViolatingFDRowsDataQuery =
+      await ViolatingFDRowsDataQuery.Create(this.table, this.lhs, rhs_copy);
 
     this.isLoading = true;
     const rowCount: number | void = await dataQuery

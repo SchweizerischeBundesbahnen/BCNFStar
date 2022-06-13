@@ -7,6 +7,7 @@ import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { ViolatingINDRowsDataQuery } from '../../../dataquery';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 
 @Component({
   selector: 'app-check-ind',
@@ -70,7 +71,12 @@ export class CheckIndComponent implements OnChanges {
   public async checkInd(): Promise<void> {
     if (this.canAddColumnRelation()) this.addColumnRelation();
 
-    const dataQuery = new ViolatingINDRowsDataQuery(this._relationship);
+    const relationShip: TableRelationship = new TableRelationship(
+      this.relationship,
+      this.referencingTable,
+      this.referencedTable!
+    );
+    const dataQuery = await ViolatingINDRowsDataQuery.Create(relationShip);
 
     this.isLoading = true;
     const rowCount: number = await dataQuery.loadRowCount();
