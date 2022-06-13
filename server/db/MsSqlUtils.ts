@@ -8,6 +8,7 @@ import SqlUtils, {
 } from "./SqlUtils";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
+import ITemptableScript from "@/definitions/ITemptableScripts";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -45,6 +46,23 @@ export default class MsSqlUtils extends SqlUtils {
 
   public UNIVERSAL_DATATYPE(): string {
     return "varchar(max)";
+  }
+
+  public tempTableName(name: string): string {
+    return `#${name}`;
+  }
+
+  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
+   */
+  public tempTableScripts(Sql: string, name: string): ITemptableScript {
+    const ITemptableScript: ITemptableScript = {
+      name: this.tempTableName(name),
+      createScript: `
+      DROP TABLE IF EXISTS ${this.tempTableName(name)}; 
+      SELECT * INTO ${this.tempTableName(name)} FROM (${Sql}) AS X;
+      `,
+    };
+    return ITemptableScript;
   }
 
   public async getSchema(): Promise<Array<SchemaQueryRow>> {

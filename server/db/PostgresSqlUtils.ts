@@ -5,6 +5,7 @@ import SqlUtils, {
   SchemaQueryRow,
 } from "./SqlUtils";
 import { Pool, QueryConfig, PoolConfig } from "pg";
+import ITemptableScript from "@/definitions/ITemptableScripts";
 
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
@@ -62,6 +63,18 @@ export default class PostgresSqlUtils extends SqlUtils {
 
   public UNIVERSAL_DATATYPE(): string {
     return "text";
+  }
+
+  public tempTableScripts(Sql: string, name: string): ITemptableScript {
+    const ITemptableScript: ITemptableScript = {
+      name: this.tempTableName(name),
+      createScript: `
+      DROP TABLE IF EXISTS ${this.tempTableName(name)}; 
+      CREATE TEMP TABLE ${this.tempTableName(name)} AS
+      ${Sql};
+      `,
+    };
+    return ITemptableScript;
   }
 
   public async tableExistsInSchema(

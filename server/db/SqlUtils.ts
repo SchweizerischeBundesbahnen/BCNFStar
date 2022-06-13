@@ -1,6 +1,7 @@
 import { IColumnRelationship } from "../definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
+import ITemptableScript from "@/definitions/ITemptableScripts";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -121,6 +122,20 @@ export default abstract class SqlUtils {
       .join(",")}
     `;
   }
+
+  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
+   * In Postgres the table name is not relevant
+   */
+  public tempTableName(name: string): string {
+    return `#${name}`;
+  }
+
+  /**
+   *
+   * @param Sql The Sql that queries the information the temp-table should contain
+   * @param name The name of the temp-table. Relevant for multiple temp-table in one query
+   */
+  public abstract tempTableScripts(Sql: string, name: string): ITemptableScript;
 
   protected violatingRowsForFD_SQL(
     schema: string,
