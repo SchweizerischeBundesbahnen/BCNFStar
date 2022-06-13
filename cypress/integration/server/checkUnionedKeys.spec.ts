@@ -1,6 +1,6 @@
 import { IRequestBodyUnionedKeys } from "./../../../server/definitions/IUnionedKeys";
 
-describe("The /typecasting route", () => {
+describe("The /unionedkeys route", () => {
   const route: string = Cypress.env("BACKEND_BASEURL") + "/unionedkeys";
   const body: IRequestBodyUnionedKeys = {
     key1: {
