@@ -7,6 +7,7 @@ import ISchemaMatchingResponse from '@server/definitions/ISchemaMatchingResponse
 import { DatabaseService } from './database.service';
 import { SchemaService } from './schema.service';
 import Table from '../model/schema/Table';
+import MsSqlPersisting from '../model/schema/persisting/MsSqlPersisting';
 
 @Injectable({
   providedIn: 'root',
@@ -27,9 +28,17 @@ export class IntegrationService {
     src: Array<Table> = [...this.schemaService.schema.tables],
     target: Array<Table> = [...(this.existingSchema?.tables ?? [])]
   ) {
+    const srcPersister = new MsSqlPersisting('__schema_matching_temp_src');
+    const targetPersister = new MsSqlPersisting(
+      '__schema_matching_temp_target'
+    );
     const body: ISchemaMatchingRequest = {
-      src: src.map((t) => t.fullName),
-      target: target.map((t) => t.fullName),
+      srcSql: srcPersister.tableCreation(this.schemaService.schema, src, true),
+      targetSql: targetPersister.tableCreation(
+        this.existingSchema!,
+        target,
+        true
+      ),
     };
     return firstValueFrom(
       this.http.post<Array<ISchemaMatchingResponse>>(

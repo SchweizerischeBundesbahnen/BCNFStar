@@ -8,7 +8,7 @@ export default async function getSchemaMatchingRoute(
 ): Promise<void> {
   try {
     const request: ISchemaMatchingRequest = req.body;
-    res.json(await getSchemaMatching(request.src, request.target));
+    res.json(await getSchemaMatching(request.srcSql, request.targetSql));
   } catch (error) {
     console.error(error);
     res.status(502).json({ error: "Could not get schema matching" });

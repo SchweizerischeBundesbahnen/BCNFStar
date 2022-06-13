@@ -24,7 +24,7 @@ export class MatchingGraphComponent {
     public intService: IntegrationService,
     private schemaService: SchemaService
   ) {
-    this.reset();
+    if (this.intService.existingSchema) this.reset();
     this.schemaService.schemaChanged.subscribe(() => this.reset());
   }
 

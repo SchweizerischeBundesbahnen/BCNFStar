@@ -1,4 +1,4 @@
 export default interface ISchemaMatchingRequest {
-  src: string[];
-  target: string[];
+  srcSql: string;
+  targetSql: string;
 }

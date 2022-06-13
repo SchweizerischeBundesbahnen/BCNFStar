@@ -141,7 +141,6 @@ export default function matchSchemas(
 ) {
   const graphLeft = createGraph(tablesLeft);
   const graphRight = createGraph(tablesRight);
-  debugger;
   // currently overridden by just levenstein for everything
   const initialSimliarity = calcInitialSimilarity(tablesLeft, tablesRight);
   const flooded = similarityFlood(graphLeft, graphRight, initialSimliarity);

@@ -21,15 +21,30 @@ export default abstract class SQLPersisting {
 
   public abstract schemaPreparation(schema: Schema): string;
 
-  public tableCreation(schema: Schema): string {
+  /**
+   * @param keepSchema whether the original schema name of the table should be kept.
+   *  Only set to true if you want to generate SQL for schema matching
+   */
+  public tableCreation(
+    schema: Schema,
+    tables: Iterable<Table> = schema.tables,
+    keepSchema = false
+  ): string {
     let Sql: string = '';
-    for (const table of schema.tables) {
-      Sql += this.createTableSql(schema, table) + '\n';
+    for (const table of tables) {
+      Sql += this.createTableSql(schema, table, keepSchema) + '\n';
     }
     return Sql;
   }
 
-  public createTableSql(schema: Schema, table: Table): string {
+  /**
+   * @returns a CREATE TABLE statement containing all final columns, but no keys for the given `table`
+   */
+  public createTableSql(
+    schema: Schema,
+    table: Table,
+    keepSchema = false
+  ): string {
     let columnStrings: string[] = [];
 
     if (table.implementsSurrogateKey()) {
@@ -49,7 +64,10 @@ export default abstract class SQLPersisting {
         columnStrings.push(`${fk.referencingName} INT NOT NULL`);
       }
     }
-    return `CREATE TABLE ${this.tableIdentifier(table)} (
+    const tableName = keepSchema
+      ? this.escape(table.fullName)
+      : this.tableIdentifier(table);
+    return `CREATE TABLE ${tableName} (
 ${columnStrings.join(',\n')});\n`;
   }
 
