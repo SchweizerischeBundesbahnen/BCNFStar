@@ -7,4 +7,53 @@
       </li>
     </ul>
   </sbb-expansion-panel>
+  <sbb-expansion-panel [expanded]="true">
+    <sbb-expansion-panel-header
+      >Surrogate Key Options</sbb-expansion-panel-header
+    >
+
+    <div
+      *ngIf="!editMode; else editSurrogateKey"
+      class="d-flex justify-content-between"
+    >
+      <div class="name-field">
+        <span>Current surrogate key: </span>
+        <span class="surrogate-key-name"> {{ surrogateKey }}</span>
+      </div>
+      <div class="buttons buttons-field">
+        <button sbb-icon-button (click)="editMode = true">
+          <sbb-icon id="edit-surrkey-btn" svgIcon="kom:pen-small"></sbb-icon>
+        </button>
+        <button sbb-icon-button (click)="deleteSurrogateKey()">
+          <sbb-icon
+            id="delete-surrkey-btn"
+            svgIcon="kom:trash-small"
+          ></sbb-icon>
+        </button>
+      </div>
+    </div>
+  </sbb-expansion-panel>
 </sbb-accordion>
+
+<ng-template #editSurrogateKey>
+  <div class="d-flex justify-content-between">
+    <input id="surrogate-key-input" sbbInput [(ngModel)]="surrogateKey" />
+    <div class="buttons">
+      <button
+        sbb-button
+        (click)="emitSurrogateKey()"
+        [disabled]="!surrogateKey"
+      >
+        Save surrogate key
+      </button>
+
+      <button
+        sbb-button
+        *ngIf="table.implementsSurrogateKey()"
+        (click)="reset()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</ng-template>

@@ -1,24 +1,25 @@
 import ITablePage from "@/definitions/ITablePage";
+import ITablePageQueryParameter from "@/definitions/ITablePageQueryParameter";
 import { Request, Response } from "express";
 import { sqlUtils } from "../db";
-
-export async function getTablePage(req: Request, res: Response): Promise<void> {
+import { validationResult } from "express-validator";
+export async function getTablePage(
+  req: Request<{}, {}, {}, ITablePageQueryParameter>,
+  res: Response
+): Promise<void> {
   try {
-    if (!req.query.limit) {
-      res.status(400).json({ error: "Must specify limit" });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(422).json({ errors: errors.mapped() });
       return;
     }
-
-    const schema = req.query.schema;
-    const tablename = req.query.table;
-    const limit: number = +req.query.limit;
-    const offset: number = +req.query.offset;
+    const params = req.query as ITablePageQueryParameter;
 
     const result: ITablePage = await sqlUtils.getTablePage(
-      tablename.toString(),
-      schema.toString(),
-      offset,
-      limit
+      params.table,
+      params.schema,
+      params.offset,
+      params.limit
     );
 
     res.json(result);

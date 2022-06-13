@@ -3,7 +3,10 @@
 </h1>
 <sbb-tab-group>
   <sbb-tab label="Keys">
-    <app-keys [table]="table"></app-keys>
+    <app-keys
+      [table]="table"
+      (setSurrogateKey)="setSurrogateKey.emit($event)"
+    ></app-keys>
   </sbb-tab>
   <sbb-tab label="Subtables">
     <app-contained-subtables
@@ -20,7 +23,6 @@
       {{ "Auto-normalize this table" }}
     </button>
   </sbb-tab>
-
   <sbb-tab label="Foreign Keys">
     <app-foreign-keys
       [schema]="schema"
@@ -31,7 +33,10 @@
     ></app-foreign-keys>
   </sbb-tab>
   <sbb-tab label="Table Editing">
-    <app-table-editing [table]="table"></app-table-editing>
+    <app-table-editing
+      [table]="table"
+      (deleteColumnEvent)="deleteColumnEvent.emit($event)"
+    ></app-table-editing>
   </sbb-tab>
   <!-- WIP -->
   <!-- <sbb-tab label="Schema Integration">

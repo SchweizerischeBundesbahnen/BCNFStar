@@ -23,6 +23,10 @@ export default class Table {
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
+  public surrogateKey: string = '';
+  public implementsSurrogateKey(): boolean {
+    return this.surrogateKey.length > 1;
+  }
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
@@ -38,6 +42,7 @@ export default class Table {
       schemaName: this.schemaName,
       columns: this.columns,
       pk: this.pk,
+      sk: this.surrogateKey,
       relationships: this.relationships,
       sources: this.sources,
     };

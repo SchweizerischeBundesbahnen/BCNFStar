@@ -61,7 +61,9 @@
         [schema]="schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
+        (deleteColumnEvent)="onDeleteColumn($event)"
         (selectColumns)="onSelectColumns($event)"
+        (setSurrogateKey)="onSetSurrogateKey($event)"
         (autoNormalizeSelectedTable)="onAutoNormalize(selectedTable)"
         (showFk)="onClickShowFk($event)"
       ></app-schema-editing-side-bar>

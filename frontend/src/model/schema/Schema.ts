@@ -11,6 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
+import BasicColumn from '../types/BasicColumn';
 import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
@@ -412,6 +413,7 @@ export default class Schema {
   }
 
   private basicAddCurrentFk(fk: TableRelationship) {
+    if (fk.referencing == fk.referenced) return false;
     if (
       !Array.from(this._tableFks.keys()).some((existingFk) =>
         existingFk.equals(fk)
@@ -423,11 +425,12 @@ export default class Schema {
     return false;
   }
 
-  private isRelationshipValid(relationship: TableRelationship): boolean {
+  public isRelationshipValid(relationship: TableRelationship): boolean {
     const newTable = new Join(relationship).newTable;
     return (
       newTable.columns.cardinality >
-      relationship.referencing.columns.cardinality
+        relationship.referencing.columns.cardinality &&
+      relationship.referenced != relationship.referencing
     );
   }
 
@@ -717,5 +720,20 @@ export default class Schema {
       }
     }
     return resultingTables;
+  }
+
+  public displayedColumnsOf(table: Table): Array<BasicColumn> {
+    const columns = new Array<BasicColumn>();
+    if (table.implementsSurrogateKey())
+      columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
+    columns.push(...table.columns);
+    for (const fk of this.fksOf(table, true))
+      if (fk.referenced.implementsSurrogateKey()) {
+        columns.push({
+          name: fk.referencingName,
+          dataTypeString: 'integer',
+        });
+      }
+    return columns;
   }
 }

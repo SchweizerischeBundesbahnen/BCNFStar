@@ -5,6 +5,7 @@ import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import Column from '@/src/model/schema/Column';
 
 @Component({
   selector: 'app-schema-editing-side-bar',
@@ -14,6 +15,8 @@ import TableRelationship from '@/src/model/schema/TableRelationship';
 export class SchemaEditingSideBarComponent {
   @Input() public table!: Table;
   @Input() public schema!: Schema;
+  @Output() public setSurrogateKey = new EventEmitter<string>();
+  @Output() public deleteColumnEvent = new EventEmitter<Column>();
   @Output() public splitFd = new EventEmitter<FunctionalDependency>();
   @Output() public indToFk = new EventEmitter<SourceRelationship>();
   @Output() public selectColumns = new EventEmitter<

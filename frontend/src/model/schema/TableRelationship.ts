@@ -38,4 +38,30 @@ export default class TableRelationship {
     if (this.referencing != other.referencing) return false;
     return this.relationship.equals(other.relationship);
   }
+
+  /**
+    If this relationship is affected by a surrogate key,
+    this is the name of the according surrogate column.
+    This is also the name of the jointjs port to
+    attach to for any foreign key.
+   */
+  get referencedName(): string {
+    return this.referenced.implementsSurrogateKey()
+      ? this.referenced.surrogateKey
+      : this.relationship.referenced[0].name;
+  }
+
+  /**
+    If this relationship is affected by a surrogate key,
+    this is the name of the according surrogate column.
+    This is also the name of the jointjs port to
+    attach to for any foreign key.
+    */
+  get referencingName(): string {
+    return this.referenced.implementsSurrogateKey()
+      ? this.referenced.surrogateKey +
+          '_' +
+          this.relationship.referencing.map((col) => col.name).join('_')
+      : this.relationship.referencing[0].name;
+  }
 }

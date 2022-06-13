@@ -2,8 +2,8 @@ import Column from '../Column';
 import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Relationship from '../Relationship';
-import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
+import Delete from './Delete';
 
 export default class Split {
   public newTables!: [Table, Table];
@@ -17,19 +17,21 @@ export default class Split {
   }
 
   private split() {
-    let remaining: Table = new Table(this.table.remainingSchema(this.fd));
-    let generating: Table = new Table(this.table.generatingSchema(this.fd));
-
-    this.projectSources(remaining);
-    this.projectSources(generating);
-
-    this.projectFds(remaining);
-    this.projectFds(generating);
-
+    let remaining: Table = new Delete(
+      this.table,
+      this.fd.rhs.copy().setMinus(this.fd.lhs)
+    ).newTable;
+    let generating: Table = new Delete(
+      this.table,
+      this.table.columns.copy().setMinus(this.fd.rhs)
+    ).newTable;
+    remaining.surrogateKey = this.table.surrogateKey;
     remaining.pk = this.table.pk?.isSubsetOf(remaining.columns)
       ? this.table.pk.deepCopy()
       : undefined;
-    generating.pk = this.fd.lhs.deepCopy();
+    generating.pk =
+      this.fd.lhs.cardinality > 0 ? this.fd.lhs.deepCopy() : undefined;
+    this.reorderColumnsOf(generating);
 
     remaining.schemaName = this.table.schemaName;
     generating.schemaName = this.table.schemaName;
@@ -42,56 +44,6 @@ export default class Split {
     this.substitute(generating, this.fd.lhs);
 
     this.newTables = [remaining, generating];
-  }
-
-  /**
-   * Projects the sources (SourceTableInstances) of the split table to one of the resulting tables.
-   * The projection consists of the sources from which columns are selected
-   * and the sources which are needed to connect other needed sources in an SQL-Statement.
-   */
-  private projectSources(table: Table) {
-    // Annahme: relationship.referenced bzw. relationship.referencing columns kommen alle aus der gleichen sourceTable
-    let columnSources = table.columns.sourceTableInstances();
-
-    let neededSources = new Array(...this.table.sources);
-    let neededRelationships = new Set(this.table.relationships);
-
-    let toRemove: Set<SourceTableInstance>;
-    do {
-      toRemove = new Set();
-      neededSources.forEach((source) => {
-        let adjacentRelationships = [...neededRelationships].filter(
-          (rel) =>
-            rel.referenced[0].sourceTableInstance == source ||
-            rel.referencing[0].sourceTableInstance == source
-        );
-        if (
-          adjacentRelationships.length == 1 &&
-          !columnSources.includes(source)
-        ) {
-          toRemove.add(source);
-          neededRelationships.delete(adjacentRelationships[0]);
-        }
-      });
-      neededSources = neededSources.filter(
-        (sourceTable) => !toRemove.has(sourceTable)
-      );
-    } while (toRemove.size > 0);
-
-    table.sources = neededSources;
-    table.relationships = Array.from(neededRelationships);
-  }
-
-  private projectFds(table: Table) {
-    this.table.fds.forEach((fd) => {
-      if (fd.lhs.isSubsetOf(table.columns)) {
-        const newFd = fd.copy();
-        newFd.rhs.intersect(table.columns);
-        if (!newFd.isFullyTrivial()) {
-          table.fds.push(newFd);
-        }
-      }
-    });
   }
 
   /**
@@ -115,5 +67,16 @@ export default class Split {
       fd.lhs.columnSubstitution(mapping);
       fd.rhs.columnSubstitution(mapping);
     });
+  }
+
+  /**
+   * puts pk columns first
+   */
+  private reorderColumnsOf(table: Table) {
+    if (!table.pk) return;
+    const columns = table.columns;
+    table.columns = new ColumnCombination();
+    for (const pkCol of table.pk!) table.columns.add(pkCol);
+    for (const col of columns) table.columns.add(col);
   }
 }

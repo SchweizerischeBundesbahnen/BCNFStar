@@ -1,4 +1,7 @@
+import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
+import Schema from '@/src/model/schema/Schema';
+import BasicColumn from '@/src/model/types/BasicColumn';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import Table from 'src/model/schema/Table';
 
@@ -9,6 +12,7 @@ import Table from 'src/model/schema/Table';
 })
 export class GraphElementComponent {
   @Input() public table!: Table;
+  @Input() public schema!: Schema;
   @Input() public bbox!: Record<string, string>;
   @Input() public selectedColumns?: ColumnCombination;
   @Input() public fact!: boolean;
@@ -22,5 +26,23 @@ export class GraphElementComponent {
 
   select() {
     this.selectedTableChanged.emit(this.table);
+  }
+
+  public isPkColumn(column: BasicColumn): boolean {
+    if (this.table.implementsSurrogateKey())
+      return column.name == this.table.surrogateKey;
+    return (
+      column instanceof Column &&
+      !!this.table.pk &&
+      this.table.pk.includes(column as Column)
+    );
+  }
+
+  public isHighlightedColumn(column: BasicColumn): boolean {
+    return (
+      column instanceof Column &&
+      !!this.selectedColumns &&
+      this.selectedColumns.includes(column as Column)
+    );
   }
 }

@@ -29,13 +29,6 @@ describe("The schema editing side bar", () => {
     cy.get("h1").contains("public.nation_region_denormalized");
   });
 
-  it("displays keys", () => {
-    cy.get("sbb-expansion-panel").contains("Keys");
-    cy.get("sbb-expansion-panel").contains("n_name");
-    cy.get("sbb-expansion-panel").contains("n_nationkey");
-    cy.get("sbb-expansion-panel").contains("n_comment");
-  });
-
   it("displays Functional Dependencies", () => {
     cy.visitContainedSubtableTab();
     cy.get("sbb-expansion-panel-header")

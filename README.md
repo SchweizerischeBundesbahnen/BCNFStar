@@ -1,5 +1,17 @@
 # BCNFStar
 
+BCNFStar is a tool for interactive database schema management. It helps you to
+
+- normalize or denormalize your schema (by splitting or joining tables)
+- create star schemas with a dedicated optimized mode
+- replace primary and foreign keys by automatically generated surrogate keys
+- find valid foreign key candidates (based on inclusion dependencies) present in the data
+  - and investigate why others are invalid
+  - same for functional dependencies, which are the basis for normalising (splitting) tables
+- integrate new tables into an existing schema (coming soon!)
+
+It makes sure all transformations are valid for a given data instance and generates SQL downloads for transforming
+
 ## Setup
 
 ### Java
@@ -42,6 +54,37 @@ from the project root, which will build both the server and the frontend. After 
 ```bash
 npm run start
 ```
+
+### Docker
+
+If want to use a docker container for deployment you can skip the steps bellow. Just follow the next commands.
+
+First set up your personal DB configuration in [](docker-compose.yml). By default we use a standard postgres database configuration.
+
+```yml
+- DB_HOST=host.docker.internal
+- DB_PORT=5432
+- DB_DATABASE=postgres
+- DB_USER=postgres
+- DB_TYPE=postgres
+- DB_PASSWORD=
+```
+
+To build your docker container run
+
+```bash
+docker build . -t bcnfstar
+```
+
+to create bcnfstar docker image and run
+
+```bash
+docker-compose up
+```
+
+to create docker containers for redis and BCNFStar.
+
+You can open BCNFStar on `http://localhost/#/`.
 
 ### Troubleshooting
 
