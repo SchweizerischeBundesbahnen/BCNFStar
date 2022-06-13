@@ -24,8 +24,8 @@ export function isValidDatatype(): CustomValidator {
       /^decimal\s*\(\d+,\d+\)$/i,
       /^numeric\s*\(\d+,\d+\)$/i,
       /^char\s*\(\d+,\d+\)$/i,
-      /^integer$/i, // somehow postgres doesn't have a type called "integer"
-      /^datetime$/i, // somehow postgres doesn't have a type called "integer"
+      /^integer$/i, 
+      /^datetime$/i,
     ];
     const serverDatatypes: string[] = await sqlUtils.getDatatypes(); // those could include user defined data-types as well
     if (
