@@ -1,0 +1,13 @@
+<div sbbDialogTitle>Violating Rows for suggested Contained Subtable</div>
+<div sbbDialogContent>
+  <p>
+    The suggested contained subtable is not valid because the chosen key does
+    not fully determine the other columns. These are the
+    {{ rowCount.entries }} violating records. They can be grouped into
+    {{ rowCount.groups }} unique violating records.
+  </p>
+  <app-database-table-viewer
+    [dataService]="dataService"
+    [rowCount]="rowCount"
+  ></app-database-table-viewer>
+</div>

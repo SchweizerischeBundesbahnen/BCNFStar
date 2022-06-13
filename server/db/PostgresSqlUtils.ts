@@ -4,10 +4,20 @@ import SqlUtils, {
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "@/definitions/IAttribute";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 
 import ITablePage from "@/definitions/ITablePage";
+import ITable from "@/definitions/ITable";
+import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -59,6 +69,10 @@ export default class PostgresSqlUtils extends SqlUtils {
     return query_result.rows;
   }
 
+  public UNIVERSAL_DATATYPE(): string {
+    return "text";
+  }
+
   public async tableExistsInSchema(
     schema: string,
     table: string
@@ -81,7 +95,7 @@ export default class PostgresSqlUtils extends SqlUtils {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
       const query_result = await this.pool.query(
-        `SELECT * FROM ${schemaname}.${tablename} 
+        `SELECT * FROM "${schemaname}"."${tablename}"
         LIMIT ${limit} 
         OFFSET ${offset}`
       );
@@ -94,10 +108,44 @@ export default class PostgresSqlUtils extends SqlUtils {
     }
   }
 
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result = await this.pool.query<{ count: number }>(_sql);
+    if (result.rows[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
+  /** The "null"-check is relevant for unionability-checks. */
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `"${str}"`;
+  }
+
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select typname from pg_type";
+    const result = await this.pool.query(_sql);
+    return result.rows.map((row) => row.typname);
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = this.testTypeCastingSql(s);
+    try {
+      const queryResult = await this.pool.query(_sql);
+      if (queryResult.rowCount == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      return TypeCasting.forbidden;
+    }
+  }
+
   public async getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
       // from https://stackoverflow.com/questions/7943233/fast-way-to-discover-the-row-count-of-a-table-in-postgresql
@@ -115,7 +163,8 @@ export default class PostgresSqlUtils extends SqlUtils {
         this.pool.query(`VACUUM ${schema}.${table}`);
         queryResult = await this.pool.query(rowCountQuery);
       }
-      return queryResult.rows[0].count;
+      const count = queryResult.rows[0].count;
+      return { entries: count, groups: count };
     } else {
       throw {
         error: "Table or schema does not exist in database",
@@ -130,7 +179,8 @@ export default class PostgresSqlUtils extends SqlUtils {
     att.attname as "foreign_column_name",
     table_schema,
     rel_referencing as "table_name",
-    att2.attname as "column_name"
+    att2.attname as "column_name",
+    conname as "fk_name"
 from
    (select 
         unnest(con1.conkey) as "parent", 
@@ -162,66 +212,154 @@ from
     return result.rows;
   }
 
-  public override SQL_CREATE_SCHEMA(schema: string): string {
-    return `CREATE SCHEMA IF NOT EXISTS ${schema};`;
-  }
-  public override SQL_DROP_TABLE_IF_EXISTS(
+  public override async getViolatingRowsForFD(
     schema: string,
-    table: string
-  ): string {
-    return `DROP TABLE IF EXISTS ${schema}.${table};`;
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const query_result = await this.pool.query(
+      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+        `ORDER BY ${lhs.join(",")}
+        LIMIT ${limit} 
+        OFFSET ${offset}
+        `
+    );
+    return {
+      rows: query_result.rows,
+      attributes: query_result.fields.map((v) => v.name),
+    };
   }
 
-  public SQL_CREATE_TABLE(
-    attributes: IAttribute[],
-    primaryKey: string[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    const attributeString: string = attributes
-      .map(
-        (attribute) =>
-          attribute.name +
-          " " +
-          attribute.dataType +
-          (primaryKey.includes(attribute.name) || attribute.nullable == false
-            ? " NOT NULL "
-            : " NULL")
+  public override async getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<{ entries: number; groups: number }> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const result = await this.pool.query<{ entries: number; groups: number }>(
+      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups FROM 
+      (${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+      ) AS X
+      `
+    );
+    return result.rows[0];
+  }
+
+  public async getViolatingRowsForSuggestedIND(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
       )
-      .join(",");
-    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString});`;
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+    const query_result = await this.pool.query(
+      `${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}` +
+        `
+        ORDER BY ${columnRelationships
+          .map((cc) => cc.referencingColumn)
+          .join(",")}
+        LIMIT ${limit} 
+        OFFSET ${offset}
+        `
+    );
+    return {
+      rows: query_result.rows,
+      attributes: query_result.fields.map((v) => v.name),
+    };
   }
 
-  public override SQL_ADD_PRIMARY_KEY(
-    newSchema: string,
-    newTable: string,
-    primaryKey: string[]
-  ): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
-      primaryKey
-    )});`;
+  public async getViolatingRowsForSuggestedINDCount(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): Promise<IRowCounts> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+
+    const count = await this.pool.query<IRowCounts>(
+      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
+      FROM ( ${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}
+      ) AS X`
+    );
+    return count.rows[0];
   }
 
-  public override SQL_FOREIGN_KEY(
-    constraintName: string,
-    referencingSchema: string,
-    referencingTable: string,
-    referencingColumns: string[],
-    referencedSchema: string,
-    referencedTable: string,
-    referencedColumns: string[]
-  ): string {
-    return `ALTER TABLE ${referencingSchema}.${referencingTable} 
-    ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
-    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
-      referencedColumns
-    )});
-`;
-  }
-
-  private generateColumnString(columns: string[]): string {
-    return columns.map((c) => `"${c}"`).join(", ");
+  public async columnsExistInTable(
+    schema: string,
+    table: string,
+    columns: Array<string>
+  ): Promise<boolean> {
+    try {
+      const queryConfig: QueryConfig = {
+        text: "SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2",
+        name: "columns-in-table",
+        values: [schema, table],
+      };
+      const columnsInTable = await this.pool.query<{ column_name: string }>(
+        queryConfig
+      );
+      return columns.every((c) =>
+        columnsInTable.rows
+          .map((d) => d.column_name.toLowerCase())
+          .includes(c.toLowerCase())
+      );
+    } catch (e) {
+      console.log(e);
+      throw Error("Error while checking if table contains columns.");
+    }
   }
 
   public getJdbcPath(): string {

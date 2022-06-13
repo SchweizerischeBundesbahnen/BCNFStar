@@ -2,8 +2,8 @@
   type="button"
   sbb-button
   id="undo"
-  [disabled]="!this.canUndo"
-  (click)="this.undo.emit()"
+  [disabled]="!canUndo"
+  (click)="undo.emit()"
 >
   &lt;
 </button>
@@ -11,8 +11,8 @@
   type="button"
   sbb-button
   id="redo"
-  [disabled]="!this.canRedo"
-  (click)="this.redo.emit()"
+  [disabled]="!canRedo"
+  (click)="redo.emit()"
 >
   &gt;
 </button>

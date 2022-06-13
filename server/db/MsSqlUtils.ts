@@ -1,20 +1,28 @@
 import ITablePage from "@/definitions/ITablePage";
-import { pseudoRandomBytes } from "crypto";
-import sql from "mssql";
+import sql, { IRow } from "mssql";
 import SqlUtils, {
   DbmsType,
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import IAttribute from "@/definitions/IAttribute";
+import ITable from "@/definitions/ITable";
+import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
 // prevent new queries
 // * this means: use try-finally
 
-const suffix = "\nGO\n";
 export default class MsSqlUtils extends SqlUtils {
   private config: sql.config;
   public connection: sql.ConnectionPool;
@@ -36,6 +44,7 @@ export default class MsSqlUtils extends SqlUtils {
         encrypt: true, // for azure
         trustServerCertificate: true, // change to true for local dev / self-signed certs
       },
+      requestTimeout: 180000,
     };
   }
 
@@ -43,8 +52,12 @@ export default class MsSqlUtils extends SqlUtils {
     this.connection = await sql.connect(this.config);
   }
 
+  public UNIVERSAL_DATATYPE(): string {
+    return "varchar(max)";
+  }
+
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
-    const result: sql.IResult<SchemaQueryRow> = await sql.query(`SELECT 
+    const result = await sql.query<SchemaQueryRow>(`SELECT 
       t.name as table_name, 
       s.name as [table_schema],
         [column_name] = c.name,
@@ -73,8 +86,8 @@ export default class MsSqlUtils extends SqlUtils {
   ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
-      const result: sql.IResult<any> = await sql.query(
-        `SELECT * FROM [${schemaname}].[${tablename}] 
+      const result = await sql.query<any>(
+        `SELECT * FROM [${schemaname}].[${tablename}]
         ORDER BY (SELECT NULL) 
         OFFSET ${offset} ROWS
         FETCH NEXT ${limit} ROWS ONLY`
@@ -88,10 +101,45 @@ export default class MsSqlUtils extends SqlUtils {
     }
   }
 
+  /** The "null"-check is relevant for unionability-checks. */
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `[${str}]`;
+  }
+
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result: sql.IResult<any> = await sql.query(_sql);
+    if (result.recordset[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select name from sys.types";
+    const result: sql.IResult<any> = await sql.query<{ name: string }>(_sql);
+    return result.recordset.map((record) => record.name);
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = this.testTypeCastingSql(s);
+
+    try {
+      const result: sql.IResult<any> = await sql.query(_sql);
+      if (result.recordset.length == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      return TypeCasting.forbidden;
+    }
+  }
+
   public async getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
       const queryResult = await sql.query(`SELECT
@@ -102,11 +150,42 @@ export default class MsSqlUtils extends SqlUtils {
        object_name(object_id) = '${table}' 
        AND (index_id < 2)
        AND object_schema_name(object_id) = '${schema}'`);
-      return +queryResult.recordset[0].count;
+      const count = +queryResult.recordset[0].count;
+      return { entries: count, groups: count };
     } else {
       throw {
         error: "Table or schema does not exist in database",
       };
+    }
+  }
+
+  /**
+   * This also checks if table and schema exist in database.
+   */
+  public async columnsExistInTable(
+    schema: string,
+    table: string,
+    columns: Array<string>
+  ): Promise<boolean> {
+    const ps = new sql.PreparedStatement();
+    try {
+      ps.input("schema", sql.NVarChar);
+      ps.input("table", sql.NVarChar);
+
+      await ps.prepare(
+        "select column_name from INFORMATION_SCHEMA.COLUMNS WHERE table_schema = @schema AND table_name = @table"
+      );
+      const result: sql.IResult<string> = await ps.execute({ schema, table });
+      return columns.every((c) =>
+        result.recordset
+          .map((r) => r.toString().toLowerCase())
+          .includes(c.toLowerCase())
+      );
+    } catch (e) {
+      console.log(e);
+      throw Error("Error while checking if table contains columns.");
+    } finally {
+      ps.unprepare();
     }
   }
 
@@ -141,12 +220,136 @@ export default class MsSqlUtils extends SqlUtils {
     return result.recordset.length > 0;
   }
 
+  public override async getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+        ` ORDER BY ${lhs.join(",")}
+          OFFSET ${offset} ROWS
+          FETCH NEXT ${limit} ROWS ONLY
+        `
+    );
+    return {
+      rows: result.recordset,
+      attributes: Object.keys(result.recordset.columns),
+    };
+  }
+
+  public async getViolatingRowsForSuggestedIND(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+
+    const result: sql.IResult<any> = await sql.query(
+      this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      ) +
+        ` ORDER BY ${columnRelationships
+          .map((cc) => cc.referencingColumn)
+          .join(",")}
+          OFFSET ${offset} ROWS
+          FETCH NEXT ${limit} ROWS ONLY
+        `
+    );
+    return {
+      rows: result.recordset,
+      attributes: Object.keys(result.recordset.columns),
+    };
+  }
+
+  public async getViolatingRowsForSuggestedINDCount(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): Promise<IRowCounts> {
+    if (
+      !this.columnsExistInTable(
+        referencingTable.schemaName,
+        referencingTable.name,
+        columnRelationships.map((c) => c.referencingColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referencing.");
+    }
+    if (
+      !this.columnsExistInTable(
+        referencedTable.schemaName,
+        referencedTable.name,
+        columnRelationships.map((c) => c.referencedColumn)
+      )
+    ) {
+      throw Error("Columns don't exist in referenced.");
+    }
+
+    const result = await sql.query<IRowCounts>(
+      `SELECT ISNULL (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
+      ${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}  ) AS X`
+    );
+    return result.recordset[0];
+  }
+
+  public async getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<IRowCounts> {
+    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+      throw Error("Columns don't exist in table.");
+    }
+
+    const result = await sql.query<IRowCounts>(
+      `SELECT ISNULL (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
+      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+      ) AS X `
+    );
+    return result.recordset[0];
+  }
+
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
     const result = await sql.query<ForeignKeyResult>(`
   SELECT 
     sch.name AS table_schema,
     tab1.name AS table_name,
     col1.name AS column_name,
+    obj.name AS fk_name,
 	sch.name AS foreign_table_schema,
     tab2.name AS foreign_table_name,
     col2.name AS foreign_column_name
@@ -170,67 +373,6 @@ INNER JOIN sys.columns col2
   public async getPrimaryKeys(): Promise<PrimaryKeyResult[]> {
     const result = await sql.query<ForeignKeyResult>(this.QUERY_PRIMARY_KEYS);
     return result.recordset;
-  }
-
-  public override SQL_CREATE_SCHEMA(newSchema: string): string {
-    return `IF NOT EXISTS ( SELECT  *
-      FROM    sys.schemas
-      WHERE   name = N'${newSchema}' )
-EXEC('CREATE SCHEMA [${newSchema}]'); ${suffix}`;
-  }
-  public override SQL_DROP_TABLE_IF_EXISTS(
-    newSchema: string,
-    newTable: string
-  ): string {
-    return `DROP TABLE IF EXISTS ${newSchema}.${newTable}; ${suffix}`;
-  }
-  public SQL_CREATE_TABLE(
-    attributes: IAttribute[],
-    primaryKey: string[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    const attributeString: string = attributes
-      .map(
-        (attribute) =>
-          attribute.name +
-          " " +
-          attribute.dataType +
-          (primaryKey.includes(attribute.name) || attribute.nullable == false
-            ? " NOT NULL "
-            : " NULL")
-      )
-      .join(",");
-    return `CREATE TABLE ${newSchema}.${newTable} (${attributeString}) ${suffix}`;
-  }
-
-  public override SQL_FOREIGN_KEY(
-    constraintName: string,
-    referencingSchema: string,
-    referencingTable: string,
-    referencingColumns: string[],
-    referencedSchema: string,
-    referencedTable: string,
-    referencedColumns: string[]
-  ): string {
-    return `
-    ALTER TABLE ${referencingSchema}.${referencingTable} 
-    ADD CONSTRAINT ${constraintName}
-    FOREIGN KEY (${this.generateColumnString(referencingColumns)})
-    REFERENCES ${referencedSchema}.${referencedTable} (${this.generateColumnString(
-      referencedColumns
-    )});
-`;
-  }
-
-  public override SQL_ADD_PRIMARY_KEY(newSchema, newTable, primaryKey): string {
-    return `ALTER TABLE ${newSchema}.${newTable} ADD PRIMARY KEY (${this.generateColumnString(
-      primaryKey
-    )});`;
-  }
-
-  private generateColumnString(columns: string[]) {
-    return columns.map((c) => `[${c}]`).join(", ");
   }
 
   public getJdbcPath(): string {

@@ -1,0 +1,34 @@
+<div>
+  <sbb-select [(ngModel)]="_lhs" multiple placeholder="Key Columns">
+    <app-sbb-option-all
+      [(current)]="_lhs"
+      [available]="table.columns.asArray()"
+    ></app-sbb-option-all>
+    <sbb-option
+      *ngFor="let column of table.columns"
+      [value]="column"
+      [sbbTooltip]="column.name"
+      >{{ column.sourceColumn.name }}
+    </sbb-option>
+  </sbb-select>
+</div>
+<div>
+  <sbb-select [(ngModel)]="rhs" multiple placeholder="Other Columns">
+    <app-sbb-option-all
+      [(current)]="_rhs"
+      [available]="table.columns.asArray()"
+    ></app-sbb-option-all>
+    <sbb-option
+      *ngFor="let column of table.columns.asArray()"
+      [value]="column"
+      [sbbTooltip]="column.name"
+      >{{ column.sourceColumn.name }}
+    </sbb-option>
+  </sbb-select>
+</div>
+<button sbb-button [disabled]="checkNotAllowed()" (click)="checkFd()">
+  Check Functional Dependency
+</button>
+<div *ngIf="isValid">
+  <h3>FD is valid</h3>
+</div>

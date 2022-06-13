@@ -20,6 +20,11 @@ A clear and concise description of what you expected to happen.
 **Actual behaviour**
 How does the behaviour differ from the expecte?
 
+**Schema export**
+
+If you are having issues with a generated schema, use the "Save current schema state"
+button in the top right corner and attach the downloaded file to this issue
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 

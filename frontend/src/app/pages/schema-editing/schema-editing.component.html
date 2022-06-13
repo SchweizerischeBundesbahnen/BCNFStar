@@ -1,57 +1,67 @@
-<div class="container-fluid border">
-  <div class="row border">
-    <div class="col-8 border">
-      <!-- [selectedTable]="this.selectedTable" -->
-      <!-- (selected)="onSelect($event)" -->
-      <app-schema-graph
-        [schema]="this.schema"
-        [(selectedTable)]="this.selectedTable"
-        [selectedColumns]="this.selectedColumns"
-        [schemaChanged]="this.schemaChanged.asObservable()"
-        (joinFk)="onJoin($event)"
-      ></app-schema-graph>
-    </div>
-    <div class="col-4 border schema-editing-side-bar">
-      <button type="button" sbb-button (click)="this.onAutoNormalize()">
-        {{
-          this.selectedTable !== undefined
-            ? "Auto-normalize this table"
-            : "Auto-normalize all tables"
-        }}
-      </button>
-      <app-undo-redo
-        class="undo-redo"
-        [canUndo]="this.commandProcessor.canUndo()"
-        [canRedo]="this.commandProcessor.canRedo()"
-        (undo)="onUndo()"
-        (redo)="onRedo()"
-      ></app-undo-redo>
+<div class="grid-container">
+  <div class="grid-container-graphmenu">
+    <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">
+      Reset view
+    </button>
+    <button
+      type="button"
+      sbb-button
+      (click)="onAutoNormalize(schema.tables)"
+      class="me-1"
+    >
+      {{ "Auto-normalize all tables" }}
+    </button>
+    <sbb-toggle (change)="setStarMode($event)" class="me-1">
+      <sbb-toggle-option label="Normal Mode" [value]="false">
+      </sbb-toggle-option>
+      <sbb-toggle-option label="Star Schema Mode" [value]="true">
+      </sbb-toggle-option>
+    </sbb-toggle>
+    <app-undo-redo
+      class="undo-redo"
+      [canUndo]="commandProcessor.canUndo()"
+      [canRedo]="commandProcessor.canRedo()"
+      (undo)="onUndo()"
+      (redo)="onRedo()"
+    ></app-undo-redo>
+  </div>
+  <div>
+    <app-schema-graph
+      [schema]="schema"
+      [(selectedTable)]="selectedTable"
+      [selectedColumns]="selectedColumns"
+      [schemaChanged]="schemaChanged.asObservable()"
+      (joinFk)="onClickJoin($event)"
+      (makeDirectDimension)="onClickMakeDirectDimension($event)"
+    ></app-schema-graph>
+  </div>
 
-      <input
-        type="text"
-        sbbInput
-        placeholder="Schema Name"
-        [(ngModel)]="schemaName"
-      />
-
-      <button
-        type="button"
-        sbb-button
-        [disabled]="!this.schemaName"
-        (click)="download()"
-      >
-        Download SQL
-      </button>
+  <div class="item-sidebar">
+    <div class="grid-container-sidebar">
+      <div>
+        <h2>Schema export</h2>
+        <div class="mb-1">
+          <app-persist-schema [schema]="schema"></app-persist-schema>
+        </div>
+        <div>
+          <app-save-schema-editing [schema]="schema"> </app-save-schema-editing>
+        </div>
+      </div>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
-        *ngIf="this.selectedTable"
-        [table]="this.selectedTable"
-        [schema]="this.schema"
+        *ngIf="selectedTable"
+        [table]="selectedTable"
+        [schema]="schema"
         (splitFd)="onClickSplit($event)"
         (indToFk)="onIndToFk($event)"
+        (deleteColumnEvent)="onDeleteColumn($event)"
         (selectColumns)="onSelectColumns($event)"
-        (renameTable)="onChangeTableName($event)"
+        (setSurrogateKey)="onSetSurrogateKey($event)"
+        (autoNormalizeSelectedTable)="onAutoNormalize(selectedTable)"
       ></app-schema-editing-side-bar>
+      <h2 *ngIf="!selectedTable" class="table-not-selected">
+        Select a table in the graph to start editing
+      </h2>
     </div>
   </div>
 </div>

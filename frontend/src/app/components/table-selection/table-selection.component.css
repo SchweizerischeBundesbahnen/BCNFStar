@@ -1,0 +1,59 @@
+.hover-color-white:hover {
+  color: var(--sbb-color-white);
+}
+
+button {
+  margin-top: 0.5vw;
+}
+
+.checkbox {
+  overflow: hidden;
+  width: 100%;
+}
+
+.container {
+  margin-left: 0.5vw;
+}
+
+.grid-container-table {
+  display: grid;
+  grid-template-columns: 33.33% calc(66.67% - 20px);
+  gap: 10px;
+  background-color: white;
+}
+
+h3 {
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loading-box {
+  text-align: center;
+}
+
+sbb-accordion {
+  width: 100%;
+}
+
+sbb-checkbox {
+  padding-bottom: 5px;
+}
+
+span {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.table-checkbox {
+  display: block;
+}
+
+.tablePreview {
+  height: 75vh;
+  width: 100%;
+  min-height: 400px;
+}
+
+
+

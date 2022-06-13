@@ -1,0 +1,7 @@
+{
+  "schema": "public",
+  "table": "nation_region_denormalized",
+  "column": "n_nationkey",
+  "currentDatatype": "integer",
+  "targetDatatype": "integer"
+}

@@ -1,9 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["es5", "dom"],
-    "types": ["cypress"],
+    "target": "es2019",
+    "lib": ["es2019", "dom"],
+    "types": ["cypress", "cypress-file-upload"],
     "moduleResolution": "node"
   },
   "include": [

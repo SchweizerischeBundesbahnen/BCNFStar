@@ -4,21 +4,27 @@
     <form class="sbb-form-group-vertical" [formGroup]="formGroup">
       <h2>Functional Dependencies</h2>
       <div *ngFor="let table of tables; let index = index">
-        {{ table.schemaAndName() }}
+        {{ table.fullName }}
         <sbb-toggle
           [formControl]="selectedFdTab[index]"
           (change)="setFdConfig(table)"
         >
+          <sbb-toggle-option label="Use no Metanome result" value="no-result">
+            <sbb-toggle-details>
+              Don't use Functional Dependencies for this table.
+            </sbb-toggle-details>
+          </sbb-toggle-option>
           <sbb-toggle-option
             label="Use existing result"
             value="existing-result"
             [disabled]="filteredMetanomeResultsForFd(table).length === 0"
           >
             <sbb-toggle-details>
-              <sbb-select [formControlName]="'fds_' + table.schemaAndName()">
+              <sbb-select [formControlName]="'fds_' + table.fullName">
                 <sbb-option
                   *ngFor="let result of filteredMetanomeResultsForFd(table)"
                   [value]="result"
+                  [sbbTooltip]="metanomeConfigInfo(result)"
                 >
                   {{ metanomeConfigInfo(result) }}
                 </sbb-option>
@@ -32,7 +38,7 @@
                 [ngTemplateOutlet]="configParameters"
                 [ngTemplateOutletContext]="{
                   config: hyfdConfigs,
-                  configName: 'fds_' + table.schemaAndName()
+                  configName: 'fds_' + table.fullName
                 }"
               ></ng-container>
             </sbb-toggle-details>
@@ -42,6 +48,11 @@
       <h2>Inclusion Dependencies</h2>
       {{ getAllTableNames() }}
       <sbb-toggle [formControl]="selectedIndTab" (change)="setIndConfig()">
+        <sbb-toggle-option label="Use no Metanome result" value="no-result">
+          <sbb-toggle-details>
+            Don't use Inclusion Dependencies for these tables.
+          </sbb-toggle-details>
+        </sbb-toggle-option>
         <sbb-toggle-option
           label="Use existing result"
           value="existing-result"
@@ -52,6 +63,7 @@
               <sbb-option
                 *ngFor="let result of filteredMetanomeResultsForInd()"
                 [value]="result"
+                [sbbTooltip]="metanomeConfigInfo(result)"
               >
                 {{ metanomeConfigInfo(result) }}
               </sbb-option>
@@ -117,6 +129,7 @@
       *ngIf="isBoolean(entry.value)"
       [(ngModel)]="config[configName]['config'][$any(entry).key]"
       [ngModelOptions]="{ standalone: true }"
+      [class]="$any(entry).key"
     >
       {{ $any(entry).key }}
     </sbb-checkbox>
@@ -126,6 +139,7 @@
         sbbInput
         [(ngModel)]="config[configName]['config'][$any(entry).key]"
         [ngModelOptions]="{ standalone: true }"
+        [class]="$any(entry).key"
       />
     </div>
   </div>

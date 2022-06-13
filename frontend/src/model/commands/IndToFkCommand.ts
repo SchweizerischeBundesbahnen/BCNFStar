@@ -1,29 +1,17 @@
-import Relationship from '../schema/Relationship';
 import Schema from '../schema/Schema';
-import Table from '../schema/Table';
+import SourceRelationship from '../schema/SourceRelationship';
 import Command from './Command';
 
 export default class IndToFkCommand extends Command {
-  schema: Schema;
-  relationship: Relationship;
-  referencing: Table;
-  referenced: Table;
-
   public constructor(
-    schema: Schema,
-    relationship: Relationship,
-    referencing: Table,
-    referenced: Table
+    private schema: Schema,
+    private relationship: SourceRelationship
   ) {
     super();
-    this.schema = schema;
-    this.relationship = relationship;
-    this.referencing = referencing;
-    this.referenced = referenced;
   }
 
   protected override _do(): void {
-    this.schema.addFk(this.relationship);
+    this.schema.addFks(this.relationship);
   }
 
   protected override _undo(): void {
@@ -31,6 +19,6 @@ export default class IndToFkCommand extends Command {
   }
 
   protected override _redo(): void {
-    this.schema.addFk(this.relationship);
+    this.schema.addFks(this.relationship);
   }
 }

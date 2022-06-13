@@ -1,0 +1,20 @@
+<div class="grid-container mx-1">
+  <input
+    class="me-1"
+    type="text"
+    sbbInput
+    id="schema-name-input"
+    placeholder="Schema name"
+    [(ngModel)]="schemaName"
+    style="text-transform: lowercase"
+  />
+
+  <button
+    type="button"
+    sbb-button
+    [disabled]="!schemaName"
+    (click)="download()"
+  >
+    Download SQL
+  </button>
+</div>

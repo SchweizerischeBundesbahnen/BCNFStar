@@ -58,19 +58,21 @@ export class MetanomeSettingsComponent {
     public dataService: DatabaseService,
     private http: HttpClient
   ) {
+    this.tables.sort((table, anotherTable) =>
+      table.fullName <= anotherTable.fullName ? -1 : 1
+    );
     let controlsConfig: Record<string, any> = {};
     controlsConfig['ind'] = {};
 
     tables.forEach((table) => {
       this.selectedFdTab.push(new FormControl('hyfd'));
 
-      this.hyfdConfigs['fds_' + table.schemaAndName()] =
-        this.createDefaultFdIndexFile(
-          table.schemaAndName(),
-          Object.assign({}, defaulHyfdConfig),
-          hyfdAlgorithmName
-        );
-      controlsConfig['fds_' + table.schemaAndName()] = {};
+      this.hyfdConfigs['fds_' + table.fullName] = this.createDefaultFdIndexFile(
+        table.fullName,
+        Object.assign({}, defaulHyfdConfig),
+        hyfdAlgorithmName
+      );
+      controlsConfig['fds_' + table.fullName] = {};
     });
 
     this.formGroup = formBuilder.group(controlsConfig);
@@ -126,7 +128,7 @@ export class MetanomeSettingsComponent {
     algorithm: string = binderAlgorithmName
   ): IIndexFileEntry {
     let newIndexFileEntry: IIndexFileEntry = {
-      tables: this.tables.map((table) => table.schemaAndName()).sort(),
+      tables: this.tables.map((table) => table.fullName).sort(),
       dbmsName: '',
       database: '',
       resultType: MetanomeResultType.ind,
@@ -143,7 +145,7 @@ export class MetanomeSettingsComponent {
       .filter(
         (res) =>
           res.resultType === MetanomeResultType.fd &&
-          res.tables[0] === table.schemaAndName()
+          res.tables[0] === table.fullName
       )
       .sort(function (table, otherTable) {
         return otherTable.createDate - table.createDate;
@@ -155,7 +157,7 @@ export class MetanomeSettingsComponent {
       .filter(
         (res) =>
           res.resultType === MetanomeResultType.ind &&
-          this.tables.every((t) => res.tables.includes(t.schemaAndName()))
+          this.tables.every((t) => res.tables.includes(t.fullName))
       )
       .sort(function (table, otherTable) {
         return otherTable.createDate - table.createDate;
@@ -164,7 +166,7 @@ export class MetanomeSettingsComponent {
 
   public getAllTableNames() {
     return this.tables
-      .map((table) => table.schemaAndName())
+      .map((table) => table.fullName)
       .sort()
       .join(', ');
   }
@@ -173,56 +175,67 @@ export class MetanomeSettingsComponent {
     return typeof value == 'boolean';
   }
 
-  public metanomeConfigInfo(result: IIndexFileEntry): String {
+  public metanomeConfigInfo(result: IIndexFileEntry): string {
     let settings = [
       new Date(+result.createDate).toLocaleString(),
       result.algorithm.split('.').slice(-1),
       Object.entries(result.config)
+        .map((value) =>
+          value[1].constructor.name === 'String' && value[1] == ''
+            ? [value[0], '?']
+            : value
+        )
         .join(';')
-        .replace(',', ': ')
-        .replace(';', ', ') || 'no further configs',
+        .replaceAll(',', ': ')
+        .replaceAll(';', ', ') || 'no further configs',
     ];
     return settings.join(' | ');
   }
 
   public setFdConfig(table: Table) {
     const tab: string = this.selectedFdTab[this.tables.indexOf(table)].value;
+    let indexFile: IIndexFileEntry;
     switch (tab) {
+      case 'no-result':
+        indexFile = this.createDefaultFdIndexFile(
+          table.fullName,
+          { memory: '' },
+          'no-result'
+        );
+        break;
       case 'existing-result':
-        this.formGroup.patchValue({
-          ['fds_' + table.schemaAndName()]:
-            this.filteredMetanomeResultsForFd(table)[0],
-        });
+        indexFile = this.filteredMetanomeResultsForFd(table)[0];
         break;
       case 'hyfd':
-        this.formGroup.patchValue({
-          ['fds_' + table.schemaAndName()]:
-            this.hyfdConfigs['fds_' + table.schemaAndName()],
-        });
+        indexFile = this.hyfdConfigs['fds_' + table.fullName];
         break;
     }
+    this.formGroup.patchValue({
+      ['fds_' + table.fullName]: indexFile!,
+    });
     this.formGroup.updateValueAndValidity();
   }
 
   public setIndConfig() {
     const tab: string = this.selectedIndTab.value;
+    let indexFile: IIndexFileEntry;
     switch (tab) {
+      case 'no-result':
+        indexFile = this.createDefaultIndIndexFile({ memory: '' }, 'no-result');
+        break;
       case 'existing-result':
-        this.formGroup.patchValue({
-          ind: this.filteredMetanomeResultsForInd()[0],
-        });
+        indexFile = this.filteredMetanomeResultsForInd()[0];
         break;
       case 'binder':
-        this.formGroup.patchValue({
-          ind: this.binderConfigs['ind'],
-        });
+        indexFile = this.binderConfigs['ind'];
         break;
       case 'faida':
-        this.formGroup.patchValue({
-          ind: this.faidaConfigs['ind'],
-        });
+        indexFile = this.faidaConfigs['ind'];
         break;
     }
+    this.formGroup.patchValue({
+      ind: indexFile!,
+    });
     this.formGroup.updateValueAndValidity();
   }
 

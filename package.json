@@ -13,6 +13,7 @@
     "test:prod": "cross-env CYPRESS_FRONTEND_BASEURL=http://localhost CYPRESS_BACKEND_BASEURL=http://localhost run-p start:coverage cypress:open",
     "start:coverage": "nyc npm run start",
     "prebuild": "npm run generateTypeGuards",
+    "postinstall": "npm run generateTypeGuards",
     "install:server": "cd server && npm install",
     "install:frontend": "cd frontend && npm install",
     "build:frontend": "cd frontend && npm run build",
@@ -31,6 +32,10 @@
     "@cypress/code-coverage": "^3.9.12",
     "cross-env": "^7.0.3",
     "cypress": "^9.1.0",
+    "cypress-dotenv": "^2.0.0",
+    "cypress-file-upload": "^5.0.8",
+    "cypress-postgres": "^1.1.1",
+    "dotenv": "^16.0.1",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.1.2",
@@ -44,6 +49,7 @@
   },
   "dependencies": {
     "@types/node": "^16.11.11",
+    "cypress-postgresql": "^1.0.8",
     "ts-auto-guard": "^1.0.0-alpha.29",
     "typescript": "~4.4.4"
   }

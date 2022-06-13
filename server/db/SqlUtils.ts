@@ -1,6 +1,15 @@
-import IAttribute from "@/definitions/IAttribute";
-import IRelationship from "@/definitions/IRelationship";
+import { IColumnRelationship } from "../definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
+import ITable from "@/definitions/ITable";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -11,6 +20,7 @@ export type SchemaQueryRow = {
 };
 
 export type ForeignKeyResult = {
+  fk_name: string;
   table_schema: string;
   table_name: string;
   column_name: string;
@@ -42,12 +52,14 @@ export default abstract class SqlUtils {
   public abstract getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public abstract tableExistsInSchema(
     schema: string,
     table: string
   ): Promise<boolean>;
+
+  public abstract UNIVERSAL_DATATYPE(): string;
 
   protected readonly QUERY_PRIMARY_KEYS: string = `
     SELECT 
@@ -64,58 +76,156 @@ export default abstract class SqlUtils {
   public abstract getJdbcPath(): string;
   public abstract getDbmsName(): DbmsType;
 
-  public abstract SQL_CREATE_SCHEMA(newSchema: string): string;
-  public abstract SQL_DROP_TABLE_IF_EXISTS(
-    newSchema: string,
-    newTable: string
-  ): string;
-  public abstract SQL_CREATE_TABLE(
-    attributes: IAttribute[],
-    primaryKey: string[],
-    newSchema,
-    newTable
-  ): string;
+  public abstract getDatatypes(): Promise<string[]>;
 
-  public SQL_INSERT_DATA(
-    attributes: IAttribute[],
-    sourceTables: string[],
-    relationships: IRelationship[],
-    newSchema: string,
-    newTable: string
-  ): string {
-    return `INSERT INTO ${newSchema}.${newTable} SELECT DISTINCT ${attributes
-      .map((attr) => `${attr.table}.${attr.name}`)
-      .join(", ")} FROM ${sourceTables.join(", ")}
-    ${this.where(relationships)};
+  public abstract testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability>;
+
+  public abstract escape(str: string): string;
+
+  public generateColumnString(columns: string[]): string {
+    return columns.map((c) => this.escape(c)).join(", ");
+  }
+
+  public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
+    const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
+    // Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int)
+    return `
+    SELECT ${this.escape(tc.column)} FROM ${tableString} 
+    EXCEPT 
+    SELECT CAST(CAST(${this.escape(tc.column)} AS ${tc.targetDatatype}) AS ${
+      tc.currentDatatype
+    }) FROM ${tableString} 
     `;
   }
 
-  public where(relationships: IRelationship[]): string {
-    if (relationships.length == 0) return "";
-    return `WHERE ${relationships
-      .map((relationship) =>
-        relationship.columnRelationships
-          .map(
-            (column) =>
-              `${relationship.referencing.schemaName}.${relationship.referencing.name}.${column.referencingColumn} = ${relationship.referenced.schemaName}.${relationship.referenced.name}.${column.referencedColumn}`
-          )
-          .join(" AND ")
-      )
-      .join(" AND ")}`;
+  /** Expects to get two keys respectively. Otherwise, this Sql won't work correctly, i.e. return wrong results
+   * The SQL calculates the number of rows of the unioned tables and the number of rows of the unioned key-columns and takes the difference
+   * difference > 0 means, that the key is invalid as the unioned table contains different rows with the same key. (SQL-UNION is implemented as a SET-Operation)
+   */
+  public testKeyUnionabilitySql(uk: IRequestBodyUnionedKeys): string {
+    const table1Identifier: string = `${this.escape(
+      uk.key1.table_schema
+    )}.${this.escape(uk.key1.table_name)}`;
+    const table2Identifier: string = `${this.escape(
+      uk.key2.table_schema
+    )}.${this.escape(uk.key2.table_name)}`;
+
+    return `
+  SELECT 
+    (SELECT COUNT(*) as unionedCount
+    FROM
+    (
+    SELECT ${this.generateColumnString(
+      uk.unionedColumns[0]
+    )} FROM ${table1Identifier} 
+    UNION
+    SELECT ${this.generateColumnString(
+      uk.unionedColumns[1]
+    )} FROM ${table2Identifier} 
+    ) as unionedCount)
+  -
+    (SELECT COUNT(*) as unionedCountKey
+    FROM
+    (
+      SELECT ${this.generateColumnString(
+        uk.key1.attributes
+      )} FROM ${table1Identifier}
+      UNION
+      SELECT ${this.generateColumnString(
+        uk.key2.attributes
+      )} FROM ${table2Identifier}
+    ) as unionedcount) as count
+`;
   }
 
-  public abstract SQL_ADD_PRIMARY_KEY(
-    newSchema: string,
-    newTable: string,
-    primaryKey: string[]
-  ): string;
-  public abstract SQL_FOREIGN_KEY(
-    constraintName: string,
-    referencingSchema: string,
-    referencingTable: string,
-    referencingColumns: string[],
-    referencedSchema: string,
-    referencedTable: string,
-    referencedColumns: string[]
-  ): string;
+  public abstract testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting>;
+
+  public abstract getViolatingRowsForFD(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>,
+    offset: number,
+    limit: number
+  ): Promise<ITablePage>;
+
+  public abstract getViolatingRowsForSuggestedINDCount(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): Promise<IRowCounts>;
+
+  public abstract getViolatingRowsForSuggestedIND(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[],
+    offset: number,
+    limit: number
+  ): Promise<ITablePage>;
+
+  /**
+   * Because of the LEFT OUTER JOIN and the WHERE-Clause only those rows from the referencing table are selected, which are missing
+   * in the referenced table and are therefore violating the Inclusion-Dependency.
+   */
+  protected violatingRowsForSuggestedIND_SQL(
+    referencingTable: ITable,
+    referencedTable: ITable,
+    columnRelationships: IColumnRelationship[]
+  ): string {
+    return `
+    SELECT ${columnRelationships
+      .map((cc) => `X.${cc.referencingColumn}`)
+      .join(",")}, COUNT(1) AS Count
+    FROM ${referencingTable.schemaName}.${referencingTable.name} AS X
+    LEFT OUTER JOIN ${referencedTable.schemaName}.${referencedTable.name} AS Y 
+      ON ${columnRelationships
+        .map(
+          (cc) =>
+            `CAST(X.${
+              cc.referencingColumn
+            } AS ${this.UNIVERSAL_DATATYPE()}) = CAST(Y.${
+              cc.referencedColumn
+            } AS ${this.UNIVERSAL_DATATYPE()})`
+        )
+        .join(" AND ")}
+    WHERE Y.${columnRelationships[0].referencedColumn} IS NULL
+    GROUP BY ${columnRelationships
+      .map((cc) => `X.${cc.referencingColumn}`)
+      .join(",")}
+    `;
+  }
+
+  protected violatingRowsForFD_SQL(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): string {
+    return `
+SELECT ${lhs.concat(rhs).join(",")}, COUNT(*) AS Count
+FROM ${schema}.${table} AS x 
+WHERE EXISTS (
+	SELECT 1 FROM (
+		SELECT ${lhs.join(",")} FROM (
+			SELECT ${[...new Set(lhs.concat(rhs))].join(",")}
+			FROM ${schema}.${table} 
+			GROUP BY ${[...new Set(lhs.concat(rhs))].join(",")}
+		) AS Z  -- removes duplicates
+		GROUP BY ${lhs.join(",")} 
+		HAVING COUNT(1) > 1 -- this is violating the fd, as duplicates are removed but the lhs still occures multiple times -> different rhs
+	) AS Y WHERE ${lhs.map((c) => `X.${c} = Y.${c}`).join(" AND ")}
+) 
+GROUP BY ${lhs.concat(rhs).join(",")}
+    `;
+  }
+  public abstract getViolatingRowsForFDCount(
+    schema: string,
+    table: string,
+    lhs: Array<string>,
+    rhs: Array<string>
+  ): Promise<IRowCounts>;
 }

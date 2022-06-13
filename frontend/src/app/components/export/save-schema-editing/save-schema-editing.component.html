@@ -1,0 +1,18 @@
+<div class="grid-container mx-1">
+  <input
+    type="text"
+    sbbInput
+    placeholder="file name"
+    [(ngModel)]="filename"
+    class="me-1"
+  />
+
+  <button
+    type="button"
+    sbb-button
+    [disabled]="!filename"
+    (click)="saveEditedSchema()"
+  >
+    Save current schema state
+  </button>
+</div>

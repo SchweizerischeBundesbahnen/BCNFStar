@@ -1,0 +1,79 @@
+<sbb-accordion>
+  <sbb-expansion-panel [expanded]="true">
+    <sbb-expansion-panel-header>
+      Contained Subtables
+    </sbb-expansion-panel-header>
+    <sbb-select
+      multiple
+      placeholder="Filter columns"
+      [(ngModel)]="_fdClusterFilter"
+    >
+      <app-sbb-option-all
+        [(current)]="_fdClusterFilter"
+        [available]="table.columns.asArray()"
+      ></app-sbb-option-all>
+      <sbb-option
+        *ngFor="let column of table.columns"
+        [value]="column"
+        [sbbTooltip]="column.name"
+        >{{ column.name }}</sbb-option
+      >
+    </sbb-select>
+    <br />
+    <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
+      <sbb-paginator
+        (page)="changePage($event)"
+        [pageSize]="pageSize"
+        [length]="fdClusters().length"
+      >
+      </sbb-paginator>
+      <sbb-expansion-panel
+        *ngFor="
+          let cluster of fdClusters().slice(
+            page * pageSize,
+            (page + 1) * pageSize
+          )
+        "
+        (mouseenter)="emitHighlightedCluster(cluster)"
+        (mouseleave)="selectColumns.emit()"
+      >
+        <sbb-expansion-panel-header style="padding: 0.2rem">
+          <span>
+            <span
+              *ngFor="let column of cluster.columns"
+              [ngClass]="{
+                filtered: fdClusterFilter.includes(column)
+              }"
+              class="cluster-header"
+            >
+              {{ column.name }}</span
+            >
+          </span>
+        </sbb-expansion-panel-header>
+        Keys:
+        <br />
+        <button
+          *ngFor="let fd of cluster.fds"
+          type="button"
+          sbb-button
+          style="margin: 3px"
+          (click)="splitFd.emit(fd)"
+          [sbbTooltip]="fd.lhs.toString()"
+        >
+          {{ fd.lhs }}
+        </button>
+      </sbb-expansion-panel>
+    </sbb-accordion>
+    <ng-template #noClusters>
+      <h2>
+        No contained subtables were found with the current filter for this table
+      </h2>
+    </ng-template>
+  </sbb-expansion-panel>
+  <sbb-expansion-panel [hidden]="table.sources.length !== 1">
+    <sbb-expansion-panel-header
+      >Check Contained Subtable</sbb-expansion-panel-header
+    >
+    <app-check-fd [table]="table"></app-check-fd>
+  </sbb-expansion-panel>
+</sbb-accordion>

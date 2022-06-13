@@ -1,52 +1,82 @@
 import IAttribute from '@server/definitions/IAttribute';
-import ColumnIdentifier from './ColumnIdentifier';
+import BasicColumn from '../types/BasicColumn';
+import SourceColumn from './SourceColumn';
+import SourceTableInstance from './SourceTableInstance';
 
-export default class Column {
-  name: string;
-  dataType: string;
-  ordinalPosition: number;
-  nullable: boolean;
-  source: ColumnIdentifier;
+/**
+ * These objects uniquely identify a column within a table.
+ * Be careful when using them outside the context of a table
+ */
+export default class Column implements BasicColumn {
+  public includeSourceName = false;
 
   public constructor(
-    name: string,
-    dataType: string,
-    ordinalPosition: number,
-    nullable: boolean,
-    source: ColumnIdentifier
-  ) {
-    this.name = name;
-    this.dataType = dataType;
-    this.ordinalPosition = ordinalPosition;
-    this.nullable = nullable;
-    this.source = source;
+    public sourceTableInstance: SourceTableInstance,
+    public sourceColumn: SourceColumn,
+    public userAlias?: string
+  ) {}
+
+  public get name() {
+    let name = '';
+    if (this.includeSourceName) name += `${this.sourceTableInstance.alias}_`;
+    name += this.baseAlias;
+    return name;
+  }
+
+  public get identifier() {
+    return `${this.sourceTableInstance.alias}.${this.sourceColumn.name}`;
+  }
+
+  public get baseAlias(): string {
+    return this.userAlias ?? this.sourceColumn.name;
   }
 
   public copy(): Column {
     return new Column(
-      this.name,
-      this.dataType,
-      this.ordinalPosition,
-      this.nullable,
-      this.source
+      this.sourceTableInstance,
+      this.sourceColumn,
+      this.userAlias
     );
   }
 
-  public dataTypeString() {
+  public get dataType() {
+    return this.sourceColumn.dataType;
+  }
+
+  public get nullable() {
+    return this.sourceColumn.nullable;
+  }
+
+  public get ordinalPosition() {
+    return this.sourceColumn.ordinalPosition;
+  }
+
+  public get dataTypeString() {
     return `(${this.dataType}, ${this.nullable == true ? 'null' : 'not null'})`;
   }
 
   public equals(other: Column): boolean {
+    if (this == other) return true;
     return (
-      this.source.name == other.source.name &&
-      this.source.table.name == other.source.table.name &&
-      this.source.table.schemaName == other.source.table.schemaName
+      this.sourceTableInstance.equals(other.sourceTableInstance) &&
+      this.sourceColumn.equals(other.sourceColumn)
     );
   }
+
+  public applySourceMapping(
+    mapping: Map<SourceTableInstance, SourceTableInstance>
+  ): Column {
+    return new Column(
+      mapping.get(this.sourceTableInstance) || this.sourceTableInstance,
+      this.sourceColumn,
+      this.userAlias
+    );
+  }
+
   public toIAttribute(): IAttribute {
     return {
       name: this.name,
-      table: this.source.table.name,
+      table: this.sourceColumn.table.name,
       dataType: this.dataType,
       nullable: this.nullable,
     };

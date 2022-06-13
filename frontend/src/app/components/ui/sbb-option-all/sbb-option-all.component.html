@@ -1,0 +1,8 @@
+<sbb-checkbox
+  class="sbb-menu-item"
+  (change)="clickSelectAll()"
+  [checked]="areAllSelected()"
+  [indeterminate]="!areAllSelected() && !areZeroSelected()"
+>
+  All
+</sbb-checkbox>

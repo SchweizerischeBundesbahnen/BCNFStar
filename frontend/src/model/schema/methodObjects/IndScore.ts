@@ -1,3 +1,4 @@
+import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
 
 export default class IndScore {
@@ -24,8 +25,8 @@ export default class IndScore {
   public keyIdScore(): number {
     let sum = 0;
     for (let cc of [
-      this.relationship.referenced(),
-      this.relationship.referencing(),
+      new ColumnCombination(this.relationship.referenced),
+      new ColumnCombination(this.relationship.referencing),
     ]) {
       sum += cc
         .columnNames()
@@ -35,7 +36,7 @@ export default class IndScore {
             String(name).toLowerCase().includes('id')
         ).length;
     }
-    return sum / (this.relationship.referenced().cardinality * 2);
+    return sum / (this.relationship.referenced.length * 2);
   }
 
   /**
@@ -44,20 +45,18 @@ export default class IndScore {
    */
   public matchingScore(): number {
     let sum = 0;
-    this.relationship
-      .referenced()
+    new ColumnCombination(this.relationship.referenced)
       .columnNames()
       .forEach((name) => {
         let minDist = 1;
-        this.relationship
-          .referencing()
+        new ColumnCombination(this.relationship.referencing)
           .columnNames()
           .forEach((name2) => {
             minDist = Math.min(minDist, this.levenshteinDistance(name, name2));
           });
         sum += 1 - minDist;
       });
-    return sum / this.relationship.referenced().cardinality;
+    return sum / this.relationship.referenced.length;
   }
 
   /**
