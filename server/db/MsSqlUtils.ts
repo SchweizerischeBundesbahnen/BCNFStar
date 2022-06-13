@@ -194,19 +194,18 @@ export default class MsSqlUtils extends SqlUtils {
   }
 
   public override async getViolatingRowsForFD(
-    schema: string,
-    table: string,
+    _sql: string,
     lhs: Array<string>,
     rhs: Array<string>,
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
-      throw Error("Columns don't exist in table.");
-    }
+    // if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+    //   throw Error("Columns don't exist in table.");
+    // }
 
     const result: sql.IResult<any> = await sql.query(
-      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+      this.violatingRowsForFD_SQL(_sql, lhs, rhs) +
         ` ORDER BY ${lhs.join(",")}
           OFFSET ${offset} ROWS
           FETCH NEXT ${limit} ROWS ONLY
@@ -219,35 +218,35 @@ export default class MsSqlUtils extends SqlUtils {
   }
 
   public async getViolatingRowsForSuggestedIND(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[],
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    if (
-      !this.columnsExistInTable(
-        referencingTable.schemaName,
-        referencingTable.name,
-        columnRelationships.map((c) => c.referencingColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referencing.");
-    }
-    if (
-      !this.columnsExistInTable(
-        referencedTable.schemaName,
-        referencedTable.name,
-        columnRelationships.map((c) => c.referencedColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referenced.");
-    }
+    // if (
+    //   !this.columnsExistInTable(
+    //     referencingTable.schemaName,
+    //     referencingTable.name,
+    //     columnRelationships.map((c) => c.referencingColumn)
+    //   )
+    // ) {
+    //   throw Error("Columns don't exist in referencing.");
+    // }
+    // if (
+    //   !this.columnsExistInTable(
+    //     referencedTable.schemaName,
+    //     referencedTable.name,
+    //     columnRelationships.map((c) => c.referencedColumn)
+    //   )
+    // ) {
+    //   throw Error("Columns don't exist in referenced.");
+    // }
 
     const result: sql.IResult<any> = await sql.query(
       this.violatingRowsForSuggestedIND_SQL(
-        referencingTable,
-        referencedTable,
+        referencingTableSql,
+        referencedTableSql,
         columnRelationships
       ) +
         ` ORDER BY ${columnRelationships
@@ -264,35 +263,35 @@ export default class MsSqlUtils extends SqlUtils {
   }
 
   public async getViolatingRowsForSuggestedINDCount(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
   ): Promise<number> {
-    if (
-      !this.columnsExistInTable(
-        referencingTable.schemaName,
-        referencingTable.name,
-        columnRelationships.map((c) => c.referencingColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referencing.");
-    }
-    if (
-      !this.columnsExistInTable(
-        referencedTable.schemaName,
-        referencedTable.name,
-        columnRelationships.map((c) => c.referencedColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referenced.");
-    }
+    // if (
+    //   !this.columnsExistInTable(
+    //     referencingTable.schemaName,
+    //     referencingTable.name,
+    //     columnRelationships.map((c) => c.referencingColumn)
+    //   )
+    // ) {
+    //   throw Error("Columns don't exist in referencing.");
+    // }
+    // if (
+    //   !this.columnsExistInTable(
+    //     referencedTable.schemaName,
+    //     referencedTable.name,
+    //     columnRelationships.map((c) => c.referencedColumn)
+    //   )
+    // ) {
+    //   throw Error("Columns don't exist in referenced.");
+    // }
 
     const result: sql.IResult<any> = await sql.query(
       `SELECT COUNT (*) as count FROM 
       (
       ${this.violatingRowsForSuggestedIND_SQL(
-        referencingTable,
-        referencedTable,
+        referencingTableSql,
+        referencedTableSql,
         columnRelationships
       )} 
       ) AS X
@@ -302,21 +301,16 @@ export default class MsSqlUtils extends SqlUtils {
   }
 
   public async getViolatingRowsForFDCount(
-    schema: string,
-    table: string,
+    _sql: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<number> {
-    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
-      throw Error("Columns don't exist in table.");
-    }
+    // if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
+    //   throw Error("Columns don't exist in table.");
+    // }
 
     const result: sql.IResult<any> = await sql.query(
-      `SELECT ISNULL (SUM(Count), 0) as count FROM 
-      (
-      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
-      ) AS X
-      `
+      this.getViolatingRowsForFDCount_Sql(_sql, lhs, rhs)
     );
     return result.recordset[0].count;
   }

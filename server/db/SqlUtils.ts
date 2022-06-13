@@ -69,8 +69,7 @@ export default abstract class SqlUtils {
   public abstract getDbmsName(): DbmsType;
 
   public abstract getViolatingRowsForFD(
-    schema: string,
-    table: string,
+    sql: string,
     lhs: Array<string>,
     rhs: Array<string>,
     offset: number,
@@ -78,14 +77,14 @@ export default abstract class SqlUtils {
   ): Promise<ITablePage>;
 
   public abstract getViolatingRowsForSuggestedINDCount(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
   ): Promise<number>;
 
   public abstract getViolatingRowsForSuggestedIND(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[],
     offset: number,
     limit: number
@@ -96,16 +95,24 @@ export default abstract class SqlUtils {
    * in the referenced table and are therefore violating the Inclusion-Dependency.
    */
   protected violatingRowsForSuggestedIND_SQL(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
   ): string {
+    const referencingTempTable: ITemptableScript = this.tempTableScripts(
+      referencingTableSql,
+      "X"
+    );
+    const referencedTempTable: ITemptableScript = this.tempTableScripts(
+      referencedTableSql,
+      "Y"
+    );
     return `
     SELECT ${columnRelationships
       .map((cc) => `X.${cc.referencingColumn}`)
       .join(",")}, COUNT(1) AS Count
-    FROM ${referencingTable.schemaName}.${referencingTable.name} AS X
-    LEFT OUTER JOIN ${referencedTable.schemaName}.${referencedTable.name} AS Y 
+    FROM ${referencingTempTable.name} AS X
+    LEFT OUTER JOIN ${referencedTempTable.name} AS Y 
       ON ${columnRelationships
         .map(
           (cc) =>
@@ -131,26 +138,27 @@ export default abstract class SqlUtils {
   }
 
   /**
-   *
    * @param Sql The Sql that queries the information the temp-table should contain
    * @param name The name of the temp-table. Relevant for multiple temp-table in one query
    */
   public abstract tempTableScripts(Sql: string, name: string): ITemptableScript;
 
   protected violatingRowsForFD_SQL(
-    schema: string,
-    table: string,
+    sql: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): string {
+    const tempTable: ITemptableScript = this.tempTableScripts(sql, "X");
+
     return `
+${tempTable.createScript}
 SELECT ${lhs.concat(rhs).join(",")}, COUNT(*) AS Count
-FROM ${schema}.${table} AS x 
+FROM ${tempTable.name} AS x 
 WHERE EXISTS (
 	SELECT 1 FROM (
 		SELECT ${lhs.join(",")} FROM (
 			SELECT ${[...new Set(lhs.concat(rhs))].join(",")}
-			FROM ${schema}.${table} 
+			FROM ${tempTable.name} 
 			GROUP BY ${[...new Set(lhs.concat(rhs))].join(",")}
 		) AS Z  -- removes duplicates
 		GROUP BY ${lhs.join(",")} 
@@ -161,9 +169,16 @@ GROUP BY ${lhs.concat(rhs).join(",")}
     `;
   }
   public abstract getViolatingRowsForFDCount(
-    schema: string,
-    table: string,
+    _sql: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<number>;
+
+  public getViolatingRowsForFDCount_Sql(sql: string, lhs, rhs) {
+    return `SELECT COALESCE(SUM(Count), 0) as count FROM 
+    (
+    ${this.violatingRowsForFD_SQL(sql, lhs, rhs)} 
+    ) AS X
+    `;
+  }
 }

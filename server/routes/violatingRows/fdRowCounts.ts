@@ -17,8 +17,7 @@ export default async function getViolatingRows(
       req.body as IRequestBodyFDViolatingRows;
 
     const result = await sqlUtils.getViolatingRowsForFDCount(
-      body.schema,
-      body.table,
+      body.sql,
       body.lhs,
       body.rhs
     );
