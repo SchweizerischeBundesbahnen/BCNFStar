@@ -1,4 +1,5 @@
 import IAttribute from '@server/definitions/IAttribute';
+import BasicColumn from '../types/BasicColumn';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 
@@ -6,7 +7,7 @@ import SourceTableInstance from './SourceTableInstance';
  * These objects uniquely identify a column within a table.
  * Be careful when using them outside the context of a table
  */
-export default class Column {
+export default class Column implements BasicColumn {
   public includeSourceName = false;
 
   public constructor(
@@ -50,7 +51,7 @@ export default class Column {
     return this.sourceColumn.ordinalPosition;
   }
 
-  public dataTypeString() {
+  public get dataTypeString() {
     return `(${this.dataType}, ${this.nullable == true ? 'null' : 'not null'})`;
   }
 

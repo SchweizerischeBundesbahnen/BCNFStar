@@ -17,6 +17,7 @@ import {
   IRequestBodyUnionedKeys,
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -144,7 +145,7 @@ export default class PostgresSqlUtils extends SqlUtils {
   public async getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
       // from https://stackoverflow.com/questions/7943233/fast-way-to-discover-the-row-count-of-a-table-in-postgresql
@@ -162,7 +163,8 @@ export default class PostgresSqlUtils extends SqlUtils {
         this.pool.query(`VACUUM ${schema}.${table}`);
         queryResult = await this.pool.query(rowCountQuery);
       }
-      return queryResult.rows[0].count;
+      const count = queryResult.rows[0].count;
+      return { entries: count, groups: count };
     } else {
       throw {
         error: "Table or schema does not exist in database",
@@ -240,18 +242,18 @@ from
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<number> {
+  ): Promise<{ entries: number; groups: number }> {
     if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
       throw Error("Columns don't exist in table.");
     }
-    const count = await this.pool.query<{ count: number }>(
-      `SELECT COALESCE(SUM(Count), 0) as count FROM 
-      (
-      ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
+
+    const result = await this.pool.query<{ entries: number; groups: number }>(
+      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups FROM 
+      (${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
       ) AS X
       `
     );
-    return count.rows[0].count;
+    return result.rows[0];
   }
 
   public async getViolatingRowsForSuggestedIND(
@@ -303,7 +305,7 @@ from
     referencingTable: ITable,
     referencedTable: ITable,
     columnRelationships: IColumnRelationship[]
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     if (
       !this.columnsExistInTable(
         referencingTable.schemaName,
@@ -323,18 +325,16 @@ from
       throw Error("Columns don't exist in referenced.");
     }
 
-    const count = await this.pool.query<{ count: number }>(
-      `SELECT COUNT (*) as count FROM 
-      (
-        ${this.violatingRowsForSuggestedIND_SQL(
-          referencingTable,
-          referencedTable,
-          columnRelationships
-        )}
-      ) AS X
-      `
+    const count = await this.pool.query<IRowCounts>(
+      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
+      FROM ( ${this.violatingRowsForSuggestedIND_SQL(
+        referencingTable,
+        referencedTable,
+        columnRelationships
+      )}
+      ) AS X`
     );
-    return count.rows[0].count;
+    return count.rows[0];
   }
 
   public async columnsExistInTable(

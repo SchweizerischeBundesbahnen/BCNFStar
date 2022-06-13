@@ -9,6 +9,7 @@ import {
   IRequestBodyUnionedKeys,
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -51,7 +52,7 @@ export default abstract class SqlUtils {
   public abstract getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public abstract tableExistsInSchema(
     schema: string,
@@ -90,7 +91,7 @@ export default abstract class SqlUtils {
   public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
     const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
     // Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int)
-	return `
+    return `
     SELECT ${this.escape(tc.column)} FROM ${tableString} 
     EXCEPT 
     SELECT CAST(CAST(${this.escape(tc.column)} AS ${tc.targetDatatype}) AS ${
@@ -156,7 +157,7 @@ export default abstract class SqlUtils {
     referencingTable: ITable,
     referencedTable: ITable,
     columnRelationships: IColumnRelationship[]
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public abstract getViolatingRowsForSuggestedIND(
     referencingTable: ITable,
@@ -226,5 +227,5 @@ GROUP BY ${lhs.concat(rhs).join(",")}
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 }

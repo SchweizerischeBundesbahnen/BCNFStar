@@ -45,55 +45,14 @@
       </sbb-accordion>
     </div>
   </div>
-  <div *ngIf="withContentPreview && hoveredTable">
-    <ng-container
-      [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"
-    >
-      <h3>
-        <span>{{ hoveredTable.fullName }}</span>
-      </h3>
-      <sbb-table-wrapper class="table-wrapper">
-        <table sbb-table [dataSource]="dataSource">
-          <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
-          <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
-          <ng-container
-            *ngFor="let column of hoveredTable.columns.sourceColumnNames()"
-            [sbbColumnDef]="column"
-          >
-            <th sbb-header-cell *sbbHeaderCellDef>{{ column }}</th>
-            <td
-              [ngClass]="{ numeric: isNumeric(column) }"
-              *sbbCellDef="let element"
-            >
-              {{ element[column] }}
-            </td>
-          </ng-container>
-        </table>
-      </sbb-table-wrapper>
-      <div class="grid-container-paginator">
-        <sbb-paginator
-          (page)="changePage($event)"
-          [pageIndex]="page"
-          [pageSize]="pageLimit"
-          [length]="tableRowCounts.get(hoveredTable)"
-          class="mt-2"
-        >
-        </sbb-paginator>
-        <ng-container *ngSwitchCase="1">
-          <div class="text-aling-right mt-2">
-            {{ pageLimit * page + 1 }} -
-            {{ pageLimit * page + dataSource.data.length }} /
-            {{ tableRowCounts.get(hoveredTable) }}
-          </div>
-        </ng-container>
-        <ng-container *ngSwitchDefault>
-          <div class="text-aling-right mt-2">
-            {{ pageLimit * page }} /
-            {{ tableRowCounts.get(hoveredTable) }}
-          </div>
-        </ng-container>
-      </div>
-    </ng-container>
+  <div *ngIf="withContentPreview && hoveredTable" class="tablePreview">
+    <h3>
+      <span>{{ hoveredTable.fullName }}</span>
+    </h3>
+    <app-database-table-viewer
+      [dataService]="dataQuery!"
+      [rowCount]="tableRowCounts.get(hoveredTable)!"
+    ></app-database-table-viewer>
   </div>
 </div>
 

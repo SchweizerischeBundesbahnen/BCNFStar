@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
+import IRowCounts from '@server/definitions/IRowCounts';
 import { DataQuery } from '../../../dataquery';
 
 @Component({
@@ -9,14 +10,14 @@ import { DataQuery } from '../../../dataquery';
 })
 export class ViolatingRowsViewIndsComponent {
   public dataService: DataQuery;
-  public rowCount: number = 0;
+  public rowCount: IRowCounts = { entries: 0, groups: 0 };
 
   constructor(
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA)
     public data: {
       dataService: DataQuery;
-      rowCount: number;
+      rowCount: IRowCounts;
     }
   ) {
     this.dataService = this.data.dataService;
