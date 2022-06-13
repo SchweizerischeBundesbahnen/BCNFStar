@@ -1,0 +1,2042 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>bcnfstar-frontend documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">bcnfstar-frontend documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content component">
+                   <div class="content-data">
+
+
+
+
+<ol class="breadcrumb">
+  <li>Components</li>
+  <li
+  >
+  SchemaEditingComponent</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+        <li >
+            <a href="#templateData" role="tab" id="templateData-tab" data-toggle="tab" data-link="template">Template</a>
+        </li>
+        <li >
+            <a href="#styleData" role="tab" id="styleData-tab" data-toggle="tab" data-link="style">Styles</a>
+        </li>
+        <li >
+            <a href="#tree" role="tab" id="tree-tab" data-toggle="tab" data-link="dom-tree">DOM Tree</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info"><p class="comment">
+    <h3>File</h3>
+</p>
+<p class="comment">
+    <code>src/app/pages/schema-editing/schema-editing.component.ts</code>
+</p>
+
+
+
+
+
+
+<section>
+    <h3>Metadata</h3>
+    <table class="table table-sm table-hover metadata">
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+            <tr>
+                <td class="col-md-3">selector</td>
+                <td class="col-md-9"><code>app-schema-editing</code></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-3">styleUrls</td>
+                <td class="col-md-9"><code>./schema-editing.component.css</code></td>
+            </tr>
+
+
+
+            <tr>
+                <td class="col-md-3">templateUrl</td>
+                <td class="col-md-9"><code>./schema-editing.component.html</code></td>
+            </tr>
+
+
+
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Readonly</span>
+                                <a href="#commandProcessor" >commandProcessor</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#dataService" >dataService</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#dialog" >dialog</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#graph" >graph</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#router" >router</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Readonly</span>
+                                <a href="#schema" >schema</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#schemaChanged" >schemaChanged</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Optional</span>
+                                <a href="#selectedColumns" >selectedColumns</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Optional</span>
+                                <a href="#selectedTable" >selectedTable</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onAutoNormalize" >onAutoNormalize</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onClickJoin" >onClickJoin</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onClickMakeDirectDimension" >onClickMakeDirectDimension</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#onClickSplit" >onClickSplit</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onDeleteColumn" >onDeleteColumn</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onIndToFk" >onIndToFk</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onJoin" >onJoin</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onMakeDirectDimensions" >onMakeDirectDimensions</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onRedo" >onRedo</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onSelectColumns" >onSelectColumns</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onSetSurrogateKey" >onSetSurrogateKey</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onSplitFd" >onSplitFd</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#onUndo" >onUndo</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#setStarMode" >setStarMode</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(dataService: <a href="../injectables/DatabaseService.html" target="_self">DatabaseService</a>, dialog: SbbDialog, router: <a href="https://angular.io/api/router/Router" target="_blank">Router</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="38" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:38</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>dataService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/DatabaseService.html" target="_self" >DatabaseService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>dialog</td>
+                                                  
+                                                        <td>
+                                                                    <code>SbbDialog</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>router</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://angular.io/api/router/Router" target="_blank" >Router</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+
+
+
+
+    <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onAutoNormalize"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onAutoNormalize</b></span>
+                        <a href="#onAutoNormalize"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onAutoNormalize(selectedTables: <a href="../classes/Table.html" target="_self">Set&lt;Table&gt; | Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="153"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:153</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>selectedTables</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Set&lt;Table&gt; | Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onClickJoin"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onClickJoin</b></span>
+                        <a href="#onClickJoin"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onClickJoin(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="55"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:55</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onClickMakeDirectDimension"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onClickMakeDirectDimension</b></span>
+                        <a href="#onClickMakeDirectDimension"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onClickMakeDirectDimension(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="176"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:176</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onClickSplit"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span class="modifier">Async</span>
+                        <span ><b>onClickSplit</b></span>
+                        <a href="#onClickSplit"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onClickSplit(fd: <a href="../classes/FunctionalDependency.html" target="_self">FunctionalDependency</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="104"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:104</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fd</td>
+                                    <td>
+                                                <code><a href="../classes/FunctionalDependency.html" target="_self" >FunctionalDependency</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onDeleteColumn"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onDeleteColumn</b></span>
+                        <a href="#onDeleteColumn"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onDeleteColumn(column: <a href="../classes/Column.html" target="_self">Column</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="140"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:140</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>column</td>
+                                    <td>
+                                                <code><a href="../classes/Column.html" target="_self" >Column</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onIndToFk"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onIndToFk</b></span>
+                        <a href="#onIndToFk"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onIndToFk(event: <a href="../classes/SourceRelationship.html" target="_self">SourceRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="133"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:133</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>event</td>
+                                    <td>
+                                                <code><a href="../classes/SourceRelationship.html" target="_self" >SourceRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onJoin"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onJoin</b></span>
+                        <a href="#onJoin"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onJoin(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>, duplicate: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>, newName?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, sourceName?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="79"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:79</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>duplicate</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>newName</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>sourceName</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onMakeDirectDimensions"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onMakeDirectDimensions</b></span>
+                        <a href="#onMakeDirectDimensions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onMakeDirectDimensions(routes: Array<Array<TableRelationship>>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="197"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:197</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>routes</td>
+                                    <td>
+                                            <code>Array&lt;Array&lt;TableRelationship&gt;&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onRedo"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onRedo</b></span>
+                        <a href="#onRedo"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onRedo()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="210"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:210</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onSelectColumns"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onSelectColumns</b></span>
+                        <a href="#onSelectColumns"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onSelectColumns(columns: Map<Table | ColumnCombination>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="51"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:51</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>columns</td>
+                                    <td>
+                                            <code>Map&lt;Table | ColumnCombination&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onSetSurrogateKey"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onSetSurrogateKey</b></span>
+                        <a href="#onSetSurrogateKey"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onSetSurrogateKey(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="192"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:192</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onSplitFd"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onSplitFd</b></span>
+                        <a href="#onSplitFd"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onSplitFd(value: literal type)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="118"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:118</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>value</td>
+                                    <td>
+                                            <code>literal type</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onUndo"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>onUndo</b></span>
+                        <a href="#onUndo"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onUndo()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="205"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:205</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="setStarMode"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>setStarMode</b></span>
+                        <a href="#setStarMode"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>setStarMode(radioChange: SbbRadioChange)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="171"
+                            class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:171</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>radioChange</td>
+                                    <td>
+                                            <code>SbbRadioChange</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+    <section>
+    
+    <h3 id="inputs">
+        Properties
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="commandProcessor"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Readonly</span>
+                        <span ><b>commandProcessor</b></span>
+                        <a href="#commandProcessor"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new CommandProcessor()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="35" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:35</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="dataService"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>dataService</b></span>
+                        <a href="#dataService"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../injectables/DatabaseService.html" target="_self" >DatabaseService</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="41" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:41</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="dialog"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>dialog</b></span>
+                        <a href="#dialog"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>SbbDialog</code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="43" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:43</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="graph"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>graph</b></span>
+                        <a href="#graph"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Schema.html" target="_self" >SchemaGraphComponent</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <b>Decorators : </b>
+                        <br />
+                        <code>
+                            @ViewChild(SchemaGraphComponent, {static: true})<br />
+                        </code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="33" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:33</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="router"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>router</b></span>
+                        <a href="#router"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://angular.io/api/router/Router" target="_blank" >Router</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:44</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="schema"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Readonly</span>
+                        <span ><b>schema</b></span>
+                        <a href="#schema"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Schema.html" target="_self" >Schema</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="34" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:34</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="schemaChanged"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>schemaChanged</b></span>
+                        <a href="#schemaChanged"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Subject&lt;void&gt;</code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Subject()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="38" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:38</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="selectedColumns"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Optional</span>
+                        <span ><b>selectedColumns</b></span>
+                        <a href="#selectedColumns"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Map&lt;Table | ColumnCombination&gt;</code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="37" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:37</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="selectedTable"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Optional</span>
+                        <span ><b>selectedTable</b></span>
+                        <a href="#selectedTable"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="36" class="link-to-prism">src/app/pages/schema-editing/schema-editing.component.ts:36</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+</section>
+
+</div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import FunctionalDependency from &#x27;src/model/schema/FunctionalDependency&#x27;;
+import Table from &#x27;src/model/schema/Table&#x27;;
+import { Component, ViewChild } from &#x27;@angular/core&#x27;;
+import { DatabaseService } from &#x27;src/app/database.service&#x27;;
+import Schema from &#x27;src/model/schema/Schema&#x27;;
+import CommandProcessor from &#x27;src/model/commands/CommandProcessor&#x27;;
+import SplitCommand from &#x27;src/model/commands/SplitCommand&#x27;;
+import AutoNormalizeCommand from &#x27;@/src/model/commands/AutoNormalizeCommand&#x27;;
+import { firstValueFrom, Subject } from &#x27;rxjs&#x27;;
+import JoinCommand from &#x27;@/src/model/commands/JoinCommand&#x27;;
+import { SbbDialog } from &#x27;@sbb-esta/angular/dialog&#x27;;
+import { SplitDialogComponent } from &#x27;../../components/operation-dialogs/split-dialog/split-dialog.component&#x27;;
+import { JoinDialogComponent } from &#x27;../../components/operation-dialogs/join-dialog/join-dialog.component&#x27;;
+import IndToFkCommand from &#x27;@/src/model/commands/IndToFkCommand&#x27;;
+import { Router } from &#x27;@angular/router&#x27;;
+import ColumnCombination from &#x27;@/src/model/schema/ColumnCombination&#x27;;
+import SourceRelationship from &#x27;@/src/model/schema/SourceRelationship&#x27;;
+import { DirectDimensionDialogComponent } from &#x27;../../components/direct-dimension-dialog/direct-dimension-dialog.component&#x27;;
+import DirectDimensionCommand from &#x27;@/src/model/commands/DirectDimensionCommand&#x27;;
+import TableRelationship from &#x27;@/src/model/schema/TableRelationship&#x27;;
+import Column from &#x27;@/src/model/schema/Column&#x27;;
+import DeleteColumnCommand from &#x27;@/src/model/commands/DeleteColumnCommand&#x27;;
+import { SchemaGraphComponent } from &#x27;../../components/graph/schema-graph/schema-graph.component&#x27;;
+import { SbbRadioChange } from &#x27;@sbb-esta/angular/radio-button&#x27;;
+
+@Component({
+  selector: &#x27;app-schema-editing&#x27;,
+  templateUrl: &#x27;./schema-editing.component.html&#x27;,
+  styleUrls: [&#x27;./schema-editing.component.css&#x27;],
+})
+export class SchemaEditingComponent {
+  @ViewChild(SchemaGraphComponent, { static: true })
+  public graph!: SchemaGraphComponent;
+  public readonly schema!: Schema;
+  public readonly commandProcessor &#x3D; new CommandProcessor();
+  public selectedTable?: Table;
+  public selectedColumns?: Map&lt;Table, ColumnCombination&gt;;
+  public schemaChanged: Subject&lt;void&gt; &#x3D; new Subject();
+
+  constructor(
+    public dataService: DatabaseService,
+    // eslint-disable-next-line no-unused-vars
+    public dialog: SbbDialog,
+    public router: Router
+  ) {
+    this.schema &#x3D; dataService.schema!;
+    if (!this.schema) router.navigate([&#x27;&#x27;]);
+    // this.schemaChanged.next();
+  }
+
+  public onSelectColumns(columns: Map&lt;Table, ColumnCombination&gt;) {
+    this.selectedColumns &#x3D; columns;
+  }
+
+  public onClickJoin(fk: TableRelationship): void {
+    const dialogRef &#x3D; this.dialog.open(JoinDialogComponent, {
+      data: { fk: fk, schema: this.schema },
+    });
+
+    dialogRef
+      .afterClosed()
+      .subscribe(
+        (value: {
+          duplicate: boolean;
+          newTableName?: string;
+          sourceName?: string;
+        }) &#x3D;&gt; {
+          if (value)
+            this.onJoin(
+              fk,
+              value.duplicate,
+              value.newTableName,
+              value.sourceName
+            );
+        }
+      );
+  }
+
+  public onJoin(
+    fk: TableRelationship,
+    duplicate: boolean,
+    newName?: string,
+    sourceName?: string
+  ): void {
+    let command &#x3D; new JoinCommand(
+      this.schema,
+      fk,
+      duplicate,
+      newName,
+      sourceName
+    );
+
+    command.onDo &#x3D; () &#x3D;&gt; {
+      this.selectedTable &#x3D; command.newTable;
+    };
+    command.onUndo &#x3D; () &#x3D;&gt; {
+      this.selectedTable &#x3D; fk.referencing;
+    };
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public async onClickSplit(fd: FunctionalDependency) {
+    const dialogRef &#x3D; this.dialog.open(SplitDialogComponent, {
+      data: {
+        fd: fd,
+        table: this.selectedTable!,
+        schema: this.schema,
+      },
+    });
+
+    const value: { fd: FunctionalDependency; name?: string } &#x3D;
+      await firstValueFrom(dialogRef.afterClosed());
+    if (value) this.onSplitFd(value);
+  }
+
+  public onSplitFd(value: { fd: FunctionalDependency; name?: string }): void {
+    let command &#x3D; new SplitCommand(
+      this.schema,
+      this.selectedTable!,
+      value.fd,
+      value.name
+    );
+
+    command.onDo &#x3D; () &#x3D;&gt; (this.selectedTable &#x3D; command.children![0]);
+    command.onUndo &#x3D; () &#x3D;&gt; (this.selectedTable &#x3D; command.table);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onIndToFk(event: SourceRelationship): void {
+    let command &#x3D; new IndToFkCommand(this.schema, event);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onDeleteColumn(column: Column): void {
+    let command &#x3D; new DeleteColumnCommand(
+      this.schema,
+      this.selectedTable!,
+      column
+    );
+    command.onDo &#x3D; () &#x3D;&gt; (this.selectedTable &#x3D; command.newTable!);
+    command.onUndo &#x3D; () &#x3D;&gt; (this.selectedTable &#x3D; command.table);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onAutoNormalize(selectedTables: Set&lt;Table&gt; | Table): void {
+    const tablesToNormalize &#x3D;
+      selectedTables.constructor.name &#x3D;&#x3D; &#x27;Set&#x27;
+        ? Array.from(selectedTables as Set&lt;Table&gt;)
+        : [selectedTables as Table];
+    let command &#x3D; new AutoNormalizeCommand(this.schema, ...tablesToNormalize);
+    let self &#x3D; this;
+    let previousSelectedTable &#x3D; this.selectedTable;
+    command.onDo &#x3D; function () {
+      self.selectedTable &#x3D; undefined;
+    };
+    command.onUndo &#x3D; function () {
+      self.selectedTable &#x3D; previousSelectedTable;
+    };
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public setStarMode(radioChange: SbbRadioChange) {
+    this.schema.starMode &#x3D; radioChange.value;
+    this.schemaChanged.next();
+  }
+
+  public onClickMakeDirectDimension(table: Table): void {
+    const routes &#x3D; this.schema.directDimensionableRoutes(table, true);
+    if (routes.length &#x3D;&#x3D; 1) {
+      this.onMakeDirectDimensions(routes);
+    } else {
+      const dialogRef &#x3D; this.dialog.open(DirectDimensionDialogComponent, {
+        data: { table: table, schema: this.schema },
+      });
+      dialogRef
+        .afterClosed()
+        .subscribe((value: { routes: Array&lt;Array&lt;TableRelationship&gt;&gt; }) &#x3D;&gt; {
+          if (value) this.onMakeDirectDimensions(value.routes);
+        });
+    }
+  }
+
+  public onSetSurrogateKey(name: string) {
+    this.selectedTable!.surrogateKey &#x3D; name;
+    this.schemaChanged.next();
+  }
+
+  public onMakeDirectDimensions(routes: Array&lt;Array&lt;TableRelationship&gt;&gt;) {
+    const command &#x3D; new DirectDimensionCommand(this.schema, routes);
+    command.onDo &#x3D; () &#x3D;&gt; (this.selectedTable &#x3D; command.newTables[0]);
+    command.onUndo &#x3D; () &#x3D;&gt; (this.selectedTable &#x3D; command.newTables[0]);
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onUndo() {
+    this.commandProcessor.undo();
+    this.schemaChanged.next();
+  }
+
+  public onRedo() {
+    this.commandProcessor.redo();
+    this.schemaChanged.next();
+  }
+}
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-templateData">
+        <pre class="line-numbers"><code class="language-html">&lt;div class&#x3D;&quot;grid-container&quot;&gt;
+  &lt;div class&#x3D;&quot;grid-container-graphmenu&quot;&gt;
+    &lt;button sbb-button (click)&#x3D;&quot;graph.resetView()&quot; id&#x3D;&quot;reset-btn&quot; class&#x3D;&quot;me-1&quot;&gt;
+      Reset view
+    &lt;/button&gt;
+    &lt;button
+      type&#x3D;&quot;button&quot;
+      sbb-button
+      (click)&#x3D;&quot;onAutoNormalize(schema.tables)&quot;
+      class&#x3D;&quot;me-1&quot;
+    &gt;
+      {{ &quot;Auto-normalize all tables&quot; }}
+    &lt;/button&gt;
+    &lt;sbb-toggle (change)&#x3D;&quot;setStarMode($event)&quot; class&#x3D;&quot;me-1&quot;&gt;
+      &lt;sbb-toggle-option label&#x3D;&quot;Normal Mode&quot; [value]&#x3D;&quot;false&quot;&gt;
+      &lt;/sbb-toggle-option&gt;
+      &lt;sbb-toggle-option label&#x3D;&quot;Star Schema Mode&quot; [value]&#x3D;&quot;true&quot;&gt;
+      &lt;/sbb-toggle-option&gt;
+    &lt;/sbb-toggle&gt;
+    &lt;app-undo-redo
+      class&#x3D;&quot;undo-redo&quot;
+      [canUndo]&#x3D;&quot;commandProcessor.canUndo()&quot;
+      [canRedo]&#x3D;&quot;commandProcessor.canRedo()&quot;
+      (undo)&#x3D;&quot;onUndo()&quot;
+      (redo)&#x3D;&quot;onRedo()&quot;
+    &gt;&lt;/app-undo-redo&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;app-schema-graph
+      [schema]&#x3D;&quot;schema&quot;
+      [(selectedTable)]&#x3D;&quot;selectedTable&quot;
+      [selectedColumns]&#x3D;&quot;selectedColumns&quot;
+      [schemaChanged]&#x3D;&quot;schemaChanged.asObservable()&quot;
+      (joinFk)&#x3D;&quot;onClickJoin($event)&quot;
+      (makeDirectDimension)&#x3D;&quot;onClickMakeDirectDimension($event)&quot;
+    &gt;&lt;/app-schema-graph&gt;
+  &lt;/div&gt;
+
+  &lt;div class&#x3D;&quot;item-sidebar&quot;&gt;
+    &lt;div class&#x3D;&quot;grid-container-sidebar&quot;&gt;
+      &lt;div&gt;
+        &lt;h2&gt;Schema export&lt;/h2&gt;
+        &lt;div class&#x3D;&quot;mb-1&quot;&gt;
+          &lt;app-persist-schema [schema]&#x3D;&quot;schema&quot;&gt;&lt;/app-persist-schema&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;app-save-schema-editing [schema]&#x3D;&quot;schema&quot;&gt; &lt;/app-save-schema-editing&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;app-schema-editing-side-bar
+        class&#x3D;&quot;schema-editing-side-bar&quot;
+        *ngIf&#x3D;&quot;selectedTable&quot;
+        [table]&#x3D;&quot;selectedTable&quot;
+        [schema]&#x3D;&quot;schema&quot;
+        (splitFd)&#x3D;&quot;onClickSplit($event)&quot;
+        (indToFk)&#x3D;&quot;onIndToFk($event)&quot;
+        (deleteColumnEvent)&#x3D;&quot;onDeleteColumn($event)&quot;
+        (selectColumns)&#x3D;&quot;onSelectColumns($event)&quot;
+        (setSurrogateKey)&#x3D;&quot;onSetSurrogateKey($event)&quot;
+        (autoNormalizeSelectedTable)&#x3D;&quot;onAutoNormalize(selectedTable)&quot;
+      &gt;&lt;/app-schema-editing-side-bar&gt;
+      &lt;h2 *ngIf&#x3D;&quot;!selectedTable&quot; class&#x3D;&quot;table-not-selected&quot;&gt;
+        Select a table in the graph to start editing
+      &lt;/h2&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-styleData">
+                <p class="comment">
+                    <code>./schema-editing.component.css</code>
+                </p>
+                <pre class="line-numbers"><code class="language-scss">element::-webkit-scrollbar {
+  display: none;
+  /* for Chrome, Safari, and Opera */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: calc(66.66% - 2px) calc(33.33% - 2px);
+  grid-template-rows: calc(var(--sbb-button-height)) auto;
+  background-color: lightgray;
+  height: calc(97vh - var(--sbb-header-lean-height));
+  gap: 4px;
+  padding: 4px;
+}
+
+.grid-container-sidebar {
+  --export-schema-sidebar-height: calc(
+    1.6666666667rem + 2 * var(--sbb-button-height) + 0.25rem +
+      var(--sbb-divider-medium) + var(--sbb-divider-small)
+  );
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: calc(var(--export-schema-sidebar-height)) auto;
+  height: 100%;
+}
+
+.grid-container-graphmenu {
+  display: grid;
+  grid-template-columns: 15% 15% auto min-content;
+  grid-template-rows: auto;
+}
+
+.grid-container &gt; div {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+h2 {
+  text-align: center;
+}
+
+.item-sidebar {
+  grid-row-start: 1;
+  grid-row-end: 3;
+  grid-column-start: 1;
+  grid-column-start: 2;
+}
+
+sbb-toggle {
+  white-space: nowrap;
+}
+
+sbb-toggle-option {
+  height: var(--sbb-button-height);
+}
+
+.schema-editing-side-bar {
+  scrollbar-width: none;
+  overflow-y: scroll;
+  display: block;
+}
+
+.table-not-selected {
+  align-self: center
+}
+
+.undo-redo {
+  width: 100%;
+  white-space: nowrap;
+}
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-tree">
+        <div id="tree-container"></div>
+        <div class="tree-legend">
+            <div class="title">
+                <b>Legend</b>
+            </div>
+            <div>
+                <div class="color htmlelement"></div><span>Html element</span>
+            </div>
+            <div>
+                <div class="color component"></div><span>Component</span>
+            </div>
+            <div>
+                <div class="color directive"></div><span>Html element with directive</span>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<script src="../js/libs/vis.min.js"></script>
+<script src="../js/libs/htmlparser.js"></script>
+<script src="../js/libs/deep-iterator.js"></script>
+<script>
+        var COMPONENT_TEMPLATE = '<div><div class="grid-container">  <div class="grid-container-graphmenu">    <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">      Reset view    </button>    <button      type="button"      sbb-button      (click)="onAutoNormalize(schema.tables)"      class="me-1"    >      {{ "Auto-normalize all tables" }}    </button>    <sbb-toggle (change)="setStarMode($event)" class="me-1">      <sbb-toggle-option label="Normal Mode" [value]="false">      </sbb-toggle-option>      <sbb-toggle-option label="Star Schema Mode" [value]="true">      </sbb-toggle-option>    </sbb-toggle>    <app-undo-redo      class="undo-redo"      [canUndo]="commandProcessor.canUndo()"      [canRedo]="commandProcessor.canRedo()"      (undo)="onUndo()"      (redo)="onRedo()"    ></app-undo-redo>  </div>  <div>    <app-schema-graph      [schema]="schema"      [(selectedTable)]="selectedTable"      [selectedColumns]="selectedColumns"      [schemaChanged]="schemaChanged.asObservable()"      (joinFk)="onClickJoin($event)"      (makeDirectDimension)="onClickMakeDirectDimension($event)"    ></app-schema-graph>  </div>  <div class="item-sidebar">    <div class="grid-container-sidebar">      <div>        <h2>Schema export</h2>        <div class="mb-1">          <app-persist-schema [schema]="schema"></app-persist-schema>        </div>        <div>          <app-save-schema-editing [schema]="schema"> </app-save-schema-editing>        </div>      </div>      <app-schema-editing-side-bar        class="schema-editing-side-bar"        *ngIf="selectedTable"        [table]="selectedTable"        [schema]="schema"        (splitFd)="onClickSplit($event)"        (indToFk)="onIndToFk($event)"        (deleteColumnEvent)="onDeleteColumn($event)"        (selectColumns)="onSelectColumns($event)"        (setSurrogateKey)="onSetSurrogateKey($event)"        (autoNormalizeSelectedTable)="onAutoNormalize(selectedTable)"      ></app-schema-editing-side-bar>      <h2 *ngIf="!selectedTable" class="table-not-selected">        Select a table in the graph to start editing      </h2>    </div>  </div></div></div>'
+    var COMPONENTS = [{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'CheckIndComponent', 'selector': 'app-check-ind'},{'name': 'ContainedSubtablesComponent', 'selector': 'app-contained-subtables'},{'name': 'CustomFunctionalDependencySideBarComponent', 'selector': 'app-check-fd'},{'name': 'DatabaseTableViewerComponent', 'selector': 'app-database-table-viewer'},{'name': 'DirectDimensionDialogComponent', 'selector': 'app-direct-dimension-dialog'},{'name': 'ForeignKeysComponent', 'selector': 'app-foreign-keys'},{'name': 'GraphElementComponent', 'selector': 'app-graph-element'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JoinDialogComponent', 'selector': 'app-join-dialog'},{'name': 'KeysComponent', 'selector': 'app-keys'},{'name': 'LoadSavedSchemaComponent', 'selector': 'app-load-saved-schema'},{'name': 'MetanomeResultsViewerComponent', 'selector': 'app-metanome-results-viewer'},{'name': 'MetanomeSettingsComponent', 'selector': 'app-metanome-settings'},{'name': 'PersistSchemaComponent', 'selector': 'app-persist-schema'},{'name': 'SaveSchemaEditingComponent', 'selector': 'app-save-schema-editing'},{'name': 'SbbOptionAllComponent', 'selector': 'app-sbb-option-all'},{'name': 'SchemaEditingComponent', 'selector': 'app-schema-editing'},{'name': 'SchemaEditingSideBarComponent', 'selector': 'app-schema-editing-side-bar'},{'name': 'SchemaGraphComponent', 'selector': 'app-schema-graph'},{'name': 'SplitDialogComponent', 'selector': 'app-split-dialog'},{'name': 'TableEditingComponent', 'selector': 'app-table-editing'},{'name': 'TableSelectionComponent', 'selector': 'app-table-selection'},{'name': 'UndoRedoComponent', 'selector': 'app-undo-redo'},{'name': 'ViolatingRowsViewComponent', 'selector': 'app-violating-rows-view'},{'name': 'ViolatingRowsViewIndsComponent', 'selector': 'app-violating-rows-view-inds'}];
+    var DIRECTIVES = [];
+    var ACTUAL_COMPONENT = {'name': 'SchemaEditingComponent'};
+</script>
+<script src="../js/tree.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'component';
+            var COMPODOC_CURRENT_PAGE_URL = 'SchemaEditingComponent.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

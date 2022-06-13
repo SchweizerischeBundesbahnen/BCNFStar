@@ -1,0 +1,2347 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>bcnfstar-frontend documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">bcnfstar-frontend documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content component">
+                   <div class="content-data">
+
+
+
+
+<ol class="breadcrumb">
+  <li>Components</li>
+  <li
+  >
+  TableSelectionComponent</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+        <li >
+            <a href="#templateData" role="tab" id="templateData-tab" data-toggle="tab" data-link="template">Template</a>
+        </li>
+        <li >
+            <a href="#styleData" role="tab" id="styleData-tab" data-toggle="tab" data-link="style">Styles</a>
+        </li>
+        <li >
+            <a href="#tree" role="tab" id="tree-tab" data-toggle="tab" data-link="dom-tree">DOM Tree</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info"><p class="comment">
+    <h3>File</h3>
+</p>
+<p class="comment">
+    <code>src/app/components/table-selection/table-selection.component.ts</code>
+</p>
+
+
+
+
+    <p class="comment">
+        <h3>Implements</h3>
+    </p>
+    <p class="comment">
+                    <code><a href="https://angular.io/api/core/OnInit" target="_blank" >OnInit</a></code>
+    </p>
+
+
+<section>
+    <h3>Metadata</h3>
+    <table class="table table-sm table-hover metadata">
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+            <tr>
+                <td class="col-md-3">selector</td>
+                <td class="col-md-9"><code>app-table-selection</code></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-3">styleUrls</td>
+                <td class="col-md-9"><code>./table-selection.component.css</code></td>
+            </tr>
+
+
+
+            <tr>
+                <td class="col-md-3">templateUrl</td>
+                <td class="col-md-9"><code>./table-selection.component.html</code></td>
+            </tr>
+
+
+
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#dataSource" >dataSource</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#dialog" >dialog</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#error" >error</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#errorDialog" >errorDialog</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Optional</span>
+                                <a href="#hoveredTable" >hoveredTable</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#loadingDialog" >loadingDialog</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#loadingStatus" >loadingStatus</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#metanomeDialog" >metanomeDialog</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#page" >page</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#pageLimit" >pageLimit</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#queueUrl" >queueUrl</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#router" >router</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#selectedTables" >selectedTables</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Optional</span>
+                                <a href="#table" >table</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#tableColumns" >tableColumns</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#tablePages" >tablePages</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#tableRowCounts" >tableRowCounts</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#tables" >tables</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#tablesInSchema" >tablesInSchema</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#areAllSelectedIn" >areAllSelectedIn</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#areZeroSelectedIn" >areZeroSelectedIn</a>
+                            </li>
+                            <li>
+                                <a href="#changePage" >changePage</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#clickSelectAll" >clickSelectAll</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#hasSelectedTables" >hasSelectedTables</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#initTable" >initTable</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#isNumeric" >isNumeric</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#mouseEnter" >mouseEnter</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#ngOnInit" >ngOnInit</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#reloadData" >reloadData</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#runMetanome" >runMetanome</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#selectTables" >selectTables</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Inputs</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#withContentPreview" >withContentPreview</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Outputs</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#schema" >schema</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(dataService: <a href="../injectables/DatabaseService.html" target="_self">DatabaseService</a>, schemaCreationService: <a href="../injectables/SchemaCreationService.html" target="_self">SchemaCreationService</a>, router: <a href="https://angular.io/api/router/Router" target="_blank">Router</a>, dialog: SbbDialog, metanomeDialog: SbbDialog)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="53" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:53</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>dataService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/DatabaseService.html" target="_self" >DatabaseService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>schemaCreationService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/SchemaCreationService.html" target="_self" >SchemaCreationService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>router</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://angular.io/api/router/Router" target="_blank" >Router</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>dialog</td>
+                                                  
+                                                        <td>
+                                                                    <code>SbbDialog</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>metanomeDialog</td>
+                                                  
+                                                        <td>
+                                                                    <code>SbbDialog</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+    <section>
+    <h3 id="inputs">Inputs</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="withContentPreview"></a>
+                        <b>withContentPreview</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>true</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-2" colspan="2">
+                                    <div class="io-line">Defined in <a href="" data-line="33" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:33</a></div>
+                            </td>
+                        </tr>
+            </tbody>
+        </table>
+</section>
+    <section>
+    <h3 id="outputs">Outputs</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="schema"></a>
+                        <b>schema</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://angular.io/api/core/EventEmitter" target="_blank" >EventEmitter</a></code>
+
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-2" colspan="2">
+                                    <div class="io-line">Defined in <a href="" data-line="34" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:34</a></div>
+                            </td>
+                        </tr>
+            </tbody>
+        </table>
+</section>
+
+
+    <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="areAllSelectedIn"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>areAllSelectedIn</b></span>
+                        <a href="#areAllSelectedIn"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>areAllSelectedIn(schema: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="114"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:114</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>schema</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="areZeroSelectedIn"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>areZeroSelectedIn</b></span>
+                        <a href="#areZeroSelectedIn"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>areZeroSelectedIn(schema: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="120"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:120</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>schema</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="changePage"></a>
+                    <span class="name">
+                        <span ><b>changePage</b></span>
+                        <a href="#changePage"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>changePage(evt: SbbPageEvent)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="198"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:198</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>evt</td>
+                                    <td>
+                                            <code>SbbPageEvent</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="clickSelectAll"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>clickSelectAll</b></span>
+                        <a href="#clickSelectAll"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>clickSelectAll(schema: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="103"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:103</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>schema</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="hasSelectedTables"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>hasSelectedTables</b></span>
+                        <a href="#hasSelectedTables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>hasSelectedTables()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="99"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:99</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="initTable"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span class="modifier">Async</span>
+                        <span ><b>initTable</b></span>
+                        <a href="#initTable"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>initTable()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="78"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:78</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isNumeric"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>isNumeric</b></span>
+                        <a href="#isNumeric"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isNumeric(columnName: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="125"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:125</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>columnName</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="mouseEnter"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>mouseEnter</b></span>
+                        <a href="#mouseEnter"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>mouseEnter(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="203"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:203</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="ngOnInit"></a>
+                    <span class="name">
+                        <span class="modifier">Async</span>
+                        <span ><b>ngOnInit</b></span>
+                        <a href="#ngOnInit"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>ngOnInit()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="65"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:65</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Promise&lt;void&gt;</code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="reloadData"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span class="modifier">Async</span>
+                        <span ><b>reloadData</b></span>
+                        <a href="#reloadData"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>reloadData()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="209"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:209</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="runMetanome"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span class="modifier">Async</span>
+                        <span ><b>runMetanome</b></span>
+                        <a href="#runMetanome"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>runMetanome(entries: Array<IIndexFileEntry>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="136"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:136</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>entries</td>
+                                    <td>
+                                            <code>Array&lt;IIndexFileEntry&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="selectTables"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span class="modifier">Async</span>
+                        <span ><b>selectTables</b></span>
+                        <a href="#selectTables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>selectTables()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="153"
+                            class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:153</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+    <section>
+    
+    <h3 id="inputs">
+        Properties
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="dataSource"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>dataSource</b></span>
+                        <a href="#dataSource"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new SbbTableDataSource&lt;Record&lt;string, any&gt;&gt;([])</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="47" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:47</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="dialog"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>dialog</b></span>
+                        <a href="#dialog"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>SbbDialog</code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="59" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:59</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="error"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>error</b></span>
+                        <a href="#error"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="52" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:52</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="errorDialog"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>errorDialog</b></span>
+                        <a href="#errorDialog"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>TemplateRef&lt;any&gt;</code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <b>Decorators : </b>
+                        <br />
+                        <code>
+                            @ViewChild(&#x27;errorDialog&#x27;)<br />
+                        </code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="30" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:30</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="hoveredTable"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Optional</span>
+                        <span ><b>hoveredTable</b></span>
+                        <a href="#hoveredTable"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="45" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:45</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="loadingDialog"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>loadingDialog</b></span>
+                        <a href="#loadingDialog"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>TemplateRef&lt;any&gt;</code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <b>Decorators : </b>
+                        <br />
+                        <code>
+                            @ViewChild(&#x27;loadingDialog&#x27;)<br />
+                        </code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="31" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:31</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="loadingStatus"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>loadingStatus</b></span>
+                        <a href="#loadingStatus"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Map&lt;IIndexFileEntry | &quot;done&quot; | &quot;error&quot; | &quot;loading&quot;&gt;</code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Map()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="42" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:42</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="metanomeDialog"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>metanomeDialog</b></span>
+                        <a href="#metanomeDialog"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>SbbDialog</code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="60" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:60</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="page"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>page</b></span>
+                        <a href="#page"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>0</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="40" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:40</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="pageLimit"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>pageLimit</b></span>
+                        <a href="#pageLimit"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>20</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="39" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:39</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="queueUrl"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>queueUrl</b></span>
+                        <a href="#queueUrl"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="53" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:53</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="router"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>router</b></span>
+                        <a href="#router"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://angular.io/api/router/Router" target="_blank" >Router</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="58" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:58</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="selectedTables"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>selectedTables</b></span>
+                        <a href="#selectedTables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Map&lt;Table, Boolean&gt;()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="50" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:50</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="table"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                            <span class="modifier">Optional</span>
+                        <span ><b>table</b></span>
+                        <a href="#table"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >SbbTable&lt;ITablePage&gt;</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <b>Decorators : </b>
+                        <br />
+                        <code>
+                            @ViewChild(SbbTable)<br />
+                        </code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="29" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:29</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="tableColumns"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>tableColumns</b></span>
+                        <a href="#tableColumns"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Array&lt;string&gt;</code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>[]</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="46" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:46</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="tablePages"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>tablePages</b></span>
+                        <a href="#tablePages"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >Map&lt;Table | ITablePage&gt;</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Map()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="36" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:36</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="tableRowCounts"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>tableRowCounts</b></span>
+                        <a href="#tableRowCounts"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >Map&lt;Table | number&gt;</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Map()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="37" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:37</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="tables"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>tables</b></span>
+                        <a href="#tables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>[]</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="49" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:49</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="tablesInSchema"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>tablesInSchema</b></span>
+                        <a href="#tablesInSchema"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >Record&lt;string | Table[]&gt;</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>{}</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="51" class="link-to-prism">src/app/components/table-selection/table-selection.component.ts:51</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+</section>
+
+</div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import Table from &#x27;@/src/model/schema/Table&#x27;;
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TemplateRef,
+  ViewChild,
+} from &#x27;@angular/core&#x27;;
+import ITablePage from &#x27;@server/definitions/ITablePage&#x27;;
+import { DatabaseService } from &#x27;src/app/database.service&#x27;;
+import { SbbTable, SbbTableDataSource } from &#x27;@sbb-esta/angular/table&#x27;;
+import { Router } from &#x27;@angular/router&#x27;;
+import { SbbDialog } from &#x27;@sbb-esta/angular/dialog&#x27;;
+import { MetanomeSettingsComponent } from &#x27;../metanome-settings/metanome-settings.component&#x27;;
+import { IIndexFileEntry } from &#x27;@server/definitions/IIndexFileEntry&#x27;;
+import { firstValueFrom } from &#x27;rxjs&#x27;;
+import { SbbPageEvent } from &#x27;@sbb-esta/angular/pagination&#x27;;
+import { SchemaCreationService } from &#x27;../../schema-creation.service&#x27;;
+import Schema from &#x27;@/src/model/schema/Schema&#x27;;
+
+@Component({
+  selector: &#x27;app-table-selection&#x27;,
+  templateUrl: &#x27;./table-selection.component.html&#x27;,
+  styleUrls: [&#x27;./table-selection.component.css&#x27;],
+})
+export class TableSelectionComponent implements OnInit {
+  @ViewChild(SbbTable) public table?: SbbTable&lt;ITablePage&gt;;
+  @ViewChild(&#x27;errorDialog&#x27;) public errorDialog!: TemplateRef&lt;any&gt;;
+  @ViewChild(&#x27;loadingDialog&#x27;) public loadingDialog!: TemplateRef&lt;any&gt;;
+
+  @Input() public withContentPreview: boolean &#x3D; true;
+  @Output() public schema &#x3D; new EventEmitter&lt;Schema&gt;();
+
+  public tablePages: Map&lt;Table, ITablePage&gt; &#x3D; new Map();
+  public tableRowCounts: Map&lt;Table, number&gt; &#x3D; new Map();
+
+  public pageLimit &#x3D; 20;
+  public page: number &#x3D; 0;
+
+  public loadingStatus: Map&lt;IIndexFileEntry, &#x27;done&#x27; | &#x27;error&#x27; | &#x27;loading&#x27;&gt; &#x3D;
+    new Map();
+
+  public hoveredTable?: Table;
+  public tableColumns: Array&lt;string&gt; &#x3D; [];
+  public dataSource &#x3D; new SbbTableDataSource&lt;Record&lt;string, any&gt;&gt;([]);
+
+  public tables: Array&lt;Table&gt; &#x3D; [];
+  public selectedTables &#x3D; new Map&lt;Table, Boolean&gt;();
+  public tablesInSchema: Record&lt;string, Table[]&gt; &#x3D; {};
+  public error: any;
+  public queueUrl: string;
+
+  constructor(
+    private dataService: DatabaseService,
+    private schemaCreationService: SchemaCreationService,
+    public router: Router,
+    public dialog: SbbDialog,
+    public metanomeDialog: SbbDialog
+  ) {
+    this.queueUrl &#x3D; dataService.baseUrl + &#x27;/queue&#x27;;
+  }
+
+  async ngOnInit(): Promise&lt;void&gt; {
+    this.tables &#x3D; await this.dataService.loadTables();
+
+    for (const table of this.tables) {
+      this.selectedTables.set(table, false);
+      if (!this.tablesInSchema[table.schemaName])
+        this.tablesInSchema[table.schemaName] &#x3D; [];
+      this.tablesInSchema[table.schemaName].push(table);
+    }
+
+    await this.initTable();
+  }
+
+  private async initTable() {
+    const rowCountPromise &#x3D; this.dataService.loadTableRowCounts();
+
+    const tablePagePromises: Record&lt;string, Promise&lt;ITablePage&gt;&gt; &#x3D; {};
+    for (const table of this.tables) {
+      tablePagePromises[table.fullName] &#x3D; this.dataService.loadTablePage(
+        table.schemaName,
+        table.name,
+        0,
+        this.pageLimit
+      );
+    }
+
+    const rowCounts: Record&lt;string, number&gt; &#x3D; await rowCountPromise;
+
+    for (const table of this.tables) {
+      this.tableRowCounts.set(table, rowCounts[table.fullName]);
+      this.tablePages.set(table, await tablePagePromises[table.fullName]);
+    }
+  }
+
+  public hasSelectedTables(): boolean {
+    return [...this.selectedTables.values()].some((bool) &#x3D;&gt; bool);
+  }
+
+  public clickSelectAll(schema: string) {
+    if (this.areAllSelectedIn(schema)) {
+      this.tablesInSchema[schema].forEach((table) &#x3D;&gt;
+        this.selectedTables.set(table, false)
+      );
+    } else
+      this.tablesInSchema[schema].forEach((table) &#x3D;&gt;
+        this.selectedTables.set(table, true)
+      );
+  }
+
+  public areAllSelectedIn(schema: string) {
+    return this.tablesInSchema[schema].every((table) &#x3D;&gt;
+      this.selectedTables.get(table)
+    );
+  }
+
+  public areZeroSelectedIn(schema: string) {
+    return !this.tablesInSchema[schema].some((table) &#x3D;&gt;
+      this.selectedTables.get(table)
+    );
+  }
+  public isNumeric(columnName: string): boolean {
+    const type &#x3D; this.hoveredTable?.columns
+      .asArray()
+      .find((c) &#x3D;&gt; c.name &#x3D;&#x3D; columnName)?.dataType;
+    return (
+      !!type &amp;&amp;
+      (type.toLowerCase().startsWith(&#x27;numeric&#x27;) ||
+        type.toLowerCase().startsWith(&#x27;int&#x27;))
+    );
+  }
+
+  public async runMetanome(entries: Array&lt;IIndexFileEntry&gt;) {
+    const jobs &#x3D; entries.map((entry) &#x3D;&gt; {
+      return { promise: this.dataService.runMetanome(entry), entry };
+    });
+    jobs.forEach((j) &#x3D;&gt; this.loadingStatus.set(j.entry, &#x27;loading&#x27;));
+
+    for (const job of jobs) {
+      try {
+        const result &#x3D; await job.promise;
+        this.loadingStatus.set(job.entry, &#x27;done&#x27;);
+        job.entry.fileName &#x3D; result.fileName;
+      } catch (e) {
+        this.loadingStatus.set(job.entry, &#x27;error&#x27;);
+      }
+    }
+  }
+
+  public async selectTables() {
+    const tables &#x3D; this.tables.filter((table) &#x3D;&gt;
+      this.selectedTables.get(table)
+    );
+    const dialogRef &#x3D; this.dialog.open(MetanomeSettingsComponent, {
+      data: tables,
+    });
+    const { values }: { values: Record&lt;string, IIndexFileEntry&gt; } &#x3D;
+      await firstValueFrom(dialogRef.afterClosed());
+
+    if (!values) return;
+
+    this.loadingStatus.clear();
+
+    const loadingDialog &#x3D; this.dialog.open(this.loadingDialog);
+
+    try {
+      await this.runMetanome(
+        Object.values(values).filter(
+          (entry) &#x3D;&gt; !entry.fileName &amp;&amp; entry.algorithm !&#x3D; &#x27;no-result&#x27;
+        )
+      );
+      let fdResults &#x3D; new Map&lt;Table, string&gt;();
+      for (let [name, config] of Object.entries(values)) {
+        if (name !&#x3D; &#x27;ind&#x27;)
+          fdResults.set(
+            [...this.tables].find((t) &#x3D;&gt; t.fullName &#x3D;&#x3D;&#x3D; config.tables[0])!,
+            config.fileName
+          );
+      }
+      const schema &#x3D; await this.schemaCreationService.createSchema(
+        tables,
+        fdResults,
+        values[&#x27;ind&#x27;].fileName
+      );
+      this.schema.emit(schema);
+    } catch (e) {
+      this.error &#x3D; e;
+      console.error(e);
+      this.dialog.open(this.errorDialog);
+    } finally {
+      loadingDialog.close();
+    }
+  }
+
+  changePage(evt: SbbPageEvent) {
+    this.page &#x3D; evt.pageIndex;
+    this.reloadData();
+  }
+
+  public mouseEnter(table: Table) {
+    this.page &#x3D; 0;
+    this.hoveredTable &#x3D; table;
+    this.reloadData();
+  }
+
+  public async reloadData() {
+    if (!this.hoveredTable) return;
+    const result &#x3D;
+      this.page &#x3D;&#x3D;&#x3D; 0
+        ? this.tablePages.get(this.hoveredTable)
+        : await this.dataService.loadTablePage(
+            this.hoveredTable.schemaName,
+            this.hoveredTable.name,
+            this.page * this.pageLimit,
+            this.pageLimit
+          );
+    if (!result) return;
+    this.tableColumns &#x3D; result.attributes;
+    this.dataSource.data &#x3D; result.rows;
+    this.table?.renderRows();
+  }
+}
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-templateData">
+        <pre class="line-numbers"><code class="language-html">&lt;div class&#x3D;&quot;grid-container-table&quot;&gt;
+  &lt;div&gt;
+    &lt;div class&#x3D;&quot;sbb-checkbox-group-vertical&quot;&gt;
+      &lt;sbb-accordion expanded&#x3D;&quot;true&quot; class&#x3D;&quot;mt-3&quot;&gt;
+        &lt;sbb-expansion-panel&gt;
+          &lt;sbb-expansion-panel-header
+            &gt;Load saved schema&lt;/sbb-expansion-panel-header
+          &gt;
+          &lt;app-load-saved-schema&gt;&lt;/app-load-saved-schema&gt;
+        &lt;/sbb-expansion-panel&gt;
+      &lt;/sbb-accordion&gt;
+      &lt;sbb-accordion expanded&#x3D;&quot;false&quot; multi&#x3D;&quot;true&quot; class&#x3D;&quot;mt-2&quot;&gt;
+        &lt;sbb-expansion-panel *ngFor&#x3D;&quot;let item of tablesInSchema | keyvalue&quot;&gt;
+          &lt;!-- item.key &#x3D; schema name, item.value &#x3D; list of associated table objects --&gt;
+          &lt;sbb-expansion-panel-header&gt;{{
+            item.key
+          }}&lt;/sbb-expansion-panel-header&gt;
+          &lt;sbb-checkbox
+            (change)&#x3D;&quot;clickSelectAll(item.key)&quot;
+            [checked]&#x3D;&quot;areAllSelectedIn(item.key)&quot;
+            [indeterminate]&#x3D;&quot;
+              !areAllSelectedIn(item.key) &amp;&amp; !areZeroSelectedIn(item.key)
+            &quot;
+          &gt;
+            All
+          &lt;/sbb-checkbox&gt;
+          &lt;sbb-checkbox
+            *ngFor&#x3D;&quot;let table of item.value&quot;
+            [ngModel]&#x3D;&quot;selectedTables.get(table)&quot;
+            (ngModelChange)&#x3D;&quot;selectedTables.set(table, $event)&quot;
+            class&#x3D;&quot;table-checkbox&quot;
+            (mouseenter)&#x3D;&quot;mouseEnter(table)&quot;
+          &gt;
+            {{ table.name }}
+          &lt;/sbb-checkbox&gt;
+        &lt;/sbb-expansion-panel&gt;
+        &lt;button
+          type&#x3D;&quot;button&quot;
+          sbb-button
+          [disabled]&#x3D;&quot;!hasSelectedTables()&quot;
+          (click)&#x3D;&quot;selectTables()&quot;
+        &gt;
+          Go
+        &lt;/button&gt;
+      &lt;/sbb-accordion&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div *ngIf&#x3D;&quot;withContentPreview &amp;&amp; hoveredTable&quot;&gt;
+    &lt;ng-container
+      [ngSwitch]&#x3D;&quot;tableRowCounts.get(hoveredTable)! &gt;&#x3D; pageLimit ? 1 : -1&quot;
+    &gt;
+      &lt;h3&gt;
+        &lt;span&gt;{{ hoveredTable.fullName }}&lt;/span&gt;
+      &lt;/h3&gt;
+      &lt;sbb-table-wrapper class&#x3D;&quot;table-wrapper&quot;&gt;
+        &lt;table sbb-table [dataSource]&#x3D;&quot;dataSource&quot;&gt;
+          &lt;tr sbb-header-row *sbbHeaderRowDef&#x3D;&quot;tableColumns&quot;&gt;&lt;/tr&gt;
+          &lt;tr sbb-row *sbbRowDef&#x3D;&quot;let row; columns: tableColumns&quot;&gt;&lt;/tr&gt;
+          &lt;ng-container
+            *ngFor&#x3D;&quot;let column of hoveredTable.columns.sourceColumnNames()&quot;
+            [sbbColumnDef]&#x3D;&quot;column&quot;
+          &gt;
+            &lt;th sbb-header-cell *sbbHeaderCellDef&gt;{{ column }}&lt;/th&gt;
+            &lt;td
+              [ngClass]&#x3D;&quot;{ numeric: isNumeric(column) }&quot;
+              *sbbCellDef&#x3D;&quot;let element&quot;
+            &gt;
+              {{ element[column] }}
+            &lt;/td&gt;
+          &lt;/ng-container&gt;
+        &lt;/table&gt;
+      &lt;/sbb-table-wrapper&gt;
+      &lt;div class&#x3D;&quot;grid-container-paginator&quot;&gt;
+        &lt;sbb-paginator
+          (page)&#x3D;&quot;changePage($event)&quot;
+          [pageIndex]&#x3D;&quot;page&quot;
+          [pageSize]&#x3D;&quot;pageLimit&quot;
+          [length]&#x3D;&quot;tableRowCounts.get(hoveredTable)&quot;
+          class&#x3D;&quot;mt-2&quot;
+        &gt;
+        &lt;/sbb-paginator&gt;
+        &lt;ng-container *ngSwitchCase&#x3D;&quot;1&quot;&gt;
+          &lt;div class&#x3D;&quot;text-aling-right mt-2&quot;&gt;
+            {{ pageLimit * page + 1 }} -
+            {{ pageLimit * page + dataSource.data.length }} /
+            {{ tableRowCounts.get(hoveredTable) }}
+          &lt;/div&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container *ngSwitchDefault&gt;
+          &lt;div class&#x3D;&quot;text-aling-right mt-2&quot;&gt;
+            {{ pageLimit * page }} /
+            {{ tableRowCounts.get(hoveredTable) }}
+          &lt;/div&gt;
+        &lt;/ng-container&gt;
+      &lt;/div&gt;
+    &lt;/ng-container&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;ng-template #loadingDialog class&#x3D;&quot;loading-box&quot;&gt;
+  &lt;div sbbDialogTitle&gt;Running Metanome&lt;/div&gt;
+  &lt;div sbbDialogContent&gt;
+    &lt;span *ngIf&#x3D;&quot;loadingStatus.size&quot;&gt;
+      Functional Dependencies and Inclusion Dependencies are currently being
+      searched. &lt;br /&gt;
+      More detailed progress reports including logs can be found
+      &lt;a [href]&#x3D;&quot;queueUrl&quot; target&#x3D;&quot;_blank&quot;&gt;here&lt;/a&gt;
+    &lt;/span&gt;
+
+    &lt;ul&gt;
+      &lt;li *ngFor&#x3D;&quot;let item of loadingStatus | keyvalue&quot;&gt;
+        {{ item.key.algorithm }} with {{ item.key.tables }}
+        &lt;sbb-loading
+          mode&#x3D;&quot;inline&quot;
+          aria-valuetext&#x3D;&quot;Loading, please wait&quot;
+          *ngIf&#x3D;&quot;item.value &#x3D;&#x3D;&#x3D; &#x27;loading&#x27;&quot;
+        &gt;&lt;/sbb-loading&gt;
+        &lt;sbb-icon
+          svgIcon&#x3D;&quot;kom:cross-medium&quot;
+          style&#x3D;&quot;color: red&quot;
+          *ngIf&#x3D;&quot;item.value &#x3D;&#x3D;&#x3D; &#x27;error&#x27;&quot;
+        &gt;&lt;/sbb-icon&gt;
+        &lt;sbb-icon
+          svgIcon&#x3D;&quot;kom:tick-medium&quot;
+          style&#x3D;&quot;color: green&quot;
+          *ngIf&#x3D;&quot;item.value &#x3D;&#x3D;&#x3D; &#x27;done&#x27;&quot;
+        &gt;&lt;/sbb-icon&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        Fetching results
+        &lt;sbb-loading
+          mode&#x3D;&quot;inline&quot;
+          aria-valuetext&#x3D;&quot;Loading, please wait&quot;
+        &gt;&lt;/sbb-loading&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/ng-template&gt;
+
+&lt;ng-template #errorDialog&gt;
+  &lt;div sbbDialogTitle&gt;Warning&lt;/div&gt;
+  &lt;div sbbDialogContent&gt;
+    An error occured while getting required table data from the server. Check
+    the browser&#x27;s console and the metanome queue for details.
+  &lt;/div&gt;
+
+  &lt;div sbbDialogActions&gt;
+    &lt;a
+      class&#x3D;&quot;hover-color-white&quot;
+      type&#x3D;&quot;button&quot;
+      sbb-button
+      sbbDialogClose
+      [href]&#x3D;&quot;queueUrl&quot;
+      target&#x3D;&quot;_blank&quot;
+      &gt;Investigate Metanome logs&lt;/a
+    &gt;
+    &lt;a
+      class&#x3D;&quot;hover-color-white&quot;
+      type&#x3D;&quot;button&quot;
+      sbb-button
+      sbbDialogClose
+      routerLink&#x3D;&quot;/edit-schema&quot;
+      &gt;Edit schema regardless&lt;/a
+    &gt;
+    &lt;a type&#x3D;&quot;button&quot; sbb-secondary-button sbbDialogClose&gt;Cancel&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/ng-template&gt;
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-styleData">
+                <p class="comment">
+                    <code>./table-selection.component.css</code>
+                </p>
+                <pre class="line-numbers"><code class="language-scss">.hover-color-white:hover {
+  color: var(--sbb-color-white);
+}
+
+button {
+  margin-top: 0.5vw;
+}
+
+.checkbox {
+  overflow: hidden;
+  width: 100%;
+}
+
+.container {
+  margin-left: 0.5vw;
+}
+
+.grid-container-table {
+  display: grid;
+  grid-template-columns: 33.33% calc(66.67% - 20px);
+  gap: 10px;
+  background-color: white;
+}
+
+.grid-container-paginator {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+  background-color: white;
+}
+
+h3 {
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loading-box {
+  text-align: center;
+}
+
+.numeric {
+  text-align: end;
+}
+
+sbb-accordion {
+  width: 100%;
+}
+
+sbb-checkbox {
+  padding-bottom: 5px;
+}
+
+span {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.table-checkbox {
+  display: block;
+}
+
+.table-wrapper {
+  height: 80vh;
+  width: 100%;
+  min-height: 400px;
+}
+
+.text-aling-right {
+  text-align: right;
+}
+
+tr {
+  white-space: nowrap;
+}
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-tree">
+        <div id="tree-container"></div>
+        <div class="tree-legend">
+            <div class="title">
+                <b>Legend</b>
+            </div>
+            <div>
+                <div class="color htmlelement"></div><span>Html element</span>
+            </div>
+            <div>
+                <div class="color component"></div><span>Component</span>
+            </div>
+            <div>
+                <div class="color directive"></div><span>Html element with directive</span>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<script src="../js/libs/vis.min.js"></script>
+<script src="../js/libs/htmlparser.js"></script>
+<script src="../js/libs/deep-iterator.js"></script>
+<script>
+        var COMPONENT_TEMPLATE = '<div><div class="grid-container-table">  <div>    <div class="sbb-checkbox-group-vertical">      <sbb-accordion expanded="true" class="mt-3">        <sbb-expansion-panel>          <sbb-expansion-panel-header            >Load saved schema</sbb-expansion-panel-header          >          <app-load-saved-schema></app-load-saved-schema>        </sbb-expansion-panel>      </sbb-accordion>      <sbb-accordion expanded="false" multi="true" class="mt-2">        <sbb-expansion-panel *ngFor="let item of tablesInSchema | keyvalue">          <!-- item.key = schema name, item.value = list of associated table objects -->          <sbb-expansion-panel-header>{{            item.key          }}</sbb-expansion-panel-header>          <sbb-checkbox            (change)="clickSelectAll(item.key)"            [checked]="areAllSelectedIn(item.key)"            [indeterminate]="              !areAllSelectedIn(item.key) && !areZeroSelectedIn(item.key)            "          >            All          </sbb-checkbox>          <sbb-checkbox            *ngFor="let table of item.value"            [ngModel]="selectedTables.get(table)"            (ngModelChange)="selectedTables.set(table, $event)"            class="table-checkbox"            (mouseenter)="mouseEnter(table)"          >            {{ table.name }}          </sbb-checkbox>        </sbb-expansion-panel>        <button          type="button"          sbb-button          [disabled]="!hasSelectedTables()"          (click)="selectTables()"        >          Go        </button>      </sbb-accordion>    </div>  </div>  <div *ngIf="withContentPreview && hoveredTable">    <ng-container      [ngSwitch]="tableRowCounts.get(hoveredTable)! >= pageLimit ? 1 : -1"    >      <h3>        <span>{{ hoveredTable.fullName }}</span>      </h3>      <sbb-table-wrapper class="table-wrapper">        <table sbb-table [dataSource]="dataSource">          <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>          <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>          <ng-container            *ngFor="let column of hoveredTable.columns.sourceColumnNames()"            [sbbColumnDef]="column"          >            <th sbb-header-cell *sbbHeaderCellDef>{{ column }}</th>            <td              [ngClass]="{ numeric: isNumeric(column) }"              *sbbCellDef="let element"            >              {{ element[column] }}            </td>          </ng-container>        </table>      </sbb-table-wrapper>      <div class="grid-container-paginator">        <sbb-paginator          (page)="changePage($event)"          [pageIndex]="page"          [pageSize]="pageLimit"          [length]="tableRowCounts.get(hoveredTable)"          class="mt-2"        >        </sbb-paginator>        <ng-container *ngSwitchCase="1">          <div class="text-aling-right mt-2">            {{ pageLimit * page + 1 }} -            {{ pageLimit * page + dataSource.data.length }} /            {{ tableRowCounts.get(hoveredTable) }}          </div>        </ng-container>        <ng-container *ngSwitchDefault>          <div class="text-aling-right mt-2">            {{ pageLimit * page }} /            {{ tableRowCounts.get(hoveredTable) }}          </div>        </ng-container>      </div>    </ng-container>  </div></div><ng-template #loadingDialog class="loading-box">  <div sbbDialogTitle>Running Metanome</div>  <div sbbDialogContent>    <span *ngIf="loadingStatus.size">      Functional Dependencies and Inclusion Dependencies are currently being      searched. <br />      More detailed progress reports including logs can be found      <a [href]="queueUrl" target="_blank">here</a>    </span>    <ul>      <li *ngFor="let item of loadingStatus | keyvalue">        {{ item.key.algorithm }} with {{ item.key.tables }}        <sbb-loading          mode="inline"          aria-valuetext="Loading, please wait"          *ngIf="item.value === \'loading\'"        ></sbb-loading>        <sbb-icon          svgIcon="kom:cross-medium"          style="color: red"          *ngIf="item.value === \'error\'"        ></sbb-icon>        <sbb-icon          svgIcon="kom:tick-medium"          style="color: green"          *ngIf="item.value === \'done\'"        ></sbb-icon>      </li>      <li>        Fetching results        <sbb-loading          mode="inline"          aria-valuetext="Loading, please wait"        ></sbb-loading>      </li>    </ul>  </div></ng-template><ng-template #errorDialog>  <div sbbDialogTitle>Warning</div>  <div sbbDialogContent>    An error occured while getting required table data from the server. Check    the browser\'s console and the metanome queue for details.  </div>  <div sbbDialogActions>    <a      class="hover-color-white"      type="button"      sbb-button      sbbDialogClose      [href]="queueUrl"      target="_blank"      >Investigate Metanome logs</a    >    <a      class="hover-color-white"      type="button"      sbb-button      sbbDialogClose      routerLink="/edit-schema"      >Edit schema regardless</a    >    <a type="button" sbb-secondary-button sbbDialogClose>Cancel</a>  </div></ng-template></div>'
+    var COMPONENTS = [{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'CheckIndComponent', 'selector': 'app-check-ind'},{'name': 'ContainedSubtablesComponent', 'selector': 'app-contained-subtables'},{'name': 'CustomFunctionalDependencySideBarComponent', 'selector': 'app-check-fd'},{'name': 'DatabaseTableViewerComponent', 'selector': 'app-database-table-viewer'},{'name': 'DirectDimensionDialogComponent', 'selector': 'app-direct-dimension-dialog'},{'name': 'ForeignKeysComponent', 'selector': 'app-foreign-keys'},{'name': 'GraphElementComponent', 'selector': 'app-graph-element'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JoinDialogComponent', 'selector': 'app-join-dialog'},{'name': 'KeysComponent', 'selector': 'app-keys'},{'name': 'LoadSavedSchemaComponent', 'selector': 'app-load-saved-schema'},{'name': 'MetanomeResultsViewerComponent', 'selector': 'app-metanome-results-viewer'},{'name': 'MetanomeSettingsComponent', 'selector': 'app-metanome-settings'},{'name': 'PersistSchemaComponent', 'selector': 'app-persist-schema'},{'name': 'SaveSchemaEditingComponent', 'selector': 'app-save-schema-editing'},{'name': 'SbbOptionAllComponent', 'selector': 'app-sbb-option-all'},{'name': 'SchemaEditingComponent', 'selector': 'app-schema-editing'},{'name': 'SchemaEditingSideBarComponent', 'selector': 'app-schema-editing-side-bar'},{'name': 'SchemaGraphComponent', 'selector': 'app-schema-graph'},{'name': 'SplitDialogComponent', 'selector': 'app-split-dialog'},{'name': 'TableEditingComponent', 'selector': 'app-table-editing'},{'name': 'TableSelectionComponent', 'selector': 'app-table-selection'},{'name': 'UndoRedoComponent', 'selector': 'app-undo-redo'},{'name': 'ViolatingRowsViewComponent', 'selector': 'app-violating-rows-view'},{'name': 'ViolatingRowsViewIndsComponent', 'selector': 'app-violating-rows-view-inds'}];
+    var DIRECTIVES = [];
+    var ACTUAL_COMPONENT = {'name': 'TableSelectionComponent'};
+</script>
+<script src="../js/tree.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'component';
+            var COMPODOC_CURRENT_PAGE_URL = 'TableSelectionComponent.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
