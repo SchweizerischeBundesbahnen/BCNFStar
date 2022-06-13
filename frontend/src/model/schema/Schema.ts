@@ -124,7 +124,7 @@ export default class Schema {
           const i = fkToReferencing.referenced.findIndex((referencingCol) => {
             if (fkToReferencing == fk || fkFromReferenced == fk)
               return referencingCol.equals(referencedCol);
-            else return fk.sourceColumnsMapped(referencingCol, referencedCol);
+            else return fk.mapsColumns(referencingCol, referencedCol);
           });
           if (i == -1) break;
           newRelReferencing.push(fkToReferencing.referencing[i]);
@@ -385,7 +385,7 @@ export default class Schema {
               if (fkToReferencing == fk || fkFromReferenced == fk)
                 return referencingCol.equals(referencedCol);
               else
-                return fk.relationship.columnsMapped(
+                return fk.relationship.mapsColumns(
                   referencingCol,
                   referencedCol
                 );

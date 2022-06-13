@@ -1,6 +1,9 @@
 import SourceColumn from './SourceColumn';
+import { IRel } from './methodObjects/FkDerivation';
 
-export default class SourceRelationship {
+export default class SourceRelationship
+  implements IRel<SourceRelationship, SourceColumn>
+{
   /**
    * these arrays are linked, the column in referencing has the same index as the
    * corresponding column in referenced
@@ -27,7 +30,7 @@ export default class SourceRelationship {
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
-  public sourceColumnsMapped(
+  public mapsColumns(
     referencingCol: SourceColumn,
     referencedCol: SourceColumn
   ): boolean {
@@ -53,5 +56,21 @@ export default class SourceRelationship {
     const rhsSourceTable = this.referenced[0].table.fullName;
 
     return `(${lhsSourceTable}) ${lhsString} -> (${rhsSourceTable}) ${rhsString}`;
+  }
+
+  isConnected(other: SourceRelationship): boolean {
+    for (const col of other.referencing) {
+      if (!this.referenced.some((otherCol) => otherCol.equals(col)))
+        return false;
+    }
+    return true;
+  }
+
+  public get referencingCols(): SourceColumn[] {
+    return this.referencing;
+  }
+
+  public get referencedCols(): SourceColumn[] {
+    return this.referenced;
   }
 }

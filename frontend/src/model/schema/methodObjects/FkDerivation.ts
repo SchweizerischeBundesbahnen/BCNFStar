@@ -1,40 +1,48 @@
 import Column from '../Column';
-import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
 import SourceColumn from '../SourceColumn';
 import SourceRelationship from '../SourceRelationship';
 import TableRelationship from '../TableRelationship';
 
-abstract class FkDerivation<RelType, ColType> {
+interface Comparable<T> {
+  equals(t: T): boolean;
+}
+
+export interface IRel<RelType, ColType> {
+  isConnected(other: RelType): boolean;
+  referencingCols: Array<ColType>;
+  referencedCols: Array<ColType>;
+  mapsColumns(col1: ColType, col2: ColType): boolean;
+}
+
+export abstract class FkDerivation<
+  RelType extends IRel<RelType, ColType>,
+  ColType extends Comparable<ColType>
+> {
   public result: Array<RelType>;
 
   constructor(public existingRels: Array<RelType>, public fk: RelType) {
     this.result = [fk];
     const fksToReferencing = this.existingRels.filter(
-      (otherRel) => otherRel == fk || this.areConnected(otherRel, fk)
+      (otherRel) => otherRel == fk || otherRel.isConnected(fk)
     );
     const fksFromReferenced = this.existingRels.filter(
-      (otherRel) => otherRel == fk || this.areConnected(fk, otherRel)
+      (otherRel) => otherRel == fk || fk.isConnected(otherRel)
     );
     for (const fkToReferencing of fksToReferencing) {
       for (const fkFromReferenced of fksFromReferenced) {
         if (fkToReferencing == fkFromReferenced) continue;
         const newRelReferencing = new Array<ColType>();
-        for (const referencedCol of this.referencingColumns(fkFromReferenced)) {
-          const col = this.referencedColumns(fkToReferencing).find(
-            (referencingCol) => {
-              if (fkToReferencing == fk || fkFromReferenced == fk)
-                return this.areEqual(referencingCol, referencedCol);
-              else return this.relMapsCols(fk, referencingCol, referencedCol);
-            }
-          );
+        for (const referencedCol of fkFromReferenced.referencingCols) {
+          const col = fkToReferencing.referencedCols.find((referencingCol) => {
+            if (fkToReferencing == fk || fkFromReferenced == fk)
+              return referencingCol.equals(referencedCol);
+            else return fk.mapsColumns(referencingCol, referencedCol);
+          });
           if (!col) break;
           newRelReferencing.push(col);
         }
-        if (
-          newRelReferencing.length ==
-          this.referencedColumns(fkFromReferenced).length
-        )
+        if (newRelReferencing.length == fkFromReferenced.referencedCols.length)
           this.result.push(
             this.constructFk(
               fkToReferencing,
@@ -45,12 +53,6 @@ abstract class FkDerivation<RelType, ColType> {
       }
     }
   }
-
-  abstract areConnected(rel1: RelType, rel2: RelType): boolean;
-  abstract referencingColumns(rel: RelType): Array<ColType>;
-  abstract referencedColumns(rel: RelType): Array<ColType>;
-  abstract areEqual(col1: ColType, col2: ColType): boolean;
-  abstract relMapsCols(rel: RelType, col1: ColType, col2: ColType): boolean;
   abstract constructFk(
     fkToReferencing: RelType,
     fkFromReferenced: RelType,
@@ -63,37 +65,6 @@ class SourceFkDerivation extends FkDerivation<
   SourceRelationship,
   SourceColumn
 > {
-  override areConnected(
-    rel1: SourceRelationship,
-    rel2: SourceRelationship
-  ): boolean {
-    for (const col of rel2.referencing) {
-      if (!rel1.referenced.some((otherCol) => otherCol.equals(col)))
-        return false;
-    }
-    return true;
-  }
-
-  override referencingColumns(rel: SourceRelationship): SourceColumn[] {
-    return rel.referencing;
-  }
-
-  override referencedColumns(rel: SourceRelationship): SourceColumn[] {
-    return rel.referenced;
-  }
-
-  override areEqual(col1: SourceColumn, col2: SourceColumn): boolean {
-    return col1.equals(col2);
-  }
-
-  override relMapsCols(
-    rel: SourceRelationship,
-    col1: SourceColumn,
-    col2: SourceColumn
-  ): boolean {
-    return rel.sourceColumnsMapped(col1, col2);
-  }
-
   override constructFk(
     fkToReferencing: SourceRelationship,
     fkFromReferenced: SourceRelationship,
@@ -108,38 +79,6 @@ class SourceFkDerivation extends FkDerivation<
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class CurrentFkDerivation extends FkDerivation<TableRelationship, Column> {
-  override areConnected(
-    rel1: TableRelationship,
-    rel2: TableRelationship
-  ): boolean {
-    return (
-      rel1.referenced == rel2.referencing &&
-      new ColumnCombination(rel2.relationship.referencing).isSubsetOf(
-        new ColumnCombination(rel1.relationship.referenced)
-      )
-    );
-  }
-
-  override referencingColumns(rel: TableRelationship): Column[] {
-    return rel.relationship.referencing;
-  }
-
-  override referencedColumns(rel: TableRelationship): Column[] {
-    return rel.relationship.referenced;
-  }
-
-  override areEqual(col1: Column, col2: Column): boolean {
-    return col1.equals(col2);
-  }
-
-  override relMapsCols(
-    rel: TableRelationship,
-    col1: Column,
-    col2: Column
-  ): boolean {
-    return rel.relationship.columnsMapped(col1, col2);
-  }
-
   override constructFk(
     fkToReferencing: TableRelationship,
     fkFromReferenced: TableRelationship,

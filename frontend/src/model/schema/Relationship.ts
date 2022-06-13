@@ -127,7 +127,7 @@ export default class Relationship {
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
-  public columnsMapped(referencingCol: Column, referencedCol: Column): boolean {
+  public mapsColumns(referencingCol: Column, referencedCol: Column): boolean {
     const i = this.referencing.findIndex((otherReferencingCol) =>
       otherReferencingCol.equals(referencingCol)
     );
