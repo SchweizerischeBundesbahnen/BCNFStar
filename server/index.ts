@@ -16,7 +16,7 @@ import { check, body } from "express-validator";
 import {
   isValidFileName,
   isValidDatatype,
-} from "./routes/validation/parameterValidation";
+} from "./validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
 
