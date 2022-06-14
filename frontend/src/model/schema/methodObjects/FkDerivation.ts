@@ -23,24 +23,28 @@ export abstract class FkDerivation<
 
   constructor(public existingRels: Array<RelType>, public fk: RelType) {
     this.result = [fk];
-    const fksToReferencing = this.existingRels.filter(
-      (otherRel) => otherRel == fk || otherRel.isConnected(fk)
+    const fksToReferencing = this.existingRels.filter((otherRel) =>
+      otherRel.isConnected(fk)
     );
-    const fksFromReferenced = this.existingRels.filter(
-      (otherRel) => otherRel == fk || fk.isConnected(otherRel)
+    const fksFromReferenced = this.existingRels.filter((otherRel) =>
+      fk.isConnected(otherRel)
     );
+    fksToReferencing.push(fk);
+    fksFromReferenced.push(fk);
     for (const fkToReferencing of fksToReferencing) {
       for (const fkFromReferenced of fksFromReferenced) {
         if (fkToReferencing == fkFromReferenced) continue;
         const newRelReferencing = new Array<ColType>();
         for (const referencedCol of fkFromReferenced.referencingCols) {
-          const col = fkToReferencing.referencedCols.find((referencingCol) => {
-            if (fkToReferencing == fk || fkFromReferenced == fk)
-              return referencingCol.equals(referencedCol);
-            else return fk.mapsColumns(referencingCol, referencedCol);
-          });
-          if (!col) break;
-          newRelReferencing.push(col);
+          const i = fkToReferencing.referencedCols.findIndex(
+            (referencingCol) => {
+              if (fkToReferencing == fk || fkFromReferenced == fk)
+                return referencingCol.equals(referencedCol);
+              else return fk.mapsColumns(referencingCol, referencedCol);
+            }
+          );
+          if (i == -1) break;
+          newRelReferencing.push(fkToReferencing.referencingCols[i]);
         }
         if (newRelReferencing.length == fkFromReferenced.referencedCols.length)
           this.result.push(
@@ -61,7 +65,7 @@ export abstract class FkDerivation<
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class SourceFkDerivation extends FkDerivation<
+export class SourceFkDerivation extends FkDerivation<
   SourceRelationship,
   SourceColumn
 > {
@@ -78,7 +82,7 @@ class SourceFkDerivation extends FkDerivation<
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class CurrentFkDerivation extends FkDerivation<TableRelationship, Column> {
+export class TableFkDerivation extends FkDerivation<TableRelationship, Column> {
   override constructFk(
     fkToReferencing: TableRelationship,
     fkFromReferenced: TableRelationship,
