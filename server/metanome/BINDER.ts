@@ -9,11 +9,19 @@ import IInclusionDependency, {
 import { sqlUtils } from "@/db";
 import { splitTableString } from "@/utils/databaseUtils";
 import { DbmsType } from "@/db/SqlUtils";
-import { binderAlgorithmName } from "@/definitions/IBinder";
+import { binderAlgorithmName, IBinderConfig } from "@/definitions/IBinder";
+import { IMetanomeConfig } from "@/definitions/IMetanomeConfig";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
 export default class BINDER extends InclusionDependencyAlgorithm {
+  constructor(
+    tables: Array<string>,
+    config: IMetanomeConfig & Partial<IBinderConfig>
+  ) {
+    config.DETECT_NARY = config.MAX_NARY_LEVEL !== 1;
+    super(tables, config);
+  }
   protected override algoJarPath(): string {
     return "BINDERFile.jar";
   }
