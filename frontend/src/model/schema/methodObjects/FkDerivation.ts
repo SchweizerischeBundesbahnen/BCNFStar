@@ -8,7 +8,7 @@ interface Comparable<T> {
   equals(t: T): boolean;
 }
 
-export interface IRel<RelType, ColType> {
+interface IRel<RelType, ColType> {
   isConnected(other: RelType): boolean;
   referencingCols: Array<ColType>;
   referencedCols: Array<ColType>;
@@ -72,7 +72,7 @@ class SourceFkDerivation extends FkDerivation<
   ): SourceRelationship {
     return new SourceRelationship(
       newRelReferencing,
-      Array.from(fkFromReferenced.referenced)
+      Array.from(fkFromReferenced.referencedCols)
     );
   }
 }
@@ -87,7 +87,7 @@ class CurrentFkDerivation extends FkDerivation<TableRelationship, Column> {
     return new TableRelationship(
       new Relationship(
         newRelReferencing,
-        Array.from(fkFromReferenced.relationship.referenced)
+        Array.from(fkFromReferenced.referencedCols)
       ),
       fkToReferencing.referencing,
       fkFromReferenced.referenced

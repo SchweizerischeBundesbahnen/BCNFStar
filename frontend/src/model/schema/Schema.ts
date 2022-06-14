@@ -109,31 +109,33 @@ export default class Schema {
     const fksToReferencing = this._fks.filter(
       (otherFk) =>
         otherFk == fk ||
-        this.sourceColumnSubset(fk.referencing, otherFk.referenced)
+        this.sourceColumnSubset(fk.referencingCols, otherFk.referencedCols)
     );
     const fksFromReferenced = this._fks.filter(
       (otherFk) =>
         otherFk == fk ||
-        this.sourceColumnSubset(otherFk.referencing, fk.referenced)
+        this.sourceColumnSubset(otherFk.referencingCols, fk.referencedCols)
     );
     for (const fkToReferencing of fksToReferencing) {
       for (const fkFromReferenced of fksFromReferenced) {
         if (fkToReferencing == fkFromReferenced) continue;
         const newRelReferencing = new Array();
-        for (const referencedCol of fkFromReferenced.referencing) {
-          const i = fkToReferencing.referenced.findIndex((referencingCol) => {
-            if (fkToReferencing == fk || fkFromReferenced == fk)
-              return referencingCol.equals(referencedCol);
-            else return fk.mapsColumns(referencingCol, referencedCol);
-          });
+        for (const referencedCol of fkFromReferenced.referencingCols) {
+          const i = fkToReferencing.referencedCols.findIndex(
+            (referencingCol) => {
+              if (fkToReferencing == fk || fkFromReferenced == fk)
+                return referencingCol.equals(referencedCol);
+              else return fk.mapsColumns(referencingCol, referencedCol);
+            }
+          );
           if (i == -1) break;
-          newRelReferencing.push(fkToReferencing.referencing[i]);
+          newRelReferencing.push(fkToReferencing.referencingCols[i]);
         }
-        if (newRelReferencing.length == fkFromReferenced.referenced.length)
+        if (newRelReferencing.length == fkFromReferenced.referencedCols.length)
           this.basicAddFk(
             new SourceRelationship(
               newRelReferencing,
-              Array.from(fkFromReferenced.referenced)
+              Array.from(fkFromReferenced.referencedCols)
             )
           );
       }
@@ -325,7 +327,7 @@ export default class Schema {
     for (const rel of this._fks) {
       const referencings = new Map<Table, Array<Array<Column>>>();
       for (const table of this.tables) {
-        const columns = table.columnsEquivalentTo(rel.referencing, true);
+        const columns = table.columnsEquivalentTo(rel.referencingCols, true);
         if (columns.length > 0) referencings.set(table, columns);
       }
       if ([...referencings.keys()].length == 0) continue;
@@ -333,7 +335,7 @@ export default class Schema {
       const referenceds = new Map<Table, Array<Array<Column>>>();
       for (const table of this.tables) {
         const columns = table
-          .columnsEquivalentTo(rel.referenced, false)
+          .columnsEquivalentTo(rel.referencedCols, false)
           .filter((possibleColumns) =>
             table.isKey(new ColumnCombination(possibleColumns))
           );
@@ -363,24 +365,24 @@ export default class Schema {
       (otherFk) =>
         otherFk == fk ||
         (fk.referencing == otherFk.referenced &&
-          new ColumnCombination(fk.relationship.referencing).isSubsetOf(
-            new ColumnCombination(otherFk.relationship.referenced)
+          new ColumnCombination(fk.referencingCols).isSubsetOf(
+            new ColumnCombination(otherFk.referencedCols)
           ))
     );
     const fksFromReferenced = Array.from(this._tableFks.keys()).filter(
       (otherFk) =>
         otherFk == fk ||
         (otherFk.referencing == fk.referenced &&
-          new ColumnCombination(otherFk.relationship.referencing).isSubsetOf(
-            new ColumnCombination(fk.relationship.referenced)
+          new ColumnCombination(otherFk.referencingCols).isSubsetOf(
+            new ColumnCombination(fk.referencedCols)
           ))
     );
     for (const fkToReferencing of fksToReferencing) {
       for (const fkFromReferenced of fksFromReferenced) {
         if (fkToReferencing == fkFromReferenced) continue;
         const newRelReferencing = new Array();
-        for (const referencedCol of fkFromReferenced.relationship.referencing) {
-          const i = fkToReferencing.relationship.referenced.findIndex(
+        for (const referencedCol of fkFromReferenced.referencingCols) {
+          const i = fkToReferencing.referencedCols.findIndex(
             (referencingCol) => {
               if (fkToReferencing == fk || fkFromReferenced == fk)
                 return referencingCol.equals(referencedCol);
@@ -392,7 +394,7 @@ export default class Schema {
             }
           );
           if (i == -1) break;
-          newRelReferencing.push(fkToReferencing.relationship.referencing[i]);
+          newRelReferencing.push(fkToReferencing.referencingCols[i]);
         }
         if (
           newRelReferencing.length ==
@@ -402,7 +404,7 @@ export default class Schema {
             new TableRelationship(
               new Relationship(
                 newRelReferencing,
-                Array.from(fkFromReferenced.relationship.referenced)
+                Array.from(fkFromReferenced.referencedCols)
               ),
               fkToReferencing.referencing,
               fkFromReferenced.referenced
@@ -478,7 +480,7 @@ export default class Schema {
         else return true;
       }
       const newReferencing = otherFk.relationship.columnsReferencedBy(
-        fk.relationship.referencing
+        fk.referencingCols
       );
       if (newReferencing.some((col) => !col)) continue;
       if (
@@ -486,7 +488,7 @@ export default class Schema {
           new TableRelationship(
             new Relationship(
               newReferencing as Array<Column>,
-              fk.relationship.referenced
+              fk.referencedCols
             ),
             otherFk.referenced,
             fk.referenced
@@ -539,13 +541,13 @@ export default class Schema {
   ): Map<SourceRelationship, Array<TableRelationship>> {
     let result = new Map<SourceRelationship, Array<TableRelationship>>();
     for (const rel of relationships) {
-      let ccs = table.columnsEquivalentTo(rel.referencing, true);
+      let ccs = table.columnsEquivalentTo(rel.referencingCols, true);
       if (ccs.length == 0) continue;
 
       for (const otherTable of this.tables) {
         if (otherTable == table) continue;
         let otherCCs = otherTable
-          .columnsEquivalentTo(rel.referenced, false)
+          .columnsEquivalentTo(rel.referencedCols, false)
           .filter((otherCC) =>
             otherTable.isKey(new ColumnCombination(otherCC))
           );
@@ -674,10 +676,7 @@ export default class Schema {
   ): Array<TableRelationship> {
     return this.fksOf(table, true).filter(
       (fk) =>
-        !table.splitPreservesCC(
-          fd,
-          new ColumnCombination(fk.relationship.referencing)
-        )
+        !table.splitPreservesCC(fd, new ColumnCombination(fk.referencingCols))
     );
   }
 
@@ -687,10 +686,7 @@ export default class Schema {
   ): Array<TableRelationship> {
     return this.referencesOf(table, true).filter(
       (ref) =>
-        !table.splitPreservesCC(
-          fd,
-          new ColumnCombination(ref.relationship.referenced)
-        )
+        !table.splitPreservesCC(fd, new ColumnCombination(ref.referencedCols))
     );
   }
 

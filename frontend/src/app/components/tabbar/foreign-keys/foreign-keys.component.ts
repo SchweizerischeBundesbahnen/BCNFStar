@@ -53,10 +53,10 @@ export class ForeignKeysComponent implements OnChanges {
       }
       map
         .get(tableRel.referencing)!
-        .union(new ColumnCombination(tableRel.relationship.referencing));
+        .union(new ColumnCombination(tableRel.referencingCols));
       map
         .get(tableRel.referenced)!
-        .union(new ColumnCombination(tableRel.relationship.referenced));
+        .union(new ColumnCombination(tableRel.referencedCols));
     }
     this.selectColumns.emit(map);
   }

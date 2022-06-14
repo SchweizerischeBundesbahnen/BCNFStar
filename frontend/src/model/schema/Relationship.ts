@@ -48,8 +48,8 @@ export default class Relationship {
   public sourceRelationship(): SourceRelationship {
     const sourceRel = new SourceRelationship();
     for (const i in this._referencing) {
-      sourceRel.referencing.push(this._referencing[i].sourceColumn);
-      sourceRel.referenced.push(this._referenced[i].sourceColumn);
+      sourceRel.referencingCols.push(this._referencing[i].sourceColumn);
+      sourceRel.referencedCols.push(this._referenced[i].sourceColumn);
     }
     return sourceRel;
   }

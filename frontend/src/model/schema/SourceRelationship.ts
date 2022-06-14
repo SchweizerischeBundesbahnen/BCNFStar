@@ -1,31 +1,33 @@
 import SourceColumn from './SourceColumn';
-import { IRel } from './methodObjects/FkDerivation';
 
-export default class SourceRelationship
-  implements IRel<SourceRelationship, SourceColumn>
-{
+export default class SourceRelationship {
   /**
    * these arrays are linked, the column in referencing has the same index as the
    * corresponding column in referenced
    */
   public constructor(
-    public referencing = new Array<SourceColumn>(),
-    public referenced = new Array<SourceColumn>()
+    private _referencingCols = new Array<SourceColumn>(),
+    private _referencedCols = new Array<SourceColumn>()
   ) {}
 
   public equals(other: SourceRelationship): boolean {
     if (this == other) return true;
-    if (!this.referencing[0].table.equals(other.referencing[0].table))
+    if (!this.referencingCols[0].table.equals(other.referencingCols[0].table))
       return false;
-    if (!this.referenced[0].table.equals(other.referenced[0].table))
+    if (!this.referencedCols[0].table.equals(other.referencedCols[0].table))
       return false;
-    if (this.referencing.length != other.referencing.length) return false;
+    if (this.referencingCols.length != other.referencingCols.length)
+      return false;
 
-    const pairs = this.referencing
-      .map((column, index) => `${column.name}.${this.referenced[index].name}`)
+    const pairs = this.referencingCols
+      .map(
+        (column, index) => `${column.name}.${this.referencedCols[index].name}`
+      )
       .sort();
-    const otherPairs = other.referencing
-      .map((column, index) => `${column.name}.${other.referenced[index].name}`)
+    const otherPairs = other.referencingCols
+      .map(
+        (column, index) => `${column.name}.${other.referencedCols[index].name}`
+      )
       .sort();
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
@@ -34,43 +36,43 @@ export default class SourceRelationship
     referencingCol: SourceColumn,
     referencedCol: SourceColumn
   ): boolean {
-    const i = this.referencing.findIndex((otherReferencingCol) =>
+    const i = this.referencingCols.findIndex((otherReferencingCol) =>
       otherReferencingCol.equals(referencingCol)
     );
     if (i == -1) return false;
-    return this.referenced[i].equals(referencedCol);
+    return this.referencedCols[i].equals(referencedCol);
   }
 
   public get isTrivial(): boolean {
-    for (const i in this.referencing) {
-      if (!this.referencing[i].equals(this.referenced[i])) return false;
+    for (const i in this.referencingCols) {
+      if (!this.referencingCols[i].equals(this.referencedCols[i])) return false;
     }
     return true;
   }
 
   public toString(): string {
-    const lhsString = this.referencing.map((col) => col.name).join(', ');
-    const rhsString = this.referenced.map((col) => col.name).join(', ');
+    const lhsString = this.referencingCols.map((col) => col.name).join(', ');
+    const rhsString = this.referencedCols.map((col) => col.name).join(', ');
 
-    const lhsSourceTable = this.referencing[0].table.fullName;
-    const rhsSourceTable = this.referenced[0].table.fullName;
+    const lhsSourceTable = this.referencingCols[0].table.fullName;
+    const rhsSourceTable = this.referencedCols[0].table.fullName;
 
     return `(${lhsSourceTable}) ${lhsString} -> (${rhsSourceTable}) ${rhsString}`;
   }
 
   isConnected(other: SourceRelationship): boolean {
-    for (const col of other.referencing) {
-      if (!this.referenced.some((otherCol) => otherCol.equals(col)))
+    for (const col of other.referencingCols) {
+      if (!this.referencedCols.some((otherCol) => otherCol.equals(col)))
         return false;
     }
     return true;
   }
 
-  public get referencingCols(): SourceColumn[] {
-    return this.referencing;
+  public get referencingCols(): Array<SourceColumn> {
+    return this._referencingCols;
   }
 
-  public get referencedCols(): SourceColumn[] {
-    return this.referenced;
+  public get referencedCols(): Array<SourceColumn> {
+    return this._referencedCols;
   }
 }

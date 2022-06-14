@@ -132,7 +132,7 @@ export default abstract class SQLPersisting {
       fk.referenced.surrogateKey
     }
     FROM ${this.updateSurrogateKeySource(fk)}
-    WHERE ${fk.relationship.referencing
+    WHERE ${fk.referencingCols
       .map(
         (c: Column, i: number) =>
           `${this.schemaWideColumnIdentifier(
@@ -140,7 +140,7 @@ export default abstract class SQLPersisting {
             c
           )} = ${this.schemaWideColumnIdentifier(
             fk.referenced,
-            fk.relationship.referenced[i]
+            fk.referencedCols[i]
           )}`
       )
       .join(' AND ')};`;
@@ -174,17 +174,17 @@ export default abstract class SQLPersisting {
     return `
 ALTER TABLE ${this.tableIdentifier(
       fk.referenced
-    )} ADD UNIQUE (${this.generateColumnString(fk.relationship.referenced)});
+    )} ADD UNIQUE (${this.generateColumnString(fk.referencedCols)});
 `;
   }
 
   public foreignKeySql(fk: TableRelationship): string {
     return `ALTER TABLE ${this.tableIdentifier(fk.referencing)}
       ADD CONSTRAINT ${this.randomFkName()}
-      FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
+      FOREIGN KEY (${this.generateColumnString(fk.referencingCols)})
       REFERENCES ${this.tableIdentifier(
         fk.referenced
-      )} (${this.generateColumnString(fk.relationship.referenced)});`;
+      )} (${this.generateColumnString(fk.referencedCols)});`;
   }
 
   public primaryKeys(tables: Table[]): string {

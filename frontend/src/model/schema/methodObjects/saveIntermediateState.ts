@@ -287,12 +287,9 @@ export default class SaveSchemaState {
   }
 
   private parseSourceRelationship(sr: JSONSourceRelationship) {
-    let newSourceRelationship = new SourceRelationship();
-    newSourceRelationship.referenced = this.parseSourceColumnArray(
-      sr.referenced
-    );
-    newSourceRelationship.referencing = this.parseSourceColumnArray(
-      sr.referencing
+    let newSourceRelationship = new SourceRelationship(
+      this.parseSourceColumnArray(sr.referencing),
+      this.parseSourceColumnArray(sr.referenced)
     );
 
     let existing = this.existingSourceRelationships.find((other) =>
