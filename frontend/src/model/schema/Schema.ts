@@ -28,6 +28,8 @@ export default class Schema {
   private _tableFksValid = false;
   private _starMode = false;
 
+  private _regularTables?: Array<Table>;
+
   public toJSON() {
     return {
       tables: Array.from(this.tables),
@@ -46,6 +48,7 @@ export default class Schema {
       this.tables.add(table);
     });
     this.relationshipsValid = false;
+    this._regularTables = undefined;
   }
 
   public deleteTables(...tables: Array<Table | UnionedTable>) {
@@ -53,12 +56,16 @@ export default class Schema {
       this.tables.delete(table);
     });
     this.relationshipsValid = false;
+    this._regularTables = undefined;
   }
 
   public get regularTables(): Array<Table> {
-    return [...this.tables].filter(
-      (table) => table instanceof Table
-    ) as Array<Table>;
+    if (this._regularTables === undefined) {
+      this._regularTables = [...this.tables].filter(
+        (table) => table instanceof Table
+      ) as Array<Table>;
+    }
+    return this._regularTables;
   }
 
   public addFks(...fks: SourceRelationship[]) {
