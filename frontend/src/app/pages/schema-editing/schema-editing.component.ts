@@ -177,7 +177,7 @@ export class SchemaEditingComponent {
   }
 
   public setFkFiltering(checkboxChange: SbbCheckboxChange) {
-    this.schema.fkFiltering = checkboxChange.checked;
+    this.schema.shouldFilterFks = checkboxChange.checked;
     this.schemaChanged.next();
   }
 

@@ -1,28 +1,34 @@
 import Schema from '../schema/Schema';
 import TableRelationship from '../schema/TableRelationship';
+import { FkDisplayOptions } from '../types/FkDisplayOptions';
 import Command from './Command';
 
 export default class ShowFkCommand extends Command {
-  private priorBools: Array<boolean>;
-  private newBools: Array<boolean>;
+  private priorDisplayOptions: FkDisplayOptions;
+  private newDisplayOptions: FkDisplayOptions;
 
   public constructor(private schema: Schema, private fk: TableRelationship) {
     super();
-    this.priorBools = this.schema.getFkBoolsOf(this.fk);
-    this.newBools = Array.from(this.priorBools);
+    this.priorDisplayOptions = this.schema.getFkDisplayOptions(this.fk);
+    this.newDisplayOptions = {
+      filtered: this.priorDisplayOptions.filtered,
+      blacklisted: this.priorDisplayOptions.blacklisted,
+      whitelisted: this.priorDisplayOptions.whitelisted,
+    };
   }
 
   protected override _do(): void {
-    this.newBools[1] = false;
-    if (this.schema.fkFiltering && this.priorBools[0]) this.newBools[2] = true;
+    this.newDisplayOptions.blacklisted = false;
+    if (this.schema.shouldFilterFks && this.priorDisplayOptions.filtered)
+      this.newDisplayOptions.whitelisted = true;
     this._redo();
   }
 
   protected override _undo(): void {
-    this.schema.setFkBoolsOf(this.fk, this.priorBools);
+    this.schema.setFkDisplayOptions(this.fk, this.priorDisplayOptions);
   }
 
   protected override _redo(): void {
-    this.schema.setFkBoolsOf(this.fk, this.newBools);
+    this.schema.setFkDisplayOptions(this.fk, this.newDisplayOptions);
   }
 }

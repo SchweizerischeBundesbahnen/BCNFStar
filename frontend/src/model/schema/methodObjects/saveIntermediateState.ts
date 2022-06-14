@@ -1,3 +1,4 @@
+import { FkDisplayOptions } from '../../types/FkDisplayOptions';
 import Column from '../Column';
 import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
@@ -13,7 +14,7 @@ import TableRelationship from '../TableRelationship';
 interface JSONSchema {
   tables: Array<JSONTable>;
   _baseFks: Array<JSONSourceRelationship>;
-  _tableFks: Array<[JSONTableRelationship, Array<boolean>]>;
+  _tableFks: Array<[JSONTableRelationship, FkDisplayOptions]>;
   _inds: Array<JSONSourceRelationship>;
   _fds: Array<JSONSourceFunctionalDependency>;
 }
@@ -104,11 +105,11 @@ export default class SaveSchemaState {
   }
 
   private parseTableFks(
-    tableFks: Array<[JSONTableRelationship, Array<boolean>]>,
+    tableFks: Array<[JSONTableRelationship, FkDisplayOptions]>,
     tables: Array<Table>
-  ): Map<TableRelationship, Array<boolean>> {
-    const result = new Map<TableRelationship, Array<boolean>>();
-    for (const [tableFk, bools] of tableFks) {
+  ): Map<TableRelationship, FkDisplayOptions> {
+    const result = new Map<TableRelationship, FkDisplayOptions>();
+    for (const [tableFk, displayOptions] of tableFks) {
       const referencingTable = tables.find(
         (table) => table.fullName == tableFk.referencing
       )!;
@@ -124,7 +125,7 @@ export default class SaveSchemaState {
         referencingTable,
         referencedTable
       );
-      result.set(newTableFk, bools);
+      result.set(newTableFk, displayOptions);
     }
     return result;
   }
