@@ -74,6 +74,15 @@ export default class MsSqlUtils extends SqlUtils {
     return ITemptableScript;
   }
 
+  public override async createTempTable(
+    _sql: string,
+    name: string
+  ): Promise<string> {
+    const x: ITemptableScript = this.tempTableScripts(_sql, name);
+    await sql.query(x.createScript);
+    return x.name;
+  }
+
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
     const result = await sql.query<SchemaQueryRow>(`SELECT 
       t.name as table_name, 
@@ -248,9 +257,10 @@ export default class MsSqlUtils extends SqlUtils {
     // if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
     //   throw Error("Columns don't exist in table.");
     // }
+    const table: string = await this.createTempTable(_sql, "X");
 
     const result: sql.IResult<any> = await sql.query(
-      this.violatingRowsForFD_SQL(_sql, lhs, rhs) +
+      this.violatingRowsForFD_SQL(table, lhs, rhs) +
         ` ORDER BY ${lhs.join(",")}
           OFFSET ${offset} ROWS
           FETCH NEXT ${limit} ROWS ONLY
@@ -312,29 +322,18 @@ export default class MsSqlUtils extends SqlUtils {
     referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
   ): Promise<IRowCounts> {
-    // if (
-    //   !this.columnsExistInTable(
-    //     referencingTable.schemaName,
-    //     referencingTable.name,
-    //     columnRelationships.map((c) => c.referencingColumn)
-    //   )
-    // ) {
-    //   throw Error("Columns don't exist in referencing.");
-    // }
-    // if (
-    //   !this.columnsExistInTable(
-    //     referencedTable.schemaName,
-    //     referencedTable.name,
-    //     columnRelationships.map((c) => c.referencedColumn)
-    //   )
-    // ) {
-    //   throw Error("Columns don't exist in referenced.");
-    // }
-
+    const referencingTable: string = await this.createTempTable(
+      referencingTableSql,
+      "X"
+    );
+    const referencedTable: string = await this.createTempTable(
+      referencedTableSql,
+      "Y"
+    );
     const result = await sql.query<IRowCounts>(
       this.getViolatingRowsForINDCount_Sql(
-        referencingTableSql,
-        referencedTableSql,
+        referencingTable,
+        referencedTable,
         columnRelationships
       )
     );
@@ -346,10 +345,6 @@ export default class MsSqlUtils extends SqlUtils {
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<IRowCounts> {
-    // if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
-    //   throw Error("Columns don't exist in table.");
-    // }
-
     const result = await sql.query<IRowCounts>(
       this.getViolatingRowsForFDCount_Sql(_sql, lhs, rhs)
     );

@@ -25,15 +25,16 @@ export abstract class DataQuery {
     );
   }
 
-  public async initPersisting(): Promise<SQLPersisting> {
+  public async initPersisting(): Promise<void> {
     const dbmsName: string = await this.getDmbsName();
 
     if (dbmsName == 'postgres') {
       this.SqlGeneration = new PostgreSQLPersisting('XXXXXXXXXXXX');
     } else if (dbmsName == 'mssql') {
       this.SqlGeneration = new MsSqlPersisting('XXXXXXXXXXXX');
+    } else {
+      throw Error('Unknown Dbms-Server');
     }
-    throw Error('Unknown Dbms-Server');
   }
 
   constructor() {

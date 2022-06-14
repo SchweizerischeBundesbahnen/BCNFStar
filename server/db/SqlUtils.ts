@@ -174,24 +174,16 @@ export default abstract class SqlUtils {
    * in the referenced table and are therefore violating the Inclusion-Dependency.
    */
   protected violatingRowsForSuggestedIND_SQL(
-    referencingTableSql: string,
-    referencedTableSql: string,
+    referencingTable: string,
+    referencedTable: string,
     columnRelationships: IColumnRelationship[]
   ): string {
-    const referencingTempTable: ITemptableScript = this.tempTableScripts(
-      referencingTableSql,
-      "X"
-    );
-    const referencedTempTable: ITemptableScript = this.tempTableScripts(
-      referencedTableSql,
-      "Y"
-    );
     return `
     SELECT ${columnRelationships
       .map((cc) => `X.${cc.referencingColumn}`)
       .join(",")}, COUNT(1) AS Count
-    FROM ${referencingTempTable.name} AS X
-    LEFT OUTER JOIN ${referencedTempTable.name} AS Y 
+    FROM ${referencingTable} AS X
+    LEFT OUTER JOIN ${referencedTable} AS Y 
       ON ${columnRelationships
         .map(
           (cc) =>
@@ -210,7 +202,6 @@ export default abstract class SqlUtils {
   }
 
   /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
-   * In Postgres the table name is not relevant
    */
   public tempTableName(name: string): string {
     return `#${name}`;
@@ -222,22 +213,25 @@ export default abstract class SqlUtils {
    */
   public abstract tempTableScripts(Sql: string, name: string): ITemptableScript;
 
+  /**
+   * @param sql The Sql that queries the information the temp-table should contain
+   * @param name The name of the temp-table. Relevant for multiple temp-table in one query
+   */
+  public abstract createTempTable(sql: string, name: string): Promise<string>;
+
   protected violatingRowsForFD_SQL(
-    sql: string,
+    tableName: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): string {
-    const tempTable: ITemptableScript = this.tempTableScripts(sql, "X");
-
     return `
-${tempTable.createScript}
 SELECT ${lhs.concat(rhs).join(",")}, COUNT(*) AS Count
-FROM ${tempTable.name} AS x 
+FROM ${tableName} AS x 
 WHERE EXISTS (
 	SELECT 1 FROM (
 		SELECT ${lhs.join(",")} FROM (
 			SELECT ${[...new Set(lhs.concat(rhs))].join(",")}
-			FROM ${tempTable.name} 
+			FROM ${tableName} 
 			GROUP BY ${[...new Set(lhs.concat(rhs))].join(",")}
 		) AS Z  -- removes duplicates
 		GROUP BY ${lhs.join(",")} 
@@ -247,27 +241,29 @@ WHERE EXISTS (
 GROUP BY ${lhs.concat(rhs).join(",")}
     `;
   }
+
   public abstract getViolatingRowsForFDCount(
     _sql: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<IRowCounts>;
 
-  public getViolatingRowsForFDCount_Sql(sql: string, lhs, rhs) {
-    return `SELECT COALESCE (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
-      ${this.violatingRowsForFD_SQL(sql, lhs, rhs)} 
+  public getViolatingRowsForFDCount_Sql(tablename: string, lhs, rhs) {
+    return `
+    SELECT COALESCE (SUM(Count), 0) as entries, COALESCE (COUNT(*),0) as groups FROM (
+      ${this.violatingRowsForFD_SQL(tablename, lhs, rhs)} 
       ) AS X `;
   }
 
   public getViolatingRowsForINDCount_Sql(
-    referencingTableSql: string,
-    referencedTableSql: string,
+    referencingTable: string,
+    referencedTable: string,
     columnRelationships: IColumnRelationship[]
   ) {
     return `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
     FROM ( ${this.violatingRowsForSuggestedIND_SQL(
-      referencingTableSql,
-      referencedTableSql,
+      referencingTable,
+      referencedTable,
       columnRelationships
     )}
     ) AS X`;
