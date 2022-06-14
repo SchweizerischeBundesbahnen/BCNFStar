@@ -334,13 +334,11 @@ from
     // }
 
     const count = await this.pool.query<IRowCounts>(
-      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
-      FROM ( ${this.violatingRowsForSuggestedIND_SQL(
+      this.getViolatingRowsForINDCount_Sql(
         referencingTableSql,
         referencedTableSql,
         columnRelationships
-      )}
-      ) AS X`
+      )
     );
     return count.rows[0];
   }

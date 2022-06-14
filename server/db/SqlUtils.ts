@@ -1,4 +1,6 @@
-import { IColumnRelationship } from "../definitions/IRelationship";
+import IRelationship, {
+  IColumnRelationship,
+} from "../definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
 import ITemptableScript from "@/definitions/ITemptableScripts";
@@ -255,5 +257,19 @@ GROUP BY ${lhs.concat(rhs).join(",")}
     return `SELECT COALESCE (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
       ${this.violatingRowsForFD_SQL(sql, lhs, rhs)} 
       ) AS X `;
+  }
+
+  public getViolatingRowsForINDCount_Sql(
+    referencingTableSql: string,
+    referencedTableSql: string,
+    columnRelationships: IColumnRelationship[]
+  ) {
+    return `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
+    FROM ( ${this.violatingRowsForSuggestedIND_SQL(
+      referencingTableSql,
+      referencedTableSql,
+      columnRelationships
+    )}
+    ) AS X`;
   }
 }

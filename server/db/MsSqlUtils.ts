@@ -332,12 +332,11 @@ export default class MsSqlUtils extends SqlUtils {
     // }
 
     const result = await sql.query<IRowCounts>(
-      `SELECT ISNULL (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
-      ${this.violatingRowsForSuggestedIND_SQL(
+      this.getViolatingRowsForINDCount_Sql(
         referencingTableSql,
         referencedTableSql,
         columnRelationships
-      )}  ) AS X`
+      )
     );
     return result.recordset[0];
   }
