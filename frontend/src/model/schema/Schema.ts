@@ -306,11 +306,7 @@ export default class Schema {
                 referencedTable
               );
               if (this.isRelationshipValid(relationship))
-                for (const newFk of new TableFkDerivation(
-                  Array.from(this._tableFks.keys()),
-                  relationship
-                ).result)
-                  this.addTableFk(newFk);
+                this.addTableFk(relationship);
             }
     }
   }
