@@ -178,10 +178,6 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     limit: number,
     withSeparators = true
   ): Promise<ITablePage> {
-    // currently supports only check on "sourceTables".
-    if (this.table.sources.length != 1)
-      throw Error('Not Implemented Exception');
-
     const lhsNames = this.lhs.map((c) => c.sourceColumn.name);
     const rhsNames = this.rhs.map((c) => c.sourceColumn.name);
     const data: IRequestBodyFDViolatingRows = {
@@ -224,9 +220,6 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
   }
 
   public override async loadRowCount(): Promise<IRowCounts> {
-    // currently supports only check on "sourceTables".
-    if (this.table.sources.length != 1)
-      throw Error('Not Implemented Exception');
     const data: IRequestBodyFDViolatingRows = {
       sql: this.SqlGeneration!.selectStatement(
         this.table,
