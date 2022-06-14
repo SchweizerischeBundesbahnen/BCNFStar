@@ -2,6 +2,15 @@ import { IColumnRelationship } from "../definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
 import ITemptableScript from "@/definitions/ITemptableScripts";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -44,7 +53,7 @@ export default abstract class SqlUtils {
   public abstract getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public abstract tableExistsInSchema(
     schema: string,
@@ -68,6 +77,74 @@ export default abstract class SqlUtils {
   public abstract getJdbcPath(): string;
   public abstract getDbmsName(): DbmsType;
 
+  public abstract getDatatypes(): Promise<string[]>;
+
+  public abstract testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability>;
+
+  public abstract escape(str: string): string;
+
+  public generateColumnString(columns: string[]): string {
+    return columns.map((c) => this.escape(c)).join(", ");
+  }
+
+  public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
+    const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
+    // Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int)
+    return `
+    SELECT ${this.escape(tc.column)} FROM ${tableString} 
+    EXCEPT 
+    SELECT CAST(CAST(${this.escape(tc.column)} AS ${tc.targetDatatype}) AS ${
+      tc.currentDatatype
+    }) FROM ${tableString} 
+    `;
+  }
+
+  /** Expects to get two keys respectively. Otherwise, this Sql won't work correctly, i.e. return wrong results
+   * The SQL calculates the number of rows of the unioned tables and the number of rows of the unioned key-columns and takes the difference
+   * difference > 0 means, that the key is invalid as the unioned table contains different rows with the same key. (SQL-UNION is implemented as a SET-Operation)
+   */
+  public testKeyUnionabilitySql(uk: IRequestBodyUnionedKeys): string {
+    const table1Identifier: string = `${this.escape(
+      uk.key1.table_schema
+    )}.${this.escape(uk.key1.table_name)}`;
+    const table2Identifier: string = `${this.escape(
+      uk.key2.table_schema
+    )}.${this.escape(uk.key2.table_name)}`;
+
+    return `
+  SELECT 
+    (SELECT COUNT(*) as unionedCount
+    FROM
+    (
+    SELECT ${this.generateColumnString(
+      uk.unionedColumns[0]
+    )} FROM ${table1Identifier} 
+    UNION
+    SELECT ${this.generateColumnString(
+      uk.unionedColumns[1]
+    )} FROM ${table2Identifier} 
+    ) as unionedCount)
+  -
+    (SELECT COUNT(*) as unionedCountKey
+    FROM
+    (
+      SELECT ${this.generateColumnString(
+        uk.key1.attributes
+      )} FROM ${table1Identifier}
+      UNION
+      SELECT ${this.generateColumnString(
+        uk.key2.attributes
+      )} FROM ${table2Identifier}
+    ) as unionedcount) as count
+`;
+  }
+
+  public abstract testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting>;
+
   public abstract getViolatingRowsForFD(
     sql: string,
     lhs: Array<string>,
@@ -80,7 +157,7 @@ export default abstract class SqlUtils {
     referencingTableSql: string,
     referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public abstract getViolatingRowsForSuggestedIND(
     referencingTableSql: string,
@@ -172,13 +249,11 @@ GROUP BY ${lhs.concat(rhs).join(",")}
     _sql: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<number>;
+  ): Promise<IRowCounts>;
 
   public getViolatingRowsForFDCount_Sql(sql: string, lhs, rhs) {
-    return `SELECT COALESCE(SUM(Count), 0) as count FROM 
-    (
-    ${this.violatingRowsForFD_SQL(sql, lhs, rhs)} 
-    ) AS X
-    `;
+    return `SELECT COALESCE (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
+      ${this.violatingRowsForFD_SQL(sql, lhs, rhs)} 
+      ) AS X `;
   }
 }

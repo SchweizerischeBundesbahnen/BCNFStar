@@ -22,13 +22,6 @@ button {
   background-color: white;
 }
 
-.grid-container-paginator {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 10px;
-  background-color: white;
-}
-
 h3 {
   font-weight: bold;
   overflow: hidden;
@@ -37,10 +30,6 @@ h3 {
 
 .loading-box {
   text-align: center;
-}
-
-.numeric {
-  text-align: end;
 }
 
 sbb-accordion {
@@ -60,16 +49,11 @@ span {
   display: block;
 }
 
-.table-wrapper {
-  height: 80vh;
+.tablePreview {
+  height: 75vh;
   width: 100%;
   min-height: 400px;
 }
 
-.text-aling-right {
-  text-align: right;
-}
 
-tr {
-  white-space: nowrap;
-}
+

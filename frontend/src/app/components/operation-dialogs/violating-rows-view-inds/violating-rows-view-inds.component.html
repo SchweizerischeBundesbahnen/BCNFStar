@@ -3,7 +3,8 @@
   <p>
     The suggested Foreign Key Reference is not valid because the chosen columns
     are not fully included in the other columns. These are the
-    {{ rowCount }} violating records:
+    {{ rowCount.entries }} missing values. They can be grouped into
+    {{ rowCount.groups }} unique missing values.
   </p>
   <app-database-table-viewer
     [dataService]="dataService"

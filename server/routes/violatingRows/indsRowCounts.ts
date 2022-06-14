@@ -22,7 +22,6 @@ export default async function getViolatingRows(
       body.relationship.columnRelationships
     );
 
-    console.log(result);
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
