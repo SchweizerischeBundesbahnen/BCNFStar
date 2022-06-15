@@ -14,8 +14,12 @@ export class KeysComponent {
     this.schemaService.selectedTableChanged.subscribe(this.reset);
   }
 
+  public get table() {
+    return this.schemaService.selectedTable!;
+  }
+
   public reset() {
-    this.surrogateKey = this.schemaService.selectedTable?.surrogateKey ?? '';
+    this.surrogateKey = this.table.surrogateKey ?? '';
     this.editMode = !this.surrogateKey;
   }
 
