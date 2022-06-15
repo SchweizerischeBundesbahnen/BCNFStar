@@ -3,16 +3,16 @@
     [disabled]="schema.hiddenFksOf(table).length === 0"
     [expanded]="schema.hiddenFksOf(table).length !== 0"
   >
-    <sbb-expansion-panel-header
-      >Dismissed Foreign Key</sbb-expansion-panel-header
-    >
+    <sbb-expansion-panel-header>
+      Dismissed Foreign Keys
+    </sbb-expansion-panel-header>
     <div
       class="hidden-fk-grid-container"
       *ngFor="let fk of schema.hiddenFksOf(table)"
     >
       <div>{{ fk.toString() }}</div>
       <button type="button" sbb-icon-button (click)="showFk.emit(fk)">
-        <sbb-icon svgIcon="kom:plus-small"></sbb-icon>
+        <sbb-icon id="add-hidden-fk-button" svgIcon="kom:plus-small"></sbb-icon>
       </button>
     </div>
   </sbb-expansion-panel>
@@ -29,8 +29,9 @@
         *ngFor="let table of schema.tables"
         [value]="table"
         [sbbTooltip]="table.fullName"
-        >{{ table.fullName }}</sbb-option
       >
+        {{ table.fullName }}
+      </sbb-option>
     </sbb-select>
     <br />
     <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">

@@ -41,21 +41,6 @@ describe("The schema editing side bar", () => {
     cy.get(".sbb-expansion-panel-body button").contains("n_regionkey");
   });
 
-  it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {
-    cy.visitPossibleForeignKeysTab();
-
-    cy.get(".table-head-title").contains("public.part_partsupp").click();
-    cy.contains(
-      "(public.part_partsupp_supplier_denormalized) s_nationkey -> (public.nation_region_denormalized) n_nationkey"
-    );
-  });
-
-  it("displays the joining button", () => {
-    cy.visitPossibleForeignKeysTab();
-
-    cy.get("button").contains("Create Foreign Key");
-  });
-
   // ############# Rename table in split dialog #############
   it("sets default name when splitting by fd", () => {
     cy.visitContainedSubtableTab();

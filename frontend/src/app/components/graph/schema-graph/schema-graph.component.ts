@@ -195,7 +195,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       markup: [
         {
           tagName: 'circle',
-          selector: 'button',
+          selector: 'delete-fk-button',
           attributes: {
             r: 11,
             fill: '#ff1d00',
@@ -222,7 +222,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       markup: [
         {
           tagName: 'circle',
-          selector: 'button',
+          selector: 'join-button',
           attributes: {
             r: 11,
             fill: '#2d327d',
