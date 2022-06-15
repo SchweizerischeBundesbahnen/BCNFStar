@@ -41,7 +41,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Output() public selectedTableChange = new EventEmitter<Table>();
   @Output() public joinFk = new EventEmitter<TableRelationship>();
   @Output() public makeDirectDimension = new EventEmitter<Table>();
-  @Output() public hideFk = new EventEmitter<TableRelationship>();
+  @Output() public dismissFk = new EventEmitter<TableRelationship>();
 
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
@@ -187,7 +187,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       this.joinFk.emit(fk);
     };
     let deleteFk = () => {
-      this.hideFk.emit(fk);
+      this.dismissFk.emit(fk);
     };
 
     let removeButton = new joint.linkTools.Remove({ action: deleteFk });

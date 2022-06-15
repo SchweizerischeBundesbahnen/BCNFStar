@@ -22,7 +22,7 @@ import Column from '@/src/model/schema/Column';
 import DeleteColumnCommand from '@/src/model/commands/DeleteColumnCommand';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
-import HideFkCommand from '@/src/model/commands/HideFkCommand';
+import DismissFkCommand from '@/src/model/commands/DismissFkCommand';
 import ShowFkCommand from '@/src/model/commands/ShowFkCommand';
 
 @Component({
@@ -204,8 +204,8 @@ export class SchemaEditingComponent {
     this.schemaChanged.next();
   }
 
-  public onClickHideFk(fk: TableRelationship) {
-    let command = new HideFkCommand(this.schema, fk);
+  public onClickDismissFk(fk: TableRelationship) {
+    let command = new DismissFkCommand(this.schema, fk);
 
     this.commandProcessor.do(command);
     this.schemaChanged.next();

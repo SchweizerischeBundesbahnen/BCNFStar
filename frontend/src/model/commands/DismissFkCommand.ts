@@ -3,7 +3,7 @@ import TableRelationship from '../schema/TableRelationship';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
 import Command from './Command';
 
-export default class HideFkCommand extends Command {
+export default class DismissFkCommand extends Command {
   private priorDisplayOptions: FkDisplayOptions;
   private newDisplayOptions: FkDisplayOptions;
 
