@@ -19,7 +19,7 @@ export default class ShowFkCommand extends Command {
 
   protected override _do(): void {
     this.newDisplayOptions.blacklisted = false;
-    if (this.schema.shouldFilterFks && this.priorDisplayOptions.filtered)
+    if (this.priorDisplayOptions.filtered)
       this.newDisplayOptions.whitelisted = true;
     this._redo();
   }

@@ -37,7 +37,6 @@ export default class Schema {
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
   private _starMode = false;
-  public shouldFilterFks = true;
 
   public toJSON() {
     return {
@@ -284,12 +283,9 @@ export default class Schema {
 
   public isFkDisplayed(fk: TableRelationship) {
     const displayOptions = this._tableFks.get(fk)!;
-    if (this.shouldFilterFks)
-      return (
-        displayOptions.whitelisted ||
-        !(displayOptions.filtered || displayOptions.blacklisted)
-      );
-    else return !displayOptions.blacklisted;
+    if (displayOptions.whitelisted) return true;
+    if (displayOptions.blacklisted || displayOptions.filtered) return false;
+    return true;
   }
 
   /**

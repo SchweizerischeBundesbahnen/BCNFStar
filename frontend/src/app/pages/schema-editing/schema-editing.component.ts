@@ -22,7 +22,6 @@ import Column from '@/src/model/schema/Column';
 import DeleteColumnCommand from '@/src/model/commands/DeleteColumnCommand';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
-import { SbbCheckboxChange } from '@sbb-esta/angular/checkbox';
 import HideFkCommand from '@/src/model/commands/HideFkCommand';
 import ShowFkCommand from '@/src/model/commands/ShowFkCommand';
 
@@ -173,11 +172,6 @@ export class SchemaEditingComponent {
 
   public setStarMode(radioChange: SbbRadioChange) {
     this.schema.starMode = radioChange.value;
-    this.schemaChanged.next();
-  }
-
-  public setFkFiltering(checkboxChange: SbbCheckboxChange) {
-    this.schema.shouldFilterFks = checkboxChange.checked;
     this.schemaChanged.next();
   }
 
