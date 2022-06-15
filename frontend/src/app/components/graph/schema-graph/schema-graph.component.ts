@@ -107,6 +107,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       // prevent left ports from being cut off
       marginX: this.portDiameter / 2,
       edgeSep: 80,
+      rankSep: 200,
       rankDir: 'LR',
     });
 
@@ -190,7 +191,33 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       this.dismissFk.emit(fk);
     };
 
-    let removeButton = new joint.linkTools.Remove({ action: deleteFk });
+    let removeButton = new joint.linkTools.Button({
+      markup: [
+        {
+          tagName: 'circle',
+          selector: 'button',
+          attributes: {
+            r: 11,
+            fill: '#ff1d00',
+            cursor: 'pointer',
+          },
+        },
+        {
+          tagName: 'path',
+          selector: 'icon',
+          attributes: {
+            d: 'M -3 -3 3 3 M -3 3 3 -3',
+            fill: 'white',
+            stroke: '#FFFFFF',
+            'stroke-width': 2,
+            'pointer-events': 'none',
+          },
+        },
+      ],
+      action: deleteFk,
+      offset: 0,
+      distance: '37%',
+    });
     let joinButton = new joint.linkTools.Button({
       markup: [
         {
@@ -214,7 +241,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
           },
         },
       ],
-      distance: '50%',
+      distance: '71%',
       offset: 0,
       action: joinTablesOnFks,
     });
