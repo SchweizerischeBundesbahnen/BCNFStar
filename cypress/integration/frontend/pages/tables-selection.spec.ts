@@ -119,7 +119,7 @@ describe("The table selection page", () => {
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
     cy.readFile("cypress/downloads/savedExampleSchema.zip").then((result) => {
-      expect(result == cy.fixture("savedSchema.zip"));
+      expect(result == cy.fixture("savedExampleSchema.zip"));
     });
   });
 });
