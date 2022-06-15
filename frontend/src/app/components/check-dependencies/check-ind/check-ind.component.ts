@@ -136,7 +136,7 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public validTables(): Array<Table> {
-    return this.tables.filter((table) => table.sources.length == 1);
+    return this.tables;
   }
 
   public canCheckIND(): boolean {

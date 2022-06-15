@@ -79,12 +79,34 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add("visitForeignKeyTab", { prevSubject: false }, () => {
+  cy.contains("Foreign Keys").click({ force: true });
+});
+
+Cypress.Commands.add(
+  "visitSuggestForeignKeyTab",
+  { prevSubject: false },
+  () => {
+    cy.visitForeignKeyTab();
+
+    cy.get(".sbb-expansion-panel-header")
+      .contains("Suggest Foreign Key")
+      .then(($ele) => {
+        cy.log($ele.parent().attr("aria-expanded") == "false");
+        if ($ele.parent().attr("aria-expanded") == "false") {
+          cy.get(".sbb-expansion-panel-header")
+            .contains("Suggest Foreign Key")
+            .click({ force: true });
+        }
+      });
+  }
+);
+
 Cypress.Commands.add(
   "visitCheckContainedSubtableTab",
   { prevSubject: false },
   () => {
-    cy.contains("Subtables").click({ force: true });
-
+    cy.visitContainedSubtableTab();
     cy.get(".sbb-expansion-panel-header")
       .contains("Check Contained Subtable")
       .then(($ele) => {
@@ -118,12 +140,39 @@ Cypress.Commands.add("checkFD", { prevSubject: false }, (lhs, rhs) => {
   cy.get("button").contains("Check Functional Dependency").click();
 });
 
-Cypress.Commands.add("selectColumns", { prevSubject: false }, (columnList) => {
-  for (const column of columnList) {
-    cy.get(".sbb-option").contains(column).click({ force: true });
+Cypress.Commands.add(
+  "checkIND",
+  { prevSubject: false },
+  (referencedTable, columnMapping) => {
+    cy.get("#referencedTableSelection").click();
+    cy.get(".sbb-option").contains(referencedTable).click({ force: true });
+
+    if (columnMapping.length > 0) {
+      for (const columnTupel of columnMapping) {
+        cy.get(".sbb-select-placeholder").first().click({ force: true });
+        cy.selectColumns([columnTupel[0]], false);
+
+        cy.get(".sbb-select-placeholder").last().click({ force: true });
+        cy.selectColumns([columnTupel[1]], false);
+
+        cy.get("#columnRelationButton").last().click();
+      }
+      cy.get("#checkIndButton").click();
+    }
   }
-  cy.get(".cdk-overlay-backdrop-showing").click();
-});
+);
+
+Cypress.Commands.add(
+  "selectColumns",
+  { prevSubject: false },
+  (columnList, multiselection = true) => {
+    cy.log(columnList.toString());
+    for (const column of columnList) {
+      cy.get(".sbb-option").contains(column).click({ force: true });
+    }
+    if (multiselection) cy.get(".cdk-overlay-backdrop-showing").click();
+  }
+);
 
 Cypress.Commands.add(
   "createForeignKeyByFirstIND",
@@ -145,6 +194,17 @@ Cypress.Commands.add(
   { prevSubject: false },
   () => {
     cy.contains("Foreign Keys").click({ force: true });
+
+    cy.get(".sbb-expansion-panel-header")
+      .contains("Possible Foreign Keys")
+      .then(($ele) => {
+        cy.log($ele.parent().attr("aria-expanded") == "false");
+        if ($ele.parent().attr("aria-expanded") == "false") {
+          cy.get(".sbb-expansion-panel-header")
+            .contains("Possible Foreign Keys")
+            .click({ force: true });
+        }
+      });
   }
 );
 Cypress.Commands.add("executeSql", (Sql) => {
