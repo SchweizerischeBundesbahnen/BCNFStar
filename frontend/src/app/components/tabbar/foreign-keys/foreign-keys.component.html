@@ -3,7 +3,12 @@
     <sbb-expansion-panel-header
       >Possible Foreign Keys</sbb-expansion-panel-header
     >
-    <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
+    <sbb-select
+      id="possibleForeignKeysSelection"
+      multiple
+      placeholder="Filter tables"
+      [(ngModel)]="indFilter"
+    >
       <app-sbb-option-all
         [(current)]="indFilter"
         [available]="schema.regularTables"

@@ -80,6 +80,67 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add(
+  "visitCheckContainedSubtableTab",
+  { prevSubject: false },
+  () => {
+    cy.contains("Subtables").click({ force: true });
+
+    cy.get(".sbb-expansion-panel-header")
+      .contains("Check Contained Subtable")
+      .then(($ele) => {
+        cy.log($ele.parent().attr("aria-expanded") == "false");
+        if ($ele.parent().attr("aria-expanded") == "false") {
+          cy.get(".sbb-expansion-panel-header")
+            .contains("Check Contained Subtable")
+            .click({ force: true });
+        }
+      });
+  }
+);
+
+Cypress.Commands.add(
+  "joinTablesByFirstIND",
+  { prevSubject: false },
+  (table1, table2) => {
+    cy.createForeignKeyByFirstIND(table1, table2);
+    cy.get(".joint-tool").click();
+    cy.get(".sbb-button").contains("Ok").click();
+  }
+);
+
+Cypress.Commands.add("checkFD", { prevSubject: false }, (lhs, rhs) => {
+  cy.get("#lhsSelection").click();
+  cy.selectColumns(lhs);
+
+  cy.get("#rhsSelection").click();
+  cy.selectColumns(rhs);
+
+  cy.get("button").contains("Check Functional Dependency").click();
+});
+
+Cypress.Commands.add("selectColumns", { prevSubject: false }, (columnList) => {
+  for (const column of columnList) {
+    cy.get(".sbb-option").contains(column).click({ force: true });
+  }
+  cy.get(".cdk-overlay-backdrop-showing").click();
+});
+
+Cypress.Commands.add(
+  "createForeignKeyByFirstIND",
+  { prevSubject: false },
+  (table1, table2) => {
+    cy.clickOnTable(table1);
+    cy.visitPossibleForeignKeysTab();
+    cy.get("#possibleForeignKeysSelection").first().click();
+    cy.get(".sbb-checkbox").click();
+    cy.get(".sbb-option").contains(table2).click();
+    cy.get(".cdk-overlay-backdrop").click();
+    cy.get(".sbb-radio-button").first().click();
+    cy.get(".sbb-button").contains("Create Foreign Key").click();
+  }
+);
+
+Cypress.Commands.add(
   "visitPossibleForeignKeysTab",
   { prevSubject: false },
   () => {
@@ -107,4 +168,8 @@ Cypress.Commands.add("deleteAllMetanomeResults", () => {
     }
   });
   cy.reload();
+});
+
+Cypress.Commands.add("clickOnTable", (tablename) => {
+  cy.get(`.table-head-title:contains("${tablename}")`).click({ force: true });
 });
