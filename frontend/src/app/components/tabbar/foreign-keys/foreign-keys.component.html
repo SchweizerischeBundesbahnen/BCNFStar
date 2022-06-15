@@ -1,7 +1,7 @@
 <sbb-accordion>
   <sbb-expansion-panel
     [disabled]="schema.hiddenFksOf(table).length === 0"
-    [expanded]="true"
+    [expanded]="schema.hiddenFksOf(table).length !== 0"
   >
     <sbb-expansion-panel-header
       >Dismissed Foreign Key</sbb-expansion-panel-header
@@ -16,10 +16,10 @@
       </button>
     </div>
   </sbb-expansion-panel>
-  <sbb-expansion-panel>
-    <sbb-expansion-panel-header
-      >Possible Foreign Keys</sbb-expansion-panel-header
-    >
+  <sbb-expansion-panel [expanded]="schema.hiddenFksOf(table).length === 0">
+    <sbb-expansion-panel-header>
+      Possible Foreign Keys
+    </sbb-expansion-panel-header>
     <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
       <app-sbb-option-all
         [(current)]="indFilter"
