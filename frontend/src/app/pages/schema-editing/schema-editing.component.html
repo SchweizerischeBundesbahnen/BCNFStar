@@ -12,7 +12,7 @@
       {{ "Auto-normalize all tables" }}
     </button>
     <sbb-checkbox
-      [checked]="schema.fkFiltering"
+      [checked]="schema.shouldFilterFks"
       (change)="setFkFiltering($event)"
     >
       Filter Fks
