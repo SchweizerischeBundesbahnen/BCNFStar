@@ -74,7 +74,6 @@ describe("The metanome settings dialog", () => {
     );
     cy.get('sbb-label:contains("memory")').should("have.length", 3);
     cy.get('sbb-checkbox:contains("CLEAN_TEMP")').should("have.length", 1);
-    cy.get('sbb-checkbox:contains("DETECT_NARY")').should("have.length", 1);
     cy.get('sbb-checkbox:contains("FILTER_KEY_FOREIGNKEYS")').should(
       "have.length",
       1
@@ -129,7 +128,6 @@ describe("The metanome settings dialog", () => {
       "have.length",
       1
     );
-    cy.get('sbb-checkbox:contains("DETECT_NARY")').should("have.length", 1);
     cy.get('sbb-label:contains("HLL_REL_STD_DEV")').should("have.length", 1);
     cy.get('sbb-checkbox:contains("IGNORE_CONSTANT")').should("have.length", 1);
     cy.get('sbb-checkbox:contains("IGNORE_NULL")').should("have.length", 1);
@@ -270,7 +268,7 @@ describe("The metanome settings dialog", () => {
     ).contains("CLEAN_TEMP: true");
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
-    ).contains("DETECT_NARY: false");
+    ).contains("DETECT_NARY: true");
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
     ).contains("FILTER_KEY_FOREIGNKEYS: false");
@@ -282,7 +280,7 @@ describe("The metanome settings dialog", () => {
     ).contains("MAX_MEMORY_USAGE_PERCENTAGE: 60");
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
-    ).contains("MAX_NARY_LEVEL: -1");
+    ).contains("MAX_NARY_LEVEL: 2");
     cy.get(
       "tr:contains('public.nation_region_denormalized\npublic.part_partsupp_supplier_denormalized')"
     ).contains("MEMORY_CHECK_FREQUENCY: 100");
@@ -389,7 +387,6 @@ describe("The metanome settings dialog", () => {
     cy.get(".memory").eq(1).clear().type("2G");
     cy.get(".MAX_DETERMINANT_SIZE").eq(1).clear().type("4");
 
-    cy.get(".DETECT_NARY").first().click();
     cy.get(".MAX_NARY_LEVEL").first().clear().type("2");
 
     cy.contains("Ok").click();

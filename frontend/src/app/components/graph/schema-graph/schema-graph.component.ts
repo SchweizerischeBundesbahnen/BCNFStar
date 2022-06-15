@@ -104,12 +104,12 @@ export class SchemaGraphComponent implements AfterContentInit {
   // components
   private addPanzoomHandler() {
     this.panzoomHandler = panzoom(
-      document.querySelector('#paper svg') as SVGElement,
+      document.querySelector('#paper svg g') as SVGElement,
       {
         smoothScroll: false,
         controller: {
           getOwner() {
-            return document.querySelector('#paper') as HTMLElement;
+            return document.querySelector('#paper svg') as HTMLElement;
           },
           applyTransform: (transform) => {
             this.panzoomTransform = Object.assign({}, transform);
