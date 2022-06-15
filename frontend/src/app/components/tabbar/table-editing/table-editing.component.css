@@ -1,6 +1,6 @@
-.grid-container-editing-field {
+.grid-container-edit-column {
   display: grid;
-  grid-template-columns: 70% auto;
+  grid-template-columns: auto min-content min-content;
 }
 
 .grid-container-table {
@@ -9,8 +9,8 @@
 }
 
 .grid-container-table-heading {
-  display: grid;
-  grid-template-columns: 90% auto;
+  display: flex;
+  justify-content: space-between;
 }
 
 input {

@@ -1,3 +1,9 @@
 sbb-header-lean {
     position: relative;
 }
+
+.brand {
+    /* align-right */
+    margin-right: 0;
+    margin-left: auto;
+}

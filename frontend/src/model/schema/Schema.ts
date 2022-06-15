@@ -11,6 +11,8 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
+import BasicColumn from '../types/BasicColumn';
+import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
 
@@ -154,17 +156,19 @@ export default class Schema {
   }
 
   public isFact(table: Table): boolean {
-    return this.referencesOf(table).length == 0;
+    return this.referencesOf(table, true).length == 0;
   }
 
   /**
    * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
    * or routes that would add no extra information to the fact table when joined completely
+   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
    */
-  public filteredRoutesFromFactTo(
-    table: Table
+  public directDimensionableRoutes(
+    table: Table,
+    filteredFks: boolean
   ): Array<Array<TableRelationship>> {
-    return this.routesFromFactTo(table).filter((route) => {
+    return this.routesFromFactTo(table, filteredFks).filter((route) => {
       if (route.length <= 1) return false;
       const dd = new DirectDimension([route]);
       return dd.newTable.columns.cardinality > dd.oldTable.columns.cardinality;
@@ -173,11 +177,15 @@ export default class Schema {
 
   /**
    * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
+   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
    */
-  public routesFromFactTo(table: Table): Array<Array<TableRelationship>> {
+  public routesFromFactTo(
+    table: Table,
+    filteredFks: boolean
+  ): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
-    for (const rel of this.referencesOf(table)) {
-      const routes = this.routesFromFactTo(rel.referencing);
+    for (const rel of this.referencesOf(table, filteredFks)) {
+      const routes = this.routesFromFactTo(rel.referencing, filteredFks);
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
@@ -185,14 +193,17 @@ export default class Schema {
     return result;
   }
 
-  public referencesOf(table: Table): Array<TableRelationship> {
+  public referencesOf(
+    table: Table,
+    filtered: boolean
+  ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return table._references;
+    return filtered ? table._filteredReferences : table._references;
   }
 
-  public fksOf(table: Table): Array<TableRelationship> {
+  public fksOf(table: Table, filtered: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
-    return table._fks;
+    return filtered ? table._filteredFks : table._fks;
   }
 
   /**
@@ -213,6 +224,12 @@ export default class Schema {
   }
 
   private updateFks(): void {
+    for (const table of this.tables) {
+      table._fks = new Array();
+      table._references = new Array();
+      table._filteredFks = new Array();
+      table._filteredReferences = new Array();
+    }
     const currentFks = new Array<TableRelationship>();
     this.calculateFks(currentFks);
     this.calculateTrivialFks(currentFks);
@@ -225,10 +242,6 @@ export default class Schema {
   }
 
   private calculateFks(result: Array<TableRelationship>): void {
-    for (const table of this.tables) {
-      table._fks = new Array();
-      table._references = new Array();
-    }
     for (const rel of this._fks) {
       const referencings = new Map<Table, Array<Array<Column>>>();
       for (const table of this.tables) {
@@ -327,6 +340,7 @@ export default class Schema {
     fk: TableRelationship,
     result: Array<TableRelationship>
   ) {
+    if (fk.referencing == fk.referenced) return false;
     if (!result.some((existingFk) => existingFk.equals(fk))) {
       result.push(fk);
       return true;
@@ -334,11 +348,12 @@ export default class Schema {
     return false;
   }
 
-  private isRelationshipValid(relationship: TableRelationship): boolean {
+  public isRelationshipValid(relationship: TableRelationship): boolean {
     const newTable = new Join(relationship).newTable;
     return (
       newTable.columns.cardinality >
-      relationship.referencing.columns.cardinality
+        relationship.referencing.columns.cardinality &&
+      relationship.referenced != relationship.referencing
     );
   }
 
@@ -377,39 +392,58 @@ export default class Schema {
   }
 
   private filterFks() {
+    const shouldBeFiltered = this.starMode
+      ? this.isStarViolatingFk
+      : this.isTransitiveFk;
     for (const table of this.tables) {
-      const badFks = this.starMode
-        ? this.starViolatingFksOf(table)
-        : this.transitiveFksOf(table);
-      for (const badFk of badFks) {
-        badFk.referenced._references = badFk.referenced._references.filter(
-          (fk) => fk != badFk
-        );
+      table._filteredFks = table._fks.filter(
+        (fk) => !shouldBeFiltered.apply(this, [fk])
+      );
+      for (const filteredFk of table._filteredFks) {
+        filteredFk.referenced._filteredReferences.push(filteredFk);
       }
-      table._fks = table._fks.filter((fk) => !badFks.includes(fk));
     }
   }
 
-  private transitiveFksOf(table: Table): Array<TableRelationship> {
-    return table._fks.filter((fk) =>
-      table._fks.some(
-        (otherFk) =>
-          new ColumnCombination(fk.relationship.referencing).isSubsetOf(
-            new ColumnCombination(otherFk.relationship.referencing)
-          ) &&
-          fk.relationship.referencing.length <
-            otherFk.relationship.referencing.length
+  private isTransitiveFk(
+    fk: TableRelationship,
+    visitedTables: Array<Table> = [],
+    firstIteration: boolean = true
+  ): boolean {
+    if (visitedTables.includes(fk.referencing)) return false;
+    visitedTables.push(fk.referencing);
+    for (const otherFk of fk.referencing._fks) {
+      if (otherFk.equals(fk)) {
+        if (firstIteration) continue;
+        else return true;
+      }
+      const newReferencing = otherFk.relationship.columnsReferencedBy(
+        fk.relationship.referencing
+      );
+      if (newReferencing.some((col) => !col)) continue;
+      if (
+        this.isTransitiveFk(
+          new TableRelationship(
+            new Relationship(
+              newReferencing as Array<Column>,
+              fk.relationship.referenced
+            ),
+            otherFk.referenced,
+            fk.referenced
+          ),
+          visitedTables,
+          false
+        )
       )
-    );
+        return true;
+    }
+    return false;
   }
 
-  private starViolatingFksOf(table: Table): Array<TableRelationship> {
-    if (this.isFact(table)) return new Array();
-    return table._fks.filter(
-      (fk) =>
-        !this.filteredRoutesFromFactTo(fk.referenced).some(
-          (route) => route[route.length - 1] == fk
-        )
+  private isStarViolatingFk(fk: TableRelationship) {
+    if (fk.referencing._references.length == 0) return false;
+    return !this.directDimensionableRoutes(fk.referenced, false).some(
+      (route) => route[route.length - 1] == fk
     );
   }
 
@@ -476,8 +510,11 @@ export default class Schema {
   }
 
   public calculateFdsOf(table: Table): void {
-    const fds = new Map<SourceTableInstance, Array<FunctionalDependency>>();
-    table.sources.forEach((source) => fds.set(source, new Array()));
+    const fds = new Map<
+      SourceTableInstance,
+      ColumnsTree<FunctionalDependency>
+    >();
+    table.sources.forEach((source) => fds.set(source, new ColumnsTree()));
     const columnsByInstance = table.columnsBySource();
 
     for (const source of table.sourcesTopological()) {
@@ -505,20 +542,14 @@ export default class Schema {
           new ColumnCombination(rhs)
         );
         if (fd.isFullyTrivial()) continue;
-        const existingFd = fds
-          .get(source)!
-          .find((other) => other.lhs.equals(fd.lhs));
+        const existingFd = fds.get(source)!.get(fd.lhs);
         if (existingFd) existingFd.rhs.union(fd.rhs);
-        else fds.get(source)!.push(fd);
+        else fds.get(source)!.add(fd, fd.lhs);
       }
       //extension
-      const fkFds = fds
-        .get(source)!
-        .filter((fd) => fd.lhs.isSubsetOf(referencingColumns));
-      for (const fd of fds.get(source)!) {
-        const extensions = fkFds
-          .filter((fkFd) => fkFd.lhs.isSubsetOf(fd.rhs))
-          .map((fkFd) => fkFd.rhs);
+      const fkFds = fds.get(source)!.getSubtree(referencingColumns);
+      for (const fd of fds.get(source)!.getAll()) {
+        const extensions = fkFds.getSubsets(fd.rhs).map((fkFd) => fkFd.rhs);
         extensions.forEach((extension) => fd.rhs.union(extension));
       }
 
@@ -535,7 +566,7 @@ export default class Schema {
             nextRelationship.referencing[i]
           );
 
-      for (const fd of fds.get(source)!) {
+      for (const fd of fds.get(source)!.getAll()) {
         if (
           !fd.lhs
             .asArray()
@@ -563,7 +594,7 @@ export default class Schema {
         } else if (nextRelationship) {
           fd.lhs.columnSubstitution(nextRelationshipMap);
           fd.rhs.columnSubstitution(nextRelationshipMap);
-          fds.get(nextSource!)!.push(fd);
+          fds.get(nextSource!)!.add(fd, fd.lhs);
         }
       }
     }
@@ -581,7 +612,7 @@ export default class Schema {
     fd: FunctionalDependency,
     table: Table
   ): Array<TableRelationship> {
-    return this.fksOf(table).filter(
+    return this.fksOf(table, true).filter(
       (fk) =>
         !table.splitPreservesCC(
           fd,
@@ -594,7 +625,7 @@ export default class Schema {
     fd: FunctionalDependency,
     table: Table
   ): Array<TableRelationship> {
-    return this.referencesOf(table).filter(
+    return this.referencesOf(table, true).filter(
       (ref) =>
         !table.splitPreservesCC(
           fd,
@@ -629,5 +660,20 @@ export default class Schema {
       }
     }
     return resultingTables;
+  }
+
+  public displayedColumnsOf(table: Table): Array<BasicColumn> {
+    const columns = new Array<BasicColumn>();
+    if (table.implementsSurrogateKey())
+      columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
+    columns.push(...table.columns);
+    for (const fk of this.fksOf(table, true))
+      if (fk.referenced.implementsSurrogateKey()) {
+        columns.push({
+          name: fk.referencingName,
+          dataTypeString: 'integer',
+        });
+      }
+    return columns;
   }
 }

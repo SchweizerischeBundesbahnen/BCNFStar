@@ -1,5 +1,5 @@
 import ITablePage from "@/definitions/ITablePage";
-import sql from "mssql";
+import sql, { IRow } from "mssql";
 import SqlUtils, {
   DbmsType,
   ForeignKeyResult,
@@ -8,6 +8,15 @@ import SqlUtils, {
 } from "./SqlUtils";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
+import {
+  IRequestBodyTypeCasting,
+  TypeCasting,
+} from "@/definitions/TypeCasting";
+import {
+  IRequestBodyUnionedKeys,
+  KeyUnionability,
+} from "@/definitions/IUnionedKeys";
+import IRowCounts from "@/definitions/IRowCounts";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -35,6 +44,7 @@ export default class MsSqlUtils extends SqlUtils {
         encrypt: true, // for azure
         trustServerCertificate: true, // change to true for local dev / self-signed certs
       },
+      requestTimeout: 180000,
     };
   }
 
@@ -47,7 +57,7 @@ export default class MsSqlUtils extends SqlUtils {
   }
 
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
-    const result: sql.IResult<SchemaQueryRow> = await sql.query(`SELECT 
+    const result = await sql.query<SchemaQueryRow>(`SELECT 
       t.name as table_name, 
       s.name as [table_schema],
         [column_name] = c.name,
@@ -76,7 +86,7 @@ export default class MsSqlUtils extends SqlUtils {
   ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
-      const result: sql.IResult<any> = await sql.query(
+      const result = await sql.query<any>(
         `SELECT * FROM [${schemaname}].[${tablename}]
         ORDER BY (SELECT NULL) 
         OFFSET ${offset} ROWS
@@ -91,10 +101,45 @@ export default class MsSqlUtils extends SqlUtils {
     }
   }
 
+  /** The "null"-check is relevant for unionability-checks. */
+  public override escape(str: string): string {
+    if (str.toLowerCase() == "null") return "null";
+    return `[${str}]`;
+  }
+
+  public override async testKeyUnionability(
+    t: IRequestBodyUnionedKeys
+  ): Promise<KeyUnionability> {
+    const _sql: string = this.testKeyUnionabilitySql(t);
+    const result: sql.IResult<any> = await sql.query(_sql);
+    if (result.recordset[0].count == 0) return KeyUnionability.allowed;
+    return KeyUnionability.forbidden;
+  }
+
+  public override async getDatatypes(): Promise<string[]> {
+    const _sql: string = "select name from sys.types";
+    const result: sql.IResult<any> = await sql.query<{ name: string }>(_sql);
+    return result.recordset.map((record) => record.name);
+  }
+
+  public override async testTypeCasting(
+    s: IRequestBodyTypeCasting
+  ): Promise<TypeCasting> {
+    const _sql: string = this.testTypeCastingSql(s);
+
+    try {
+      const result: sql.IResult<any> = await sql.query(_sql);
+      if (result.recordset.length == 0) return TypeCasting.allowed;
+      return TypeCasting.informationloss;
+    } catch (Error) {
+      return TypeCasting.forbidden;
+    }
+  }
+
   public async getTableRowCount(
     table: string,
     schema: string
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     const tableExists = await this.tableExistsInSchema(schema, table);
     if (tableExists) {
       const queryResult = await sql.query(`SELECT
@@ -105,7 +150,8 @@ export default class MsSqlUtils extends SqlUtils {
        object_name(object_id) = '${table}' 
        AND (index_id < 2)
        AND object_schema_name(object_id) = '${schema}'`);
-      return +queryResult.recordset[0].count;
+      const count = +queryResult.recordset[0].count;
+      return { entries: count, groups: count };
     } else {
       throw {
         error: "Table or schema does not exist in database",
@@ -248,7 +294,7 @@ export default class MsSqlUtils extends SqlUtils {
     referencingTable: ITable,
     referencedTable: ITable,
     columnRelationships: IColumnRelationship[]
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     if (
       !this.columnsExistInTable(
         referencingTable.schemaName,
@@ -268,18 +314,15 @@ export default class MsSqlUtils extends SqlUtils {
       throw Error("Columns don't exist in referenced.");
     }
 
-    const result: sql.IResult<any> = await sql.query(
-      `SELECT COUNT (*) as count FROM 
-      (
+    const result = await sql.query<IRowCounts>(
+      `SELECT ISNULL (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
       ${this.violatingRowsForSuggestedIND_SQL(
         referencingTable,
         referencedTable,
         columnRelationships
-      )} 
-      ) AS X
-      `
+      )}  ) AS X`
     );
-    return result.recordset[0].count;
+    return result.recordset[0];
   }
 
   public async getViolatingRowsForFDCount(
@@ -287,19 +330,17 @@ export default class MsSqlUtils extends SqlUtils {
     table: string,
     lhs: Array<string>,
     rhs: Array<string>
-  ): Promise<number> {
+  ): Promise<IRowCounts> {
     if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
       throw Error("Columns don't exist in table.");
     }
 
-    const result: sql.IResult<any> = await sql.query(
-      `SELECT COUNT (*) as count FROM 
-      (
+    const result = await sql.query<IRowCounts>(
+      `SELECT ISNULL (SUM(Count), 0) as entries, ISNULL (COUNT(*),0) as groups FROM (
       ${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
-      ) AS X
-      `
+      ) AS X `
     );
-    return result.recordset[0].count;
+    return result.recordset[0];
   }
 
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {

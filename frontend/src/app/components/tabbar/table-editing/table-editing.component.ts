@@ -1,6 +1,12 @@
 import Column from '@/src/model/schema/Column';
 import SourceTableInstance from '@/src/model/schema/SourceTableInstance';
-import { Component, Input, OnChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+} from '@angular/core';
 import Table from 'src/model/schema/Table';
 
 @Component({
@@ -10,6 +16,7 @@ import Table from 'src/model/schema/Table';
 })
 export class TableEditingComponent implements OnChanges {
   @Input() public table!: Table;
+  @Output() public deleteColumnEvent = new EventEmitter<Column>();
 
   /** Is the table name being edited? */
   public isEditingTableName = false;
@@ -58,6 +65,10 @@ export class TableEditingComponent implements OnChanges {
   public startColumnEdit(column: Column) {
     this.editingColumn = column;
     this.columnNameEditString = column.baseAlias;
+  }
+
+  public deleteColumn(column: Column): void {
+    this.deleteColumnEvent.emit(column);
   }
 
   public changeColumnName() {

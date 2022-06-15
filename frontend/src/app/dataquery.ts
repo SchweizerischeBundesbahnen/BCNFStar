@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import IRequestBodyINDViolatingRows from '@server/definitions/IRequestBodyINDViolatingRows';
+import IRowCounts from '@server/definitions/IRowCounts';
 import ITablePage from '@server/definitions/ITablePage';
 import { firstValueFrom } from 'rxjs';
 import Column from '../model/schema/Column';
@@ -21,14 +22,54 @@ export abstract class DataQuery {
     limit: number
   ): Promise<ITablePage>;
 
-  public abstract loadRowCount(): Promise<number>;
+  public abstract loadRowCount(): Promise<IRowCounts>;
+
+  /**
+   *
+   * @returns an object where a key is an attribute and the value is
+   *  the styling which should be applied to cells in this column
+   */
+  public get cellStyle(): Record<string, Record<string, any>> {
+    return {};
+  }
+}
+
+export class TablePreviewDataQuery extends DataQuery {
+  constructor(protected table: Table) {
+    super();
+  }
+  public loadTablePage(offset: number, limit: number): Promise<ITablePage> {
+    return firstValueFrom(
+      this.http.get<ITablePage>(
+        `${this.baseUrl}/tables/page?schema=${this.table.schemaName}&table=${this.table.name}&offset=${offset}&limit=${limit}`
+      )
+    );
+  }
+  public loadRowCount(): Promise<IRowCounts> {
+    return Promise.reject(
+      'not implemented. use loadTableRowCounts from database-service instead'
+    );
+  }
+  public override get cellStyle(): Record<string, Record<string, any>> {
+    function isNumeric(dataType: string): boolean {
+      return (
+        !!dataType &&
+        (dataType.toLowerCase().startsWith('numeric') ||
+          dataType.toLowerCase().startsWith('int'))
+      );
+    }
+    const result: Record<string, Record<string, any>> = {};
+    for (const column of this.table.columns)
+      result[column.name] = isNumeric(column.dataType)
+        ? { 'text-align': 'end' }
+        : {};
+    return result;
+  }
 }
 
 export class ViolatingINDRowsDataQuery extends DataQuery {
-  protected relationship: Relationship;
-  constructor(relationship: Relationship) {
+  constructor(protected relationship: Relationship) {
     super();
-    this.relationship = relationship;
   }
 
   public override async loadTablePage(
@@ -45,14 +86,17 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     );
   }
 
-  public override async loadRowCount(): Promise<number> {
+  public override async loadRowCount(): Promise<IRowCounts> {
     const data: IRequestBodyINDViolatingRows = {
       relationship: this.relationship.toIRelationship(),
       offset: 0,
       limit: 0,
     };
     return firstValueFrom(
-      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/ind`, data)
+      this.http.post<IRowCounts>(
+        `${this.baseUrl}/violatingRows/rowcount/ind`,
+        data
+      )
     );
   }
 }
@@ -115,7 +159,7 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     return result;
   }
 
-  public override async loadRowCount(): Promise<number> {
+  public override async loadRowCount(): Promise<IRowCounts> {
     // currently supports only check on "sourceTables".
     if (this.table.sources.length != 1)
       throw Error('Not Implemented Exception');
@@ -128,7 +172,10 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
       limit: 0,
     };
     return firstValueFrom(
-      this.http.post<number>(`${this.baseUrl}/violatingRows/rowcount/fd`, data)
+      this.http.post<IRowCounts>(
+        `${this.baseUrl}/violatingRows/rowcount/fd`,
+        data
+      )
     );
   }
 }

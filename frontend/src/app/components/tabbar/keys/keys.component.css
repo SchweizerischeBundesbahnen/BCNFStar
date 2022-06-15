@@ -1,0 +1,31 @@
+#surrogate-key-input {
+    width: 100%;
+}
+
+.surrogate-key-name {
+    font-weight: bold;
+    word-wrap: break-word;
+    display: block;
+}
+
+button {
+    margin-left: 5px;
+}
+
+.buttons {
+    white-space: nowrap;
+}
+
+.buttons-field {
+    width: 15%;
+}
+
+.editing {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.name-field {
+    width: 85%;
+}
