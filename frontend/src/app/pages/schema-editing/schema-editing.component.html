@@ -33,6 +33,7 @@
       [schemaChanged]="schemaChanged.asObservable()"
       (joinFk)="onClickJoin($event)"
       (makeDirectDimension)="onClickMakeDirectDimension($event)"
+      (dismissFk)="onClickDismissFk($event)"
     ></app-schema-graph>
   </div>
 
@@ -58,6 +59,7 @@
         (selectColumns)="onSelectColumns($event)"
         (setSurrogateKey)="onSetSurrogateKey($event)"
         (autoNormalizeSelectedTable)="onAutoNormalize(selectedTable)"
+        (showFk)="onClickShowFk($event)"
       ></app-schema-editing-side-bar>
       <h2 *ngIf="!selectedTable" class="table-not-selected">
         Select a table in the graph to start editing

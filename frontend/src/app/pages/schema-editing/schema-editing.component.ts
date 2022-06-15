@@ -22,6 +22,8 @@ import Column from '@/src/model/schema/Column';
 import DeleteColumnCommand from '@/src/model/commands/DeleteColumnCommand';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
 import { SbbRadioChange } from '@sbb-esta/angular/radio-button';
+import DismissFkCommand from '@/src/model/commands/DismissFkCommand';
+import ShowFkCommand from '@/src/model/commands/ShowFkCommand';
 
 @Component({
   selector: 'app-schema-editing',
@@ -198,6 +200,20 @@ export class SchemaEditingComponent {
     const command = new DirectDimensionCommand(this.schema, routes);
     command.onDo = () => (this.selectedTable = command.newTables[0]);
     command.onUndo = () => (this.selectedTable = command.newTables[0]);
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onClickDismissFk(fk: TableRelationship) {
+    let command = new DismissFkCommand(this.schema, fk);
+
+    this.commandProcessor.do(command);
+    this.schemaChanged.next();
+  }
+
+  public onClickShowFk(fk: TableRelationship) {
+    let command = new ShowFkCommand(this.schema, fk);
+
     this.commandProcessor.do(command);
     this.schemaChanged.next();
   }

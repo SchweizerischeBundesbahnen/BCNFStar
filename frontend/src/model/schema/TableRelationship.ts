@@ -18,11 +18,19 @@ export default class TableRelationship {
   ) {}
 
   public toString() {
-    return `(${this.referencing.name}) ${new ColumnCombination(
+    return `(${this.referencing.fullName}) ${new ColumnCombination(
       this.relationship.referencing
-    )} -> (${this.referenced.name}) ${new ColumnCombination(
+    )} -> (${this.referenced.fullName}) ${new ColumnCombination(
       this.relationship.referenced
     )}`;
+  }
+
+  public toJSON() {
+    return {
+      relationship: this.relationship,
+      referencing: this.referencing.fullName,
+      referenced: this.referenced.fullName,
+    };
   }
 
   public equals(other: TableRelationship): boolean {
