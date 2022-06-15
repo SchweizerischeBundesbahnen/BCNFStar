@@ -1,10 +1,13 @@
 <sbb-accordion>
-  <sbb-expansion-panel [disabled]="schema.hiddenFksOf(table).length === 0">
+  <sbb-expansion-panel
+    [disabled]="schema.hiddenFksOf(table).length === 0"
+    [expanded]="true"
+  >
     <sbb-expansion-panel-header
       >Dismissed Foreign Key</sbb-expansion-panel-header
     >
     <div
-      class="d-flex align-items-center justify-content-between"
+      class="hidden-fk-grid-container"
       *ngFor="let fk of schema.hiddenFksOf(table)"
     >
       <div>{{ fk.toString() }}</div>
@@ -13,7 +16,7 @@
       </button>
     </div>
   </sbb-expansion-panel>
-  <sbb-expansion-panel [expanded]="true">
+  <sbb-expansion-panel>
     <sbb-expansion-panel-header
       >Possible Foreign Keys</sbb-expansion-panel-header
     >
