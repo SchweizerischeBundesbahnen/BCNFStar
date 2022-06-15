@@ -75,38 +75,27 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  private findEquivalentFks(fk: TableRelationship) {
+  private findEquivalentFk(fk: TableRelationship) {
     if (this._tableFks.has(fk)) return fk;
     return Array.from(this._tableFks.keys()).find((otherFk) =>
       otherFk.equals(fk)
     )!;
   }
 
-  public addFkToBlacklist(fk: TableRelationship) {
-    fk = this.findEquivalentFks(fk);
-    let displayOptions = this._tableFks.get(fk)!;
-    displayOptions.blacklisted = true;
-    displayOptions.whitelisted = false;
-  }
-
-  public deleteFkFromBlacklist(fk: TableRelationship) {
-    fk = this.findEquivalentFks(fk);
-    let displayOptions = this._tableFks.get(fk)!;
-    displayOptions.blacklisted = false;
-    displayOptions.whitelisted = true;
-  }
-
   public getFkDisplayOptions(fk: TableRelationship) {
-    fk = this.findEquivalentFks(fk);
+    fk = this.findEquivalentFk(fk);
     return this._tableFks.get(fk)!;
   }
 
   public setFkDisplayOptions(
     fk: TableRelationship,
-    newDisplayOptions: FkDisplayOptions
+    blacklisted: boolean,
+    whitelisted: boolean
   ) {
-    fk = this.findEquivalentFks(fk);
-    this._tableFks.set(fk, newDisplayOptions);
+    fk = this.findEquivalentFk(fk);
+    const displayOptions = this._tableFks.get(fk)!;
+    displayOptions.blacklisted = blacklisted;
+    displayOptions.whitelisted = whitelisted;
   }
 
   private deriveFks() {
@@ -282,7 +271,7 @@ export default class Schema {
   }
 
   public isFkDisplayed(fk: TableRelationship) {
-    const displayOptions = this._tableFks.get(fk)!;
+    const displayOptions = this.getFkDisplayOptions(fk)!;
     if (displayOptions.whitelisted) return true;
     if (displayOptions.blacklisted || displayOptions.filtered) return false;
     return true;

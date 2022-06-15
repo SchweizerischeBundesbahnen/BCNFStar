@@ -9,12 +9,9 @@ export default class ShowFkCommand extends Command {
 
   public constructor(private schema: Schema, private fk: TableRelationship) {
     super();
-    this.priorDisplayOptions = this.schema.getFkDisplayOptions(this.fk);
-    this.newDisplayOptions = {
-      filtered: this.priorDisplayOptions.filtered,
-      blacklisted: this.priorDisplayOptions.blacklisted,
-      whitelisted: this.priorDisplayOptions.whitelisted,
-    };
+    const currentDisplayOptions = this.schema.getFkDisplayOptions(this.fk);
+    this.priorDisplayOptions = { ...currentDisplayOptions };
+    this.newDisplayOptions = { ...currentDisplayOptions };
   }
 
   protected override _do(): void {
@@ -25,10 +22,18 @@ export default class ShowFkCommand extends Command {
   }
 
   protected override _undo(): void {
-    this.schema.setFkDisplayOptions(this.fk, this.priorDisplayOptions);
+    this.schema.setFkDisplayOptions(
+      this.fk,
+      this.priorDisplayOptions.blacklisted,
+      this.priorDisplayOptions.whitelisted
+    );
   }
 
   protected override _redo(): void {
-    this.schema.setFkDisplayOptions(this.fk, this.newDisplayOptions);
+    this.schema.setFkDisplayOptions(
+      this.fk,
+      this.newDisplayOptions.blacklisted,
+      this.newDisplayOptions.whitelisted
+    );
   }
 }
