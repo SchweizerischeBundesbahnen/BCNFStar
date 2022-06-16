@@ -1,23 +1,14 @@
+import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import SourceTableInstance from '@/src/model/schema/SourceTableInstance';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-} from '@angular/core';
-import Table from 'src/model/schema/Table';
-
+import Table from '@/src/model/schema/Table';
+import { Component } from '@angular/core';
 @Component({
   selector: 'app-table-editing',
   templateUrl: './table-editing.component.html',
   styleUrls: ['./table-editing.component.css'],
 })
-export class TableEditingComponent implements OnChanges {
-  @Input() public table!: Table;
-  @Output() public deleteColumnEvent = new EventEmitter<Column>();
-
+export class TableEditingComponent {
   /** Is the table name being edited? */
   public isEditingTableName = false;
   /** The string inside the schema editing field */
@@ -33,10 +24,16 @@ export class TableEditingComponent implements OnChanges {
   /** The string inside the source editing field */
   public sourceNameEditString: string = '';
 
-  ngOnChanges(): void {
-    this.resetTableEdit();
-    this.resetColumnEdit();
-    this.resetSourceEdit();
+  constructor(public schemaService: SchemaService) {
+    this.schemaService.selectedTableChanged.subscribe(() => {
+      this.resetTableEdit();
+      this.resetColumnEdit();
+      this.resetSourceEdit();
+    });
+  }
+
+  public get table() {
+    return this.schemaService.selectedTable as Table;
   }
 
   // TABLENAME EDITING
@@ -68,7 +65,7 @@ export class TableEditingComponent implements OnChanges {
   }
 
   public deleteColumn(column: Column): void {
-    this.deleteColumnEvent.emit(column);
+    this.schemaService.deleteColumn(column);
   }
 
   public changeColumnName() {

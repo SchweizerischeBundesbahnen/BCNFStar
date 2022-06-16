@@ -1,26 +1,22 @@
+import { SchemaService } from '@/src/app/schema.service';
 import Table from '@/src/model/schema/Table';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-} from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-keys',
   templateUrl: './keys.component.html',
   styleUrls: ['./keys.component.css'],
 })
-export class KeysComponent implements OnChanges {
-  @Input() public table!: Table;
-  @Output() public setSurrogateKey = new EventEmitter<string>();
-
+export class KeysComponent {
   public surrogateKey = '';
   public editMode = true;
 
-  ngOnChanges(): void {
-    this.reset();
+  constructor(public schemaService: SchemaService) {
+    this.schemaService.selectedTableChanged.subscribe(this.reset);
+  }
+
+  public get table() {
+    return this.schemaService.selectedTable as Table;
   }
 
   public reset() {
@@ -29,12 +25,12 @@ export class KeysComponent implements OnChanges {
   }
 
   public emitSurrogateKey() {
-    this.setSurrogateKey.emit(this.surrogateKey);
+    this.schemaService.setSurrogateKey(this.surrogateKey);
     this.editMode = false;
   }
   public deleteSurrogateKey() {
     this.surrogateKey = '';
-    this.setSurrogateKey.emit(this.surrogateKey);
+    this.schemaService.setSurrogateKey(this.surrogateKey);
     this.editMode = true;
   }
 }

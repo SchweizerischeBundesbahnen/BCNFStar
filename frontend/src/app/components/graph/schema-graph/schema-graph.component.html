@@ -2,14 +2,7 @@
   <div id="paper" #paper></div>
   <app-graph-element
     *ngFor="let item of graphStorage | keyvalue"
-    (makeDirectDimension)="makeDirectDimension.emit($event)"
-    (selectedTableChanged)="selectedTableChange.emit($event)"
-    [selectedColumns]="selectedColumns?.get(item.key)"
-    [selectedTable]="selectedTable"
-    [schema]="schema"
     [table]="item.key"
     [bbox]="item.value.style"
-    [fact]="schema.starMode && schema.isFact(item.key)"
-    [dimension]="schema.starMode && !schema.isFact(item.key)"
   ></app-graph-element>
 </div>

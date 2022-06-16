@@ -1,8 +1,8 @@
 import Column from '@/src/model/schema/Column';
-import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SchemaService } from '../../schema.service';
 import { UnionDialogComponent } from '../union-dialog/union-dialog.component';
 
 export interface unionSpec {
@@ -17,19 +17,22 @@ export interface unionSpec {
   styleUrls: ['./union-sidebar.component.css'],
 })
 export class UnionSidebarComponent implements OnInit {
-  @Input() public table!: Table;
-  @Input() public schema!: Schema;
-  @Output() public union = new EventEmitter<unionSpec>();
   public otherTable?: Table;
 
-  constructor(public dialog: SbbDialog) {}
+  constructor(public dialog: SbbDialog, public schemaService: SchemaService) {}
 
   ngOnInit(): void {
     return;
   }
 
+  get table() {
+    return this.schemaService.selectedTable as Table;
+  }
+
   public filteredTables(): Array<Table> {
-    return this.schema.regularTables.filter((t) => t !== this.table);
+    return this.schemaService.schema.regularTables.filter(
+      (t) => t !== this.table
+    );
   }
 
   openDialog(): void {
@@ -47,7 +50,7 @@ export class UnionSidebarComponent implements OnInit {
           columns: Array<Array<Column | null>>;
           newTableName: string;
         }) => {
-          this.union.emit({
+          this.schemaService.union({
             tables: [this.table, this.otherTable!],
             columns: result.columns,
             newTableName: result.newTableName,

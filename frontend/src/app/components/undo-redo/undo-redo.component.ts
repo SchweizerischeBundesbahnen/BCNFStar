@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component } from '@angular/core';
+import { SchemaService } from '../../schema.service';
 
 @Component({
   selector: 'app-undo-redo',
@@ -6,10 +7,5 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./undo-redo.component.css'],
 })
 export class UndoRedoComponent {
-  @Input() public canUndo!: boolean;
-  @Input() public canRedo!: boolean;
-  @Output() public undo = new EventEmitter();
-  @Output() public redo = new EventEmitter();
-
-  constructor() {}
+  constructor(public schemaService: SchemaService) {}
 }
