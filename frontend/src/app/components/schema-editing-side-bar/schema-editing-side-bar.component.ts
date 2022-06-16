@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import FunctionalDependency from 'src/model/schema/FunctionalDependency';
 import Table from 'src/model/schema/Table';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 import Column from '@/src/model/schema/Column';
 
 @Component({
@@ -22,6 +23,7 @@ export class SchemaEditingSideBarComponent {
     Map<Table, ColumnCombination>
   >();
   @Output() public autoNormalizeSelectedTable = new EventEmitter();
+  @Output() public showFk = new EventEmitter<TableRelationship>();
 
   constructor() {}
 }

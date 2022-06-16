@@ -29,6 +29,7 @@
       [table]="table"
       (selectColumns)="selectColumns.emit($event)"
       (indToFk)="indToFk.emit($event)"
+      (showFk)="showFk.emit($event)"
     ></app-foreign-keys>
   </sbb-tab>
   <sbb-tab label="Table Editing">

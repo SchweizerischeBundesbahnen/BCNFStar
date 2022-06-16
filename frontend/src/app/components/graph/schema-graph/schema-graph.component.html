@@ -9,8 +9,8 @@
     [schema]="schema"
     [table]="item.key"
     [bbox]="item.value.style"
-    [fact]="schema.starMode && schema.isFact(item.key)"
-    [dimension]="schema.starMode && !schema.isFact(item.key)"
+    [fact]="schema.starMode && schema.isFact(item.key, true)"
+    [dimension]="schema.starMode && !schema.isFact(item.key, true)"
     [showMakeDirectDimension]="
       schema.starMode &&
       schema.directDimensionableRoutes(item.key, true).length > 0

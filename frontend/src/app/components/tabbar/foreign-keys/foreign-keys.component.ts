@@ -3,6 +3,7 @@ import IndScore from '@/src/model/schema/methodObjects/IndScore';
 import Schema from '@/src/model/schema/Schema';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import Table from '@/src/model/schema/Table';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 import {
   Component,
   EventEmitter,
@@ -26,6 +27,7 @@ export class ForeignKeysComponent implements OnChanges {
   >();
   @Output() public indToFk = new EventEmitter<SourceRelationship>();
   public indFilter = new Array<Table>();
+  @Output() public showFk = new EventEmitter<TableRelationship>();
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
 
