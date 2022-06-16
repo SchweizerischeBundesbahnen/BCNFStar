@@ -46,6 +46,13 @@ export class GraphElementComponent {
     );
   }
 
+  public isDirectDimension(): boolean {
+    return (
+      this.schemaService.starMode &&
+      this.schemaService.schema.isDirectDimension(this.table)
+    );
+  }
+
   public isDimension(): boolean {
     return (
       this.schemaService.starMode &&
