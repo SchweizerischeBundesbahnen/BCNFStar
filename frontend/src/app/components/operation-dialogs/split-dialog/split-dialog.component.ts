@@ -1,7 +1,6 @@
+import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
-import Schema from '@/src/model/schema/Schema';
-import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
@@ -13,8 +12,6 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 })
 export class SplitDialogComponent {
   public fd: FunctionalDependency;
-  public table: Table;
-  public schema: Schema;
   public pkViolation!: boolean;
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
@@ -26,13 +23,12 @@ export class SplitDialogComponent {
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<SplitDialogComponent>,
+    public schemaService: SchemaService,
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA)
-    data: { fd: FunctionalDependency; table: Table; schema: Schema }
+    data: { fd: FunctionalDependency }
   ) {
     this.fd = data.fd.copy();
-    this.table = data.table;
-    this.schema = data.schema;
     this.updateViolations();
     this.fd.rhs
       .copy()
@@ -40,6 +36,10 @@ export class SplitDialogComponent {
       .asArray()
       .forEach((column) => this.selectedColumns.set(column, true));
     this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
+  }
+
+  public get table() {
+    return this.schemaService.selectedTable!;
   }
 
   public setColumnSelection(column: Column, value: boolean) {
@@ -50,12 +50,19 @@ export class SplitDialogComponent {
   }
 
   public updateViolations() {
-    this.pkViolation = this.schema.fdSplitPKViolationOf(this.fd, this.table);
-    this.fkViolations = this.schema.fdSplitFKViolationsOf(this.fd, this.table);
-    this.referenceViolations = this.schema.fdSplitReferenceViolationsOf(
+    this.pkViolation = this.schemaService.schema.fdSplitPKViolationOf(
       this.fd,
       this.table
     );
+    this.fkViolations = this.schemaService.schema.fdSplitFKViolationsOf(
+      this.fd,
+      this.table
+    );
+    this.referenceViolations =
+      this.schemaService.schema.fdSplitReferenceViolationsOf(
+        this.fd,
+        this.table
+      );
   }
 
   public canConfirm() {

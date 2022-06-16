@@ -24,10 +24,10 @@ export function isValidDatatype(): CustomValidator {
       /^decimal\s*\(\d+,\d+\)$/i,
       /^numeric\s*\(\d+,\d+\)$/i,
       /^char\s*\(\d+,\d+\)$/i,
-      /^integer$/i, 
+      /^integer$/i,
       /^datetime$/i,
     ];
-    const serverDatatypes: string[] = await sqlUtils.getDatatypes(); 
+    const serverDatatypes: string[] = await sqlUtils.getDatatypes();
     if (
       !serverDatatypes.includes(datatype) &&
       patterns.every((pattern) => pattern.test(datatype) == false)

@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe("The schema editing side bar", () => {
+describe("The foreign keys tab", () => {
   beforeEach(() => {
     cy.visitFrontend();
     cy.selectTablesAndGo();

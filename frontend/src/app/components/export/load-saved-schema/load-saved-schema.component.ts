@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import Schema from '@/src/model/schema/Schema';
-import { DatabaseService } from '../../../database.service';
 import { Router } from '@angular/router';
 import { parse } from 'zipson';
 import * as JSZip from 'jszip';
 import SaveSchemaState from '@/src/model/schema/methodObjects/saveIntermediateState';
+import { SchemaService } from '@/src/app/schema.service';
 
 @Component({
   selector: 'app-load-saved-schema',
@@ -15,7 +15,7 @@ export class LoadSavedSchemaComponent {
   public newSchema = new Schema();
   public file: File = new File([], '');
 
-  constructor(public dataService: DatabaseService, public router: Router) {}
+  constructor(public schemaService: SchemaService, public router: Router) {}
 
   public onChange(fileList: Array<File>) {
     if (fileList) {
@@ -32,7 +32,7 @@ export class LoadSavedSchemaComponent {
         ?.async('string')
         .then((result) => {
           this.getSchema(result);
-          this.dataService.schema = this.newSchema;
+          this.schemaService.setSchema(this.newSchema);
           this.router.navigate(['/edit-schema']);
         });
     }
