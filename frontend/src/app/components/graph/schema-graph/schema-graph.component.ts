@@ -1,21 +1,11 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  AfterContentInit,
-  SimpleChanges,
-  OnChanges,
-} from '@angular/core';
+import { Component, AfterContentInit } from '@angular/core';
 import * as joint from 'jointjs';
 import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
-import { Observable } from 'rxjs';
-import Schema from '@/src/model/schema/Schema';
-import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { SchemaService } from '@/src/app/schema.service';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -33,16 +23,7 @@ enum PortSide {
   templateUrl: './schema-graph.component.html',
   styleUrls: ['./schema-graph.component.css'],
 })
-export class SchemaGraphComponent implements AfterContentInit, OnChanges {
-  @Input() public schema!: Schema;
-  @Input() public selectedTable?: Table;
-  @Input() public selectedColumns?: Map<Table, ColumnCombination>;
-  @Input() public schemaChanged!: Observable<void>;
-  @Output() public selectedTableChange = new EventEmitter<Table>();
-  @Output() public joinFk = new EventEmitter<TableRelationship>();
-  @Output() public makeDirectDimension = new EventEmitter<Table>();
-  @Output() public dismissFk = new EventEmitter<TableRelationship>();
-
+export class SchemaGraphComponent implements AfterContentInit {
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
   protected portDiameter = 22.5;
@@ -53,6 +34,8 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   protected paper!: joint.dia.Paper;
 
   protected elementWidth = 300;
+
+  constructor(private schemaService: SchemaService) {}
 
   ngAfterContentInit(): void {
     this.graph = new joint.dia.Graph();
@@ -67,7 +50,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     });
 
     this.paper.on('blank:pointerclick', () => {
-      this.selectedTableChange.emit();
+      this.schemaService.selectedTable = undefined;
     });
 
     // move the corresponding HTML overlay whenever a graph element changes position
@@ -81,16 +64,13 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     });
 
     this.addPanzoomHandler();
-
-    this.schemaChanged.subscribe(() => {
+    this.schemaService.schemaChanged.subscribe(() => {
       this.updateGraph();
+    });
+    this.schemaService.selectedTableChanged.subscribe(() => {
       this.centerOnSelectedTable();
     });
     this.updateGraph();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedTable']) this.centerOnSelectedTable();
   }
 
   public updateGraph() {
@@ -114,6 +94,8 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     setTimeout(() => {
       this.updateAllBBoxes();
     }, 10);
+
+    this.centerOnSelectedTable();
   }
 
   protected panzoomHandler?: PanZoom;
@@ -155,7 +137,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   }
 
   private generateElements() {
-    for (const table of this.schema.tables) {
+    for (const table of this.schemaService.schema.tables) {
       const jointjsEl = new joint.shapes.standard.Rectangle({
         attrs: { root: { id: '__jointel__' + table.fullName } },
       });
@@ -167,7 +149,9 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       });
       jointjsEl.resize(
         this.elementWidth,
-        60 + this.portDiameter * this.schema.displayedColumnsOf(table).length
+        60 +
+          this.portDiameter *
+            this.schemaService.schema.displayedColumnsOf(table).length
       );
       this.graphStorage.set(table, {
         // alternative to HtmlElement: joint.shapes.html.Element
@@ -184,13 +168,6 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     link: joint.shapes.standard.Link,
     fk: TableRelationship
   ) {
-    let joinTablesOnFks = () => {
-      this.joinFk.emit(fk);
-    };
-    let deleteFk = () => {
-      this.dismissFk.emit(fk);
-    };
-
     let removeButton = new joint.linkTools.Button({
       markup: [
         {
@@ -214,7 +191,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
           },
         },
       ],
-      action: deleteFk,
+      action: () => this.schemaService.dismiss(fk),
       offset: 0,
       distance: '37%',
     });
@@ -243,7 +220,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       ],
       distance: '71%',
       offset: 0,
-      action: joinTablesOnFks,
+      action: () => this.schemaService.join(fk),
     });
 
     var toolsView = new joint.dia.ToolsView({
@@ -255,8 +232,8 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   }
 
   private generateLinks() {
-    for (const table of this.schema.tables) {
-      for (const fk of this.schema.fksOf(table, true)) {
+    for (const table of this.schemaService.schema.tables) {
+      for (const fk of this.schemaService.schema.fksOf(table, true)) {
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
@@ -303,7 +280,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
     let counter = 0;
-    for (let column of this.schema.displayedColumnsOf(table)) {
+    for (let column of this.schemaService.schema.displayedColumnsOf(table)) {
       let args = { counter, side: PortSide.Left };
       jointjsEl.addPort({
         id: column.name + '_left', // generated if `id` value is not present
@@ -323,10 +300,12 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   }
 
   public centerOnSelectedTable() {
-    if (!this.selectedTable) return;
+    if (!this.schemaService.selectedTable) return;
     // center on selectedTable
     const paper = document.querySelector('#paper svg') as SVGElement;
-    const bbox = this.graphStorage.get(this.selectedTable)?.jointjsEl.getBBox();
+    const bbox = this.graphStorage
+      .get(this.schemaService.selectedTable)
+      ?.jointjsEl.getBBox();
     if (!bbox) return;
     const offsetX =
       paper.getBoundingClientRect().width / 2 -

@@ -1,7 +1,7 @@
 import Schema from '@/src/model/schema/Schema';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { DatabaseService } from '../../database.service';
+import { SchemaService } from '../../schema.service';
 
 @Component({
   selector: 'app-home',
@@ -9,10 +9,10 @@ import { DatabaseService } from '../../database.service';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  constructor(private dataService: DatabaseService, private router: Router) {}
+  constructor(private schemaService: SchemaService, private router: Router) {}
 
   public setSchemaAndGo(schema: Schema) {
-    this.dataService.schema = schema;
+    this.schemaService.setSchema(schema);
     this.router.navigate(['/edit-schema']);
   }
 }
