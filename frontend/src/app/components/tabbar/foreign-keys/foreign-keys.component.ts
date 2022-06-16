@@ -26,6 +26,10 @@ export class ForeignKeysComponent {
     return this.schemaService.selectedTable!;
   }
 
+  public get schema() {
+    return this.schemaService.schema!;
+  }
+
   public selectedInd(): SourceRelationship | undefined {
     return this.indSelectionGroup?.value;
   }

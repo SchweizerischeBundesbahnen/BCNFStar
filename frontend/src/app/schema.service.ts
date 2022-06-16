@@ -108,8 +108,8 @@ export class SchemaService {
 
   public show(fk: TableRelationship) {
     let command = new ShowFkCommand(this.schema, fk);
-    this.notifyAboutSchemaChanges();
     this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
   }
 
   public async split(fd: FunctionalDependency) {
