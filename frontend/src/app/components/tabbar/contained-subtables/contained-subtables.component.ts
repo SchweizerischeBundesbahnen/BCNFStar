@@ -27,6 +27,8 @@ export class ContainedSubtablesComponent implements OnChanges {
   public page: number = 0;
   public pageSize = 5;
 
+  public lhsSelection = new Array<Column>();
+
   constructor() {}
 
   ngOnChanges(): void {
@@ -53,5 +55,16 @@ export class ContainedSubtablesComponent implements OnChanges {
     return this.table.fdClusters.filter((cluster) =>
       cc.isSubsetOf(cluster.columns)
     );
+  }
+
+  public fdFromLhs(): FunctionalDependency {
+    const lhs = new ColumnCombination(this.lhsSelection);
+    console.log(
+      this.table
+        .hull(lhs)
+        .asArray()
+        .map((col) => this.table.columns.includes(col))
+    );
+    return new FunctionalDependency(lhs, this.table.hull(lhs));
   }
 }

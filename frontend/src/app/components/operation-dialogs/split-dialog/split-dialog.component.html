@@ -21,7 +21,6 @@
         <ul>
           <li *ngFor="let column of fd.lhs">{{ column.name }}</li>
         </ul>
-        <button sbb-button (click)="changeLhs()">Change Key</button>
       </td>
       <td width="50%" style="vertical-align: top">
         <div class="sbb-checkbox-group-vertical">
@@ -40,16 +39,16 @@
   </table>
 
   <div *ngIf="!selectedColumnsCC().isSubsetOf(hull)" class="violation">
-    The key doesnt determine all of the selected attributes. Please change the
-    key
+    The key doesnt determine all of the selected attributes. Check the
+    violations and clean the data or choose other key.
   </div>
 
   <div
     *ngIf="selectedColumnsCC().isSubsetOf(hull) && isKeyNonMinimal()"
     class="violation"
   >
-    The key is not a minimal key of the selected attributes. Please change the
-    key
+    A simpler key could determine all the selected attributes. We strongly
+    advice to choose other key.
   </div>
   <div *ngIf="pkViolation" class="violation">
     The primary key {{ table.pk }} would be destroyed when splitting.
@@ -73,6 +72,8 @@
     </ul>
   </div>
   <div sbbDialogActions>
+    <button sbb-button>Check violations</button>
+    <button sbb-button>Choose other key</button>
     <button
       sbb-button
       [disabled]="!canConfirm()"

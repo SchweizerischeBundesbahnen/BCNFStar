@@ -22,6 +22,7 @@ export default class Delete {
 
     this.projectFds();
 
+    this.newTable.surrogateKey = this.table.surrogateKey;
     this.newTable.pk = this.table.pk?.isSubsetOf(this.newTable.columns)
       ? this.table.pk.deepCopy()
       : undefined;

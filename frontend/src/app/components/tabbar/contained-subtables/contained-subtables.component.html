@@ -70,6 +70,19 @@
       </h2>
     </ng-template>
   </sbb-expansion-panel>
+  <sbb-expansion-panel>
+    <sbb-expansion-panel-header>
+      Contained Subtable by key
+    </sbb-expansion-panel-header>
+    <sbb-select [(ngModel)]="lhsSelection" multiple placeholder="Key Columns">
+      <sbb-option *ngFor="let column of table.columns" [value]="column"
+        >{{ column.name }}
+      </sbb-option>
+    </sbb-select>
+    <button type="button" sbb-button (click)="splitFd.emit(fdFromLhs())">
+      Split Table with this key
+    </button>
+  </sbb-expansion-panel>
   <sbb-expansion-panel [hidden]="table.sources.length !== 1">
     <sbb-expansion-panel-header
       >Check Contained Subtable</sbb-expansion-panel-header

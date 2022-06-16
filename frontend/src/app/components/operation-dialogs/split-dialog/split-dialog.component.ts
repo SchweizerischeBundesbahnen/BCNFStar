@@ -42,9 +42,9 @@ export class SplitDialogComponent {
       this.selectedColumns.set(column, false);
     });
     this.hull = this.table.hull(this.fd.lhs);
-    this.fd.rhs
-      .asArray()
-      .forEach((column) => this.selectedColumns.set(column, true));
+    this.table.columns.asArray().forEach((column) => {
+      if (this.fd.rhs.includes(column)) this.selectedColumns.set(column, true);
+    });
     this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
     this.updateViolations();
   }
