@@ -5,8 +5,10 @@ import AutoNormalizeCommand from '../model/commands/AutoNormalizeCommand';
 import CommandProcessor from '../model/commands/CommandProcessor';
 import DeleteColumnCommand from '../model/commands/DeleteColumnCommand';
 import DirectDimensionCommand from '../model/commands/DirectDimensionCommand';
+import DismissFkCommand from '../model/commands/DismissFkCommand';
 import IndToFkCommand from '../model/commands/IndToFkCommand';
 import JoinCommand from '../model/commands/JoinCommand';
+import ShowFkCommand from '../model/commands/ShowFkCommand';
 import SplitCommand from '../model/commands/SplitCommand';
 import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
@@ -96,6 +98,18 @@ export class SchemaService {
 
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
+  }
+
+  public dismiss(fk: TableRelationship) {
+    let command = new DismissFkCommand(this.schema, fk);
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public show(fk: TableRelationship) {
+    let command = new ShowFkCommand(this.schema, fk);
+    this.notifyAboutSchemaChanges();
+    this.commandProcessor.do(command);
   }
 
   public async split(fd: FunctionalDependency) {

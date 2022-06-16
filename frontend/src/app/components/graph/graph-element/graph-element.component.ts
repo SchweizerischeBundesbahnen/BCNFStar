@@ -42,14 +42,14 @@ export class GraphElementComponent {
   public isFact(): boolean {
     return (
       this.schemaService.starMode &&
-      this.schemaService.schema.isFact(this.table)
+      this.schemaService.schema.isFact(this.table, true)
     );
   }
 
   public isDimension(): boolean {
     return (
       this.schemaService.starMode &&
-      !this.schemaService.schema.isFact(this.table)
+      !this.schemaService.schema.isFact(this.table, true)
     );
   }
 
