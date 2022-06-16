@@ -2,7 +2,22 @@ select {
   width: 30px;
 }
 
-.centered {
+.union-grid > h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin: 10px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.center {
+  /* margin: auto; */
+  /* align-self: center; */
+  /* position: absolute; */
+  /* transform: translate(-50%, -50%); */
+  /* top: 50%; */
+  /* left: 50%; */
   text-align: center;
 }
 
@@ -10,26 +25,27 @@ select {
   width: 80vw;
 }
 
-.grid-container {
+.union-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: min-content 60vh;
   grid-gap: 20px;
-}
-
-.grid-child {
-  height: 60vh;
-  scrollbar-width: none;
-  overflow-y: scroll;
 }
 
 element::-webkit-scrollbar {
   display: none; /* for Chrome, Safari, and Opera */
 }
 
+.scroll-y {
+  /* height: 60vh; */
+}
+
 /* example from angular tutorial to see something, don't merge */
 .list {
   border: solid 1px #ccc;
-  min-height: 60px;
+  height: 100%;
+  overflow-y: scroll;
+
   background: white;
   border-radius: 4px;
   overflow: hidden;
@@ -37,7 +53,7 @@ element::-webkit-scrollbar {
 }
 
 .box {
-  padding: 20px 10px;
+  padding: 10px 5px;
   border-bottom: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
   display: flex;
