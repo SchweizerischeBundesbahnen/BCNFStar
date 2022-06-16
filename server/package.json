@@ -25,7 +25,7 @@
     "morgan": "^1.10.0",
     "mssql": "^7.3.0",
     "pg": "^8.7.1",
-    "ts-node": "^9.0.0"
+    "ts-node": "~10.7.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

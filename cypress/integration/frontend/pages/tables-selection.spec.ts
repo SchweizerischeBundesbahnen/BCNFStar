@@ -31,16 +31,22 @@ describe("The table selection page", () => {
 
   it("display content of numeric columns right", () => {
     cy.contains("nation_region_denormalized").trigger("mouseenter");
-    cy.get("td:contains('6')").should("have.class", "numeric");
+    cy.get(".loading");
+    cy.get(".loading").should("not.exist");
+    cy.get("td:contains('6')").should("have.css", "text-align", "end");
   });
 
   it("display content of not numeric columns left", () => {
     cy.contains("nation_region_denormalized").trigger("mouseenter");
-    cy.get("td:contains('FRANCE')").should("not.have.class", "numeric");
+    cy.get(".loading");
+    cy.get(".loading").should("not.exist");
+    cy.get("td:contains('FRANCE')").should("not.have.css", "text-align", "end");
   });
 
   it("shows table row count", () => {
     cy.contains("customer_orders_lineitem_denormalized").trigger("mouseenter");
+    cy.get(".loading");
+    cy.get(".loading").should("not.exist");
     cy.contains("1 - 20 / 6005");
     cy.get("sbb-paginator").contains("301").click();
     cy.contains("6001 - 6005 / 6005");
@@ -51,6 +57,8 @@ describe("The table selection page", () => {
   it("shows table content", () => {
     cy.contains("part_partsupp_supplier_denormalized").trigger("mouseenter");
     // first is ps_partkey, second ps_suppkey
+    cy.get(".loading");
+    cy.get(".loading").should("not.exist");
     cy.get(".sbb-row")
       .first()
       .should("contain.text", "154")
@@ -58,6 +66,8 @@ describe("The table selection page", () => {
 
     cy.get('button[aria-label="Next Page"]').click();
 
+    cy.get(".loading");
+    cy.get(".loading").should("not.exist");
     cy.get(".sbb-row")
       .first()
       .should("contain.text", "58")
@@ -112,14 +122,16 @@ describe("The table selection page", () => {
   it("loads, saves and loads edited schema correct", () => {
     cy.get("sbb-expansion-panel:contains('Load saved schema')").click();
     cy.contains("Upload file").click();
+
     cy.get('input[type="file"]').attachFile("savedExampleSchema.zip");
     cy.get(".sbb-button").eq(0).should("contain", "Load").click();
     cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
+
     cy.get("input").eq(3).type("savedExampleSchema");
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
     cy.readFile("cypress/downloads/savedExampleSchema.zip").then((result) => {
-      expect(result == cy.fixture("savedSchema.zip"));
+      expect(result == cy.fixture("savedExampleSchema.zip"));
     });
   });
 });

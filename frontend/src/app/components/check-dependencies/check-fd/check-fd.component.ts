@@ -1,33 +1,40 @@
 import Column from '@/src/model/schema/Column';
-import Table from '@/src/model/schema/Table';
-import { DatabaseService } from 'src/app/database.service';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewComponent } from '../../operation-dialogs/violating-rows-view/violating-rows-view.component';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import { ViolatingFDRowsDataQuery } from '../../../dataquery';
+import { SchemaService } from '@/src/app/schema.service';
+import IRowCounts from '@server/definitions/IRowCounts';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
 @Component({
   selector: 'app-check-fd',
   templateUrl: './check-fd.component.html',
   styleUrls: ['./check-fd.component.css'],
 })
-export class CustomFunctionalDependencySideBarComponent implements OnChanges {
-  @Input() table!: Table;
-
+export class CustomFunctionalDependencySideBarComponent {
   public _lhs: Array<Column> = new Array<Column>();
   public _rhs: Array<Column> = new Array<Column>();
   public isLoading: boolean = false;
 
   public isValid: boolean = false;
-  constructor(public dataService: DatabaseService, public dialog: SbbDialog) {}
+  constructor(
+    public schemaService: SchemaService,
+    public dialog: SbbDialog,
+    private notification: SbbNotificationToast
+  ) {
+    this.schemaService.selectedTableChanged.subscribe(() => {
+      this.lhs = [];
+      this.rhs = [];
+      this.isValid = false;
+      this.isLoading = false;
+    });
+  }
 
-  ngOnChanges(): void {
-    this.lhs = [];
-    this.rhs = [];
-    this.isValid = false;
-    this.isLoading = false;
+  public get table() {
+    return this.schemaService.selectedTable!;
   }
 
   public get lhs() {
@@ -65,15 +72,21 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
     );
 
     this.isLoading = true;
-    const rowCount: number | void = await dataQuery
+    const rowCount: IRowCounts | void = await dataQuery
       .loadRowCount()
       .catch((e) => {
         console.error(e);
-        this.isLoading = false;
       });
     this.isLoading = false;
+    if (!rowCount) {
+      this.notification.open(
+        'There was a backend error while checking this IND. Check the browser and server logs for details',
+        { type: 'error' }
+      );
+      return;
+    }
 
-    if (rowCount == 0) {
+    if (rowCount.entries == 0) {
       this.isValid = true;
       this.table.addFd(
         new FunctionalDependency(
@@ -82,6 +95,7 @@ export class CustomFunctionalDependencySideBarComponent implements OnChanges {
         )
       );
     } else {
+      this.isValid = false;
       this.dialog.open(ViolatingRowsViewComponent, {
         data: {
           dataService: dataQuery,

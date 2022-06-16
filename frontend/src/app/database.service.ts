@@ -1,19 +1,16 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
-import ITablePage from '@server/definitions/ITablePage';
 import Table from '../model/schema/Table';
-import Schema from '../model/schema/Schema';
 import { firstValueFrom } from 'rxjs';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
+import IRowCounts from '@server/definitions/IRowCounts';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatabaseService {
-  public schema?: Schema;
-
   /**
    * when using the angular dev server, you need to access another adress
    * for the BCNFStar express server. It is assumed that this server is
@@ -29,28 +26,15 @@ export class DatabaseService {
     return this.getTables();
   }
 
-  public loadTablePage(
-    schema: string,
-    table: string,
-    offset: number,
-    limit: number
-  ): Promise<ITablePage> {
-    return firstValueFrom(
-      this.http.get<ITablePage>(
-        `${this.baseUrl}/tables/page?schema=${schema}&table=${table}&offset=${offset}&limit=${limit}`
-      )
-    );
-  }
-
   public async getDmbsName(): Promise<string> {
     return firstValueFrom(
       this.http.get<string>(`${this.baseUrl}/persist/dbmsname`)
     );
   }
 
-  public loadTableRowCounts(): Promise<Record<string, number>> {
+  public loadTableRowCounts(): Promise<Record<string, IRowCounts>> {
     return firstValueFrom(
-      this.http.get<Record<string, number>>(`${this.baseUrl}/tables/rows`)
+      this.http.get<Record<string, IRowCounts>>(`${this.baseUrl}/tables/rows`)
     );
   }
 

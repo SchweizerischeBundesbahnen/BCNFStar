@@ -1,40 +1,44 @@
 <sbb-accordion>
-  <sbb-expansion-panel [disabled]="schema.hiddenFksOf(table).length === 0">
-    <sbb-expansion-panel-header
-      >Dismissed Foreign Key</sbb-expansion-panel-header
-    >
+  <sbb-expansion-panel
+    [disabled]="schema.hiddenFksOf(table).length === 0"
+    [expanded]="schema.hiddenFksOf(table).length !== 0"
+  >
+    <sbb-expansion-panel-header>
+      Dismissed Foreign Keys
+    </sbb-expansion-panel-header>
     <div
-      class="d-flex align-items-center justify-content-between"
+      class="hidden-fk-grid-container"
       *ngFor="let fk of schema.hiddenFksOf(table)"
     >
       <div>{{ fk.toString() }}</div>
-      <button type="button" sbb-icon-button (click)="showFk.emit(fk)">
-        <sbb-icon svgIcon="kom:plus-small"></sbb-icon>
+      <button type="button" sbb-icon-button (click)="schemaService.show(fk)">
+        <sbb-icon id="add-hidden-fk-button" svgIcon="kom:plus-small"></sbb-icon>
       </button>
     </div>
   </sbb-expansion-panel>
-  <sbb-expansion-panel [expanded]="true">
-    <sbb-expansion-panel-header
-      >Possible Foreign Keys</sbb-expansion-panel-header
-    >
+  <sbb-expansion-panel [expanded]="schema.hiddenFksOf(table).length === 0">
+    <sbb-expansion-panel-header>
+      Possible Foreign Keys
+    </sbb-expansion-panel-header>
     <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
       <app-sbb-option-all
         [(current)]="indFilter"
         [available]="tablesAsArray()"
       ></app-sbb-option-all>
       <sbb-option
-        *ngFor="let table of schema.tables"
+        *ngFor="let table of tablesAsArray()"
         [value]="table"
         [sbbTooltip]="table.fullName"
-        >{{ table.fullName }}</sbb-option
       >
+        {{ table.fullName }}
+      </sbb-option>
     </sbb-select>
     <br />
     <sbb-radio-group #indSelection *ngIf="inds().length > 0; else noInds">
       <!-- (mouseleave)="selectColumns.emit(new Map())" -->
       <sbb-radio-button
-        (mouseenter)="emitHighlightedInd(rel)"
-        (mouseleave)="selectColumns.emit()"
+        (mouseenter)="setHighlightedInd(rel)"
+        (mouseleave)="schemaService.highlightedColumns = undefined"
         *ngFor="let rel of inds()"
         [value]="rel"
         style="display: block"
@@ -60,9 +64,6 @@
 
   <sbb-expansion-panel [hidden]="table.sources.length !== 1">
     <sbb-expansion-panel-header>Suggest Foreign Key</sbb-expansion-panel-header>
-    <app-check-ind
-      [referencingTable]="table"
-      [tables]="schema.tables!"
-    ></app-check-ind>
+    <app-check-ind></app-check-ind>
   </sbb-expansion-panel>
 </sbb-accordion>

@@ -18,32 +18,39 @@ import {
   TableFkDerivation,
   SourceFkDerivation,
 } from './methodObjects/FkDerivation';
+import { FkDisplayOptions } from '../types/FkDisplayOptions';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
   public name?: string;
+  /**
+   * all fks from the actual database and inds that the user validated
+   */
   private _baseFks = new Array<SourceRelationship>();
+  /**
+   * all fks that can be derived from _baseFks
+   */
   private _fks = new Array<SourceRelationship>();
   /**
    * all fks in the form of TableRelationship that are valid among the current tables
    * mapped to filtered, blacklisted, whitelisted
    */
-  private _tableFks = new Map<TableRelationship, Array<boolean>>();
+  private _tableFks = new Map<TableRelationship, FkDisplayOptions>();
   private _inds = new Array<SourceRelationship>();
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
   private _starMode = false;
-  private _fkFiltering = true;
 
   public toJSON() {
     return {
       tables: Array.from(this.tables),
-      _baseFks: Array.from(this._baseFks),
+      _baseFks: this._baseFks,
       _tableFks: Array.from(this._tableFks.entries()).filter(
-        ([, bools]) => bools[1] || bools[2]
+        ([, displayOptions]) =>
+          displayOptions.blacklisted || displayOptions.whitelisted
       ),
-      _inds: Array.from(this._inds),
-      _fds: [...this._fds.values()].flat(),
+      _inds: this._inds,
+      _fds: Array.from(this._fds.values()).flat(),
     };
   }
 
@@ -100,35 +107,27 @@ export default class Schema {
     this._fds.get(fd.rhs[0].table)!.push(fd);
   }
 
-  public addFkToBlacklist(fk: TableRelationship) {
-    fk = this.findEquivalentFks(fk);
-    let bools = this._tableFks.get(fk)!;
-    bools[1] = true;
-    bools[2] = false;
-  }
-
-  public deleteFkFromBlacklist(fk: TableRelationship) {
-    fk = this.findEquivalentFks(fk);
-    let bools = this._tableFks.get(fk)!;
-    bools[1] = false;
-    bools[2] = true;
-  }
-
-  public getFkBoolsOf(fk: TableRelationship) {
-    fk = this.findEquivalentFks(fk);
-    return this._tableFks.get(fk)!;
-  }
-
-  public setFkBoolsOf(fk: TableRelationship, newBools: Array<boolean>) {
-    fk = this.findEquivalentFks(fk);
-    this._tableFks.set(fk, newBools);
-  }
-
-  private findEquivalentFks(fk: TableRelationship) {
+  private findEquivalentFk(fk: TableRelationship) {
     if (this._tableFks.has(fk)) return fk;
     return Array.from(this._tableFks.keys()).find((otherFk) =>
       otherFk.equals(fk)
     )!;
+  }
+
+  public getFkDisplayOptions(fk: TableRelationship) {
+    fk = this.findEquivalentFk(fk);
+    return this._tableFks.get(fk)!;
+  }
+
+  public setFkDisplayOptions(
+    fk: TableRelationship,
+    blacklisted: boolean,
+    whitelisted: boolean
+  ) {
+    fk = this.findEquivalentFk(fk);
+    const displayOptions = this._tableFks.get(fk)!;
+    displayOptions.blacklisted = blacklisted;
+    displayOptions.whitelisted = whitelisted;
   }
 
   public get starMode(): boolean {
@@ -137,16 +136,8 @@ export default class Schema {
 
   public set starMode(value: boolean) {
     this._starMode = value;
-    for (const [fk, bools] of this._tableFks.entries())
-      bools[0] = this.shouldBeFiltered(fk);
-  }
-
-  public get fkFiltering(): boolean {
-    return this._fkFiltering;
-  }
-
-  public set fkFiltering(value: boolean) {
-    this._fkFiltering = value;
+    for (const [fk, displayOptions] of this._tableFks.entries())
+      displayOptions.filtered = this.shouldBeFiltered(fk);
   }
 
   private set relationshipsValid(valid: boolean) {
@@ -234,9 +225,10 @@ export default class Schema {
   }
 
   public isFkDisplayed(fk: TableRelationship) {
-    const bools = this._tableFks.get(fk)!;
-    if (this._fkFiltering) return bools[2] || !(bools[0] || bools[1]);
-    else return !bools[1];
+    const displayOptions = this.getFkDisplayOptions(fk)!;
+    if (displayOptions.whitelisted) return true;
+    if (displayOptions.blacklisted || displayOptions.filtered) return false;
+    return true;
   }
 
   /**
@@ -257,21 +249,27 @@ export default class Schema {
   }
 
   public updateFks(oldFks = this._tableFks): void {
-    this._tableFks = new Map<TableRelationship, Array<boolean>>();
+    this._tableFks = new Map<TableRelationship, FkDisplayOptions>();
     this.calculateFks();
     this.calculateTrivialFks();
     this._tableFksValid = true;
+    this.calculateFkDisplayOptions(oldFks);
+  }
+
+  private calculateFkDisplayOptions(
+    oldFks: Map<TableRelationship, FkDisplayOptions>
+  ) {
     for (const fk of Array.from(this._tableFks.keys())) {
       const equivalentOldFk = Array.from(oldFks.keys()).find((otherFk) =>
         otherFk.equals(fk)
       );
       if (equivalentOldFk)
-        this._tableFks.set(fk, [
-          false,
-          oldFks.get(equivalentOldFk)![1],
-          oldFks.get(equivalentOldFk)![2],
-        ]);
-      this._tableFks.get(fk)![0] = this.shouldBeFiltered(fk);
+        this._tableFks.set(fk, {
+          filtered: false,
+          blacklisted: oldFks.get(equivalentOldFk)!.blacklisted,
+          whitelisted: oldFks.get(equivalentOldFk)!.whitelisted,
+        });
+      this._tableFks.get(fk)!.filtered = this.shouldBeFiltered(fk);
     }
   }
 
@@ -395,7 +393,11 @@ export default class Schema {
         existingFk.equals(fk)
       )
     ) {
-      this._tableFks.set(fk, [false, false, false]);
+      this._tableFks.set(fk, {
+        filtered: false,
+        blacklisted: false,
+        whitelisted: false,
+      });
     }
   }
 

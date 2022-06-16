@@ -2,8 +2,8 @@
   type="button"
   sbb-button
   id="undo"
-  [disabled]="!canUndo"
-  (click)="undo.emit()"
+  [disabled]="!schemaService.canUndo()"
+  (click)="schemaService.undo()"
 >
   &lt;
 </button>
@@ -11,8 +11,8 @@
   type="button"
   sbb-button
   id="redo"
-  [disabled]="!canRedo"
-  (click)="redo.emit()"
+  [disabled]="!schemaService.canRedo()"
+  (click)="schemaService.redo()"
 >
   &gt;
 </button>
