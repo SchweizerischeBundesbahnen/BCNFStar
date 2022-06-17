@@ -219,7 +219,7 @@ export default class Schema {
     return this.referencesOf(table, onlyDisplayed).length == 0;
   }
 
-  public isDirectDimension(table: Table): boolean {
+  public isDirectDimension(table: BasicTable): boolean {
     return this.referencesOf(table, true).some((reference) =>
       this.isFact(reference.referencing, true)
     );
