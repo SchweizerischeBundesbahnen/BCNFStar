@@ -30,7 +30,7 @@ export default async function getSchemaMatching(
     await readFile(resultFile, { encoding: "utf-8" })
   );
 
-  for (const file of [srcFile, targetFile, resultFile]) await rm(file);
+  for (const file of [srcFile, targetFile, resultFile]) rm(file);
   return escaped.map((entry) => {
     return {
       similarity: entry.similarity,
