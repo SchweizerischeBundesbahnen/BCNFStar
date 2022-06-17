@@ -81,7 +81,7 @@ export default abstract class SQLPersisting {
 ${columnStrings.join(',\n')});\n`;
   }
 
-  public dataTransfer(tables: Array<Table | UnionedTable>): string {
+  public dataTransfer(tables: Array<BasicTable>): string {
     let Sql: string = '';
     for (const table of tables) {
       Sql += this.dataTransferSql(table) + '\n';
@@ -89,14 +89,16 @@ ${columnStrings.join(',\n')});\n`;
     return Sql;
   }
 
-  public dataTransferSql(table: Table | UnionedTable): string {
+  public dataTransferSql(table: BasicTable): string {
     let Sql = '';
 
     let columns: Column[] = [];
     if (table instanceof UnionedTable) {
       columns = table.displayedColumns();
-    } else {
+    } else if (table instanceof Table) {
       columns = table.columns.asArray();
+    } else {
+      throw Error('Not implemented for tables other than unioned and regular');
     }
 
     Sql = `INSERT INTO ${this.tableIdentifier(
@@ -109,8 +111,10 @@ ${columnStrings.join(',\n')});\n`;
       Sql += '\n UNION \n';
       Sql += this.selectStatement(table.tables[1], table.columns[1]);
       Sql += ') as X';
-    } else {
+    } else if (table instanceof Table) {
       Sql += this.selectStatement(table, table.columns.asArray());
+    } else {
+      throw Error('Not implemented for tables other than unioned and regular');
     }
 
     Sql += ';';
