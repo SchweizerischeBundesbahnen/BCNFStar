@@ -12,7 +12,8 @@
     [sbbTooltip]="table.fullName"
     [ngClass]="{
       fact: isFact(),
-      dimension: isDimension(),
+      directDimension: isDirectDimension(),
+      dimension: isDimension() && !isDirectDimension(),
       'table-head-highlight': schemaService.selectedTable === table
     }"
   >
