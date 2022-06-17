@@ -51,7 +51,6 @@ import { KeysComponent } from './components/tabbar/keys/keys.component';
 import { ContainedSubtablesComponent } from './components/tabbar/contained-subtables/contained-subtables.component';
 import { ForeignKeysComponent } from './components/tabbar/foreign-keys/foreign-keys.component';
 import { SbbOptionAllComponent } from './components/ui/sbb-option-all/sbb-option-all.component';
-import { MatchingGraphComponent } from './components/integration/matching-graph/matching-graph.component';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -84,7 +83,6 @@ export let InjectorInstance: Injector;
     ContainedSubtablesComponent,
     ForeignKeysComponent,
     SbbOptionAllComponent,
-    MatchingGraphComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,8 +1,6 @@
 <div class="grid-container">
   <div class="grid-container-graphmenu">
-    <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">
-      Reset view
-    </button>
+    <button sbb-button id="reset-btn" class="me-1">Reset view</button>
     <button
       type="button"
       sbb-button
@@ -24,14 +22,21 @@
     </sbb-toggle>
     <app-undo-redo class="undo-redo"></app-undo-redo>
   </div>
-  <app-schema-graph
-    *ngIf="schemaService.mode !== EditingMode.integration"
-    [tables]="schemaService.schema.tables"
-    [links]="links"
-  ></app-schema-graph>
-  <app-matching-graph
-    *ngIf="schemaService.mode === EditingMode.integration"
-  ></app-matching-graph>
+  <div
+    *ngIf="
+      schemaService.mode === EditingMode.integration &&
+        !intService.existingSchema;
+      else graph
+    "
+  >
+    <h3>Choose which schema you want to compare to while editing</h3>
+    <app-table-selection
+      (schema)="this.intService.existingSchema = $event"
+    ></app-table-selection>
+  </div>
+  <ng-template #graph>
+    <app-schema-graph [tables]="tables" [links]="links"></app-schema-graph
+  ></ng-template>
 
   <div class="item-sidebar">
     <div class="grid-container-sidebar">

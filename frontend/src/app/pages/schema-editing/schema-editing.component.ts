@@ -7,6 +7,7 @@ import {
   PortSide,
   SchemaGraphComponent,
 } from '../../components/graph/schema-graph/schema-graph.component';
+import { IntegrationService } from '../../integration.service';
 import { EditingMode, SchemaService } from '../../schema.service';
 
 @Component({
@@ -24,13 +25,34 @@ export class SchemaEditingComponent {
     return EditingMode;
   }
 
-  constructor(router: Router, public schemaService: SchemaService) {
+  get tables() {
+    if (
+      this.schemaService.mode === EditingMode.integration &&
+      this.intService.existingSchema
+    )
+      return this.intService.tables;
+    return this.schemaService.schema.tables;
+  }
+
+  constructor(
+    router: Router,
+    public schemaService: SchemaService,
+    public intService: IntegrationService
+  ) {
     if (!schemaService.hasSchema) router.navigate(['']);
     this.generateLinks();
     this.schemaService.schemaChanged.subscribe(() => this.generateLinks());
+    this.intService.existingSchemaChanged.subscribe(() => this.generateLinks());
   }
 
   public generateLinks() {
+    if (
+      this.schemaService.mode === EditingMode.integration &&
+      this.intService.existingSchema
+    ) {
+      this.links = this.intService.links;
+      return;
+    }
     const newLinks: Array<LinkDefinition> = [];
     for (const table of this.schemaService.schema.tables)
       for (const fk of this.schemaService.schema.fksOf(table, true))
