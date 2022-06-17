@@ -189,7 +189,7 @@ export class SchemaCreationService {
     for (const fd of await fdPromise) schema.addFd(fd);
     for (const [table, pk] of (await pkPromise).entries()) table.pk = pk;
 
-    for (const table of schema.tables) schema.calculateFdsOf(table);
+    for (const table of schema.regularTables) schema.calculateFdsOf(table);
     return schema;
   }
 }

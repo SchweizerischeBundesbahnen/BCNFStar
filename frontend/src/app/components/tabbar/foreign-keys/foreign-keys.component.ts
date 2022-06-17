@@ -23,17 +23,21 @@ export class ForeignKeysComponent {
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
+  }
+
+  public get schema() {
+    return this.schemaService.schema!;
   }
 
   public selectedInd(): SourceRelationship | undefined {
     return this.indSelectionGroup?.value;
   }
 
-  public emitHighlightedInd(rel: SourceRelationship) {
+  public setHighlightedInd(rel: SourceRelationship) {
     const map = new Map<Table, ColumnCombination>();
     for (const tableRel of this.schemaService.schema
-      .indsOf(this.schemaService.selectedTable!)
+      .indsOf(this.table)
       .get(rel)!) {
       if (!map.has(tableRel.referencing)) {
         map.set(tableRel.referencing, new ColumnCombination());
@@ -52,7 +56,7 @@ export class ForeignKeysComponent {
   }
 
   public tablesAsArray() {
-    return [...this.schemaService.schema.tables];
+    return [...this.schemaService.schema.regularTables];
   }
 
   public inds(): Array<SourceRelationship> {

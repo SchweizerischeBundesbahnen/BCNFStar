@@ -15,7 +15,7 @@ describe("The save schema editing", () => {
     cy.get("input")
       .eq(3)
       .invoke("attr", "placeholder")
-      .should("contain", "Filename");
+      .should("contain", "file name");
   });
 
   it("disables the save current schema state button when filename input is empty", () => {

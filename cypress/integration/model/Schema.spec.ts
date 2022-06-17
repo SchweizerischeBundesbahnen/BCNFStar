@@ -6,6 +6,8 @@ import JoinCommand from "../../../frontend/src/model/commands/JoinCommand";
 import SourceTableInstance from "../../../frontend/src/model/schema/SourceTableInstance";
 import FunctionalDependency from "../../../frontend/src/model/schema/FunctionalDependency";
 import ColumnCombination from "../../../frontend/src/model/schema/ColumnCombination";
+import DismissFkCommand from "../../../frontend/src/model/commands/DismissFkCommand";
+import ShowFkCommand from "../../../frontend/src/model/commands/ShowFkCommand";
 
 describe("Schema", () => {
   let schema: Schema;
@@ -147,9 +149,28 @@ describe("Schema", () => {
   it("calculates fks of a table correctly", () => {
     let fks = schema.fksOf(tableA, true);
     expect(fks.length).to.equal(2);
-    let fk = [...fks][0];
+    let fk = fks[0];
     expect(fk.referencing).to.equal(tableA);
     expect(fk.referenced).to.equal(tableB);
+  });
+
+  it("dismisses fks correctly", () => {
+    const fk = schema.fksOf(tableA, true)[0];
+    const dismissCommand = new DismissFkCommand(schema, fk);
+    dismissCommand.do();
+    expect(schema.fksOf(tableA, true)).to.not.include(fk);
+    dismissCommand.undo();
+    expect(schema.fksOf(tableA, true)).to.include(fk);
+  });
+
+  it("readds fks correctly", () => {
+    const fk = schema.hiddenFksOf(tableA)[0];
+    expect(schema.fksOf(tableA, true)).to.not.include(fk);
+    const showCommand = new ShowFkCommand(schema, fk);
+    showCommand.do();
+    expect(schema.fksOf(tableA, true)).to.include(fk);
+    showCommand.undo();
+    expect(schema.fksOf(tableA, true)).to.not.include(fk);
   });
 
   it("calculates inds of a table correctly", () => {

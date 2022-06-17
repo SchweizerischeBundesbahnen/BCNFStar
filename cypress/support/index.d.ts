@@ -55,5 +55,7 @@ declare namespace Cypress {
     visitContainedSubtableTab(): void;
 
     visitPossibleForeignKeysTab(): void;
+
+    createForeignKey(): void;
   }
 }

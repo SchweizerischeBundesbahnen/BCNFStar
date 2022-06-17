@@ -5,6 +5,7 @@ import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
 import { EditingMode, SchemaService } from '@/src/app/schema.service';
+import BasicTable from '@/src/model/schema/BasicTable';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -18,7 +19,7 @@ export enum PortSide {
 }
 
 export interface LinkEndDefinititon {
-  table: Table;
+  table: BasicTable;
   columnName: string;
   side: PortSide;
 }
@@ -40,7 +41,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   protected portDiameter = 22.5;
 
-  public graphStorage = new Map<Table, GraphStorageItem>();
+  public graphStorage = new Map<BasicTable, GraphStorageItem>();
 
   protected graph!: joint.dia.Graph;
   protected paper!: joint.dia.Paper;
@@ -117,12 +118,12 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   // components
   private addPanzoomHandler() {
     this.panzoomHandler = panzoom(
-      document.querySelector('#paper svg') as SVGElement,
+      document.querySelector('#paper svg g') as SVGElement,
       {
         smoothScroll: false,
         controller: {
           getOwner() {
-            return document.querySelector('#paper') as HTMLElement;
+            return document.querySelector('#paper svg') as HTMLElement;
           },
           applyTransform: (transform) => {
             this.panzoomTransform = Object.assign({}, transform);
@@ -233,7 +234,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     ];
   }
 
-  private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
+  private generatePorts(jointjsEl: joint.dia.Element, table: BasicTable) {
     let counter = 0;
     for (let column of this.schemaService.schema.displayedColumnsOf(table)) {
       let args = { counter, side: PortSide.Left };

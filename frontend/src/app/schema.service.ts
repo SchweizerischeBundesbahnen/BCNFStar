@@ -5,9 +5,13 @@ import AutoNormalizeCommand from '../model/commands/AutoNormalizeCommand';
 import CommandProcessor from '../model/commands/CommandProcessor';
 import DeleteColumnCommand from '../model/commands/DeleteColumnCommand';
 import DirectDimensionCommand from '../model/commands/DirectDimensionCommand';
+import DismissFkCommand from '../model/commands/DismissFkCommand';
 import IndToFkCommand from '../model/commands/IndToFkCommand';
 import JoinCommand from '../model/commands/JoinCommand';
+import ShowFkCommand from '../model/commands/ShowFkCommand';
 import SplitCommand from '../model/commands/SplitCommand';
+import UnionCommand from '../model/commands/UnionCommand';
+import BasicTable from '../model/schema/BasicTable';
 import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import FunctionalDependency from '../model/schema/FunctionalDependency';
@@ -18,6 +22,7 @@ import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
+import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
 
 export enum EditingMode {
   star,
@@ -44,18 +49,16 @@ export class SchemaService {
   public get selectedTableChanged() {
     return this._selectedTableChanged.asObservable();
   }
-
-  private _selectedTable?: Table;
+  private _selectedTable?: BasicTable;
   public get selectedTable() {
     return this._selectedTable;
   }
-
-  public set selectedTable(val: Table | undefined) {
+  public set selectedTable(val: BasicTable | undefined) {
     this._selectedTable = val;
     this._selectedTableChanged.emit();
   }
 
-  public highlightedColumns?: Map<Table, ColumnCombination>;
+  public highlightedColumns?: Map<BasicTable, ColumnCombination>;
 
   private _mode: EditingMode = EditingMode.normal;
   public get starMode() {
@@ -70,7 +73,7 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public commandProcessor = new CommandProcessor();
+  private commandProcessor = new CommandProcessor();
 
   private _schemaChanged = new EventEmitter<void>();
   get schemaChanged() {
@@ -109,7 +112,21 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  public dismiss(fk: TableRelationship) {
+    let command = new DismissFkCommand(this.schema, fk);
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public show(fk: TableRelationship) {
+    let command = new ShowFkCommand(this.schema, fk);
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
   public async split(fd: FunctionalDependency) {
+    if (!(this.selectedTable instanceof Table))
+      throw Error('splitting not implemented for unioned tables');
     const dialogRef = this.dialog.open(SplitDialogComponent, {
       data: {
         fd: fd,
@@ -142,6 +159,8 @@ export class SchemaService {
   }
 
   public deleteColumn(column: Column) {
+    if (!(this.selectedTable instanceof Table))
+      throw Error('deleteColumn not implemented for unioned tables');
     let command = new DeleteColumnCommand(
       this._schema,
       this.selectedTable!,
@@ -155,13 +174,9 @@ export class SchemaService {
   }
 
   public autoNormalize(
-    selectedTables: Set<Table> | Table = this._schema.tables
+    selectedTables: Iterable<Table> = this._schema.regularTables
   ): void {
-    const tablesToNormalize =
-      selectedTables.constructor.name == 'Set'
-        ? Array.from(selectedTables as Set<Table>)
-        : [selectedTables as Table];
-    let command = new AutoNormalizeCommand(this._schema, ...tablesToNormalize);
+    let command = new AutoNormalizeCommand(this._schema, ...selectedTables);
     let self = this;
     let previousSelectedTable = this.selectedTable;
     command.onDo = function () {
@@ -174,7 +189,23 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async makeDirectDimension(table: Table): Promise<void> {
+  public union(spec: unionSpec) {
+    const command = new UnionCommand(
+      this.schema,
+      spec.tables,
+      spec.columns,
+      spec.newTableName
+    );
+    command.onDo = () => (this.selectedTable = command.newTable);
+    command.onUndo = () => (this.selectedTable = command.tables[0]);
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public async makeDirectDimension(table: BasicTable): Promise<void> {
+    if (!(table instanceof Table))
+      throw Error('directDimension not implemented for unioned tables');
+
     const routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
@@ -195,8 +226,18 @@ export class SchemaService {
   }
 
   public setSurrogateKey(key: string) {
+    if (!(this.selectedTable instanceof Table))
+      throw Error('surrogate keys not implemented for unioned tables');
     this.selectedTable!.surrogateKey = key;
     this.notifyAboutSchemaChanges();
+  }
+
+  public canUndo() {
+    return this.commandProcessor.canUndo();
+  }
+
+  public canRedo() {
+    return this.commandProcessor.canRedo();
   }
 
   public undo() {

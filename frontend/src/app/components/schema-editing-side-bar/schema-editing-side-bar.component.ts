@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import Table from 'src/model/schema/Table';
 import { SchemaService } from '../../schema.service';
 
 @Component({
@@ -9,6 +10,6 @@ import { SchemaService } from '../../schema.service';
 export class SchemaEditingSideBarComponent {
   constructor(public schemaService: SchemaService) {}
   get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable! as Table;
   }
 }

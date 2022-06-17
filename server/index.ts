@@ -7,9 +7,16 @@ import morgan from "morgan";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
 import getPksFunction from "./routes/pks";
+
+import testTypeCasting from "./routes/unionability/checkTypeConversion";
+import checkUnionedKeys from "./routes/unionability/checkUniqueConstraint";
+
 import { getTablePage } from "./routes/tablePage";
-import { check } from "express-validator";
-import isValidFileName from "./routes/validation/parameterValidation";
+import { check, body } from "express-validator";
+import {
+  isValidFileName,
+  isValidDatatype,
+} from "./validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
 
@@ -95,6 +102,17 @@ app.post("/metanomeResults", runMetanome);
 app.post("/schemaMatching", getSchemaMatching);
 
 app.get("/persist/dbmsname", getDbmsName);
+
+app.post(
+  "/typecasting",
+  [
+    body("currentDatatype").trim().custom(isValidDatatype()),
+    body("targetDatatype").trim().custom(isValidDatatype()),
+  ],
+  testTypeCasting
+);
+
+app.post("/unionedkeys", checkUnionedKeys);
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
 app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);

@@ -1,6 +1,7 @@
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import SourceTableInstance from '@/src/model/schema/SourceTableInstance';
+import Table from '@/src/model/schema/Table';
 import { Component } from '@angular/core';
 @Component({
   selector: 'app-table-editing',
@@ -32,7 +33,7 @@ export class TableEditingComponent {
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
   }
 
   // TABLENAME EDITING

@@ -1,5 +1,17 @@
 # BCNFStar
 
+BCNFStar is a tool for interactive database schema management. It helps you to
+
+- normalize or denormalize your schema (by splitting or joining tables)
+- create star schemas with a dedicated optimized mode
+- replace primary and foreign keys by automatically generated surrogate keys
+- find valid foreign key candidates (based on inclusion dependencies) present in the data
+  - and investigate why others are invalid
+  - same for functional dependencies, which are the basis for normalising (splitting) tables
+- integrate new tables into an existing schema (coming soon!)
+
+It makes sure all transformations are valid for a given data instance and generates SQL downloads for transforming
+
 ## Setup
 
 ### Java

@@ -1,4 +1,5 @@
 import { SchemaService } from '@/src/app/schema.service';
+import Table from '@/src/model/schema/Table';
 import { Component } from '@angular/core';
 
 @Component({
@@ -14,8 +15,12 @@ export class KeysComponent {
     this.schemaService.selectedTableChanged.subscribe(() => this.reset());
   }
 
+  public get table() {
+    return this.schemaService.selectedTable as Table;
+  }
+
   public reset() {
-    this.surrogateKey = this.schemaService.selectedTable?.surrogateKey ?? '';
+    this.surrogateKey = this.table.surrogateKey ?? '';
     this.editMode = !this.surrogateKey;
   }
 

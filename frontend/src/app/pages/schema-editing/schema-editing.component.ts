@@ -51,11 +51,38 @@ export class SchemaEditingComponent {
   }
 
   private generateJoinButton(fk: TableRelationship) {
+    let removeButton = new joint.linkTools.Button({
+      markup: [
+        {
+          tagName: 'circle',
+          selector: 'delete-fk-button',
+          attributes: {
+            r: 11,
+            fill: '#ff1d00',
+            cursor: 'pointer',
+          },
+        },
+        {
+          tagName: 'path',
+          selector: 'icon',
+          attributes: {
+            d: 'M -3 -3 3 3 M -3 3 3 -3',
+            fill: 'white',
+            stroke: '#FFFFFF',
+            'stroke-width': 2,
+            'pointer-events': 'none',
+          },
+        },
+      ],
+      action: () => this.schemaService.dismiss(fk),
+      offset: 0,
+      distance: '37%',
+    });
     let joinButton = new joint.linkTools.Button({
       markup: [
         {
           tagName: 'circle',
-          selector: 'button',
+          selector: 'join-button',
           attributes: {
             r: 11,
             fill: '#2d327d',
@@ -74,13 +101,13 @@ export class SchemaEditingComponent {
           },
         },
       ],
-      distance: '50%',
+      distance: '71%',
       offset: 0,
       action: () => this.schemaService.join(fk),
     });
 
     return new joint.dia.ToolsView({
-      tools: [joinButton],
+      tools: [joinButton, removeButton],
     });
   }
 }
