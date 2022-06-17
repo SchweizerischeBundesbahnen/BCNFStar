@@ -39,8 +39,8 @@
   </table>
 
   <div *ngIf="!selectedColumnsCC().isSubsetOf(hull)" class="violation">
-    The key doesnt determine all of the selected attributes. Check the
-    violations and clean the data or choose other key.
+    The key doesnt determine all of the selected attributes. Choose another key
+    or check the violations and clean the data.
   </div>
 
   <div
@@ -72,8 +72,14 @@
     </ul>
   </div>
   <div sbbDialogActions>
-    <button sbb-button>Check violations</button>
-    <button sbb-button>Choose other key</button>
+    <button
+      sbb-button
+      [disabled]="selectedColumnsCC().isSubsetOf(hull)"
+      (click)="showViolations()"
+    >
+      Show violations
+    </button>
+    <button sbb-button (click)="otherKey()">Choose other key</button>
     <button
       sbb-button
       [disabled]="!canConfirm()"

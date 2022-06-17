@@ -1,5 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
+import IRowCounts from '@server/definitions/IRowCounts';
 import { firstValueFrom } from 'rxjs';
 import AutoNormalizeCommand from '../model/commands/AutoNormalizeCommand';
 import CommandProcessor from '../model/commands/CommandProcessor';
@@ -19,6 +21,8 @@ import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
+import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
+import { ViolatingFDRowsDataQuery } from './dataquery';
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +51,7 @@ export class SchemaService {
   }
   public set selectedTable(val: Table | undefined) {
     this._selectedTable = val;
+    console.log('selected', this.selectedTable);
     this._selectedTableChanged.emit();
   }
 
@@ -67,7 +72,10 @@ export class SchemaService {
     return this._schemaChanged.asObservable();
   }
 
-  constructor(private dialog: SbbDialog) {}
+  constructor(
+    private dialog: SbbDialog,
+    private notification: SbbNotificationToast
+  ) {}
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
@@ -179,6 +187,46 @@ export class SchemaService {
     command.onUndo = () => (this.selectedTable = command.newTables[0]);
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
+  }
+
+  /**
+   * Checks the existance of a fd inside a table. It shows the violations inside a dialog.
+   * @returns whether the fd is valid
+   */
+  public async checkFd(
+    table: Table,
+    fd: FunctionalDependency
+  ): Promise<boolean> {
+    // only check those columns, which are not defined by existing fds
+    const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
+      table,
+      fd.lhs.asArray(),
+      fd.rhs.copy().setMinus(table.hull(fd.lhs)).asArray()
+    );
+
+    const rowCount: IRowCounts | void = await dataQuery
+      .loadRowCount()
+      .catch((e) => {
+        console.error(e);
+      });
+
+    if (!rowCount) {
+      const error_message =
+        'There was a backend error while checking this IND. Check the browser and server logs for details';
+      this.notification.open(error_message, { type: 'error' });
+      throw new Error(error_message);
+    }
+
+    if (rowCount.entries != 0) {
+      this.dialog.open(ViolatingRowsViewComponent, {
+        data: {
+          dataService: dataQuery,
+          rowCount: rowCount,
+        },
+      });
+    }
+
+    return rowCount.entries == 0;
   }
 
   public setSurrogateKey(key: string) {

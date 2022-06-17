@@ -4,11 +4,18 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Table from '@/src/model/schema/Table';
 import { FdCluster } from '@/src/model/types/FdCluster';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { SbbExpansionPanel } from '@sbb-esta/angular/accordion';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
 import { firstValueFrom } from 'rxjs';
-import { SplitDialogComponent } from '../../operation-dialogs/split-dialog/split-dialog.component';
+import {
+  SplitDialogResponse,
+  SplitDialogComponent,
+  FdSplitResponse,
+  ShowViolationsResponse,
+  ChangeKeyResponse,
+} from '../../operation-dialogs/split-dialog/split-dialog.component';
 
 @Component({
   selector: 'app-contained-subtables',
@@ -16,6 +23,9 @@ import { SplitDialogComponent } from '../../operation-dialogs/split-dialog/split
   styleUrls: ['./contained-subtables.component.css'],
 })
 export class ContainedSubtablesComponent {
+  @ViewChild('containedSubtablesPanel')
+  containedSubtablesPanel!: SbbExpansionPanel;
+
   public _fdClusterFilter = new Array<Column>();
   public page: number = 0;
   public pageSize = 5;
@@ -33,7 +43,6 @@ export class ContainedSubtablesComponent {
   }
 
   public emitHighlightedCluster(cluster: FdCluster) {
-    console.log('highlight');
     const map = new Map<Table, ColumnCombination>();
     map.set(this.table, cluster.columns);
     this.schemaService.highlightedColumns = map;
@@ -56,12 +65,6 @@ export class ContainedSubtablesComponent {
 
   public fdFromLhs(): FunctionalDependency {
     const lhs = new ColumnCombination(this.lhsSelection);
-    console.log(
-      this.table
-        .hull(lhs)
-        .asArray()
-        .map((col) => this.table.columns.includes(col))
-    );
     return new FunctionalDependency(lhs, this.table.hull(lhs));
   }
 
@@ -72,9 +75,30 @@ export class ContainedSubtablesComponent {
       },
     });
 
-    const value: { fd: FunctionalDependency; name?: string } =
-      await firstValueFrom(dialogRef.afterClosed());
-    if (!value) return;
-    this.schemaService.split(value.fd, value.name);
+    const response: SplitDialogResponse = await firstValueFrom(
+      dialogRef.afterClosed()
+    );
+    if (!response) return;
+    switch (response.type) {
+      case 'fdSplit': {
+        const fdResponse = response as FdSplitResponse;
+        this.schemaService.split(fdResponse.fd, fdResponse.name);
+        break;
+      }
+      case 'showViolations': {
+        const violationResponse = response as ShowViolationsResponse;
+        this.schemaService.checkFd(this.table, violationResponse.fd);
+        break;
+      }
+      case 'changeKey': {
+        const keyResponse = response as ChangeKeyResponse;
+        this._fdClusterFilter = keyResponse.rhs.asArray();
+        this.containedSubtablesPanel.open();
+        break;
+      }
+      default: {
+        throw Error();
+      }
+    }
   }
 }

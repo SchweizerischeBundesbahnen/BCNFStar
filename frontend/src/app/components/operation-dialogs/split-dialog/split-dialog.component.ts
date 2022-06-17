@@ -6,6 +6,23 @@ import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 
+export interface SplitDialogResponse {
+  type: string;
+}
+
+export interface FdSplitResponse extends SplitDialogResponse {
+  fd: FunctionalDependency;
+  name: string;
+}
+
+export interface ChangeKeyResponse extends SplitDialogResponse {
+  rhs: ColumnCombination;
+}
+
+export interface ShowViolationsResponse extends SplitDialogResponse {
+  fd: FunctionalDependency;
+}
+
 @Component({
   selector: 'app-split-dialog',
   templateUrl: './split-dialog.component.html',
@@ -26,7 +43,10 @@ export class SplitDialogComponent {
 
   constructor(
     // eslint-disable-next-line no-unused-vars
-    public dialogRef: SbbDialogRef<SplitDialogComponent>,
+    public dialogRef: SbbDialogRef<
+      SplitDialogComponent,
+      FdSplitResponse | ChangeKeyResponse | ShowViolationsResponse
+    >,
     public schemaService: SchemaService,
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA)
@@ -103,6 +123,18 @@ export class SplitDialogComponent {
   }
 
   public confirm() {
-    this.dialogRef.close({ fd: this.fd, name: this.tableName });
+    this.dialogRef.close({
+      type: 'fdSplit',
+      fd: this.fd,
+      name: this.tableName,
+    });
+  }
+
+  public showViolations() {
+    this.dialogRef.close({ type: 'showViolations', fd: this.fd });
+  }
+
+  public otherKey() {
+    this.dialogRef.close({ type: 'changeKey', rhs: this.fd.rhs });
   }
 }
