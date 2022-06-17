@@ -88,9 +88,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   public updateGraph() {
     if (!this.paper) return;
-    for (const item of this.graphStorage.keys()) {
-      this.graphStorage.get(item)?.jointjsEl.remove();
-    }
+    this.graph.clear();
     this.graphStorage = new Map<Table, GraphStorageItem>();
     this.generateElements();
     this.generateLinks();
