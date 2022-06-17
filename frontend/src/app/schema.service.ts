@@ -19,7 +19,6 @@ import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
-import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -112,23 +111,8 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async split(fd: FunctionalDependency) {
-    const dialogRef = this.dialog.open(SplitDialogComponent, {
-      data: {
-        fd: fd,
-      },
-    });
-
-    const value: { fd: FunctionalDependency; name?: string } =
-      await firstValueFrom(dialogRef.afterClosed());
-    if (!value) return;
-
-    let command = new SplitCommand(
-      this._schema,
-      this.selectedTable!,
-      value.fd,
-      value.name
-    );
+  public split(fd: FunctionalDependency, name?: string) {
+    let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);

@@ -5,7 +5,10 @@ import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Table from '@/src/model/schema/Table';
 import { FdCluster } from '@/src/model/types/FdCluster';
 import { Component } from '@angular/core';
+import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { SbbPageEvent } from '@sbb-esta/angular/pagination';
+import { firstValueFrom } from 'rxjs';
+import { SplitDialogComponent } from '../../operation-dialogs/split-dialog/split-dialog.component';
 
 @Component({
   selector: 'app-contained-subtables',
@@ -19,7 +22,7 @@ export class ContainedSubtablesComponent {
 
   public lhsSelection = new Array<Column>();
 
-  constructor(public schemaService: SchemaService) {
+  constructor(public schemaService: SchemaService, private dialog: SbbDialog) {
     this.schemaService.selectedTableChanged.subscribe(() => {
       this._fdClusterFilter = [];
     });
@@ -60,5 +63,18 @@ export class ContainedSubtablesComponent {
         .map((col) => this.table.columns.includes(col))
     );
     return new FunctionalDependency(lhs, this.table.hull(lhs));
+  }
+
+  public async openSplitDialog(fd: FunctionalDependency) {
+    const dialogRef = this.dialog.open(SplitDialogComponent, {
+      data: {
+        fd: fd,
+      },
+    });
+
+    const value: { fd: FunctionalDependency; name?: string } =
+      await firstValueFrom(dialogRef.afterClosed());
+    if (!value) return;
+    this.schemaService.split(value.fd, value.name);
   }
 }

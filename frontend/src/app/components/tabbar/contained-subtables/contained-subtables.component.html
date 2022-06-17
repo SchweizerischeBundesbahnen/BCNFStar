@@ -57,7 +57,7 @@
           type="button"
           sbb-button
           style="margin: 3px"
-          (click)="schemaService.split(fd)"
+          (click)="openSplitDialog(fd)"
           [sbbTooltip]="fd.lhs.toString()"
         >
           {{ fd.lhs }}
@@ -79,7 +79,7 @@
         >{{ column.name }}
       </sbb-option>
     </sbb-select>
-    <button type="button" sbb-button (click)="schemaService.split(fdFromLhs())">
+    <button type="button" sbb-button (click)="openSplitDialog(fdFromLhs())">
       Split Table with this key
     </button>
   </sbb-expansion-panel>
