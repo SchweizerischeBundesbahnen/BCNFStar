@@ -9,6 +9,8 @@
       [placeholder]="tables[Side.left].name"
     />
 
+    <button sbb-button (click)="matchTables()">Match automatically</button>
+
     <div class="union-grid">
       <h2 [sbbTooltip]="tables[Side.left].fullName">
         Columns of <br />

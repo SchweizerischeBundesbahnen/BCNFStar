@@ -12,6 +12,8 @@ import {
   LinkDefinition,
   PortSide,
 } from './components/graph/schema-graph/schema-graph.component';
+import Table from '../model/schema/Table';
+import Column from '../model/schema/Column';
 
 @Injectable({
   providedIn: 'root',
@@ -55,28 +57,32 @@ export class IntegrationService {
     this.baseUrl = dataService.baseUrl;
   }
 
-  private getMatching(
+  public async getMatching(
     src: Array<BasicTable> = [...this.schemaService.schema.tables],
-    target: Array<BasicTable> = [...(this.existingSchema?.tables ?? [])]
+    target: Array<BasicTable> = [...(this.existingSchema?.tables ?? [])],
+    srcSchema: Schema = this.schemaService.schema,
+    targetSchema: Schema = this._existingSchema!
   ) {
     const srcPersister = new MsSqlPersisting('__schema_matching_temp_src');
     const targetPersister = new MsSqlPersisting(
       '__schema_matching_temp_target'
     );
     const body: ISchemaMatchingRequest = {
-      srcSql: srcPersister.tableCreation(this.schemaService.schema, src, true),
-      targetSql: targetPersister.tableCreation(
-        this.existingSchema!,
-        target,
-        true
-      ),
+      srcSql: srcPersister.tableCreation(srcSchema, src, true),
+      targetSql: targetPersister.tableCreation(targetSchema, target, true),
     };
-    return firstValueFrom(
+    const result = await firstValueFrom(
       this.http.post<Array<ISchemaMatchingResponse>>(
         this.baseUrl + '/schemaMatching',
         body
       )
     );
+    const matchings: Record<string, string[]> = {};
+    for (const entry of result) {
+      if (!matchings[entry.source]) matchings[entry.source] = [];
+      matchings[entry.source].push(entry.target);
+    }
+    return matchings;
   }
 
   private async reset() {
@@ -87,44 +93,57 @@ export class IntegrationService {
     this._existingSchemaChanged.emit();
   }
 
-  private async getMatchingsFromBackend() {
-    const matchings: Record<string, string[]> = {};
-    const result = await this.getMatching();
-    for (const entry of result) {
-      if (!matchings[entry.source]) matchings[entry.source] = [];
-      matchings[entry.source].push(entry.target);
-    }
-    return matchings;
-  }
-
-  private async generateLinks() {
-    if (!this.matchings) this.matchings = await this.getMatchingsFromBackend();
-    const newLinks: Array<LinkDefinition> = [];
-    for (const table of this.schemaService.schema.regularTables)
+  forMatch(
+    matchings: Record<string, string[]>,
+    tablesLeft: Iterable<Table>,
+    tablesRight: Iterable<Table>,
+    cb: (
+      src: Column,
+      target: Column,
+      srcTable: Table,
+      targetTable: Table
+    ) => void
+  ) {
+    for (const table of tablesLeft)
       for (const column of table.columns) {
         const sourceIdent = `${column.sourceColumn.table.fullName}.${column.sourceColumn.name}`;
-        if (!this.matchings[sourceIdent]) continue;
-        for (const target of this.matchings[sourceIdent])
-          for (const existingTable of this.existingSchema!.regularTables)
+        if (!matchings[sourceIdent]) continue;
+        for (const target of matchings[sourceIdent])
+          for (const existingTable of tablesRight)
             for (const existingColumn of existingTable.columns) {
               const sC = existingColumn.sourceColumn;
               const existingSourceIdent = `${sC.table.fullName}.${sC.name}`;
               if (target === existingSourceIdent) {
-                newLinks.push({
-                  source: {
-                    columnName: column.sourceColumn.name,
-                    side: PortSide.Right,
-                    table,
-                  },
-                  target: {
-                    columnName: existingColumn.name,
-                    side: PortSide.Left,
-                    table: existingTable,
-                  },
-                });
+                cb(column, existingColumn, table, existingTable);
               }
             }
       }
+  }
+
+  private async generateLinks() {
+    if (!this.matchings) this.matchings = await this.getMatching();
+    const newLinks: Array<LinkDefinition> = [];
+    if (!this.existingSchema) return;
+    this.forMatch(
+      this.matchings,
+      this.schemaService.schema.regularTables,
+      this.existingSchema.regularTables,
+      (column, existingColumn, table, existingTable) => {
+        newLinks.push({
+          source: {
+            columnName: column.sourceColumn.name,
+            side: PortSide.Right,
+            table,
+          },
+          target: {
+            columnName: existingColumn.name,
+            side: PortSide.Left,
+            table: existingTable,
+          },
+        });
+      }
+    );
+
     this.links = newLinks;
   }
 }
