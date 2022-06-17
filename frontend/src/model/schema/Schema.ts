@@ -202,6 +202,12 @@ export default class Schema {
     return this.referencesOf(table, onlyDisplayed).length == 0;
   }
 
+  public isDirectDimension(table: Table): boolean {
+    return this.referencesOf(table, true).some((reference) =>
+      this.isFact(reference.referencing, true)
+    );
+  }
+
   /**
    * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
    * or routes that would add no extra information to the fact table when joined completely
