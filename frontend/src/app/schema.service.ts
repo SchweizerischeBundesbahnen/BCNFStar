@@ -22,7 +22,7 @@ import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
-import { unionSpec } from './components/union-sidebar/union-sidebar.component';
+import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
 
 @Injectable({
   providedIn: 'root',

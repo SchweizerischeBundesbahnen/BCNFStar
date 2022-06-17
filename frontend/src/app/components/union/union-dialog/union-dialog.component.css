@@ -45,7 +45,7 @@ element::-webkit-scrollbar {
   border: solid 1px #ccc;
   height: 100%;
   overflow-y: scroll;
-
+  grid-row: 2;
   background: white;
   border-radius: 4px;
   overflow: hidden;

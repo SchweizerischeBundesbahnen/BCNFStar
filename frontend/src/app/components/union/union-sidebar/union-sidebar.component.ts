@@ -2,7 +2,7 @@ import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
 import { Component, OnInit } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { SchemaService } from '../../schema.service';
+import { SchemaService } from '../../../schema.service';
 import { UnionDialogComponent } from '../union-dialog/union-dialog.component';
 
 export interface unionSpec {
@@ -38,9 +38,8 @@ export class UnionSidebarComponent implements OnInit {
   openDialog(): void {
     const dialogRef = this.dialog.open(UnionDialogComponent, {
       data: {
-        tableLeft: this.table,
-        tableRight: this.otherTable,
-      }, //panelClass: "union-dialog"
+        tables: [this.table, this.otherTable],
+      },
     });
 
     dialogRef
