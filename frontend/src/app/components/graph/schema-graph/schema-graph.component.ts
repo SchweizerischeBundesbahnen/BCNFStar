@@ -35,7 +35,7 @@ export interface LinkDefinition {
   styleUrls: ['./schema-graph.component.css'],
 })
 export class SchemaGraphComponent implements AfterContentInit, OnChanges {
-  @Input() public tables: Iterable<Table> = [];
+  @Input() public tables: Iterable<BasicTable> = [];
   @Input() public links: Iterable<LinkDefinition> = [];
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 

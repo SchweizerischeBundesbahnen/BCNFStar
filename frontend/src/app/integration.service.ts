@@ -6,8 +6,8 @@ import ISchemaMatchingRequest from '@server/definitions/ISchemaMatchingRequest';
 import ISchemaMatchingResponse from '@server/definitions/ISchemaMatchingResponse';
 import { DatabaseService } from './database.service';
 import { SchemaService } from './schema.service';
-import Table from '../model/schema/Table';
 import MsSqlPersisting from '../model/schema/persisting/MsSqlPersisting';
+import BasicTable from '../model/schema/BasicTable';
 
 @Injectable({
   providedIn: 'root',
@@ -25,8 +25,8 @@ export class IntegrationService {
   }
 
   public getMatching(
-    src: Array<Table> = [...this.schemaService.schema.tables],
-    target: Array<Table> = [...(this.existingSchema?.tables ?? [])]
+    src: Array<BasicTable> = [...this.schemaService.schema.tables],
+    target: Array<BasicTable> = [...(this.existingSchema?.tables ?? [])]
   ) {
     const srcPersister = new MsSqlPersisting('__schema_matching_temp_src');
     const targetPersister = new MsSqlPersisting(
