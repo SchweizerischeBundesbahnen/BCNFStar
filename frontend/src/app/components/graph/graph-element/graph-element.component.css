@@ -24,17 +24,21 @@
   text-align: center;
   vertical-align: middle;
   display: inline-block;
-  background-color: #f27e00;
+  background-color: #ffde15;
   font-weight: bold;
   color: white;
 }
 
-.dimension {
+.fact {
   background-color: #ffde1577 !important;
 }
 
-.fact {
+.directDimension {
   background-color: #f27e0077 !important;
+}
+
+.dimension {
+  background-color: #e84e10df !important;
 }
 
 .pk {
@@ -44,7 +48,6 @@
 .fk {
   font-style: italic;
 }
-
 
 .highlighted {
   font-weight: bold;
