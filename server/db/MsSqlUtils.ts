@@ -220,6 +220,16 @@ export default class MsSqlUtils extends SqlUtils {
     return result.recordset.length > 0;
   }
 
+  public async getRedundantValuesByColumns(
+    table: string,
+    columns: Array<string>
+  ) {
+    const query_result = await sql.query<SchemaQueryRow>(
+      `SELECT ${columns}, COUNT(*) from ${table} group by ${columns}`
+    );
+    return query_result;
+  }
+
   public override async getViolatingRowsForFD(
     schema: string,
     table: string,

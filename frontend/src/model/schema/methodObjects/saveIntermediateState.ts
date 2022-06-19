@@ -22,6 +22,8 @@ interface JSONSchema {
 interface JSONSourceFunctionalDependency {
   lhs: Array<JSONSourceColumn>;
   rhs: Array<JSONSourceColumn>;
+  redundantTuples: number;
+  allTuples: number;
 }
 
 interface JSONSourceRelationship {
@@ -320,7 +322,9 @@ export default class SaveSchemaState {
   private parseSourceFunctionalDependency(sfd: JSONSourceFunctionalDependency) {
     return new SourceFunctionalDependency(
       this.parseSourceColumnArray(sfd.lhs),
-      this.parseSourceColumnArray(sfd.rhs)
+      this.parseSourceColumnArray(sfd.rhs),
+      sfd.redundantTuples,
+      sfd.allTuples
     );
   }
 }

@@ -71,11 +71,14 @@ export class SchemaCreationService {
         );
       // if there are no fds, add one that maps from empty to every column (like with empty tables)
       // to make the schema model work
+      // TODO: right default?
       else
         fds.push(
           new SourceFunctionalDependency(
             [],
-            table.columns.asArray().map((c) => c.sourceColumn)
+            table.columns.asArray().map((c) => c.sourceColumn),
+            0,
+            0
           )
         );
     for (const [table, promise] of fdPromises.entries()) {
@@ -89,7 +92,23 @@ export class SchemaCreationService {
           (colName) =>
             sourceColumns.get(`${table.schemaName}.${table.name}.${colName}`)!
         );
-        fds.push(new SourceFunctionalDependency(lhs, rhs));
+
+        const redundanceResult: Array<number> =
+          await this.dataService.getRedundanceByValueCombinations(
+            table,
+            lhs,
+            rhs
+          );
+        let allTuples = 0;
+        let redundantTuples = 0;
+        for (let res of redundanceResult) {
+          allTuples += res;
+          if (res != 1) redundantTuples += res;
+        }
+
+        fds.push(
+          new SourceFunctionalDependency(lhs, rhs, redundantTuples, allTuples)
+        );
       }
     }
     return fds;

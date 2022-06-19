@@ -369,17 +369,7 @@ export default class Table {
 
   public violatingFds(): Array<FunctionalDependency> {
     if (!this._violatingFds) {
-      this._violatingFds = this.fds
-        .filter((fd) => this.isBCNFViolating(fd))
-        .sort((fd1, fd2) => {
-          let score1 = new FdScore(this, fd1).get();
-          let score2 = new FdScore(this, fd2).get();
-          if (score1 !== score2) return score2 - score1;
-          const [fd1String, fd2String] = [fd1.toString(), fd2.toString()];
-          if (fd1String < fd2String) return 1;
-          if (fd2String < fd1String) return -1;
-          return 0;
-        });
+      this._violatingFds = this.fds.filter((fd) => this.isBCNFViolating(fd));
     }
     return this._violatingFds;
   }
@@ -389,19 +379,27 @@ export default class Table {
    * Used in UI to make functional dependencies easier to discover
    */
   public get fdClusters(): Array<FdCluster> {
+    let allFds: Array<FunctionalDependency> = this.violatingFds();
     if (!this._fdClusters) {
-      const fdClusterTree = new ColumnsTree<FdCluster>();
       if (this.pk)
-        fdClusterTree.add(
-          {
-            columns: this.columns.copy(),
-            fds: new Array(
-              new FunctionalDependency(this.pk!.copy(), this.columns.copy())
-            ),
-          },
-          this.columns.copy()
+        // because lhs is primary key there ar no redundant data, so we could set 1, 1
+        allFds.push(
+          new FunctionalDependency(this.pk!.copy(), this.columns.copy(), 1, 1)
         );
-      for (let fd of this.violatingFds()) {
+
+      // TODO: sort keys in clusters
+      allFds.sort((fd1, fd2) => {
+        let score1 = new FdScore(this, fd1).get();
+        let score2 = new FdScore(this, fd2).get();
+        if (score1 !== score2) return score2 - score1;
+        const [fd1String, fd2String] = [fd1.toString(), fd2.toString()];
+        if (fd1String < fd2String) return 1;
+        if (fd2String < fd1String) return -1;
+        return 0;
+      });
+
+      const fdClusterTree = new ColumnsTree<FdCluster>();
+      for (let fd of allFds) {
         let cluster = fdClusterTree.get(fd.rhs);
         if (!cluster) {
           cluster = { columns: fd.rhs.copy(), fds: new Array() };
@@ -411,6 +409,21 @@ export default class Table {
       }
       this._fdClusters = fdClusterTree.getAll();
     }
+
+    this._fdClusters.sort((cluster1, cluster2) => {
+      const bestFdScore1 = Math.max(
+        ...cluster1.fds.map((fd) => fd._score || 0)
+      );
+      const bestFdScore2 = Math.max(
+        ...cluster2.fds.map((fd) => fd._score || 0)
+      );
+      if (bestFdScore1 < bestFdScore2) return 1;
+      if (bestFdScore1 > bestFdScore2) return -1;
+      return 0;
+    });
+
+    console.log(this._fdClusters);
+
     return this._fdClusters;
   }
 

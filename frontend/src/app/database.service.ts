@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 import IRowCounts from '@server/definitions/IRowCounts';
+import SourceColumn from '../model/schema/SourceColumn';
 
 @Injectable({
   providedIn: 'root',
@@ -56,6 +57,22 @@ export class DatabaseService {
       this.http.post<{ message: string; fileName: string }>(
         `${this.baseUrl}/metanomeResults/`,
         job
+      )
+    );
+  }
+
+  public async getRedundanceByValueCombinations(
+    table: Table,
+    lhs: Array<SourceColumn>,
+    rhs: Array<SourceColumn>
+  ): Promise<any> {
+    let columns: Array<string> = [];
+    lhs.forEach((col) => columns.push('"' + col.name + '"'));
+    rhs.forEach((col) => columns.push('"' + col.name + '"'));
+    return await firstValueFrom(
+      this.http.get(
+        this.baseUrl +
+          `/redundances?tableName=${table.fullName}&&fdColumns=[${columns}]`
       )
     );
   }

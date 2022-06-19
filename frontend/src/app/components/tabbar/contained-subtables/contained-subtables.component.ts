@@ -27,7 +27,6 @@ export class ContainedSubtablesComponent {
   }
 
   public emitHighlightedCluster(cluster: FdCluster) {
-    console.log('highlight');
     const map = new Map<Table, ColumnCombination>();
     map.set(this.table, cluster.columns);
     this.schemaService.highlightedColumns = map;

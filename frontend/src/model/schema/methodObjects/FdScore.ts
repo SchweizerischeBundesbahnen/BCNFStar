@@ -2,13 +2,19 @@ import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Table from '../Table';
 
+import { InjectorInstance } from '@/src/app/app.module';
+import { DatabaseService } from '@/src/app/database.service';
+
 export default class FdScore {
   private table: Table;
   private fd: FunctionalDependency;
+  protected dataService: DatabaseService;
 
   public constructor(table: Table, fd: FunctionalDependency) {
     this.table = table;
     this.fd = fd;
+
+    this.dataService = InjectorInstance.get<DatabaseService>(DatabaseService);
   }
 
   public get(): number {
@@ -24,7 +30,8 @@ export default class FdScore {
       (this.fdLengthScore() +
         this.keyValueScore() +
         this.fdPositionScore() +
-        this.fdDensityScore()) /
+        this.fdDensityScore() +
+        this.fdRedundanceScore()) /
       4
     );
   }
@@ -81,5 +88,10 @@ export default class FdScore {
   public fdDensityScore(): number {
     //TODO
     return 0;
+  }
+
+  // TODO: null values
+  public fdRedundanceScore(): number {
+    return this.fd.redundantTuples / this.fd.allTuples;
   }
 }

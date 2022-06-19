@@ -33,6 +33,7 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
+import getRankingRedundances from "./routes/rankingRedudance";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -83,6 +84,12 @@ app.get(
 
 app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
+
+app.get(
+  "/redundances",
+  [check("tableName").isString(), check("columns").isString()],
+  getRankingRedundances
+);
 
 // Metanome
 app.get("/metanomeResults", getMetanomeIndex);

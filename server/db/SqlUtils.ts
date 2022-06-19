@@ -78,6 +78,11 @@ export default abstract class SqlUtils {
 
   public abstract getDatatypes(): Promise<string[]>;
 
+  public abstract getRedundantValuesByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any>;
+
   public abstract testKeyUnionability(
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability>;
@@ -222,6 +227,7 @@ WHERE EXISTS (
 GROUP BY ${lhs.concat(rhs).join(",")}
     `;
   }
+
   public abstract getViolatingRowsForFDCount(
     schema: string,
     table: string,

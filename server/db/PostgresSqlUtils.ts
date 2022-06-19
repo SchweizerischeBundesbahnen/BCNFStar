@@ -237,6 +237,17 @@ from
     };
   }
 
+  public async getRedundantValuesByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any> {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT ${stringColumns}, COUNT(*) from ${table} GROUP BY ${stringColumns}`
+    );
+    return query_result.rows;
+  }
+
   public override async getViolatingRowsForFDCount(
     schema: string,
     table: string,

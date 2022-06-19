@@ -1,36 +1,36 @@
-import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import ColumnCombination from './ColumnCombination';
-import Table from './Table';
 
 export default class FunctionalDependency {
-  lhs: ColumnCombination;
-  rhs: ColumnCombination;
+  public lhs: ColumnCombination;
+  public rhs: ColumnCombination;
+  public redundantTuples: number;
+  public allTuples: number;
+
   /**
    * cached result of the score calculation. Should not be accessed directly
    */
   public _score?: number;
 
-  public constructor(lhs: ColumnCombination, rhs: ColumnCombination) {
+  public constructor(
+    lhs: ColumnCombination,
+    rhs: ColumnCombination,
+    redundantTuples: number,
+    allTuples: number
+  ) {
     this.lhs = lhs;
     this.rhs = rhs;
+    this.redundantTuples = redundantTuples;
+    this.allTuples = allTuples;
     this.extend();
   }
 
-  public static fromIFunctionalDependency(
-    table: Table,
-    iFd: IFunctionalDependency
-  ): FunctionalDependency {
-    const lhs = table.columns.columnsFromNames(...iFd.lhsColumns);
-    const rhs = table.columns.columnsFromNames(...iFd.rhsColumns);
-
-    return new FunctionalDependency(
-      new ColumnCombination(lhs),
-      new ColumnCombination(rhs)
-    );
-  }
-
   public copy(): FunctionalDependency {
-    return new FunctionalDependency(this.lhs.copy(), this.rhs.copy());
+    return new FunctionalDependency(
+      this.lhs.copy(),
+      this.rhs.copy(),
+      this.redundantTuples,
+      this.allTuples
+    );
   }
 
   private extend(): void {
