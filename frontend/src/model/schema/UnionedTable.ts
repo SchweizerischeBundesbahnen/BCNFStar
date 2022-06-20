@@ -1,7 +1,5 @@
 import BasicTable from './BasicTable';
 import Column from './Column';
-import ColumnCombination from './ColumnCombination';
-import SourceColumn from './SourceColumn';
 import Table from './Table';
 
 export default class UnionedTable extends BasicTable {
@@ -17,20 +15,6 @@ export default class UnionedTable extends BasicTable {
     super();
     this.tables = [table1, table2];
     this.columns = [cols1, cols2];
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public isKey(columns: ColumnCombination): boolean {
-    return false;
-  }
-
-  public columnsEquivalentTo(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sourceColumns: Array<SourceColumn>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    allowReduced: boolean
-  ): Array<Array<Column>> {
-    return [];
   }
 
   public displayedColumns(): Array<Column> {
