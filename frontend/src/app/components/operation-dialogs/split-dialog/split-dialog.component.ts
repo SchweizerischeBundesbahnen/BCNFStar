@@ -83,13 +83,6 @@ export class SplitDialogComponent {
     );
   }
 
-  public changeLhs() {
-    console.log(this.minimalDeterminants);
-    console.log(
-      this.minimalDeterminants.filter((cc) => this.fd.lhs.isSubsetOf(cc))
-    );
-  }
-
   public isKeyNonMinimal() {
     return !this.minimalDeterminants.some((det) => det.equals(this.fd.lhs));
   }
@@ -106,11 +99,6 @@ export class SplitDialogComponent {
       this.fd,
       this.table
     );
-    this.referenceViolations =
-      this.schemaService.schema.fdSplitReferenceViolationsOf(
-        this.fd,
-        this.table
-      );
     this.referenceViolations =
       this.schemaService.schema.fdSplitReferenceViolationsOf(
         this.fd,
