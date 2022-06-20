@@ -38,15 +38,12 @@
     </tr>
   </table>
 
-  <div *ngIf="!selectedColumnsCC().isSubsetOf(hull)" class="violation">
+  <div *ngIf="!isFullyDetermined()" class="violation">
     The key doesnt determine all of the selected attributes. Choose another key
     or check the violations and clean the data.
   </div>
 
-  <div
-    *ngIf="selectedColumnsCC().isSubsetOf(hull) && isKeyNonMinimal()"
-    class="violation"
-  >
+  <div *ngIf="isFullyDetermined() && isKeyNonMinimal()" class="violation">
     A simpler key could determine all the selected attributes. We strongly
     advice to choose other key.
   </div>
@@ -74,7 +71,7 @@
   <div sbbDialogActions>
     <button
       sbb-button
-      [disabled]="selectedColumnsCC().isSubsetOf(hull)"
+      [disabled]="isFullyDetermined()"
       (click)="showViolations()"
     >
       Show violations

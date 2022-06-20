@@ -118,8 +118,15 @@ export class SplitDialogComponent {
       );
   }
 
+  public isFullyDetermined() {
+    return this.selectedColumnsCC().isSubsetOf(this.hull);
+  }
+
   public canConfirm() {
-    return [...this.selectedColumns.values()].some((bool) => bool);
+    return (
+      [...this.selectedColumns.values()].some((bool) => bool) &&
+      this.isFullyDetermined()
+    );
   }
 
   public confirm() {
