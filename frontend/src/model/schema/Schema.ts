@@ -11,7 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
-import BasicColumn from '../types/BasicColumn';
+import BasicColumn, { surrogateKeyColumn } from '../types/BasicColumn';
 import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
@@ -753,12 +753,7 @@ export default class Schema {
     if (table instanceof Table) {
       const columns = new Array<BasicColumn>();
       if (table.implementsSurrogateKey())
-        columns.push({
-          name: table.surrogateKey,
-          dataType: 'integer',
-          nullable: false,
-          dataTypeString: '(integer, not null)',
-        });
+        columns.push(surrogateKeyColumn(table.surrogateKey));
       columns.push(...table.columns);
       for (const fk of this.fksOf(table, true))
         if (fk.referenced.implementsSurrogateKey()) {
@@ -766,12 +761,7 @@ export default class Schema {
             fk.referenced.surrogateKey +
             '_' +
             fk.relationship.referencing.map((col) => col.name).join('_');
-          columns.push({
-            name: name,
-            dataType: 'integer',
-            nullable: false,
-            dataTypeString: '(integer, not null)',
-          });
+          columns.push(surrogateKeyColumn(name));
         }
       return columns;
     } else if (table instanceof UnionedTable) {

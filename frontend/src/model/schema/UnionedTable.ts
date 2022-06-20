@@ -3,8 +3,8 @@ import Column from './Column';
 import Table from './Table';
 
 export default class UnionedTable extends BasicTable {
-  public tables: Array<Table>;
-  public columns = new Array<Array<Column | null>>();
+  public tables: [Table, Table];
+  public columns: [Array<Column | null>, Array<Column | null>];
   /** states for each column whether columns from table1 (false) or table2 (true) should be prioritized. */
   public rPriority = new Array<boolean>();
 
