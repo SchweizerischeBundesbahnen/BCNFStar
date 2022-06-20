@@ -27,7 +27,7 @@ export default class Split {
     ).newTable;
     generating.surrogateKey = '';
     generating.pk =
-      this.fd.lhs.cardinality > 0 ? this.fd.lhs.deepCopy() : undefined;
+      this.fd.lhs.cardinality > 0 ? this.fd.lhs.copy() : undefined;
     this.reorderColumnsOf(generating);
     generating.name =
       this.generatingName ||

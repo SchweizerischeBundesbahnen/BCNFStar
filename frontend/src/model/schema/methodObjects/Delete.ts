@@ -14,9 +14,7 @@ export default class Delete {
   }
 
   private delete() {
-    this.newTable = new Table(
-      this.table.columns.deepCopy().setMinus(this.columns)
-    );
+    this.newTable = new Table(this.table.columns.copy().setMinus(this.columns));
 
     this.projectSources();
 
@@ -24,7 +22,7 @@ export default class Delete {
 
     this.newTable.surrogateKey = this.table.surrogateKey;
     this.newTable.pk = this.table.pk?.isSubsetOf(this.newTable.columns)
-      ? this.table.pk.deepCopy()
+      ? this.table.pk.copy()
       : undefined;
 
     this.newTable.schemaName = this.table.schemaName;
