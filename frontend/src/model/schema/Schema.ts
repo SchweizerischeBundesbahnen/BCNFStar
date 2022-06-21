@@ -11,7 +11,7 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
-import BasicColumn from '../types/BasicColumn';
+import BasicColumn, { surrogateKeyColumn } from '../types/BasicColumn';
 import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
@@ -41,10 +41,12 @@ export default class Schema {
   private _starMode = false;
 
   private _regularTables?: Array<Table>;
+  private _unionedTables?: Array<UnionedTable>;
 
   public toJSON() {
     return {
-      tables: Array.from(this.tables),
+      regularTables: Array.from(this.regularTables),
+      unionedTables: Array.from(this.unionedTables),
       _baseFks: this._baseFks,
       _tableFks: Array.from(this._tableFks.entries()).filter(
         ([, displayOptions]) =>
@@ -65,6 +67,7 @@ export default class Schema {
     });
     this.relationshipsValid = false;
     this._regularTables = undefined;
+    this._unionedTables = undefined;
   }
 
   public deleteTables(...tables: Array<Table | UnionedTable>) {
@@ -82,6 +85,15 @@ export default class Schema {
       ) as Array<Table>;
     }
     return this._regularTables;
+  }
+
+  public get unionedTables(): Array<UnionedTable> {
+    if (this._unionedTables === undefined) {
+      this._unionedTables = [...this.tables].filter(
+        (table) => table instanceof UnionedTable
+      ) as Array<UnionedTable>;
+    }
+    return this._unionedTables;
   }
 
   public addFks(...fks: SourceRelationship[]) {
@@ -753,12 +765,7 @@ export default class Schema {
     if (table instanceof Table) {
       const columns = new Array<BasicColumn>();
       if (table.implementsSurrogateKey())
-        columns.push({
-          name: table.surrogateKey,
-          dataType: 'integer',
-          nullable: false,
-          dataTypeString: '(integer, not null)',
-        });
+        columns.push(surrogateKeyColumn(table.surrogateKey));
       columns.push(...table.columns);
       for (const fk of this.fksOf(table, true))
         if (fk.referenced.implementsSurrogateKey()) {
@@ -766,12 +773,7 @@ export default class Schema {
             fk.referenced.surrogateKey +
             '_' +
             fk.relationship.referencing.map((col) => col.name).join('_');
-          columns.push({
-            name: name,
-            dataType: 'integer',
-            nullable: false,
-            dataTypeString: '(integer, not null)',
-          });
+          columns.push(surrogateKeyColumn(name));
         }
       return columns;
     } else if (table instanceof UnionedTable) {

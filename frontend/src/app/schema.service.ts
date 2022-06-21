@@ -54,6 +54,10 @@ export class SchemaService {
     this._selectedTableChanged.emit();
   }
 
+  public hasSelectedRegularTable() {
+    return !!this.selectedTable && this.selectedTable instanceof Table;
+  }
+
   public highlightedColumns?: Map<BasicTable, ColumnCombination>;
 
   public get starMode() {
