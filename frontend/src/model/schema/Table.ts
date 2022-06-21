@@ -392,6 +392,7 @@ export default class Table {
    */
   public get fdClusters(): Array<FdCluster> {
     let allFds: Array<FunctionalDependency> = this.violatingFds();
+    console.log(allFds);
     if (!this._fdClusters) {
       if (this.pk)
         // because lhs is primary key there are no redundant data, so we could set [1] default which results in 0 redundant data
@@ -434,7 +435,7 @@ export default class Table {
       return 0;
     });
 
-    console.log(this._fdClusters);
+    // console.log(this._fdClusters);
 
     return this._fdClusters;
   }
