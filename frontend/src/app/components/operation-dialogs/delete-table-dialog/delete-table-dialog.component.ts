@@ -17,8 +17,4 @@ export class DeleteTableDialogComponent {
   public get table() {
     return this.schemaService.selectedTable!;
   }
-
-  public confirm() {
-    this.dialogRef.close({ table: this.table });
-  }
 }
