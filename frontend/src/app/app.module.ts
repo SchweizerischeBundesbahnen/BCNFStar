@@ -25,6 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './components/graph/graph-element/graph-element.component';
 import { UndoRedoComponent } from './components/undo-redo/undo-redo.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
+import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { MetanomeSettingsComponent } from './components/metanome-settings/metanome-settings.component';
@@ -60,6 +61,7 @@ export let InjectorInstance: Injector;
     GraphElementComponent,
     UndoRedoComponent,
     SplitDialogComponent,
+    DeleteTableDialogComponent,
     JoinDialogComponent,
     DirectDimensionDialogComponent,
     MetanomeResultsViewerComponent,

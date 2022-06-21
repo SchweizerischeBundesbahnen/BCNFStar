@@ -21,6 +21,7 @@ import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
+import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -113,7 +114,12 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public deleteTable() {
+  public async deleteTable() {
+    const dialogRef = this.dialog.open(DeleteTableDialogComponent);
+    const value: { table: Table } = await firstValueFrom(
+      dialogRef.afterClosed()
+    );
+    if (!value) return;
     const command = new DeleteTableCommand(this.schema, this._selectedTable!);
     command.onDo = () => {
       this.selectedTable = undefined;
