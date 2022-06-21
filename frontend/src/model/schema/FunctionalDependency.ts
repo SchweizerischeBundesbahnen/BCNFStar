@@ -3,8 +3,8 @@ import ColumnCombination from './ColumnCombination';
 export default class FunctionalDependency {
   public lhs: ColumnCombination;
   public rhs: ColumnCombination;
-  public redundantTuples: number;
-  public allTuples: number;
+  // TODO: change after splitting
+  public redundanceGroups: Array<number>;
 
   /**
    * cached result of the score calculation. Should not be accessed directly
@@ -14,13 +14,11 @@ export default class FunctionalDependency {
   public constructor(
     lhs: ColumnCombination,
     rhs: ColumnCombination,
-    redundantTuples: number,
-    allTuples: number
+    redundanceGroups: Array<number>
   ) {
     this.lhs = lhs;
     this.rhs = rhs;
-    this.redundantTuples = redundantTuples;
-    this.allTuples = allTuples;
+    this.redundanceGroups = redundanceGroups;
     this.extend();
   }
 
@@ -28,8 +26,7 @@ export default class FunctionalDependency {
     return new FunctionalDependency(
       this.lhs.copy(),
       this.rhs.copy(),
-      this.redundantTuples,
-      this.allTuples
+      this.redundanceGroups
     );
   }
 

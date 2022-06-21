@@ -43,7 +43,13 @@ export class DatabaseService {
     const iTables = await firstValueFrom(
       this.http.get<Array<ITable>>(this.baseUrl + '/tables')
     );
-    const tables = iTables.map((iTable) => Table.fromITable(iTable));
+    const rowCounts = await this.loadTableRowCounts();
+    const tables = iTables.map((iTable) =>
+      Table.fromITable(
+        iTable,
+        rowCounts[iTable.schemaName + '.' + iTable.name].entries
+      )
+    );
     return tables;
   }
 
@@ -63,12 +69,10 @@ export class DatabaseService {
 
   public async getRedundanceByValueCombinations(
     table: Table,
-    lhs: Array<SourceColumn>,
-    rhs: Array<SourceColumn>
+    lhs: Array<SourceColumn>
   ): Promise<any> {
     let columns: Array<string> = [];
     lhs.forEach((col) => columns.push('"' + col.name + '"'));
-    rhs.forEach((col) => columns.push('"' + col.name + '"'));
     return await firstValueFrom(
       this.http.get(
         this.baseUrl +

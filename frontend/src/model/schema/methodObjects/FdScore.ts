@@ -32,7 +32,7 @@ export default class FdScore {
         this.fdPositionScore() +
         this.fdDensityScore() +
         this.fdRedundanceScore()) /
-      4
+      5
     );
   }
 
@@ -62,8 +62,7 @@ export default class FdScore {
   }
 
   public fdPositionScore(): number {
-    // TODO fix coherenceScore
-    return 0; // (this.lhsPositionScore() + this.rhsPositionScore()) / 2;
+    return (this.lhsPositionScore() + this.rhsPositionScore()) / 2;
   }
 
   private lhsPositionScore(): number {
@@ -74,15 +73,24 @@ export default class FdScore {
     return this.coherenceScore(this.fd.rhs);
   }
 
-  private coherenceScore(attributes: ColumnCombination): number {
-    return 1 / (this.numAttributesBetween(attributes) + 1);
+  private coherenceScore(columns: ColumnCombination): number {
+    return 1 / (this.numAttributesBetween(columns) + 1);
   }
 
-  public numAttributesBetween(attributes: ColumnCombination): number {
-    let firstColumn = attributes.asArray()[0];
-    let lastColumn = attributes.asArray()[attributes.cardinality - 1];
+  /* looks how much columns are between the columns of a column combination
+  example: sorted ordinal positions of columns 1 3 4 7
+  3 columns between this column combination
+  because one column bewteen 1 and 3, two columns between 4 and 7 */
+  public numAttributesBetween(columns: ColumnCombination): number {
+    let columnsOrderByOrdinalPosition = columns.asArray().sort((col1, col2) => {
+      if (col1.ordinalPosition > col2.ordinalPosition) return 1;
+      return -1;
+    });
+    let firstColumn = columnsOrderByOrdinalPosition[0];
+    let lastColumn = columnsOrderByOrdinalPosition[columns.cardinality - 1];
+
     let range = lastColumn.ordinalPosition - firstColumn.ordinalPosition + 1;
-    return range - attributes.cardinality;
+    return range - columns.cardinality;
   }
 
   public fdDensityScore(): number {
@@ -92,6 +100,11 @@ export default class FdScore {
 
   // TODO: null values
   public fdRedundanceScore(): number {
-    return this.fd.redundantTuples / this.fd.allTuples;
+    let redundanceSum = 0;
+    this.fd.redundanceGroups.forEach((num) =>
+      num != 1 ? (redundanceSum += num) : redundanceSum
+    );
+    console.log(this.fd, redundanceSum, this.table.rowCount);
+    return redundanceSum / this.table.rowCount;
   }
 }

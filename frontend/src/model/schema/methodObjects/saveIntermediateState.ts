@@ -22,8 +22,7 @@ interface JSONSchema {
 interface JSONSourceFunctionalDependency {
   lhs: Array<JSONSourceColumn>;
   rhs: Array<JSONSourceColumn>;
-  redundantTuples: number;
-  allTuples: number;
+  redundanceGroups: Array<number>;
 }
 
 interface JSONSourceRelationship {
@@ -45,6 +44,7 @@ interface JSONTable {
   sk: string;
   relationships: Array<JSONRelationship>;
   sources: Array<JSONSourceTableInstance>;
+  rowCount: number;
 }
 
 interface JSONRelationship {
@@ -82,6 +82,7 @@ interface JSONSourceColumn {
 interface JSONSourceTable {
   name: string;
   schemaName: string;
+  rowCount: number;
 }
 
 export default class SaveSchemaState {
@@ -168,6 +169,7 @@ export default class SaveSchemaState {
       newRelationships.push(this.parseRelationship(relationship, table, table));
     });
     table.relationships = newRelationships;
+    table.rowCount = jsonTable.rowCount;
 
     return table;
   }
@@ -196,7 +198,11 @@ export default class SaveSchemaState {
   }
 
   private parseSourceTableInstance(sti: JSONSourceTableInstance) {
-    let newSourceTable = new SourceTable(sti.table.name, sti.table.schemaName);
+    let newSourceTable = new SourceTable(
+      sti.table.name,
+      sti.table.schemaName,
+      sti.table.rowCount
+    );
 
     let existing = this.existingSourceTables.find((other) =>
       other.equals(newSourceTable)
@@ -227,7 +233,11 @@ export default class SaveSchemaState {
   }
 
   private parseSourceColumn(sc: JSONSourceColumn) {
-    let newSourceTable = new SourceTable(sc.table.name, sc.table.schemaName);
+    let newSourceTable = new SourceTable(
+      sc.table.name,
+      sc.table.schemaName,
+      sc.table.rowCount
+    );
 
     let existingTab = this.existingSourceTables.find((other) =>
       other.equals(newSourceTable)
@@ -323,8 +333,7 @@ export default class SaveSchemaState {
     return new SourceFunctionalDependency(
       this.parseSourceColumnArray(sfd.lhs),
       this.parseSourceColumnArray(sfd.rhs),
-      sfd.redundantTuples,
-      sfd.allTuples
+      sfd.redundanceGroups
     );
   }
 }

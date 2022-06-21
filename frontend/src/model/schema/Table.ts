@@ -24,6 +24,7 @@ export default class Table {
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
   public surrogateKey: string = '';
+  public rowCount: number = 0;
   public implementsSurrogateKey(): boolean {
     return this.surrogateKey.length > 1;
   }
@@ -45,6 +46,7 @@ export default class Table {
       sk: this.surrogateKey,
       relationships: this.relationships,
       sources: this.sources,
+      rowCount: this.rowCount,
     };
   }
 
@@ -52,8 +54,12 @@ export default class Table {
     this.columns = columns || new ColumnCombination();
   }
 
-  public static fromITable(iTable: ITable): Table {
-    const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
+  public static fromITable(iTable: ITable, rowCount: number): Table {
+    const sourceTable = new SourceTable(
+      iTable.name,
+      iTable.schemaName,
+      rowCount
+    );
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
     iTable.attributes.forEach((iAttribute, index) => {
@@ -68,14 +74,19 @@ export default class Table {
     });
     table.name = sourceTable.name;
     table.schemaName = sourceTable.schemaName;
+    table.rowCount = sourceTable.rowCount;
     return table;
   }
 
   /**
    * This way of creating Table objects should not be used in production as important information (datatype and nullable) are missing
    */
-  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
-    const sourceTable = new SourceTable(tableName, '');
+  public static fromColumnNames(
+    columnNames: Array<string>,
+    tableName: string,
+    rowCount: number
+  ) {
+    const sourceTable = new SourceTable(tableName, '', rowCount);
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
 
@@ -91,6 +102,7 @@ export default class Table {
     });
     table.name = tableName;
     table.schemaName = '';
+    table.rowCount = rowCount;
     return table;
   }
 
@@ -382,9 +394,9 @@ export default class Table {
     let allFds: Array<FunctionalDependency> = this.violatingFds();
     if (!this._fdClusters) {
       if (this.pk)
-        // because lhs is primary key there ar no redundant data, so we could set 1, 1
+        // because lhs is primary key there are no redundant data, so we could set [1] default which results in 0 redundant data
         allFds.push(
-          new FunctionalDependency(this.pk!.copy(), this.columns.copy(), 1, 1)
+          new FunctionalDependency(this.pk!.copy(), this.columns.copy(), [])
         );
 
       // TODO: sort keys in clusters

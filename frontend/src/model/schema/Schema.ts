@@ -602,8 +602,7 @@ export default class Schema {
         const fd = new FunctionalDependency(
           new ColumnCombination(lhs),
           new ColumnCombination(rhs),
-          sourceFd.redundantTuples,
-          sourceFd.allTuples
+          sourceFd.redundanceGroups
         );
         if (fd.isFullyTrivial()) continue;
         const existingFd = fds.get(source)!.get(fd.lhs);

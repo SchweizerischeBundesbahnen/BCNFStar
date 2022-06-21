@@ -63,6 +63,10 @@ export class SchemaCreationService {
   ): Promise<Array<SourceFunctionalDependency>> {
     const fdPromises = new Map<Table, Promise<Array<IFunctionalDependency>>>();
     const fds: Array<SourceFunctionalDependency> = [];
+    let fdRedundancePromises: Map<
+      SourceFunctionalDependency,
+      Promise<Array<number>>
+    > = new Map<SourceFunctionalDependency, Promise<Array<number>>>();
     for (const [table, file] of fdFiles.entries())
       if (file)
         fdPromises.set(
@@ -71,14 +75,12 @@ export class SchemaCreationService {
         );
       // if there are no fds, add one that maps from empty to every column (like with empty tables)
       // to make the schema model work
-      // TODO: right default?
       else
         fds.push(
           new SourceFunctionalDependency(
             [],
             table.columns.asArray().map((c) => c.sourceColumn),
-            0,
-            0
+            []
           )
         );
     for (const [table, promise] of fdPromises.entries()) {
@@ -92,23 +94,17 @@ export class SchemaCreationService {
           (colName) =>
             sourceColumns.get(`${table.schemaName}.${table.name}.${colName}`)!
         );
-
-        const redundanceResult: Array<number> =
-          await this.dataService.getRedundanceByValueCombinations(
-            table,
-            lhs,
-            rhs
-          );
-        let allTuples = 0;
-        let redundantTuples = 0;
-        for (let res of redundanceResult) {
-          allTuples += res;
-          if (res != 1) redundantTuples += res;
-        }
-
-        fds.push(
-          new SourceFunctionalDependency(lhs, rhs, redundantTuples, allTuples)
+        const newFd = new SourceFunctionalDependency(lhs, rhs);
+        fdRedundancePromises.set(
+          newFd,
+          this.dataService.getRedundanceByValueCombinations(table, lhs)
         );
+
+        fds.push(newFd);
+      }
+
+      for (let [fd, promise] of fdRedundancePromises) {
+        fd.redundanceGroups = await promise;
       }
     }
     return fds;

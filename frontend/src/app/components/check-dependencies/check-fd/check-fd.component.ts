@@ -92,8 +92,7 @@ export class CustomFunctionalDependencySideBarComponent {
         new FunctionalDependency(
           new ColumnCombination(Array.from(this.lhs)),
           new ColumnCombination(Array.from(this.rhs)),
-          0,
-          0 // TODO: hier korrekten Wert einfügen
+          [] // TODO
         )
       );
     } else {

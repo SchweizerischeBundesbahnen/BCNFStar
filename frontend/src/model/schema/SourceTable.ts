@@ -1,5 +1,9 @@
 export default class SourceTable {
-  public constructor(public name: string, public schemaName: string) {}
+  public constructor(
+    public name: string,
+    public schemaName: string,
+    public rowCount: number
+  ) {}
 
   /**
    * returns the name of the table in the format "{schemaName}.{tableName}"
