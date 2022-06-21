@@ -68,12 +68,7 @@ export class SchemaService {
     return this._schemaChanged.asObservable();
   }
 
-  constructor(private dialog: SbbDialog) {
-    this.selectedTableChanged.subscribe(() => {
-      if (this.selectedTable)
-        console.log(this.schema.routesFromFactTo(this.selectedTable, false));
-    });
-  }
+  constructor(private dialog: SbbDialog) {}
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
