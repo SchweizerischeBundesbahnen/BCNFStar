@@ -10,6 +10,7 @@ import IndToFkCommand from '../model/commands/IndToFkCommand';
 import JoinCommand from '../model/commands/JoinCommand';
 import ShowFkCommand from '../model/commands/ShowFkCommand';
 import SplitCommand from '../model/commands/SplitCommand';
+import DeleteTableCommand from '../model/commands/DeleteTableCommand';
 import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import FunctionalDependency from '../model/schema/FunctionalDependency';
@@ -108,6 +109,18 @@ export class SchemaService {
 
   public show(fk: TableRelationship) {
     let command = new ShowFkCommand(this.schema, fk);
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public deleteTable() {
+    const command = new DeleteTableCommand(this.schema, this._selectedTable!);
+    command.onDo = () => {
+      this.selectedTable = undefined;
+    };
+    command.onUndo = () => {
+      this.selectedTable = command.table;
+    };
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }
