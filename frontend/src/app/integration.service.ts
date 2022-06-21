@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { firstValueFrom, Subscription } from 'rxjs';
 import Schema from '../model/schema/Schema';
 import ISchemaMatchingRequest from '@server/definitions/ISchemaMatchingRequest';
@@ -15,6 +15,11 @@ import {
 import Table from '../model/schema/Table';
 import Column from '../model/schema/Column';
 
+export enum Side {
+  left,
+  right,
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,30 +28,27 @@ export class IntegrationService {
 
   private updater?: Subscription;
 
-  private _existingSchemaChanged = new EventEmitter<void>();
-  get existingSchemaChanged() {
-    return this._existingSchemaChanged.asObservable();
+  public isComparing = false;
+
+  private _schemas?: [Schema, Schema];
+  private _currentlyEditedSide: Side = Side.left;
+  set currentlyEditedSide(side: Side) {
+    this._currentlyEditedSide = side;
+    this.schemaService.schema = this._schemas![this._currentlyEditedSide];
+  }
+  /** schema that is currently not edited (the other ome is schemaService.schema)*/
+  get inactiveSchema() {
+    return this._schemas![this.currentlyEditedSide];
   }
 
-  private _existingSchema?: Schema;
-  get existingSchema() {
-    return this._existingSchema;
-  }
-  set existingSchema(schema: Schema | undefined) {
-    if (!this.updater) {
-      this.updater = this.schemaService.schemaChanged.subscribe(() =>
-        this.reset()
-      );
-    }
-    this._existingSchema = schema;
-    this.reset();
-    this._existingSchemaChanged.emit();
+  get isIntegrating() {
+    return !!this._schemas;
   }
 
   public links: Array<LinkDefinition> = [];
   public tables: Array<BasicTable> = [];
 
-  // <newColumn, oldColumn>
+  /** <schema.table.column of left schema, schema.table.column of right schema*/
   private matchings?: Record<string, string[]>;
 
   constructor(
@@ -57,11 +59,27 @@ export class IntegrationService {
     this.baseUrl = dataService.baseUrl;
   }
 
+  public startIntegration(schemaLeft: Schema, schemaRight: Schema) {
+    this._schemas = [schemaLeft, schemaRight];
+    if (!this.updater) {
+      this.updater = this.schemaService.schemaChanged.subscribe(() =>
+        this.generateGraphContent()
+      );
+    }
+    this.schemaService.schema = this._schemas[this._currentlyEditedSide];
+  }
+
+  stopIntegration() {
+    delete this.updater;
+    this._schemas = undefined;
+    this._currentlyEditedSide = Side.left;
+  }
+
   public async getMatching(
-    src: Array<BasicTable> = [...this.schemaService.schema.tables],
-    target: Array<BasicTable> = [...(this.existingSchema?.tables ?? [])],
-    srcSchema: Schema = this.schemaService.schema,
-    targetSchema: Schema = this._existingSchema!
+    src: Iterable<BasicTable> = this._schemas![Side.left].tables,
+    target: Iterable<BasicTable> = this._schemas![Side.right].tables,
+    srcSchema: Schema = this._schemas![Side.left],
+    targetSchema: Schema = this._schemas![Side.right]
   ) {
     const srcPersister = new MsSqlPersisting('__schema_matching_temp_src');
     const targetPersister = new MsSqlPersisting(
@@ -85,12 +103,11 @@ export class IntegrationService {
     return matchings;
   }
 
-  private async reset() {
+  private async generateGraphContent() {
     this.tables = [];
-    this.schemaService.schema.tables.forEach((t) => this.tables.push(t));
-    this.existingSchema?.tables.forEach((t) => this.tables.push(t));
+    this._schemas![Side.left].tables.forEach((t) => this.tables.push(t));
+    this._schemas![Side.right].tables.forEach((t) => this.tables.push(t));
     await this.generateLinks();
-    this._existingSchemaChanged.emit();
   }
 
   forMatch(
@@ -123,11 +140,10 @@ export class IntegrationService {
   private async generateLinks() {
     if (!this.matchings) this.matchings = await this.getMatching();
     const newLinks: Array<LinkDefinition> = [];
-    if (!this.existingSchema) return;
     this.forMatch(
       this.matchings,
-      this.schemaService.schema.regularTables,
-      this.existingSchema.regularTables,
+      this._schemas![Side.left].regularTables,
+      this._schemas![Side.right].regularTables,
       (column, existingColumn, table, existingTable) => {
         newLinks.push({
           source: {

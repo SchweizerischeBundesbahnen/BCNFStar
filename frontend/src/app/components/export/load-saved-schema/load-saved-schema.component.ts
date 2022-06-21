@@ -32,7 +32,7 @@ export class LoadSavedSchemaComponent {
         ?.async('string')
         .then((result) => {
           this.getSchema(result);
-          this.schemaService.setSchema(this.newSchema);
+          this.schemaService.schema = this.newSchema;
           this.router.navigate(['/edit-schema']);
         });
     }

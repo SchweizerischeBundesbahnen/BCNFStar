@@ -26,11 +26,7 @@ export class SchemaEditingComponent {
   }
 
   get tables() {
-    if (
-      this.schemaService.mode === EditingMode.integration &&
-      this.intService.existingSchema
-    )
-      return this.intService.tables;
+    if (this.intService.isComparing) return this.intService.tables;
     return this.schemaService.schema.tables;
   }
 
@@ -39,17 +35,15 @@ export class SchemaEditingComponent {
     public schemaService: SchemaService,
     public intService: IntegrationService
   ) {
-    if (!schemaService.hasSchema) router.navigate(['']);
+    if (!schemaService.hasSchema) {
+      router.navigate(['']);
+    }
     this.generateLinks();
     this.schemaService.schemaChanged.subscribe(() => this.generateLinks());
-    this.intService.existingSchemaChanged.subscribe(() => this.generateLinks());
   }
 
   public generateLinks() {
-    if (
-      this.schemaService.mode === EditingMode.integration &&
-      this.intService.existingSchema
-    ) {
+    if (this.intService.isComparing) {
       this.links = this.intService.links;
       return;
     }

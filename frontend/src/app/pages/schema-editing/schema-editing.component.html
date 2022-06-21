@@ -1,3 +1,5 @@
+<app-integration-bar *ngIf="intService.isIntegrating"></app-integration-bar>
+
 <div class="grid-container">
   <div class="grid-container-graphmenu">
     <button sbb-button id="reset-btn" class="me-1">Reset view</button>
@@ -7,36 +9,17 @@
       (click)="schemaService.autoNormalize()"
       class="me-1"
     >
-      {{ "Auto-normalize all tables" }}
+      Auto-normalize all tables
     </button>
     <sbb-toggle [(ngModel)]="schemaService.mode" class="me-1">
       <sbb-toggle-option label="Normal Mode" [value]="EditingMode.normal">
       </sbb-toggle-option>
       <sbb-toggle-option label="Star Schema Mode" [value]="EditingMode.star">
       </sbb-toggle-option>
-      <sbb-toggle-option
-        label="Integration Mode"
-        [value]="EditingMode.integration"
-      >
-      </sbb-toggle-option>
     </sbb-toggle>
     <app-undo-redo class="undo-redo"></app-undo-redo>
   </div>
-  <div
-    *ngIf="
-      schemaService.mode === EditingMode.integration &&
-        !intService.existingSchema;
-      else graph
-    "
-  >
-    <h3>Choose which schema you want to compare to while editing</h3>
-    <app-table-selection
-      (schema)="this.intService.existingSchema = $event"
-    ></app-table-selection>
-  </div>
-  <ng-template #graph>
-    <app-schema-graph [tables]="tables" [links]="links"></app-schema-graph
-  ></ng-template>
+  <app-schema-graph [tables]="tables" [links]="links"></app-schema-graph>
 
   <div class="item-sidebar">
     <div class="grid-container-sidebar">

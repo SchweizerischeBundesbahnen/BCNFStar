@@ -4,8 +4,9 @@ import Table from 'src/model/schema/Table';
 import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
-import { EditingMode, SchemaService } from '@/src/app/schema.service';
+import { SchemaService } from '@/src/app/schema.service';
 import BasicTable from '@/src/model/schema/BasicTable';
+import { IntegrationService } from '@/src/app/integration.service';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -48,7 +49,10 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   protected elementWidth = 300;
 
-  constructor(private schemaService: SchemaService) {}
+  constructor(
+    private schemaService: SchemaService,
+    private intService: IntegrationService
+  ) {}
 
   ngOnChanges() {
     this.updateGraph();
@@ -99,8 +103,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       nodeSep: 40,
       // prevent left ports from being cut off
       marginX: this.portDiameter / 2,
-      rankSep: this.schemaService.mode == EditingMode.integration ? 150 : 60,
-      edgeSep: 80,
+      rankSep: this.intService.isComparing ? 150 : 60,
       rankDir: 'LR',
     });
 

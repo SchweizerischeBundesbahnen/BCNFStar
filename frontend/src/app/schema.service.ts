@@ -25,9 +25,8 @@ import { SplitDialogComponent } from './components/operation-dialogs/split-dialo
 import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
 
 export enum EditingMode {
-  star,
   normal,
-  integration,
+  star,
 }
 
 @Injectable({
@@ -36,7 +35,7 @@ export enum EditingMode {
 export class SchemaService {
   public hasSchema = false;
   private _schema: Schema = new Schema();
-  public setSchema(schema: Schema) {
+  public set schema(schema: Schema) {
     this._schema = schema;
     this.hasSchema = true;
     this.notifyAboutSchemaChanges();
@@ -250,7 +249,7 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  private notifyAboutSchemaChanges() {
+  public notifyAboutSchemaChanges() {
     this._schemaChanged.next();
   }
 }

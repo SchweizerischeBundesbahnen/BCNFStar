@@ -7,15 +7,10 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-import { IntegrationService } from '@/src/app/integration.service';
+import { IntegrationService, Side } from '@/src/app/integration.service';
 import { SchemaService } from '@/src/app/schema.service';
 
 type ColumnsList = Array<Column | null>;
-
-enum Side {
-  left,
-  right,
-}
 
 @Component({
   selector: 'app-union-dialog',
