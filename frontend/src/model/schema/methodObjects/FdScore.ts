@@ -104,7 +104,6 @@ export default class FdScore {
     this.fd.redundanceGroups.forEach((num) =>
       num != 1 ? (redundanceSum += num) : redundanceSum
     );
-    console.log(this.fd, redundanceSum, this.table.rowCount);
     return redundanceSum / this.table.rowCount;
   }
 }
