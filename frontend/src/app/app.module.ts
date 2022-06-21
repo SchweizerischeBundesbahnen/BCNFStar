@@ -37,7 +37,7 @@ import { CheckIndComponent } from '@/src/app/components/check-dependencies/check
 import { ViolatingRowsViewIndsComponent } from './components/operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/operation-dialogs/database-table-viewer/database-table-viewer.component';
 import { TableEditingComponent } from './components/tabbar/table-editing/table-editing.component';
-import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
+import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { HomeComponent } from './pages/home/home.component';
 
 import { SaveSchemaEditingComponent } from './components/export/save-schema-editing/save-schema-editing.component';

@@ -18,7 +18,7 @@ import Schema from '../model/schema/Schema';
 import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
-import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
+import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
 
