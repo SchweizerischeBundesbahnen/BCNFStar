@@ -34,7 +34,7 @@
       </div>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
-        *ngIf="schemaService.selectedTable"
+        *ngIf="schemaService.hasSelectedRegularTable()"
       ></app-schema-editing-side-bar>
       <h2 *ngIf="!schemaService.selectedTable" class="table-not-selected">
         Select a table in the graph to start editing
