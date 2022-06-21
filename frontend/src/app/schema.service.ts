@@ -68,7 +68,12 @@ export class SchemaService {
     return this._schemaChanged.asObservable();
   }
 
-  constructor(private dialog: SbbDialog) {}
+  constructor(private dialog: SbbDialog) {
+    this.selectedTableChanged.subscribe(() => {
+      if (this.selectedTable)
+        console.log(this.schema.routesFromFactTo(this.selectedTable, false));
+    });
+  }
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
@@ -178,21 +183,20 @@ export class SchemaService {
   }
 
   public async makeDirectDimension(table: Table): Promise<void> {
-    const routes = this._schema.directDimensionableRoutes(table, true);
+    let routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
         data: { table: table },
       });
 
-      const routes: Array<Array<TableRelationship>> = await firstValueFrom(
-        dialogRef.afterClosed()
-      );
+      const result = await firstValueFrom(dialogRef.afterClosed());
+      routes = result.routes;
       if (!routes) return;
     }
 
     const command = new DirectDimensionCommand(this._schema, routes);
     command.onDo = () => (this.selectedTable = command.newTables[0]);
-    command.onUndo = () => (this.selectedTable = command.newTables[0]);
+    command.onUndo = () => (this.selectedTable = command.oldTables[0]);
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }

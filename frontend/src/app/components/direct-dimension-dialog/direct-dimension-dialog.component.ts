@@ -12,6 +12,7 @@ import { SchemaService } from '../../schema.service';
 export class DirectDimensionDialogComponent {
   public table: Table;
   public routes = new Map<Array<TableRelationship>, Boolean>();
+  public allRoutes: Array<Array<TableRelationship>>;
 
   constructor(
     // eslint-disable-next-line no-unused-vars
@@ -19,10 +20,11 @@ export class DirectDimensionDialogComponent {
     schemaService: SchemaService,
     @Inject(SBB_DIALOG_DATA) data: { table: Table }
   ) {
-    for (const route of schemaService.schema.directDimensionableRoutes(
+    this.allRoutes = schemaService.schema.directDimensionableRoutes(
       data.table,
       true
-    )) {
+    );
+    for (const route of this.allRoutes) {
       this.routes.set(route, false);
     }
     this.table = data.table;
@@ -34,7 +36,7 @@ export class DirectDimensionDialogComponent {
 
   public confirm() {
     this.dialogRef.close({
-      routes: [...this.routes.keys()].filter((route) => this.routes.get(route)),
+      routes: this.allRoutes.filter((route) => this.routes.get(route)),
     });
   }
 }
