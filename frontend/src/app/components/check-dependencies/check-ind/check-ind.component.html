@@ -8,6 +8,7 @@
       (ngModelChange)="onTableSelected($event)"
       [(ngModel)]="referencedTable"
       placeholder="Referenced Table"
+      id="referencedTableSelection"
     >
       <sbb-option
         *ngFor="let table of validTables()"
@@ -34,7 +35,7 @@
         />
         <button
           sbb-icon-button
-          id="columnRelationButton"
+          id="removeColumnRelationButton"
           type="button"
           (click)="removeColumnRelation(i)"
           sbbTooltip="remove match"

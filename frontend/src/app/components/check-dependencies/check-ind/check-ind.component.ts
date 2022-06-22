@@ -7,6 +7,7 @@ import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { ViolatingINDRowsDataQuery } from '../../../dataquery';
 import { SchemaService } from '@/src/app/schema.service';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 import IRowCounts from '@server/definitions/IRowCounts';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
@@ -81,7 +82,12 @@ export class CheckIndComponent {
   public async checkInd(): Promise<void> {
     if (this.canAddColumnRelation()) this.addColumnRelation();
 
-    const dataQuery = new ViolatingINDRowsDataQuery(this._relationship);
+    const relationShip: TableRelationship = new TableRelationship(
+      this.relationship,
+      this.referencingTable,
+      this.referencedTable!
+    );
+    const dataQuery = await ViolatingINDRowsDataQuery.Create(relationShip);
 
     this.isLoading = true;
     const rowCount: IRowCounts | void = await dataQuery
@@ -135,7 +141,7 @@ export class CheckIndComponent {
   }
 
   public validTables(): Array<Table> {
-    return this.tables.filter((table) => table.sources.length == 1);
+    return this.tables;
   }
 
   public canCheckIND(): boolean {

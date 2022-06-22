@@ -17,8 +17,8 @@ export default async function getViolatingRows(
       req.body as IRequestBodyINDViolatingRows;
 
     const result = await sqlUtils.getViolatingRowsForSuggestedINDCount(
-      body.relationship.referencing,
-      body.relationship.referenced,
+      body.referencingTableSql,
+      body.referencedTableSql,
       body.relationship.columnRelationships
     );
 

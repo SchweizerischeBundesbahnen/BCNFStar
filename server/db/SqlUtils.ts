@@ -1,6 +1,9 @@
-import { IColumnRelationship } from "../definitions/IRelationship";
+import IRelationship, {
+  IColumnRelationship,
+} from "../definitions/IRelationship";
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
+import ITemptableScript from "@/definitions/ITemptableScripts";
 import {
   IRequestBodyTypeCasting,
   TypeCasting,
@@ -150,8 +153,7 @@ export default abstract class SqlUtils {
   ): Promise<TypeCasting>;
 
   public abstract getViolatingRowsForFD(
-    schema: string,
-    table: string,
+    sql: string,
     lhs: Array<string>,
     rhs: Array<string>,
     offset: number,
@@ -159,14 +161,14 @@ export default abstract class SqlUtils {
   ): Promise<ITablePage>;
 
   public abstract getViolatingRowsForSuggestedINDCount(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
   ): Promise<IRowCounts>;
 
   public abstract getViolatingRowsForSuggestedIND(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[],
     offset: number,
     limit: number
@@ -177,16 +179,16 @@ export default abstract class SqlUtils {
    * in the referenced table and are therefore violating the Inclusion-Dependency.
    */
   protected violatingRowsForSuggestedIND_SQL(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTable: string,
+    referencedTable: string,
     columnRelationships: IColumnRelationship[]
   ): string {
     return `
     SELECT ${columnRelationships
       .map((cc) => `X.${cc.referencingColumn}`)
       .join(",")}, COUNT(1) AS Count
-    FROM ${referencingTable.schemaName}.${referencingTable.name} AS X
-    LEFT OUTER JOIN ${referencedTable.schemaName}.${referencedTable.name} AS Y 
+    FROM ${referencingTable} AS X
+    LEFT OUTER JOIN ${referencedTable} AS Y 
       ON ${columnRelationships
         .map(
           (cc) =>
@@ -204,20 +206,37 @@ export default abstract class SqlUtils {
     `;
   }
 
+  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
+   */
+  public tempTableName(name: string): string {
+    return `#${name}`;
+  }
+
+  /**
+   * @param Sql The Sql that queries the information the temp-table should contain
+   * @param name The name of the temp-table. Relevant for multiple temp-table in one query
+   */
+  public abstract tempTableScripts(Sql: string, name: string): ITemptableScript;
+
+  /**
+   * @param sql The Sql that queries the information the temp-table should contain
+   * @param name The name of the temp-table. Relevant for multiple temp-table in one query
+   */
+  public abstract createTempTable(sql: string, name: string): Promise<string>;
+
   protected violatingRowsForFD_SQL(
-    schema: string,
-    table: string,
+    tableName: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): string {
     return `
 SELECT ${lhs.concat(rhs).join(",")}, COUNT(*) AS Count
-FROM ${schema}.${table} AS x 
+FROM ${tableName} AS x 
 WHERE EXISTS (
 	SELECT 1 FROM (
 		SELECT ${lhs.join(",")} FROM (
 			SELECT ${[...new Set(lhs.concat(rhs))].join(",")}
-			FROM ${schema}.${table} 
+			FROM ${tableName} 
 			GROUP BY ${[...new Set(lhs.concat(rhs))].join(",")}
 		) AS Z  -- removes duplicates
 		GROUP BY ${lhs.join(",")} 
@@ -229,9 +248,29 @@ GROUP BY ${lhs.concat(rhs).join(",")}
   }
 
   public abstract getViolatingRowsForFDCount(
-    schema: string,
-    table: string,
+    _sql: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<IRowCounts>;
+
+  public getViolatingRowsForFDCount_Sql(tablename: string, lhs, rhs) {
+    return `
+    SELECT COALESCE (SUM(Count), 0) as entries, COALESCE (COUNT(*),0) as groups FROM (
+      ${this.violatingRowsForFD_SQL(tablename, lhs, rhs)} 
+      ) AS X `;
+  }
+
+  public getViolatingRowsForINDCount_Sql(
+    referencingTable: string,
+    referencedTable: string,
+    columnRelationships: IColumnRelationship[]
+  ) {
+    return `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
+    FROM ( ${this.violatingRowsForSuggestedIND_SQL(
+      referencingTable,
+      referencedTable,
+      columnRelationships
+    )}
+    ) AS X`;
+  }
 }
