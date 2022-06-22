@@ -6,7 +6,8 @@ import { firstValueFrom } from 'rxjs';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 import IRowCounts from '@server/definitions/IRowCounts';
-import SourceColumn from '../model/schema/SourceColumn';
+import Column from '../model/schema/Column';
+import { TableQuery } from './dataquery';
 
 @Injectable({
   providedIn: 'root',
@@ -69,14 +70,17 @@ export class DatabaseService {
 
   public async getRedundanceByValueCombinations(
     table: Table,
-    lhs: Array<SourceColumn>
+    lhs: Array<Column>
   ): Promise<any> {
     let columns: Array<string> = [];
     lhs.forEach((col) => columns.push('"' + col.name + '"'));
+
+    const tableSql = await new TableQuery(table).getTableSQL();
+
     return await firstValueFrom(
       this.http.get(
         this.baseUrl +
-          `/redundances?tableName=${table.fullName}&&fdColumns=[${columns}]`
+          `/redundances?tableName=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }

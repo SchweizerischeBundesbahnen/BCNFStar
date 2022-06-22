@@ -638,8 +638,7 @@ export default class Schema {
         const rhs = relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;
         const fd = new FunctionalDependency(
           new ColumnCombination(lhs),
-          new ColumnCombination(rhs),
-          sourceFd.redundanceGroups
+          new ColumnCombination(rhs)
         );
         if (fd.isFullyTrivial()) continue;
         const existingFd = fds.get(source)!.get(fd.lhs);

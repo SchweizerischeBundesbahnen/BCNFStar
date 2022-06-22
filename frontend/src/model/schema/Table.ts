@@ -12,6 +12,8 @@ import BasicTable from './BasicTable';
 import ColumnsTree from './ColumnsTree';
 import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
+import { DatabaseService } from '@/src/app/database.service';
+import { InjectorInstance } from '@/src/app/app.module';
 
 export default class Table extends BasicTable {
   public columns: ColumnCombination;
@@ -36,6 +38,10 @@ export default class Table extends BasicTable {
    */
   public _indsValid = false;
 
+  public _fdClusterValid = false;
+
+  public dataService: DatabaseService;
+
   public toJSON() {
     return {
       name: this.name,
@@ -52,6 +58,7 @@ export default class Table extends BasicTable {
   public constructor(columns?: ColumnCombination) {
     super();
     this.columns = columns || new ColumnCombination();
+    this.dataService = InjectorInstance.get<DatabaseService>(DatabaseService);
   }
 
   public static fromITable(iTable: ITable, rowCount: number): Table {
@@ -383,18 +390,67 @@ export default class Table extends BasicTable {
    * @returns FdClusters, which group functional dependencies that have the same right hand side
    * Used in UI to make functional dependencies easier to discover
    */
-  public get fdClusters(): Array<FdCluster> {
+  public async fdClusters(): Promise<Array<FdCluster>> {
+    console.log('Cluster build');
     let allFds: Array<FunctionalDependency> = this.violatingFds();
-    console.log(allFds);
-    if (!this._fdClusters) {
+    console.log(!this._fdClusterValid || !this._fdClusters);
+    if (!this._fdClusterValid || !this._fdClusters) {
       if (this.pk)
         // because lhs is primary key there are no redundant data, so we could set [1] default which results in 0 redundant data
         allFds.push(
-          new FunctionalDependency(this.pk!.copy(), this.columns.copy(), [])
+          new FunctionalDependency(this.pk!.copy(), this.columns.copy())
         );
 
-      // TODO: sort keys in clusters
-      allFds.sort((fd1, fd2) => {
+      return await this.scoreFds(allFds).then(() => {
+        // TODO Marie: sort keys in clusters
+        console.log('start then');
+        const fdClusterTree = new ColumnsTree<FdCluster>();
+        for (let fd of allFds) {
+          let cluster = fdClusterTree.get(fd.rhs);
+          if (!cluster) {
+            cluster = { columns: fd.rhs.copy(), fds: new Array() };
+            fdClusterTree.add(cluster, cluster.columns);
+          }
+          cluster.fds.push(fd);
+        }
+        this._fdClusters = fdClusterTree.getAll();
+
+        this._fdClusters.sort((cluster1, cluster2) => {
+          const bestFdScore1 = Math.max(
+            ...cluster1.fds.map((fd) => fd._score || 0)
+          );
+          const bestFdScore2 = Math.max(
+            ...cluster2.fds.map((fd) => fd._score || 0)
+          );
+          if (bestFdScore1 < bestFdScore2) return 1;
+          if (bestFdScore1 > bestFdScore2) return -1;
+          return 0;
+        });
+        console.log(this._fdClusters);
+        console.log('ready');
+        this._fdClusterValid = true;
+        return this._fdClusters;
+      });
+    } else {
+      console.log('else');
+      return this._fdClusters;
+    }
+  }
+
+  private async scoreFds(fds: Array<FunctionalDependency>) {
+    let fdRedundancePromises: Array<Promise<Array<number>>> = new Array<
+      Promise<Array<number>>
+    >();
+    fds.forEach((fd) =>
+      fdRedundancePromises.push(
+        this.dataService
+          .getRedundanceByValueCombinations(this, fd.lhs.asArray())
+          .then((res) => (fd._redundanceGroups = res))
+      )
+    );
+    return Promise.all(fdRedundancePromises).finally(() => {
+      console.log('score');
+      fds.sort((fd1, fd2) => {
         let score1 = new FdScore(this, fd1).get();
         let score2 = new FdScore(this, fd2).get();
         if (score1 !== score2) return score2 - score1;
@@ -403,34 +459,8 @@ export default class Table extends BasicTable {
         if (fd2String < fd1String) return -1;
         return 0;
       });
-
-      const fdClusterTree = new ColumnsTree<FdCluster>();
-      for (let fd of allFds) {
-        let cluster = fdClusterTree.get(fd.rhs);
-        if (!cluster) {
-          cluster = { columns: fd.rhs.copy(), fds: new Array() };
-          fdClusterTree.add(cluster, cluster.columns);
-        }
-        cluster.fds.push(fd);
-      }
-      this._fdClusters = fdClusterTree.getAll();
-    }
-
-    this._fdClusters.sort((cluster1, cluster2) => {
-      const bestFdScore1 = Math.max(
-        ...cluster1.fds.map((fd) => fd._score || 0)
-      );
-      const bestFdScore2 = Math.max(
-        ...cluster2.fds.map((fd) => fd._score || 0)
-      );
-      if (bestFdScore1 < bestFdScore2) return 1;
-      if (bestFdScore1 > bestFdScore2) return -1;
-      return 0;
+      console.log('end score  ');
     });
-
-    // console.log(this._fdClusters);
-
-    return this._fdClusters;
   }
 
   public hull(columns: ColumnCombination): ColumnCombination {

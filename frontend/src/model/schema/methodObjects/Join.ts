@@ -65,6 +65,7 @@ export default class Join {
     this.newTable.name = this.referencing.name;
     this.newTable.surrogateKey = this.referencing.surrogateKey;
     this.newTable.rowCount = this.referencing.rowCount;
+    this.newTable._fdClusterValid = false;
 
     // inherit sources, relationships and columns from referencing table
     this.referencing.sources.forEach((source) => {

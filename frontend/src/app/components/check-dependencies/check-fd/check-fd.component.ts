@@ -89,8 +89,7 @@ export class CustomFunctionalDependencySideBarComponent {
       this.table.addFd(
         new FunctionalDependency(
           new ColumnCombination(Array.from(this.lhs)),
-          new ColumnCombination(Array.from(this.rhs)),
-          [] // TODO
+          new ColumnCombination(Array.from(this.rhs))
         )
       );
     } else {

@@ -34,7 +34,12 @@ export default class Split {
       this.fd.lhs.columnNames().join('_').substring(0, 50);
 
     remaining.rowCount = this.table.rowCount;
-    generating.rowCount = this.fd.redundanceGroups.length;
+    generating.rowCount = this.fd._redundanceGroups.length;
+    console.log('slpitttt');
+    console.log(this.fd, generating.rowCount);
+
+    remaining._fdClusterValid = false;
+    generating._fdClusterValid = false;
 
     this.substitute(generating, this.fd.lhs);
     this.newTables = [remaining, generating];

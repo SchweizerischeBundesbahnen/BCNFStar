@@ -15,11 +15,14 @@ export class ContainedSubtablesComponent {
   public _fdClusterFilter = new Array<Column>();
   public page: number = 0;
   public pageSize = 5;
+  public fdCluster: Array<FdCluster> = [];
 
   constructor(public schemaService: SchemaService) {
     this.schemaService.selectedTableChanged.subscribe(() => {
       this._fdClusterFilter = [];
+      this.table.fdClusters().then((cluster) => (this.fdCluster = cluster));
     });
+    this.table.fdClusters().then((cluster) => (this.fdCluster = cluster));
   }
 
   public get table() {
@@ -41,9 +44,8 @@ export class ContainedSubtablesComponent {
   }
 
   public fdClusters(): Array<FdCluster> {
+    // console.log(this.allClusters)
     const cc = this.fdClusterFilter;
-    return this.table.fdClusters.filter((cluster) =>
-      cc.isSubsetOf(cluster.columns)
-    );
+    return this.fdCluster.filter((cluster) => cc.isSubsetOf(cluster.columns));
   }
 }

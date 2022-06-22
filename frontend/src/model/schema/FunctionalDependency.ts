@@ -3,31 +3,21 @@ import ColumnCombination from './ColumnCombination';
 export default class FunctionalDependency {
   public lhs: ColumnCombination;
   public rhs: ColumnCombination;
-  // TODO: change after splitting
-  public redundanceGroups: Array<number>;
+  public _redundanceGroups: Array<number> = [];
 
   /**
    * cached result of the score calculation. Should not be accessed directly
    */
   public _score?: number;
 
-  public constructor(
-    lhs: ColumnCombination,
-    rhs: ColumnCombination,
-    redundanceGroups: Array<number>
-  ) {
+  public constructor(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.lhs = lhs;
     this.rhs = rhs;
-    this.redundanceGroups = redundanceGroups;
     this.extend();
   }
 
   public copy(): FunctionalDependency {
-    return new FunctionalDependency(
-      this.lhs.copy(),
-      this.rhs.copy(),
-      this.redundanceGroups
-    );
+    return new FunctionalDependency(this.lhs.copy(), this.rhs.copy());
   }
 
   private extend(): void {

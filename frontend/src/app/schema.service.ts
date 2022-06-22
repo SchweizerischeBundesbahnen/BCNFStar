@@ -144,11 +144,10 @@ export class SchemaService {
         fd: fd,
       },
     });
-
     const value: { fd: FunctionalDependency; name?: string } =
       await firstValueFrom(dialogRef.afterClosed());
     if (!value) return;
-
+    console.log('fd2: ', value);
     let command = new SplitCommand(
       this._schema,
       this.selectedTable!,

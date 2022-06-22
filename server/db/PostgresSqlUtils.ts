@@ -265,7 +265,7 @@ from
   ): Promise<any> {
     const stringColumns = columns.map((col) => '"' + col + '"').join(",");
     const query_result = await this.pool.query<SchemaQueryRow>(
-      `SELECT ${stringColumns}, COUNT(*) from ${table} GROUP BY ${stringColumns}`
+      `SELECT ${stringColumns}, COUNT(*) from (${table}) as temp_table GROUP BY ${stringColumns}`
     );
     return query_result.rows;
   }
