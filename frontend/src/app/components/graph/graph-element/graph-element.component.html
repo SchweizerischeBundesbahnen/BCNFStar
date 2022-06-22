@@ -11,20 +11,10 @@
   <div
     *ngIf="isPotentialFact()"
     class="extra-button"
+    [sbbTooltip]="factTooltip"
     style="left: 40px; top: 3px"
-    type="button"
-    (click)="schemaService.suggestOrRejectFact(table, true)"
   >
-    Y
-  </div>
-  <div
-    *ngIf="isPotentialFact()"
-    class="extra-button"
-    style="left: 60px; top: 3px"
-    type="button"
-    (click)="schemaService.suggestOrRejectFact(table, false)"
-  >
-    N
+    F
   </div>
   <div
     class="table-head ellipsis"
@@ -70,3 +60,19 @@
     ></sbb-icon>
   </div>
 </div>
+
+<ng-template #factTooltip>
+  <div>Is {{ table.name }} a fact table?</div>
+  <button
+    sbb-icon-button
+    (click)="schemaService.suggestOrRejectFact(table, true)"
+  >
+    <sbb-icon svgIcon="kom:tick-medium"></sbb-icon>
+  </button>
+  <button
+    sbb-icon-button
+    (click)="schemaService.suggestOrRejectFact(table, false)"
+  >
+    <sbb-icon svgIcon="kom:cross-medium"></sbb-icon>
+  </button>
+</ng-template>
