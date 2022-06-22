@@ -19,6 +19,7 @@ import { FkDisplayOptions } from '../types/FkDisplayOptions';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
+  private customFactTables = new Set<Table>();
   public name?: string;
   /**
    * all fks from the actual database and inds that the user validated
@@ -66,6 +67,16 @@ export default class Schema {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
+    this.relationshipsValid = false;
+  }
+
+  public suggestFactTable(table: Table) {
+    this.customFactTables.add(table);
+    this.relationshipsValid = false;
+  }
+
+  public unsuggestFactTable(table: Table) {
+    this.customFactTables.delete(table);
     this.relationshipsValid = false;
   }
 
@@ -199,7 +210,17 @@ export default class Schema {
    * @param onlyDisplayed whether to use only the displayed fks or all fks as a basis for calculation
    */
   public isFact(table: Table, onlyDisplayed: boolean): boolean {
-    return this.referencesOf(table, onlyDisplayed).length == 0;
+    return (
+      this.referencesOf(table, onlyDisplayed).length == 0 ||
+      this.customFactTables.has(table)
+    );
+  }
+
+  public isPotentialFact(table: Table): boolean {
+    return (
+      this.referencesOf(table, false).length <= 1 &&
+      this.fksOf(table, false).length >= 1
+    ); //TODO
   }
 
   public isDirectDimension(table: Table): boolean {
@@ -243,7 +264,8 @@ export default class Schema {
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
-    if (result.length == 0) result.push(new Array<TableRelationship>());
+    if (result.length == 0 || this.customFactTables.has(table))
+      result.push(new Array<TableRelationship>());
     return result;
   }
 
