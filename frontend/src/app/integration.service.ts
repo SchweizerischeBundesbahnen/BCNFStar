@@ -14,6 +14,7 @@ import {
 } from './components/graph/schema-graph/schema-graph.component';
 import Table from '../model/schema/Table';
 import Column from '../model/schema/Column';
+import SourceColumn from '../model/schema/SourceColumn';
 
 export enum Side {
   left,
@@ -49,7 +50,7 @@ export class IntegrationService {
   public tables: Array<BasicTable> = [];
 
   /** <schema.table.column of left schema, schema.table.column of right schema*/
-  private matchings?: Record<string, string[]>;
+  private matchings?: Map<SourceColumn, SourceColumn>;
 
   constructor(
     private http: HttpClient,
@@ -76,8 +77,8 @@ export class IntegrationService {
   }
 
   public async getMatching(
-    src: Iterable<BasicTable> = this._schemas![Side.left].tables,
-    target: Iterable<BasicTable> = this._schemas![Side.right].tables,
+    src: Iterable<Table> = this._schemas![Side.left].regularTables,
+    target: Iterable<Table> = this._schemas![Side.right].regularTables,
     srcSchema: Schema = this._schemas![Side.left],
     targetSchema: Schema = this._schemas![Side.right]
   ) {
@@ -95,10 +96,22 @@ export class IntegrationService {
         body
       )
     );
-    const matchings: Record<string, string[]> = {};
+    const matchings: Map<SourceColumn, SourceColumn> = new Map();
+    const srcSourceColumns = [...src]
+      .map((t) => t.columns.asArray().map((c) => c.sourceColumn))
+      .flat();
+    const targetSourceColumns = [...target]
+      .map((t) => t.columns.asArray().map((c) => c.sourceColumn))
+      .flat();
     for (const entry of result) {
-      if (!matchings[entry.source]) matchings[entry.source] = [];
-      matchings[entry.source].push(entry.target);
+      matchings.set(
+        srcSourceColumns.find(
+          (sc) => `${sc.table.fullName}.${sc.name}` === entry.source
+        )!,
+        targetSourceColumns.find(
+          (sc) => `${sc.table.fullName}.${sc.name}` === entry.target
+        )!
+      );
     }
     return matchings;
   }
@@ -110,8 +123,16 @@ export class IntegrationService {
     await this.generateLinks();
   }
 
+  /**
+   * Executes code for every found matching with
+   *
+   * @param matchings from coma obtained by calling integrationService.getMatching
+   * @param tablesLeft tables the matching should be applied to
+   * @param tablesRight tables the matching should be applied to
+   * @param cb a function that is called for every pair of columns where a matching exists
+   */
   forMatch(
-    matchings: Record<string, string[]>,
+    matchings: Map<SourceColumn, SourceColumn>,
     tablesLeft: Iterable<Table>,
     tablesRight: Iterable<Table>,
     cb: (
@@ -123,20 +144,23 @@ export class IntegrationService {
   ) {
     for (const table of tablesLeft)
       for (const column of table.columns) {
-        const sourceIdent = `${column.sourceColumn.table.fullName}.${column.sourceColumn.name}`;
-        if (!matchings[sourceIdent]) continue;
-        for (const target of matchings[sourceIdent])
-          for (const existingTable of tablesRight)
-            for (const existingColumn of existingTable.columns) {
-              const sC = existingColumn.sourceColumn;
-              const existingSourceIdent = `${sC.table.fullName}.${sC.name}`;
-              if (target === existingSourceIdent) {
-                cb(column, existingColumn, table, existingTable);
-              }
+        if (!matchings.get(column.sourceColumn)) continue;
+        for (const existingTable of tablesRight)
+          for (const existingColumn of existingTable.columns) {
+            if (
+              existingColumn.sourceColumn === matchings.get(column.sourceColumn)
+            ) {
+              cb(column, existingColumn, table, existingTable);
             }
+          }
       }
   }
 
+  /**
+   * Fills this.links with links representing the matching
+   * between the current schemas
+   * ready to be used in the schema graph
+   */
   private async generateLinks() {
     if (!this.matchings) this.matchings = await this.getMatching();
     const newLinks: Array<LinkDefinition> = [];
