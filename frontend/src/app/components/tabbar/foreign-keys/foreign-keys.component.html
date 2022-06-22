@@ -31,7 +31,7 @@
         [available]="schema.regularTables"
       ></app-sbb-option-all>
       <sbb-option
-        *ngFor="let table of schema.regularTables"
+        *ngFor="let table of schemaService.schema.regularTables"
         [value]="table"
         [sbbTooltip]="table.fullName"
       >

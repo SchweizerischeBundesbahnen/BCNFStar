@@ -28,8 +28,8 @@ import { SplitDialogComponent } from './components/operation-dialogs/split-dialo
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
-import { UnionSidebarComponent } from './components/union-sidebar/union-sidebar.component';
-import { UnionDialogComponent } from './components/union-dialog/union-dialog.component';
+import { UnionSidebarComponent } from './components/union/union-sidebar/union-sidebar.component';
+import { UnionDialogComponent } from './components/union/union-dialog/union-dialog.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MetanomeSettingsComponent } from './components/metanome-settings/metanome-settings.component';
 import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';

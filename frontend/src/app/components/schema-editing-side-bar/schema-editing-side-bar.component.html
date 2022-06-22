@@ -10,7 +10,7 @@
     <button
       type="button"
       sbb-button
-      (click)="schemaService.autoNormalize(this.table)"
+      (click)="schemaService.autoNormalize([this.table])"
       class="mt-1"
     >
       {{ "Auto-normalize this table" }}
@@ -23,11 +23,7 @@
     <app-table-editing></app-table-editing>
   </sbb-tab>
   <sbb-tab label="Union">
-    <app-union-sidebar
-      [schema]="this.schema"
-      [table]="this.table"
-      (union)="union.emit($event)"
-    ></app-union-sidebar>
+    <app-union-sidebar></app-union-sidebar>
   </sbb-tab>
   <!-- WIP -->
   <!-- <sbb-tab label="Schema Integration">
