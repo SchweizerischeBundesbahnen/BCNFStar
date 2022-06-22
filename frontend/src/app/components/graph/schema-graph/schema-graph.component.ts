@@ -28,6 +28,7 @@ export interface LinkDefinition {
   source: LinkEndDefinititon;
   target: LinkEndDefinititon;
   tool?: joint.dia.ToolsView;
+  arrow?: boolean;
 }
 
 @Component({
@@ -196,10 +197,12 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       // reversed arrowhead to align with powerbi
       link.attr({
         line: {
-          sourceMarker: {
-            type: 'path',
-            d: 'M 10 -5 0 0 10 5 Z',
-          },
+          sourceMarker: linkDef.arrow
+            ? {
+                type: 'path',
+                d: 'M 10 -5 0 0 10 5 Z',
+              }
+            : { type: 'none' },
           targetMarker: {
             type: 'none',
           },
@@ -218,20 +221,25 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   private generatePortMarkup({
     counter,
     side,
+    table,
   }: {
     counter: number;
     side: PortSide;
+    table: BasicTable;
   }) {
     const cx = side == PortSide.Left ? 0 : this.elementWidth;
+    let fill = 'white';
+    if (this.intService.isInRightSchema(table)) fill = 'rgb(250, 255, 245)';
+    else if (this.intService.isInLeftSchema(table)) fill = 'rgb(245, 255, 255)';
     return [
       {
         tagName: 'circle',
         attributes: {
           r: this.portDiameter / 2,
           cx,
+          fill,
           cy:
             this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5),
-          fill: 'white',
         },
       },
     ];
@@ -240,14 +248,14 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   private generatePorts(jointjsEl: joint.dia.Element, table: BasicTable) {
     let counter = 0;
     for (let column of this.schemaService.schema.displayedColumnsOf(table)) {
-      let args = { counter, side: PortSide.Left };
+      let args = { counter, side: PortSide.Left, table };
       jointjsEl.addPort({
         id: column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
         args,
         markup: this.generatePortMarkup(args),
       });
-      args = { counter, side: PortSide.Right };
+      args = { counter, side: PortSide.Right, table };
       jointjsEl.addPort({
         id: column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',

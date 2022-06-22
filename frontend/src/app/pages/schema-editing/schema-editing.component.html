@@ -21,7 +21,7 @@
   </div>
   <app-schema-graph [tables]="tables" [links]="links"></app-schema-graph>
 
-  <div class="item-sidebar">
+  <div class="item-sidebar" [ngClass]="intService.getBackground()">
     <div class="grid-container-sidebar">
       <div>
         <h2>Schema export</h2>

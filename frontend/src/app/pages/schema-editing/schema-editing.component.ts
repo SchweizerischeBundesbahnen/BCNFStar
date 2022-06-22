@@ -62,6 +62,7 @@ export class SchemaEditingComponent {
             columnName: fk.referencedName,
             side: PortSide.Left,
           },
+          arrow: true,
         });
     this.links = newLinks;
   }

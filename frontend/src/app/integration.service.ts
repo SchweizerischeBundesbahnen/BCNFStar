@@ -36,7 +36,12 @@ export class IntegrationService {
   set currentlyEditedSide(side: Side) {
     this._currentlyEditedSide = side;
     this.schemaService.schema = this._schemas![this._currentlyEditedSide];
+    this.schemaService.selectedTable = undefined;
   }
+  get currentlyEditedSide() {
+    return this._currentlyEditedSide;
+  }
+
   /** schema that is currently not edited (the other ome is schemaService.schema)*/
   get inactiveSchema() {
     return this._schemas![this.currentlyEditedSide];
@@ -185,5 +190,41 @@ export class IntegrationService {
     );
 
     this.links = newLinks;
+  }
+
+  public isInLeftSchema(table: BasicTable) {
+    return this._schemas && this._schemas[Side.left].tables.has(table);
+  }
+  public isInRightSchema(table: BasicTable) {
+    return this._schemas && this._schemas[Side.right].tables.has(table);
+  }
+
+  /**
+   * Can be used with [ngClass]="intService.getBackground(table)" to set an element's background according to
+   * which schema it belongs to
+   * @param table The table used as basis for coloring
+   * @param otherClasses Other classes that shall be applied via ngClass
+   */
+  public getBackground(
+    table: BasicTable | undefined = this.schemaService.selectedTable,
+    otherClasses: Record<string, boolean> = {}
+  ): Record<string, boolean> {
+    if (!table) return otherClasses;
+    console.log(
+      Object.assign(
+        {
+          'integration-left': this.isInLeftSchema(table),
+          'integration-right': this.isInRightSchema(table),
+        },
+        otherClasses
+      )
+    );
+    return Object.assign(
+      {
+        'integration-left': this.isInLeftSchema(table),
+        'integration-right': this.isInRightSchema(table),
+      },
+      otherClasses
+    );
   }
 }
