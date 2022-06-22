@@ -12,6 +12,7 @@ import ShowFkCommand from '../model/commands/ShowFkCommand';
 import SplitCommand from '../model/commands/SplitCommand';
 import UnionCommand from '../model/commands/UnionCommand';
 import BasicTable from '../model/schema/BasicTable';
+import DeleteTableCommand from '../model/commands/DeleteTableCommand';
 import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import FunctionalDependency from '../model/schema/FunctionalDependency';
@@ -19,10 +20,11 @@ import Schema from '../model/schema/Schema';
 import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
-import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
+import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
 import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
+import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 
 export enum EditingMode {
   normal,
@@ -123,6 +125,21 @@ export class SchemaService {
 
   public show(fk: TableRelationship) {
     let command = new ShowFkCommand(this.schema, fk);
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public async deleteTable() {
+    const dialogRef = this.dialog.open(DeleteTableDialogComponent);
+    const value = await firstValueFrom(dialogRef.afterClosed());
+    if (!value) return;
+    const command = new DeleteTableCommand(this.schema, this._selectedTable!);
+    command.onDo = () => {
+      this.selectedTable = undefined;
+    };
+    command.onUndo = () => {
+      this.selectedTable = command.table;
+    };
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }

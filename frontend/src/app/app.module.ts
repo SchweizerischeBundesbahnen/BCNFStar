@@ -25,6 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraphElementComponent } from './components/graph/graph-element/graph-element.component';
 import { UndoRedoComponent } from './components/undo-redo/undo-redo.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
+import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 import { SbbSelectModule } from '@sbb-esta/angular/select';
 import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/metanome-results-viewer.component';
 import { UnionSidebarComponent } from './components/union/union-sidebar/union-sidebar.component';
@@ -40,7 +41,7 @@ import { CheckIndComponent } from '@/src/app/components/check-dependencies/check
 import { ViolatingRowsViewIndsComponent } from './components/operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { DatabaseTableViewerComponent } from './components/operation-dialogs/database-table-viewer/database-table-viewer.component';
 import { TableEditingComponent } from './components/tabbar/table-editing/table-editing.component';
-import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
+import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { HomeComponent } from './pages/home/home.component';
 
 import { SaveSchemaEditingComponent } from './components/export/save-schema-editing/save-schema-editing.component';
@@ -65,6 +66,7 @@ export let InjectorInstance: Injector;
     GraphElementComponent,
     UndoRedoComponent,
     SplitDialogComponent,
+    DeleteTableDialogComponent,
     JoinDialogComponent,
     DirectDimensionDialogComponent,
     MetanomeResultsViewerComponent,
