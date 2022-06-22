@@ -16,9 +16,11 @@ import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
+import PotentialFacts from './methodObjects/PotentialFacts';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
+  private potentialFacts = new Set<Table>();
   private suggestedFacts = new Set<Table>();
   private rejectedFacts = new Set<Table>();
   public name?: string;
@@ -206,6 +208,7 @@ export default class Schema {
     this._starMode = value;
     for (const [fk, displayOptions] of this._tableFks.entries())
       displayOptions.filtered = this.shouldBeFiltered(fk);
+    if (value) this.updatePotentialFacts();
   }
 
   private set relationshipsValid(valid: boolean) {
@@ -229,10 +232,8 @@ export default class Schema {
 
   public isPotentialFact(table: Table): boolean {
     if (this.rejectedFacts.has(table)) return false;
-    return (
-      this.referencesOf(table, false).length <= 1 &&
-      this.fksOf(table, false).length >= 1
-    ); //TODO
+    if (!this.relationshipsValid) this.updateFks();
+    return this.potentialFacts.has(table);
   }
 
   public isDirectDimension(table: Table): boolean {
@@ -345,6 +346,7 @@ export default class Schema {
     this.calculateTrivialFks();
     this._tableFksValid = true;
     this.calculateFkDisplayOptions(oldFks);
+    if (this.starMode) this.updatePotentialFacts();
   }
 
   private calculateFkDisplayOptions(
@@ -553,6 +555,10 @@ export default class Schema {
     return !this.directDimensionableRoutes(fk.referenced, false).some(
       (route) => route[route.length - 1] == fk
     );
+  }
+
+  private updatePotentialFacts() {
+    this.potentialFacts = new PotentialFacts(this).potentialFacts;
   }
 
   /**
