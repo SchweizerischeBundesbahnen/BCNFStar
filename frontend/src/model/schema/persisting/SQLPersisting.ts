@@ -60,7 +60,7 @@ export default abstract class SQLPersisting {
     )});`;
   }
 
-  public dataTransfer(tables: Array<Table | UnionedTable>): string {
+  public dataTransfer(tables: Array<BasicTable>): string {
     let Sql: string = '';
     for (const table of tables) {
       Sql += this.dataTransferSql(table) + '\n';
@@ -68,13 +68,13 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
-  public dataTransferSql(table: Table | UnionedTable): string {
+  public dataTransferSql(table: BasicTable): string {
     let Sql = '';
 
     let columns: Column[] = [];
     if (table instanceof UnionedTable) {
       columns = table.displayedColumns();
-    } else {
+    } else if (table instanceof Table) {
       columns = table.columns.asArray();
     }
 
@@ -88,7 +88,7 @@ export default abstract class SQLPersisting {
       Sql += '\n UNION \n';
       Sql += this.selectStatement(table.tables[1], table.columns[1]);
       Sql += ') as X';
-    } else {
+    } else if (table instanceof Table) {
       Sql += this.selectStatement(table, table.columns.asArray());
     }
 
