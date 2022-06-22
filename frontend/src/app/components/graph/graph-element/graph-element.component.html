@@ -63,16 +63,18 @@
 
 <ng-template #factTooltip>
   <div>Is {{ table.name }} a fact table?</div>
-  <button
-    sbb-icon-button
-    (click)="schemaService.suggestOrRejectFact(table, true)"
-  >
-    <sbb-icon svgIcon="kom:tick-medium"></sbb-icon>
-  </button>
-  <button
-    sbb-icon-button
-    (click)="schemaService.suggestOrRejectFact(table, false)"
-  >
-    <sbb-icon svgIcon="kom:cross-medium"></sbb-icon>
-  </button>
+  <div style="display: flex; justify-content: space-evenly">
+    <button
+      sbb-icon-button
+      (click)="schemaService.suggestOrRejectFact(table, true)"
+    >
+      <sbb-icon svgIcon="kom:tick-medium"></sbb-icon>
+    </button>
+    <button
+      sbb-icon-button
+      (click)="schemaService.suggestOrRejectFact(table, false)"
+    >
+      <sbb-icon svgIcon="kom:cross-medium"></sbb-icon>
+    </button>
+  </div>
 </ng-template>
