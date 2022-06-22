@@ -2,7 +2,7 @@ import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
-import { SchemaService } from '../../schema.service';
+import { SchemaService } from '../../../schema.service';
 
 @Component({
   selector: 'app-direct-dimension-dialog',
