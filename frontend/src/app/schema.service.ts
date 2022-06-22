@@ -22,6 +22,7 @@ import { DirectDimensionDialogComponent } from './components/operation-dialogs/d
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
+import SuggestFactCommand from '../model/commands/SuggestFactCommand';
 
 @Injectable({
   providedIn: 'root',
@@ -124,6 +125,18 @@ export class SchemaService {
     };
     command.onUndo = () => {
       this.selectedTable = command.table;
+    };
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public suggestFact(table: Table) {
+    const command = new SuggestFactCommand(this.schema, table);
+    command.onDo = () => {
+      this.selectedTable = table;
+    };
+    command.onUndo = () => {
+      this.selectedTable = table;
     };
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();

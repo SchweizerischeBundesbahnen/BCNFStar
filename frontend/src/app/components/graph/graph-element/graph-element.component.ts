@@ -49,6 +49,7 @@ export class GraphElementComponent {
   public isDirectDimension(): boolean {
     return (
       this.schemaService.starMode &&
+      !this.schemaService.schema.isFact(this.table, true) &&
       this.schemaService.schema.isDirectDimension(this.table)
     );
   }
@@ -56,7 +57,16 @@ export class GraphElementComponent {
   public isDimension(): boolean {
     return (
       this.schemaService.starMode &&
-      !this.schemaService.schema.isFact(this.table, true)
+      !this.schemaService.schema.isFact(this.table, true) &&
+      !this.schemaService.schema.isDirectDimension(this.table)
+    );
+  }
+
+  public isPotentialFact(): boolean {
+    return (
+      this.schemaService.starMode &&
+      !this.schemaService.schema.isFact(this.table, true) &&
+      this.schemaService.schema.isPotentialFact(this.table)
     );
   }
 

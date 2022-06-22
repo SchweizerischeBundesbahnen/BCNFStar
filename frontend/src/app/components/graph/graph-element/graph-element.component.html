@@ -2,18 +2,28 @@
   <div
     *ngIf="showMakeDirectDimension()"
     class="extra-button"
+    style="left: 10px; top: 3px"
     type="button"
     (click)="schemaService.makeDirectDimension(table)"
   >
     D
   </div>
   <div
+    *ngIf="isPotentialFact()"
+    class="extra-button"
+    style="left: 40px; top: 3px"
+    type="button"
+    (click)="schemaService.suggestFact(table)"
+  >
+    F
+  </div>
+  <div
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"
     [ngClass]="{
       fact: isFact(),
-      directDimension: isDirectDimension(),
-      dimension: isDimension() && !isDirectDimension(),
+      'direct-dimension': isDirectDimension(),
+      dimension: isDimension(),
       'table-head-highlight': schemaService.selectedTable === table
     }"
   >

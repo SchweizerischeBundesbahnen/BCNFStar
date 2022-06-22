@@ -15,8 +15,6 @@
 
 .extra-button {
   position: absolute;
-  left: 10px;
-  top: 3px;
   pointer-events: auto !important;
   height: 22px;
   width: 22px;
@@ -33,7 +31,7 @@
   background-color: #ffde1577 !important;
 }
 
-.directDimension {
+.direct-dimension {
   background-color: #f27e0077 !important;
 }
 

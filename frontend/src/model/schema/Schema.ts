@@ -536,6 +536,7 @@ export default class Schema {
   }
 
   private isStarViolatingFk(fk: TableRelationship) {
+    if (this.isFact(fk.referenced, false)) return true;
     if (this.isFact(fk.referencing, false)) return false;
     return !this.directDimensionableRoutes(fk.referenced, false).some(
       (route) => route[route.length - 1] == fk
