@@ -63,7 +63,6 @@ export default class Join {
     // name, pk, sk
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
-    this.newTable.pk = this.referencing.pk?.deepCopy();
     this.newTable.surrogateKey = this.referencing.surrogateKey;
     this.newTable.rowCount = this.referencing.rowCount;
 
@@ -81,6 +80,9 @@ export default class Join {
     );
     this.newTable.addColumns(
       ...this.referencing.columns.applySourceMapping(this.sourceMapping)
+    );
+    this.newTable.pk = this.referencing.pk?.applySourceMapping(
+      this.sourceMapping
     );
 
     // sources and relationships from referenced table

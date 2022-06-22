@@ -25,18 +25,10 @@ export default class Split {
       this.table,
       this.table.columns.copy().setMinus(this.fd.rhs)
     ).newTable;
-    remaining.surrogateKey = this.table.surrogateKey;
-    remaining.pk = this.table.pk?.isSubsetOf(remaining.columns)
-      ? this.table.pk.deepCopy()
-      : undefined;
+    generating.surrogateKey = '';
     generating.pk =
-      this.fd.lhs.cardinality > 0 ? this.fd.lhs.deepCopy() : undefined;
+      this.fd.lhs.cardinality > 0 ? this.fd.lhs.copy() : undefined;
     this.reorderColumnsOf(generating);
-
-    remaining.schemaName = this.table.schemaName;
-    generating.schemaName = this.table.schemaName;
-
-    remaining.name = this.table.name;
     generating.name =
       this.generatingName ||
       this.fd.lhs.columnNames().join('_').substring(0, 50);

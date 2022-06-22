@@ -1,0 +1,96 @@
+<div class="union-dialog">
+  <div sbbDialogTitle>Match Columns</div>
+  <div sbbDialogContent>
+    Name of the generated table
+    <input
+      type="text"
+      sbbInput
+      [(ngModel)]="newTableName"
+      [placeholder]="tables[Side.left].name"
+    />
+
+    <div class="union-grid">
+      <h2 [sbbTooltip]="tables[Side.left].fullName">
+        Columns of <br />{{ tables[Side.left].fullName }}
+      </h2>
+      <h2 style="grid-column: 2 / span 2">Matched Columns</h2>
+      <h2 [sbbTooltip]="tables[Side.right].fullName">
+        Columns of <br />{{ tables[Side.right].fullName }}
+      </h2>
+
+      <ng-template ngFor let-side [ngForOf]="[Side.left, Side.right]">
+        <!-- available -->
+        <div
+          cdkDropList
+          (cdkDropListDropped)="drop($event)"
+          class="list"
+          [ngStyle]="{ 'grid-column': side === Side.left ? 1 : 4 }"
+          #availableList="cdkDropList"
+          [cdkDropListConnectedTo]="[matchedList]"
+          [cdkDropListData]="available[side]"
+        >
+          <div
+            class="box"
+            *ngFor="let column of available[side]"
+            (click)="addColumn(column, side)"
+            cdkDrag
+          >
+            <span>{{ column ? column.name : "Fill Column with NULL" }} </span>
+            <span *ngIf="column">{{ column.dataType }}</span>
+          </div>
+
+          <sbb-expansion-panel *ngIf="extendedAvailable[side].length > 0">
+            <sbb-expansion-panel-header
+              >Show {{ extendedAvailable[side].length }} already unioned
+              columns</sbb-expansion-panel-header
+            >
+            <div
+              class="box"
+              *ngFor="let column of extendedAvailable[side]"
+              (click)="addColumn(column, side)"
+              cdkDrag
+            >
+              <span>{{ column ? column.name : "Fill Column with NULL" }} </span>
+              <span *ngIf="column">{{ column.dataType }}</span>
+            </div>
+          </sbb-expansion-panel>
+        </div>
+
+        <!-- matched -->
+        <div
+          #matchedList="cdkDropList"
+          id="matchedList"
+          cdkDropList
+          [ngStyle]="{ 'grid-column': side === Side.left ? 2 : 3 }"
+          class="list"
+          (cdkDropListDropped)="drop($event)"
+          [cdkDropListConnectedTo]="[availableList]"
+          [cdkDropListData]="matched[side]"
+        >
+          <h2 class="center" *ngIf="matched[side].length === 0">
+            Click a column on the left or drag it here to add it to the unioned
+            table
+          </h2>
+          <div *ngIf="matched.length > 0" class="scroll-y">
+            <div class="box" *ngFor="let column of matched[side]" cdkDrag>
+              <span>{{ column ? column.name : "Fill Column with NULL" }} </span>
+              <span *ngIf="column">{{ column.dataType }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <div sbbDialogActions>
+    <button
+      sbb-button
+      [sbbDialogClose]="result()"
+      cdkFocusInitial
+      [disabled]="!unionPossible()"
+    >
+      Union
+    </button>
+    <button sbb-secondary-button sbbDialogClose>Cancel</button>
+  </div>
+</div>

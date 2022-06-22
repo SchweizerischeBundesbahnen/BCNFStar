@@ -1,6 +1,6 @@
 <div class="container px-0" [ngStyle]="bbox">
   <div
-    *ngIf="showMakeDirectDimension()"
+    *ngIf="showMakeDirectDimension"
     class="extra-button"
     type="button"
     (click)="schemaService.makeDirectDimension(table)"
@@ -12,7 +12,8 @@
     [sbbTooltip]="table.fullName"
     [ngClass]="{
       fact: isFact(),
-      dimension: isDimension(),
+      directDimension: isDirectDimension(),
+      dimension: isDimension() && !isDirectDimension(),
       'table-head-highlight': schemaService.selectedTable === table
     }"
   >

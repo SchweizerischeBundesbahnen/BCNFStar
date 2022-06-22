@@ -23,7 +23,7 @@ export class ContainedSubtablesComponent {
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
   }
 
   public emitHighlightedCluster(cluster: FdCluster) {
