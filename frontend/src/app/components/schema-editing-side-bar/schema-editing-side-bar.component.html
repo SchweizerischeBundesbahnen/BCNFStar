@@ -3,39 +3,24 @@
 </h1>
 <sbb-tab-group>
   <sbb-tab label="Keys">
-    <app-keys
-      [table]="table"
-      (setSurrogateKey)="setSurrogateKey.emit($event)"
-    ></app-keys>
+    <app-keys></app-keys>
   </sbb-tab>
   <sbb-tab label="Subtables">
-    <app-contained-subtables
-      [table]="table"
-      (selectColumns)="selectColumns.emit($event)"
-      (splitFd)="splitFd.emit($event)"
-    ></app-contained-subtables>
+    <app-contained-subtables></app-contained-subtables>
     <button
       type="button"
       sbb-button
-      (click)="autoNormalizeSelectedTable.emit()"
+      (click)="schemaService.autoNormalize(this.table)"
       class="mt-1"
     >
       {{ "Auto-normalize this table" }}
     </button>
   </sbb-tab>
   <sbb-tab label="Foreign Keys">
-    <app-foreign-keys
-      [schema]="schema"
-      [table]="table"
-      (selectColumns)="selectColumns.emit($event)"
-      (indToFk)="indToFk.emit($event)"
-    ></app-foreign-keys>
+    <app-foreign-keys></app-foreign-keys>
   </sbb-tab>
   <sbb-tab label="Table Editing">
-    <app-table-editing
-      [table]="table"
-      (deleteColumnEvent)="deleteColumnEvent.emit($event)"
-    ></app-table-editing>
+    <app-table-editing></app-table-editing>
   </sbb-tab>
   <sbb-tab label="Union">
     <app-union-sidebar

@@ -1,8 +1,8 @@
+import { SchemaService } from '@/src/app/schema.service';
 import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersisting';
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
+import { Component } from '@angular/core';
 import MsSqlPersisting from '@/src/model/schema/persisting/MsSqlPersisting';
-import Schema from '@/src/model/schema/Schema';
-import { Component, Input } from '@angular/core';
 import * as saveAs from 'file-saver';
 import { DatabaseService } from '../../../database.service';
 
@@ -12,10 +12,12 @@ import { DatabaseService } from '../../../database.service';
   styleUrls: ['./persist-schema.component.css'],
 })
 export class PersistSchemaComponent {
-  @Input() public schema!: Schema;
   public schemaName: string = '';
 
-  constructor(public dataService: DatabaseService) {}
+  constructor(
+    public dataService: DatabaseService,
+    private schemaService: SchemaService
+  ) {}
 
   public async initPersisting(): Promise<SQLPersisting> {
     const dbmsName: string = await this.dataService.getDmbsName();
@@ -30,7 +32,7 @@ export class PersistSchemaComponent {
 
   public async persistSchema(): Promise<string> {
     const persisting = await this.initPersisting();
-    return persisting!.createSQL(this.schema);
+    return persisting.createSQL(this.schemaService.schema);
   }
 
   async download(): Promise<void> {

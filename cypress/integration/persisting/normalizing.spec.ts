@@ -38,11 +38,11 @@ describe("The persist-button should create executable SQL", () => {
       "contain",
       "r_regionkey"
     );
-    cy.get(".joint-tool").should("have.length", 1);
+    cy.get(".joint-tool").should("have.length", 2);
   });
 
   it("denormalized table contains same data as initial table", () => {
-    cy.get(".joint-tool").first().click();
+    cy.get('[joint-selector="join-button"]').click();
     cy.contains("Ok").click();
 
     cy.createSchema(denormalizedSchema);

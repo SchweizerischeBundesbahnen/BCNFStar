@@ -233,3 +233,13 @@ Cypress.Commands.add("deleteAllMetanomeResults", () => {
 Cypress.Commands.add("clickOnTable", (tablename) => {
   cy.get(`.table-head-title:contains("${tablename}")`).click({ force: true });
 });
+Cypress.Commands.add("createForeignKey", () => {
+  cy.visitPossibleForeignKeysTab();
+  cy.contains("public.part_partsupp_supplier_denormalized").click();
+  cy.get("sbb-radio-button")
+    .contains(
+      "(public.part_partsupp_supplier_denormalized) s_nationkey -> (public.nation_region_denormalized) n_nationkey"
+    )
+    .click();
+  cy.get("button").contains("Create Foreign Key").click();
+});

@@ -3,37 +3,19 @@
     <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">
       Reset view
     </button>
-    <button
-      type="button"
-      sbb-button
-      (click)="onAutoNormalize(schema.regularTables)"
-      class="me-1"
-    >
+    <button type="button" sbb-button>
       {{ "Auto-normalize all tables" }}
     </button>
-    <sbb-toggle (change)="setStarMode($event)" class="me-1">
+    <sbb-toggle [(ngModel)]="schemaService.starMode" class="me-1">
       <sbb-toggle-option label="Normal Mode" [value]="false">
       </sbb-toggle-option>
       <sbb-toggle-option label="Star Schema Mode" [value]="true">
       </sbb-toggle-option>
     </sbb-toggle>
-    <app-undo-redo
-      class="undo-redo"
-      [canUndo]="commandProcessor.canUndo()"
-      [canRedo]="commandProcessor.canRedo()"
-      (undo)="onUndo()"
-      (redo)="onRedo()"
-    ></app-undo-redo>
+    <app-undo-redo class="undo-redo"></app-undo-redo>
   </div>
   <div>
-    <app-schema-graph
-      [schema]="schema"
-      [(selectedTable)]="selectedTable"
-      [selectedColumns]="selectedColumns"
-      [schemaChanged]="schemaChanged.asObservable()"
-      (joinFk)="onClickJoin($event)"
-      (makeDirectDimension)="onClickMakeDirectDimension($event)"
-    ></app-schema-graph>
+    <app-schema-graph></app-schema-graph>
   </div>
 
   <div class="item-sidebar">
@@ -41,26 +23,17 @@
       <div>
         <h2>Schema export</h2>
         <div class="mb-1">
-          <app-persist-schema [schema]="schema"></app-persist-schema>
+          <app-persist-schema></app-persist-schema>
         </div>
         <div>
-          <app-save-schema-editing [schema]="schema"> </app-save-schema-editing>
+          <app-save-schema-editing> </app-save-schema-editing>
         </div>
       </div>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
-        *ngIf="showSidebar()"
-        [table]="selectedTableAsTable"
-        [schema]="schema"
-        (splitFd)="onClickSplit($event)"
-        (indToFk)="onIndToFk($event)"
-        (deleteColumnEvent)="onDeleteColumn($event)"
-        (selectColumns)="onSelectColumns($event)"
-        (setSurrogateKey)="onSetSurrogateKey($event)"
-        (autoNormalizeSelectedTable)="onAutoNormalize([selectedTableAsTable])"
-        (union)="onUnion($event)"
+        *ngIf="schemaService.selectedTable"
       ></app-schema-editing-side-bar>
-      <h2 *ngIf="!selectedTable" class="table-not-selected">
+      <h2 *ngIf="!schemaService.selectedTable" class="table-not-selected">
         Select a table in the graph to start editing
       </h2>
     </div>

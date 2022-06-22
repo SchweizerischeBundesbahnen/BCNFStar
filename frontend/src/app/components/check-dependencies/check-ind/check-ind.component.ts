@@ -1,13 +1,13 @@
 import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import { SbbTableDataSource } from '@sbb-esta/angular/table';
-import { DatabaseService } from '@/src/app/database.service';
 import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { ViolatingINDRowsDataQuery } from '../../../dataquery';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { SchemaService } from '@/src/app/schema.service';
 import IRowCounts from '@server/definitions/IRowCounts';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 
@@ -16,18 +16,20 @@ import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
   templateUrl: './check-ind.component.html',
   styleUrls: ['./check-ind.component.css'],
 })
-export class CheckIndComponent implements OnChanges {
-  @Input() referencingTable!: Table;
-  @Input() tables!: Array<Table>;
+export class CheckIndComponent {
+  public get tables() {
+    return Array.from(this.schemaService.schema.tables);
+  }
 
   public rowCount: number = 0;
   public isLoading: boolean = false;
 
-  public referencedTable: Table | undefined;
+  public referencedTable?: Table;
+  public referencingTable: Table;
   private _relationship: Relationship = new Relationship([], []);
 
-  public referencingColumn: Column | undefined;
-  public referencedColumn: Column | undefined;
+  public referencingColumn?: Column;
+  public referencedColumn?: Column;
 
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
   public tableColumns: Array<string> = [];
@@ -35,20 +37,21 @@ export class CheckIndComponent implements OnChanges {
   public isValid: boolean = false;
 
   constructor(
-    public dataService: DatabaseService,
+    public schemaService: SchemaService,
     private notification: SbbNotificationToast,
     public dialog: SbbDialog
-  ) {}
+  ) {
+    this.referencingTable = this.schemaService.selectedTable!;
+    this.schemaService.selectedTableChanged.subscribe(() => {
+      this.referencedTable = undefined;
+      this._relationship = new Relationship([], []);
 
-  ngOnChanges() {
-    this.referencedTable = undefined;
-    this._relationship = new Relationship([], []);
+      this.referencingColumn = undefined;
+      this.referencedColumn = undefined;
 
-    this.referencingColumn = undefined;
-    this.referencedColumn = undefined;
-
-    this.isValid = false;
-    this.isLoading = false;
+      this.isValid = false;
+      this.isLoading = false;
+    });
   }
 
   public get relationship(): Relationship {
@@ -136,7 +139,7 @@ export class CheckIndComponent implements OnChanges {
   }
 
   public validTables(): Array<Table> {
-    return this.tables;
+    return this.tables as Table[];
   }
 
   public canCheckIND(): boolean {
