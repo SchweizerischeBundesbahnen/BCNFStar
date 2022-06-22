@@ -125,7 +125,7 @@ Cypress.Commands.add(
   { prevSubject: false },
   (table1, table2) => {
     cy.createForeignKeyByFirstIND(table1, table2);
-    cy.get(".joint-tool").click();
+    cy.get(".joint-tool").first().click();
     cy.get(".sbb-button").contains("Ok").click();
   }
 );
