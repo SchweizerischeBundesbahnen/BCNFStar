@@ -20,7 +20,7 @@ import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
 
 export default class Schema {
-  public readonly tables = new Set<Table | UnionedTable>();
+  public readonly tables = new Set<BasicTable>();
   public name?: string;
   /**
    * all fks from the actual database and inds that the user validated
@@ -61,7 +61,7 @@ export default class Schema {
     this.addTables(...tables);
   }
 
-  public addTables(...tables: Array<Table | UnionedTable>) {
+  public addTables(...tables: Array<BasicTable>) {
     tables.forEach((table) => {
       this.tables.add(table);
     });
@@ -70,7 +70,7 @@ export default class Schema {
     this._unionedTables = undefined;
   }
 
-  public deleteTables(...tables: Array<Table | UnionedTable>) {
+  public deleteTables(...tables: Array<BasicTable>) {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
