@@ -81,6 +81,14 @@ export class IntegrationService {
     this._currentlyEditedSide = Side.left;
   }
 
+  /**
+   *
+   * @param src Tables that should be matched
+   * @param target Tables that should be matched
+   * @param srcSchema Corresponding schema object of these tables
+   * @param targetSchema Corresponding schema object of these tables
+   * @returns Schema matching according to COMA
+   */
   public async getMatching(
     src: Iterable<Table> = this._schemas![Side.left].regularTables,
     target: Iterable<Table> = this._schemas![Side.right].regularTables,

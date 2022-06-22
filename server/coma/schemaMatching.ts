@@ -1,5 +1,3 @@
-import { sqlUtils } from "@/db";
-import { DbmsType } from "@/db/SqlUtils";
 import ISchemaMatchingResponse from "@/definitions/ISchemaMatchingResponse";
 import { ensureDirExists } from "@/utils/files";
 import { exec } from "child_process";
@@ -11,8 +9,8 @@ const execAsync = promisify(exec);
 
 /**
  *
- * @param srcTables with schema.
- * @param trgTables
+ * @param srcTables in format schema.tables
+ * @param trgTables in format schema.tables
  */
 export default async function getSchemaMatching(
   srcSql: string,
