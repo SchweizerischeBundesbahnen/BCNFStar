@@ -19,7 +19,8 @@ import { FkDisplayOptions } from '../types/FkDisplayOptions';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
-  private customFactTables = new Set<Table>();
+  private suggestedFacts = new Set<Table>();
+  private rejectedFacts = new Set<Table>();
   public name?: string;
   /**
    * all fks from the actual database and inds that the user validated
@@ -70,13 +71,23 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
-  public suggestFactTable(table: Table) {
-    this.customFactTables.add(table);
+  public suggestFact(table: Table) {
+    this.suggestedFacts.add(table);
     this.relationshipsValid = false;
   }
 
-  public unsuggestFactTable(table: Table) {
-    this.customFactTables.delete(table);
+  public unsuggestFact(table: Table) {
+    this.suggestedFacts.delete(table);
+    this.relationshipsValid = false;
+  }
+
+  public rejectFact(table: Table) {
+    this.rejectedFacts.add(table);
+    this.relationshipsValid = false;
+  }
+
+  public unrejectFact(table: Table) {
+    this.rejectedFacts.delete(table);
     this.relationshipsValid = false;
   }
 
@@ -212,11 +223,12 @@ export default class Schema {
   public isFact(table: Table, onlyDisplayed: boolean): boolean {
     return (
       this.referencesOf(table, onlyDisplayed).length == 0 ||
-      this.customFactTables.has(table)
+      this.suggestedFacts.has(table)
     );
   }
 
   public isPotentialFact(table: Table): boolean {
+    if (this.rejectedFacts.has(table)) return false;
     return (
       this.referencesOf(table, false).length <= 1 &&
       this.fksOf(table, false).length >= 1
@@ -264,7 +276,7 @@ export default class Schema {
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
-    if (result.length == 0 || this.customFactTables.has(table))
+    if (result.length == 0 || this.suggestedFacts.has(table))
       result.push(new Array<TableRelationship>());
     return result;
   }

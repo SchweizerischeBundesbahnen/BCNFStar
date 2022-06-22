@@ -23,6 +23,7 @@ import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 import SuggestFactCommand from '../model/commands/SuggestFactCommand';
+import RejectFactCommand from '../model/commands/RejectFactCommand';
 
 @Injectable({
   providedIn: 'root',
@@ -130,8 +131,10 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public suggestFact(table: Table) {
-    const command = new SuggestFactCommand(this.schema, table);
+  public suggestOrRejectFact(table: Table, suggest: boolean) {
+    const command = suggest
+      ? new SuggestFactCommand(this.schema, table)
+      : new RejectFactCommand(this.schema, table);
     command.onDo = () => {
       this.selectedTable = table;
     };

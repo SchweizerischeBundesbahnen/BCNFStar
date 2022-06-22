@@ -13,9 +13,18 @@
     class="extra-button"
     style="left: 40px; top: 3px"
     type="button"
-    (click)="schemaService.suggestFact(table)"
+    (click)="schemaService.suggestOrRejectFact(table, true)"
   >
-    F
+    Y
+  </div>
+  <div
+    *ngIf="isPotentialFact()"
+    class="extra-button"
+    style="left: 60px; top: 3px"
+    type="button"
+    (click)="schemaService.suggestOrRejectFact(table, false)"
+  >
+    N
   </div>
   <div
     class="table-head ellipsis"
