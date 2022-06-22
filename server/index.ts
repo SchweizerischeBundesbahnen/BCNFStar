@@ -16,6 +16,7 @@ import { check, body } from "express-validator";
 import {
   isValidFileName,
   isValidDatatype,
+  isValidSql,
 } from "./validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
@@ -111,11 +112,33 @@ app.post(
 
 app.post("/unionedkeys", checkUnionedKeys);
 
-app.post("/violatingRows/fd", getViolatingRowsForFD);
-app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
+app.post(
+  "/violatingRows/fd",
+  [body("sql").trim().custom(isValidSql())],
+  getViolatingRowsForFD
+);
+app.post(
+  "/violatingRows/rowcount/fd",
+  [body("sql").trim().custom(isValidSql())],
+  getViolatingRowsForFDCount
+);
 
-app.post("/violatingRows/rowcount/ind", getViolatingRowsForSuggestedINDCount);
-app.post("/violatingRows/ind", getViolatingRowsForSuggestedIND);
+app.post(
+  "/violatingRows/rowcount/ind",
+  [
+    body("referencingTableSql").trim().custom(isValidSql()),
+    body("referencedTableSql").trim().custom(isValidSql()),
+  ],
+  getViolatingRowsForSuggestedINDCount
+);
+app.post(
+  "/violatingRows/ind",
+  [
+    body("referencingTableSql").trim().custom(isValidSql()),
+    body("referencedTableSql").trim().custom(isValidSql()),
+  ],
+  getViolatingRowsForSuggestedIND
+);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 

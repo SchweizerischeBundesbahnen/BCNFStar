@@ -37,3 +37,26 @@ export function isValidDatatype(): CustomValidator {
     return true;
   };
 }
+
+export function isValidSql(): CustomValidator {
+  return (sqlString: string) => {
+    const sql = sqlString.toLowerCase().trim();
+    const forbiddenSubstrings = [
+      " --",
+      " drop ",
+      " exec ",
+      " view ",
+      " alter ",
+    ];
+
+    if (
+      forbiddenSubstrings.every((str) => !sql.toLocaleLowerCase().includes(str))
+    ) {
+      return Promise.reject("This SQL isn't safe to execute");
+    }
+    if (sql.length == 0) {
+      return Promise.reject("This SQL isn't safe to execute");
+    }
+    return true;
+  };
+}
