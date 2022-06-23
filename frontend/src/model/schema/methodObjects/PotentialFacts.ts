@@ -22,8 +22,6 @@ export default class PotentialFacts {
     for (const table of this.schema.tables)
       if (this.connectionTopologyValues.get(table)! >= threshold)
         this.potentialFacts.add(table);
-    console.log('threshold', threshold);
-    console.log(this.connectionTopologyValues);
   }
 
   private calculateCTVOf(

@@ -43,6 +43,10 @@
   text-decoration: underline;
 }
 
+.fact-col {
+  font-weight: bold;
+}
+
 .fk {
   font-style: italic;
 }

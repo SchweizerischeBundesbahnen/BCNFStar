@@ -38,6 +38,8 @@
       [sbbTooltip]="column.name"
       [ngClass]="{
         pk: isPkColumn(column),
+        fk: isFkColumn(column),
+        'fact-col': isFactColumn(column),
         highlighted: isHighlightedColumn(column)
       }"
       class="ellipsis"

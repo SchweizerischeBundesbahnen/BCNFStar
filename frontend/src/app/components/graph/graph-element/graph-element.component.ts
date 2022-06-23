@@ -29,6 +29,22 @@ export class GraphElementComponent {
     );
   }
 
+  public isFkColumn(column: BasicColumn): boolean {
+    return this.schemaService.schema.isFkColumn(this.table, column);
+  }
+
+  public isFactColumn(column: BasicColumn) {
+    if (!this.isFact()) return false;
+    return (
+      !this.isFkColumn(column) &&
+      !(
+        this.table.implementsSurrogateKey() &&
+        column.name == this.table.surrogateKey
+      ) &&
+      !this.table.pk?.includes(column as Column)
+    );
+  }
+
   public isHighlightedColumn(column: BasicColumn): boolean {
     if (!(column instanceof Column) || !this.schemaService.highlightedColumns)
       return false;

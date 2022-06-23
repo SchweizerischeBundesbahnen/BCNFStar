@@ -776,6 +776,16 @@ export default class Schema {
     return resultingTables;
   }
 
+  public isFkColumn(table: Table, column: BasicColumn): boolean {
+    if (!(column instanceof Column))
+      return (
+        !table.implementsSurrogateKey() || column.name != table.surrogateKey
+      );
+    for (const fk of this.fksOf(table, true))
+      if (fk.relationship.referencing.includes(column)) return true;
+    return false;
+  }
+
   public displayedColumnsOf(table: Table): Array<BasicColumn> {
     const columns = new Array<BasicColumn>();
     if (table.implementsSurrogateKey())
