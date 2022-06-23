@@ -15,6 +15,9 @@ interface IRel<RelType, ColType> {
   mapsColumns(col1: ColType, col2: ColType): boolean;
 }
 
+/**
+ * uses existingRels to calculate all valid relationships by transitively extending them
+ */
 export abstract class FkDerivation<
   RelType extends IRel<RelType, ColType>,
   ColType extends Comparable<ColType>
