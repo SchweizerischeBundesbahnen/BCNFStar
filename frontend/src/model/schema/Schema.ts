@@ -232,7 +232,7 @@ export default class Schema {
 
   public isPotentialFact(table: Table): boolean {
     if (this.rejectedFacts.has(table)) return false;
-    if (!this.relationshipsValid) this.updateFks();
+    if (!this._tableFksValid) this.updateFks();
     return this.potentialFacts.has(table);
   }
 
