@@ -13,7 +13,6 @@ import {
   SplitDialogResponse,
   SplitDialogComponent,
   FdSplitResponse,
-  ShowViolationsResponse,
   ChangeKeyResponse,
 } from '../../operation-dialogs/split-dialog/split-dialog.component';
 
@@ -83,11 +82,6 @@ export class ContainedSubtablesComponent {
       case 'fdSplit': {
         const fdResponse = response as FdSplitResponse;
         this.schemaService.split(fdResponse.fd, fdResponse.name);
-        break;
-      }
-      case 'showViolations': {
-        const violationResponse = response as ShowViolationsResponse;
-        this.schemaService.checkFd(this.table, violationResponse.fd);
         break;
       }
       case 'changeKey': {

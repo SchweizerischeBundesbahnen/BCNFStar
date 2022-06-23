@@ -51,7 +51,6 @@ export class SchemaService {
   }
   public set selectedTable(val: Table | undefined) {
     this._selectedTable = val;
-    console.log('selected', this.selectedTable);
     this._selectedTableChanged.emit();
   }
 

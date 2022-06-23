@@ -26,8 +26,8 @@
         <div class="sbb-checkbox-group-vertical">
           <sbb-checkbox
             *ngFor="let column of table.columns"
-            [ngModel]="selectedColumns.get(column)"
-            (ngModelChange)="setColumnSelection(column, $event)"
+            [checked]="selectedColumns.get(column)!"
+            (change)="setColumnSelection(column, $event.checked)"
           >
             <span [ngClass]="{ hull: hull.includes(column) }">{{
               column.name
@@ -45,7 +45,7 @@
 
   <div *ngIf="isFullyDetermined() && isKeyNonMinimal()" class="violation">
     A simpler key could determine all the selected attributes. We strongly
-    advice to choose other key.
+    advise to choose other key.
   </div>
   <div *ngIf="pkViolation" class="violation">
     The primary key {{ table.pk }} would be destroyed when splitting.

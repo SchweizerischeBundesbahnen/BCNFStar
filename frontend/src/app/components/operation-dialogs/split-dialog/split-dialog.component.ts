@@ -19,10 +19,6 @@ export interface ChangeKeyResponse extends SplitDialogResponse {
   rhs: ColumnCombination;
 }
 
-export interface ShowViolationsResponse extends SplitDialogResponse {
-  fd: FunctionalDependency;
-}
-
 @Component({
   selector: 'app-split-dialog',
   templateUrl: './split-dialog.component.html',
@@ -37,7 +33,7 @@ export class SplitDialogComponent {
   public minimalDeterminants!: Array<ColumnCombination>;
   public hull!: ColumnCombination;
 
-  public selectedColumns = new Map<Column, Boolean>();
+  public selectedColumns = new Map<Column, boolean>();
 
   public tableName: string;
 
@@ -45,7 +41,7 @@ export class SplitDialogComponent {
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<
       SplitDialogComponent,
-      FdSplitResponse | ChangeKeyResponse | ShowViolationsResponse
+      FdSplitResponse | ChangeKeyResponse
     >,
     public schemaService: SchemaService,
     // eslint-disable-next-line no-unused-vars
@@ -126,7 +122,7 @@ export class SplitDialogComponent {
   }
 
   public showViolations() {
-    this.dialogRef.close({ type: 'showViolations', fd: this.fd });
+    this.schemaService.checkFd(this.table, this.fd);
   }
 
   public otherKey() {
