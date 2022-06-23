@@ -10,6 +10,7 @@ import IndToFkCommand from '../model/commands/IndToFkCommand';
 import JoinCommand from '../model/commands/JoinCommand';
 import ShowFkCommand from '../model/commands/ShowFkCommand';
 import SplitCommand from '../model/commands/SplitCommand';
+import DeleteTableCommand from '../model/commands/DeleteTableCommand';
 import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import FunctionalDependency from '../model/schema/FunctionalDependency';
@@ -17,9 +18,10 @@ import Schema from '../model/schema/Schema';
 import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
-import { DirectDimensionDialogComponent } from './components/direct-dimension-dialog/direct-dimension-dialog.component';
+import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
+import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -112,6 +114,21 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  public async deleteTable() {
+    const dialogRef = this.dialog.open(DeleteTableDialogComponent);
+    const value = await firstValueFrom(dialogRef.afterClosed());
+    if (!value) return;
+    const command = new DeleteTableCommand(this.schema, this._selectedTable!);
+    command.onDo = () => {
+      this.selectedTable = undefined;
+    };
+    command.onUndo = () => {
+      this.selectedTable = command.table;
+    };
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
   public async split(fd: FunctionalDependency) {
     const dialogRef = this.dialog.open(SplitDialogComponent, {
       data: {
@@ -178,21 +195,20 @@ export class SchemaService {
   }
 
   public async makeDirectDimension(table: Table): Promise<void> {
-    const routes = this._schema.directDimensionableRoutes(table, true);
+    let routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
         data: { table: table },
       });
 
-      const routes: Array<Array<TableRelationship>> = await firstValueFrom(
-        dialogRef.afterClosed()
-      );
+      const result = await firstValueFrom(dialogRef.afterClosed());
+      routes = result.routes;
       if (!routes) return;
     }
 
     const command = new DirectDimensionCommand(this._schema, routes);
     command.onDo = () => (this.selectedTable = command.newTables[0]);
-    command.onUndo = () => (this.selectedTable = command.newTables[0]);
+    command.onUndo = () => (this.selectedTable = command.oldTables[0]);
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }

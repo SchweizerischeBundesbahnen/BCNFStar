@@ -156,6 +156,12 @@ export default class Schema {
     return this.referencesOf(table, onlyDisplayed).length == 0;
   }
 
+  public isDirectDimension(table: Table): boolean {
+    return this.referencesOf(table, true).some((reference) =>
+      this.isFact(reference.referencingTable, true)
+    );
+  }
+
   /**
    * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
    * or routes that would add no extra information to the fact table when joined completely
@@ -178,13 +184,16 @@ export default class Schema {
    */
   public routesFromFactTo(
     table: Table,
-    onlyDisplayedFks: boolean
+    onlyDisplayedFks: boolean,
+    visitedTables: Array<Table> = []
   ): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
     for (const rel of this.referencesOf(table, onlyDisplayedFks)) {
+      if (visitedTables.includes(rel.referencingTable)) continue;
       const routes = this.routesFromFactTo(
         rel.referencingTable,
-        onlyDisplayedFks
+        onlyDisplayedFks,
+        [...visitedTables, table]
       );
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
@@ -499,7 +508,7 @@ export default class Schema {
         .union(referencedColumns);
 
       //matching (sourceFd -> Fd) and selection
-      for (const sourceFd of this._fds.get(source.table)!) {
+      for (const sourceFd of this._fds.get(source.table) ?? []) {
         const lhs = relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
         if (!lhs) continue;
         const rhs = relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;

@@ -193,11 +193,11 @@ export default class Table {
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
-    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).deepCopy();
+    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).copy();
   }
 
   public generatingSchema(fd: FunctionalDependency): ColumnCombination {
-    return fd.rhs.deepCopy();
+    return fd.rhs.copy();
   }
 
   public splitPreservesCC(

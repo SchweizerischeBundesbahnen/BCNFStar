@@ -5,7 +5,7 @@ import TableRelationship from '../schema/TableRelationship';
 import Command from './Command';
 
 export default class DirectDimensionCommand extends Command {
-  private oldTables = new Array<Table>();
+  public oldTables = new Array<Table>();
   public newTables = new Array<Table>();
   private routes = new Map<Table, Array<Array<TableRelationship>>>();
 

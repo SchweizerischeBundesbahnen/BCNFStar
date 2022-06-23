@@ -8,7 +8,7 @@
   <sbb-checkbox
     [ngModel]="routes.get(route)"
     (ngModelChange)="routes.set(route, $event)"
-    *ngFor="let route of routes.keys()"
+    *ngFor="let route of allRoutes"
     class="block mt-1"
   >
     <span class="bold">{{ route[0].referencingTable.fullName }}</span>

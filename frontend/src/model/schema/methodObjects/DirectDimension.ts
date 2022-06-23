@@ -19,6 +19,7 @@ export default class DirectDimension {
   private directDimension(i: number): Table {
     const route = this.routes[i];
     let oldTable = route[0].referencingTable;
+    let originalColumns = oldTable.columns;
     let newTable = oldTable;
     let newRel = route[0].relationship;
     for (let j = 0; j < route.length - 1; j++) {
@@ -29,10 +30,13 @@ export default class DirectDimension {
       newRel = route[j + 1].relationship.applySourceMapping(
         this.join.sourceMapping
       );
+      originalColumns = originalColumns.applySourceMapping(
+        this.join.sourceMapping
+      );
     }
     newTable.columns.intersect(
       new ColumnCombination(new Array(...newRel.referencing)).union(
-        oldTable.columns
+        originalColumns
       )
     );
     return newTable;
