@@ -80,15 +80,6 @@ export class SchemaCreationService {
         );
     for (const [table, promise] of fdPromises.entries()) {
       const iFds = await promise;
-      if (iFds.length === 0) {
-        fds.push(
-          new SourceFunctionalDependency(
-            [],
-            table.columns.asArray().map((c) => c.sourceColumn)
-          )
-        );
-        continue;
-      }
       for (const iFd of iFds) {
         const lhs = iFd.lhsColumns.map(
           (colName) =>
