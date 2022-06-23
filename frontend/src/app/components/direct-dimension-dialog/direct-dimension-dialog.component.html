@@ -11,12 +11,12 @@
     *ngFor="let route of routes.keys()"
     class="block mt-1"
   >
-    <span class="bold">{{ route[0].referencing.fullName }}</span>
+    <span class="bold">{{ route[0].referencingTable.fullName }}</span>
     <span *ngFor="let rel of route">
       <span [sbbTooltip]="rel.relationship.sourceRelationship().toString()">
         -&gt;
       </span>
-      <span class="bold">{{ rel.referenced.fullName }}</span>
+      <span class="bold">{{ rel.referencedTable.fullName }}</span>
     </span>
   </sbb-checkbox>
 </div>

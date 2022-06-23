@@ -231,7 +231,7 @@ export class SchemaGraphComponent implements AfterContentInit {
             port: fk.referencingName + '_right',
           },
           target: {
-            id: this.graphStorage.get(fk.referenced)?.jointjsEl.id,
+            id: this.graphStorage.get(fk.referencedTable)?.jointjsEl.id,
             port: fk.referencedName + '_left',
           },
           z: -1,
@@ -247,7 +247,7 @@ export class SchemaGraphComponent implements AfterContentInit {
             },
           },
         });
-        this.graphStorage.get(table)?.links.set(fk.referenced, link);
+        this.graphStorage.get(table)?.links.set(fk.referencedTable, link);
         this.graph.addCell(link);
         this.addJoinButtonAndRemoveButton(link, fk);
       }

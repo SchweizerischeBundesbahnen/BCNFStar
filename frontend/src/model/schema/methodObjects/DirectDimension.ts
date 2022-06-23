@@ -9,7 +9,7 @@ export default class DirectDimension {
   private join!: Join;
 
   public constructor(private routes: Array<Array<TableRelationship>>) {
-    this.oldTable = routes[0][0].referencing;
+    this.oldTable = routes[0][0].referencingTable;
     for (const i in this.routes) {
       this.newTable = this.directDimension(+i);
       this.mapOtherRoutes(+i, this.join);
@@ -18,12 +18,12 @@ export default class DirectDimension {
 
   private directDimension(i: number): Table {
     const route = this.routes[i];
-    let oldTable = route[0].referencing;
+    let oldTable = route[0].referencingTable;
     let newTable = oldTable;
     let newRel = route[0].relationship;
     for (let j = 0; j < route.length - 1; j++) {
       this.join = new Join(
-        new TableRelationship(newRel, newTable!, route[j].referenced)
+        new TableRelationship(newRel, newTable!, route[j].referencedTable)
       );
       newTable = this.join.newTable;
       newRel = route[j + 1].relationship.applySourceMapping(
@@ -41,7 +41,7 @@ export default class DirectDimension {
   private mapOtherRoutes(i: number, join: Join) {
     for (let j = i + 1; j < this.routes.length; j++) {
       const nextRouteFk = this.routes[j][0];
-      nextRouteFk.referencing = join.newTable;
+      nextRouteFk.referencingTable = join.newTable;
       nextRouteFk.relationship.referencing =
         nextRouteFk.relationship.referencing.map(
           (col) =>

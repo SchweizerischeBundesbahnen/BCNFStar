@@ -15,7 +15,7 @@ export default class DirectDimensionCommand extends Command {
   ) {
     super();
     for (const route of routes) {
-      const fact = route[0].referencing;
+      const fact = route[0].referencingTable;
       if (!this.oldTables.includes(fact)) {
         this.oldTables.push(fact);
         this.routes.set(fact, new Array());

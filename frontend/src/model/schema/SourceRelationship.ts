@@ -60,12 +60,13 @@ export default class SourceRelationship {
     return `(${lhsSourceTable}) ${lhsString} -> (${rhsSourceTable}) ${rhsString}`;
   }
 
-  isConnected(other: SourceRelationship): boolean {
-    for (const col of other.referencingCols) {
-      if (!this.referencedCols.some((otherCol) => otherCol.equals(col)))
-        return false;
-    }
-    return true;
+  /**
+   * whether @other can be transitively extended by composing this relationship with @other
+   */
+  public isConnected(other: SourceRelationship): boolean {
+    return other.referencingCols.every((otherCol) =>
+      this.referencedCols.some((col) => col.equals(otherCol))
+    );
   }
 
   public get referencingCols(): Array<SourceColumn> {

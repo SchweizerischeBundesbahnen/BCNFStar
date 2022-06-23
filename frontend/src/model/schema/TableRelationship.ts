@@ -14,14 +14,14 @@ export default class TableRelationship {
    */
   public constructor(
     public relationship: Relationship,
-    public referencing: Table,
-    public referenced: Table
+    public referencingTable: Table,
+    public referencedTable: Table
   ) {}
 
   public toString() {
-    return `(${this.referencing.fullName}) ${new ColumnCombination(
+    return `(${this.referencingTable.fullName}) ${new ColumnCombination(
       this.referencingCols
-    )} -> (${this.referenced.fullName}) ${new ColumnCombination(
+    )} -> (${this.referencedTable.fullName}) ${new ColumnCombination(
       this.referencedCols
     )}`;
   }
@@ -29,14 +29,14 @@ export default class TableRelationship {
   public toJSON() {
     return {
       relationship: this.relationship,
-      referencing: this.referencing.fullName,
-      referenced: this.referenced.fullName,
+      referencing: this.referencingTable.fullName,
+      referenced: this.referencedTable.fullName,
     };
   }
 
   public equals(other: TableRelationship): boolean {
-    if (this.referenced != other.referenced) return false;
-    if (this.referencing != other.referencing) return false;
+    if (this.referencedTable != other.referencedTable) return false;
+    if (this.referencingTable != other.referencingTable) return false;
     return this.relationship.equals(other.relationship);
   }
 
@@ -47,8 +47,8 @@ export default class TableRelationship {
     attach to for any foreign key.
    */
   get referencedName(): string {
-    return this.referenced.implementsSurrogateKey()
-      ? this.referenced.surrogateKey
+    return this.referencedTable.implementsSurrogateKey()
+      ? this.referencedTable.surrogateKey
       : this.referencedCols[0].name;
   }
 
@@ -59,16 +59,19 @@ export default class TableRelationship {
     attach to for any foreign key.
     */
   get referencingName(): string {
-    return this.referenced.implementsSurrogateKey()
-      ? this.referenced.surrogateKey +
+    return this.referencedTable.implementsSurrogateKey()
+      ? this.referencedTable.surrogateKey +
           '_' +
           this.referencingCols.map((col) => col.name).join('_')
       : this.referencingCols[0].name;
   }
 
-  isConnected(other: TableRelationship): boolean {
+  /**
+   * whether @other can be transitively extended by composing this relationship with @other
+   */
+  public isConnected(other: TableRelationship): boolean {
     return (
-      this.referenced == other.referencing &&
+      this.referencedTable == other.referencingTable &&
       new ColumnCombination(other.referencingCols).isSubsetOf(
         new ColumnCombination(this.referencedCols)
       )

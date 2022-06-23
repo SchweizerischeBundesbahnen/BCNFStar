@@ -182,7 +182,10 @@ export default class Schema {
   ): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
     for (const rel of this.referencesOf(table, onlyDisplayedFks)) {
-      const routes = this.routesFromFactTo(rel.referencing, onlyDisplayedFks);
+      const routes = this.routesFromFactTo(
+        rel.referencingTable,
+        onlyDisplayedFks
+      );
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
@@ -199,7 +202,7 @@ export default class Schema {
   ): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
-      (fk) => fk.referenced == table
+      (fk) => fk.referencedTable == table
     );
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
     return result;
@@ -211,7 +214,7 @@ export default class Schema {
   public fksOf(table: Table, onlyDisplayed: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
-      (fk) => fk.referencing == table
+      (fk) => fk.referencingTable == table
     );
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
     return result;
@@ -220,7 +223,7 @@ export default class Schema {
   public hiddenFksOf(table: Table): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     return Array.from(this._tableFks.keys()).filter(
-      (fk) => fk.referencing == table && !this.isFkDisplayed(fk)
+      (fk) => fk.referencingTable == table && !this.isFkDisplayed(fk)
     );
   }
 
@@ -349,9 +352,9 @@ export default class Schema {
     visitedTables: Array<Table> = [],
     firstIteration: boolean = true
   ): boolean {
-    if (visitedTables.includes(fk.referencing)) return false;
-    visitedTables.push(fk.referencing);
-    for (const otherFk of this.fksOf(fk.referencing, false)) {
+    if (visitedTables.includes(fk.referencingTable)) return false;
+    visitedTables.push(fk.referencingTable);
+    for (const otherFk of this.fksOf(fk.referencingTable, false)) {
       if (otherFk.equals(fk)) {
         if (firstIteration) continue;
         else return true;
@@ -367,8 +370,8 @@ export default class Schema {
               newReferencing as Array<Column>,
               fk.referencedCols
             ),
-            otherFk.referenced,
-            fk.referenced
+            otherFk.referencedTable,
+            fk.referencedTable
           ),
           visitedTables,
           false
@@ -380,14 +383,14 @@ export default class Schema {
   }
 
   private isStarViolatingFk(fk: TableRelationship) {
-    if (this.isFact(fk.referencing, false)) return false;
-    return !this.directDimensionableRoutes(fk.referenced, false).some(
+    if (this.isFact(fk.referencingTable, false)) return false;
+    return !this.directDimensionableRoutes(fk.referencedTable, false).some(
       (route) => route[route.length - 1] == fk
     );
   }
 
   private addTableFk(fk: TableRelationship) {
-    if (fk.referencing == fk.referenced) return;
+    if (fk.referencingTable == fk.referencedTable) return;
     if (
       !Array.from(this._tableFks.keys()).some((existingFk) =>
         existingFk.equals(fk)
@@ -405,8 +408,8 @@ export default class Schema {
     const newTable = new Join(relationship).newTable;
     return (
       newTable.columns.cardinality >
-        relationship.referencing.columns.cardinality &&
-      relationship.referenced != relationship.referencing
+        relationship.referencingTable.columns.cardinality &&
+      relationship.referencedTable != relationship.referencingTable
     );
   }
 
@@ -625,7 +628,7 @@ export default class Schema {
       columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
     columns.push(...table.columns);
     for (const fk of this.fksOf(table, true))
-      if (fk.referenced.implementsSurrogateKey()) {
+      if (fk.referencedTable.implementsSurrogateKey()) {
         columns.push({
           name: fk.referencingName,
           dataTypeString: 'integer',

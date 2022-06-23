@@ -93,8 +93,8 @@ export class TableFkDerivation extends FkDerivation<TableRelationship, Column> {
         newRelReferencing,
         Array.from(fkFromReferenced.referencedCols)
       ),
-      fkToReferencing.referencing,
-      fkFromReferenced.referenced
+      fkToReferencing.referencingTable,
+      fkFromReferenced.referencedTable
     );
   }
 }
