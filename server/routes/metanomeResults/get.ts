@@ -37,8 +37,9 @@ export async function sendMetanomeResult(res: Response, fileName: string) {
   let firstLine = true;
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");
+  res.write("[");
   for await (const line of lines) {
-    res.write(firstLine ? "[" : ",");
+    if (!firstLine) res.write(",");
     firstLine = false;
     res.write(line);
   }
