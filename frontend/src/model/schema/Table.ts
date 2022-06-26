@@ -401,21 +401,58 @@ export default class Table extends BasicTable {
           new FunctionalDependency(this.pk!.copy(), this.columns.copy())
         );
 
-      return await this.scoreFds(allFds).then(() => {
-        // TODO Marie: sort keys in clusters
-        console.log('start then');
-        const fdClusterTree = new ColumnsTree<FdCluster>();
-        for (let fd of allFds) {
-          let cluster = fdClusterTree.get(fd.rhs);
-          if (!cluster) {
-            cluster = { columns: fd.rhs.copy(), fds: new Array() };
-            fdClusterTree.add(cluster, cluster.columns);
-          }
-          cluster.fds.push(fd);
+      const fdClusterTree = new ColumnsTree<FdCluster>();
+      for (let fd of allFds) {
+        let cluster = fdClusterTree.get(fd.rhs);
+        if (!cluster) {
+          cluster = { columns: fd.rhs.copy(), fds: new Array() };
+          fdClusterTree.add(cluster, cluster.columns);
         }
-        this._fdClusters = fdClusterTree.getAll();
+        cluster.fds.push(fd);
+      }
+      this._fdClusters = fdClusterTree.getAll();
+      return await this.scoreFdClusters(this._fdClusters).then(() => {
+        console.log('start then');
+        console.log(this._fdClusters);
+        console.log('ready');
+        this._fdClusterValid = true;
+        if (!this._fdClusters) {
+          console.log(undefined);
+          return [];
+        }
+        return this._fdClusters;
+      });
+    } else {
+      console.log('else');
+      return this._fdClusters;
+    }
+  }
 
-        this._fdClusters.sort((cluster1, cluster2) => {
+  private async scoreFdClusters(fdClusters: Array<FdCluster>) {
+    let fdRedundancePromises: Array<Promise<Array<number>>> = new Array<
+      Promise<Array<number>>
+    >();
+    fdClusters.forEach((cluster) =>
+      fdRedundancePromises.push(
+        this.dataService.getRedundanceByValueCombinations(
+          this,
+          cluster.fds[0].lhs.asArray()
+        )
+      )
+    );
+    return Promise.all(fdRedundancePromises)
+      .then((res) => {
+        for (let i = 0; i < fdClusters.length; i++) {
+          fdClusters[i].fds.forEach((fd) => {
+            fd._redundanceGroups = res[i];
+          });
+        }
+        console.log(fdClusters);
+      })
+      .finally(() => {
+        fdClusters.sort((cluster1, cluster2) => {
+          cluster1.fds.forEach((fd) => new FdScore(this, fd).get());
+          cluster2.fds.forEach((fd) => new FdScore(this, fd).get());
           const bestFdScore1 = Math.max(
             ...cluster1.fds.map((fd) => fd._score || 0)
           );
@@ -426,41 +463,11 @@ export default class Table extends BasicTable {
           if (bestFdScore1 > bestFdScore2) return -1;
           return 0;
         });
-        console.log(this._fdClusters);
-        console.log('ready');
-        this._fdClusterValid = true;
-        return this._fdClusters;
+        fdClusters.forEach((cluster) =>
+          cluster.fds.sort((fd1, fd2) => (fd2._score || 0) - (fd1._score || 0))
+        );
+        console.log('end score  ');
       });
-    } else {
-      console.log('else');
-      return this._fdClusters;
-    }
-  }
-
-  private async scoreFds(fds: Array<FunctionalDependency>) {
-    let fdRedundancePromises: Array<Promise<Array<number>>> = new Array<
-      Promise<Array<number>>
-    >();
-    fds.forEach((fd) =>
-      fdRedundancePromises.push(
-        this.dataService
-          .getRedundanceByValueCombinations(this, fd.lhs.asArray())
-          .then((res) => (fd._redundanceGroups = res))
-      )
-    );
-    return Promise.all(fdRedundancePromises).finally(() => {
-      console.log('score');
-      fds.sort((fd1, fd2) => {
-        let score1 = new FdScore(this, fd1).get();
-        let score2 = new FdScore(this, fd2).get();
-        if (score1 !== score2) return score2 - score1;
-        const [fd1String, fd2String] = [fd1.toString(), fd2.toString()];
-        if (fd1String < fd2String) return 1;
-        if (fd2String < fd1String) return -1;
-        return 0;
-      });
-      console.log('end score  ');
-    });
   }
 
   public hull(columns: ColumnCombination): ColumnCombination {

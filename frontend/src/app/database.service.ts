@@ -71,14 +71,14 @@ export class DatabaseService {
   public async getRedundanceByValueCombinations(
     table: Table,
     lhs: Array<Column>
-  ): Promise<any> {
+  ): Promise<Array<number>> {
     let columns: Array<string> = [];
     lhs.forEach((col) => columns.push('"' + col.name + '"'));
 
     const tableSql = await new TableQuery(table).getTableSQL();
 
     return await firstValueFrom(
-      this.http.get(
+      this.http.get<Array<number>>(
         this.baseUrl +
           `/redundances?tableName=${tableSql}&&fdColumns=[${columns}]`
       )
