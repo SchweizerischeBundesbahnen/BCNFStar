@@ -43,8 +43,16 @@ export class ContainedSubtablesComponent {
 
   public fdClusters(): Array<FdCluster> {
     const cc = this.fdClusterFilter;
-    return this.table.fdClusters.filter((cluster) =>
+    let cluster = this.table.fdClusters.filter((cluster) =>
       cc.isSubsetOf(cluster.columns)
     );
+    if (cc.asArray().length > 0) {
+      cluster.sort((cluster1: FdCluster, cluster2: FdCluster) => {
+        const count1 = cluster1.columns.copy().setMinus(cc).asArray().length;
+        const count2 = cluster2.columns.copy().setMinus(cc).asArray().length;
+        return count1 - count2;
+      });
+    }
+    return cluster;
   }
 }
