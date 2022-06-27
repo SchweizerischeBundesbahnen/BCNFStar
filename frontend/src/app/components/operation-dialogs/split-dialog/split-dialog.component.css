@@ -1,4 +1,14 @@
 /* TODO: das Dialogfenster konstante Breite haben lassen */
+.grid-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto auto;
+  margin-bottom: 10px;
+}
+
+.hull {
+  color: lightgreen;
+}
 
 .keys {
   font-weight: bold;
@@ -6,10 +16,6 @@
 
 ul {
   margin: 0;
-}
-
-.hull {
-  color: lightgreen;
 }
 
 .violation {

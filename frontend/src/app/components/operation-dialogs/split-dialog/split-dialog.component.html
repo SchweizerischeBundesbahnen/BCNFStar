@@ -7,36 +7,28 @@
     [(ngModel)]="tableName"
     placeholder="if empty: column names of the chosen subtable key"
   />
-  <table width="100%">
-    <tr>
-      <td>
-        <h3>New Key</h3>
-      </td>
-      <td>
-        <h3>New Attributes</h3>
-      </td>
-    </tr>
-    <tr>
-      <td width="50%" style="vertical-align: top">
-        <ul>
-          <li *ngFor="let column of fd.lhs">{{ column.name }}</li>
-        </ul>
-      </td>
-      <td width="50%" style="vertical-align: top">
-        <div class="sbb-checkbox-group-vertical">
-          <sbb-checkbox
-            *ngFor="let column of table.columns"
-            [checked]="selectedColumns.get(column)!"
-            (change)="setColumnSelection(column, $event.checked)"
-          >
-            <span [ngClass]="{ hull: hull.includes(column) }">{{
-              column.name
-            }}</span>
-          </sbb-checkbox>
-        </div>
-      </td>
-    </tr>
-  </table>
+  <div class="grid-container">
+    <div>
+      <h3>New Key</h3>
+      <ul>
+        <li *ngFor="let column of fd.lhs">{{ column.name }}</li>
+      </ul>
+    </div>
+    <div>
+      <h3>New Attributes</h3>
+      <div class="sbb-checkbox-group-vertical">
+        <sbb-checkbox
+          *ngFor="let column of table.columns"
+          [checked]="selectedColumns.get(column)!"
+          (change)="setColumnSelection(column, $event.checked)"
+        >
+          <span [ngClass]="{ hull: hull.includes(column) }">{{
+            column.name
+          }}</span>
+        </sbb-checkbox>
+      </div>
+    </div>
+  </div>
 
   <div *ngIf="!isFullyDetermined()" class="violation">
     The key doesnt determine all of the selected attributes. Choose another key
