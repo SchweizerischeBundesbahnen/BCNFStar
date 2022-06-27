@@ -1,8 +1,8 @@
-import Schema from '@/src/model/schema/Schema';
 import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
+import { SchemaService } from '../../../schema.service';
 
 @Component({
   selector: 'app-direct-dimension-dialog',
@@ -12,17 +12,19 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 export class DirectDimensionDialogComponent {
   public table: Table;
   public routes = new Map<Array<TableRelationship>, Boolean>();
+  public allRoutes: Array<Array<TableRelationship>>;
 
   constructor(
     // eslint-disable-next-line no-unused-vars
     public dialogRef: SbbDialogRef<DirectDimensionDialogComponent>,
-    // eslint-disable-next-line no-unused-vars
-    @Inject(SBB_DIALOG_DATA) data: { table: Table; schema: Schema }
+    schemaService: SchemaService,
+    @Inject(SBB_DIALOG_DATA) data: { table: Table }
   ) {
-    for (const route of data.schema.directDimensionableRoutes(
+    this.allRoutes = schemaService.schema.directDimensionableRoutes(
       data.table,
       true
-    )) {
+    );
+    for (const route of this.allRoutes) {
       this.routes.set(route, false);
     }
     this.table = data.table;
@@ -34,7 +36,7 @@ export class DirectDimensionDialogComponent {
 
   public confirm() {
     this.dialogRef.close({
-      routes: [...this.routes.keys()].filter((route) => this.routes.get(route)),
+      routes: this.allRoutes.filter((route) => this.routes.get(route)),
     });
   }
 }

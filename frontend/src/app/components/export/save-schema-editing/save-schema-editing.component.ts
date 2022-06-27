@@ -1,5 +1,5 @@
-import Schema from '@/src/model/schema/Schema';
-import { Component, Input } from '@angular/core';
+import { SchemaService } from '@/src/app/schema.service';
+import { Component } from '@angular/core';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 import * as saveAs from 'file-saver';
 import * as JSZip from 'jszip';
@@ -11,15 +11,16 @@ import { stringify } from 'zipson';
   styleUrls: ['./save-schema-editing.component.css'],
 })
 export class SaveSchemaEditingComponent {
-  @Input() public schema!: Schema;
-
-  constructor(private notification: SbbNotificationToast) {}
+  constructor(
+    private notification: SbbNotificationToast,
+    private schemaService: SchemaService
+  ) {}
 
   public filename: string = '';
 
   public saveEditedSchema() {
     try {
-      let schemaEntryToJSON = JSON.stringify(this.schema);
+      let schemaEntryToJSON = JSON.stringify(this.schemaService.schema);
       let zipedJSON = stringify(JSON.parse(schemaEntryToJSON));
       this.downloadFile(zipedJSON);
       this.notification.open('Schema download');

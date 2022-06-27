@@ -4,13 +4,13 @@ import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
 import FdScore from './methodObjects/FdScore';
-import TableRelationship from './TableRelationship';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
-import SourceRelationship from './SourceRelationship';
 import { FdCluster } from '../types/FdCluster';
 import ColumnsTree from './ColumnsTree';
+import SourceRelationship from './SourceRelationship';
+import TableRelationship from './TableRelationship';
 
 export default class Table {
   public name = '';
@@ -23,28 +23,10 @@ export default class Table {
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
-
   public surrogateKey: string = '';
   public implementsSurrogateKey(): boolean {
     return this.surrogateKey.length > 1;
   }
-
-  /**
-   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
-   */
-  public _filteredFks!: Array<TableRelationship>;
-  /**
-   * cached results of schema.fksOf(this, false). Should not be accessed from outside the schema class
-   */
-  public _fks!: Array<TableRelationship>;
-  /**
-   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
-   */
-  public _filteredReferences!: Array<TableRelationship>;
-  /**
-   * cached results of schema.filteredksOf(this, false). Should not be accessed from outside the schema class
-   */
-  public _references!: Array<TableRelationship>;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
@@ -211,11 +193,11 @@ export default class Table {
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
-    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).deepCopy();
+    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).copy();
   }
 
   public generatingSchema(fd: FunctionalDependency): ColumnCombination {
-    return fd.rhs.deepCopy();
+    return fd.rhs.copy();
   }
 
   public splitPreservesCC(

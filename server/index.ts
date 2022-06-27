@@ -7,9 +7,16 @@ import morgan from "morgan";
 import cors, { CorsOptions } from "cors";
 import getFksFunction from "./routes/fks";
 import getPksFunction from "./routes/pks";
+
+import testTypeCasting from "./routes/unionability/checkTypeConversion";
+import checkUnionedKeys from "./routes/unionability/checkUniqueConstraint";
+
 import { getTablePage } from "./routes/tablePage";
-import { check } from "express-validator";
-import isValidFileName from "./routes/validation/parameterValidation";
+import { check, body } from "express-validator";
+import {
+  isValidFileName,
+  isValidDatatype,
+} from "./validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
 
@@ -27,14 +34,13 @@ import {
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
 
-const whitelist = ["http://localhost", "http://localhost:4200"];
-
 const corsOptions: CorsOptions = {
   origin(
     origin: string | undefined,
     callback: (a: Error | null, b: boolean) => void
   ) {
-    callback(null, true);
+    if (process.env.NODE_ENV === "development") callback(null, true);
+    else callback(new Error("CORS not allowed!"), false);
   },
   credentials: true,
 };
@@ -92,6 +98,17 @@ app.delete(
 app.post("/metanomeResults", runMetanome);
 
 app.get("/persist/dbmsname", getDbmsName);
+
+app.post(
+  "/typecasting",
+  [
+    body("currentDatatype").trim().custom(isValidDatatype()),
+    body("targetDatatype").trim().custom(isValidDatatype()),
+  ],
+  testTypeCasting
+);
+
+app.post("/unionedkeys", checkUnionedKeys);
 
 app.post("/violatingRows/fd", getViolatingRowsForFD);
 app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);

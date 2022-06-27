@@ -1,39 +1,51 @@
-<sbb-loading
-  mode="inline"
-  aria-valuetext="Loading, please wait"
-  *ngIf="this.isLoading"
-></sbb-loading>
-<sbb-paginator
-  (page)="changePage($event)"
-  [pageIndex]="page"
-  [pageSize]="pageSize"
-  [length]="rowCount"
->
-</sbb-paginator>
-<sbb-table-wrapper class="table-wrapper">
-  <table sbb-table [dataSource]="_dataSource">
-    <sbb-text-column *ngFor="let column of tableColumns" name="{{ column }}">
-    </sbb-text-column>
-    <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
-    <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+<div class="table-parent">
+  <div class="loading" *ngIf="this.isLoading">
+    <sbb-loading mode="large"></sbb-loading>
+  </div>
+  <sbb-table-wrapper class="table-wrapper">
+    <table sbb-table [dataSource]="_dataSource">
+      <tr sbb-header-row *sbbHeaderRowDef="tableColumns"></tr>
+      <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
+      <ng-container *ngFor="let column of tableColumns" [sbbColumnDef]="column">
+        <th sbb-header-cell *sbbHeaderCellDef>{{ column }}</th>
+        <td [ngStyle]="dataService.cellStyle[column]" *sbbCellDef="let element">
+          {{ element[column] }}
+        </td>
+      </ng-container>
 
-    <!-- Horizontal Table Divider -->
-    <!-- from sbb angular example 
+      <!-- Horizontal Table Divider -->
+      <!-- from sbb angular example 
       "Grouped Rows And Columns Table"
       https://angular.app.sbb.ch/angular/components/table/examples -->
-    <tr
-      sbb-row
-      *sbbRowDef="let row; columns: ['horizontalTableDivider']; when: isGroup"
-    ></tr>
-    <ng-container sbbColumnDef="horizontalTableDivider">
-      <td
-        class="groupby-cell"
-        [attr.colspan]="tableColumns.length"
-        sbb-cell
-        *sbbCellDef="let groupBy"
-      >
-        <span class="sbb-table-divider-title">{{ groupBy.title }}</span>
-      </td>
-    </ng-container>
-  </table>
-</sbb-table-wrapper>
+      <tr
+        sbb-row
+        *sbbRowDef="let row; columns: ['horizontalTableDivider']; when: isGroup"
+      ></tr>
+      <ng-container sbbColumnDef="horizontalTableDivider">
+        <td
+          class="groupby-cell"
+          [attr.colspan]="tableColumns.length"
+          sbb-cell
+          *sbbCellDef="let groupBy"
+        >
+          <span class="sbb-table-divider-title">{{ groupBy.title }}</span>
+        </td>
+      </ng-container>
+    </table>
+  </sbb-table-wrapper>
+
+  <div class="grid-container-paginator">
+    <sbb-paginator
+      (page)="changePage($event)"
+      [pageIndex]="page"
+      [pageSize]="pageSize"
+      [length]="rowCount.groups"
+      class="mt-2"
+    >
+    </sbb-paginator>
+    <div class="text-aling-right mt-2 align-right">
+      {{ pageSize * page + 1 }} - {{ pageSize * page + currentPageLength() }} /
+      {{ rowCount.groups }}
+    </div>
+  </div>
+</div>
