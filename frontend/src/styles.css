@@ -38,6 +38,11 @@ body {
   max-height: 40vh;
 }
 
+/* shows cursor as clickable when hovering over join/union buttons */
+text {
+  cursor: pointer;
+}
+
 .d-flex {
     display: flex !important;
 }

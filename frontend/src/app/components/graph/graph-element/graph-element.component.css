@@ -11,6 +11,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  font-size: 14.5px;
 }
 
 .extra-button {

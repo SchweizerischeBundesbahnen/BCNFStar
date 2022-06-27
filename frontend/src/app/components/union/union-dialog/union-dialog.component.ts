@@ -92,7 +92,7 @@ export class UnionDialogComponent {
   }
 
   public async matchTables() {
-    const result = await this.intService.getMatching(
+    const result = await this.intService.getColumnMatching(
       [this.tables[Side.left]],
       [this.tables[Side.right]],
       this.schemaService.schema,

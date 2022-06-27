@@ -1,7 +1,9 @@
+import { IntegrationService } from '@/src/app/integration.service';
 import Column from '@/src/model/schema/Column';
 import Table from '@/src/model/schema/Table';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { firstValueFrom } from 'rxjs';
 import { SchemaService } from '../../../schema.service';
 import { UnionDialogComponent } from '../union-dialog/union-dialog.component';
 
@@ -19,7 +21,13 @@ export interface unionSpec {
 export class UnionSidebarComponent implements OnInit {
   public otherTable?: Table;
 
-  constructor(public dialog: SbbDialog, public schemaService: SchemaService) {}
+  @Input() availableTables!: Array<Table>;
+
+  constructor(
+    public dialog: SbbDialog,
+    public schemaService: SchemaService,
+    public intService: IntegrationService
+  ) {}
 
   ngOnInit(): void {
     return;
@@ -30,31 +38,24 @@ export class UnionSidebarComponent implements OnInit {
   }
 
   public filteredTables(): Array<Table> {
-    return this.schemaService.schema.regularTables.filter(
-      (t) => t !== this.table
-    );
+    return this.availableTables.filter((t) => t !== this.table);
   }
 
-  openDialog(): void {
+  public async openDialog(): Promise<void> {
     const dialogRef = this.dialog.open(UnionDialogComponent, {
       data: {
         tables: [this.table, this.otherTable],
       },
     });
 
-    dialogRef
-      .afterClosed()
-      .subscribe(
-        (result: {
-          columns: Array<Array<Column | null>>;
-          newTableName: string;
-        }) => {
-          this.schemaService.union({
-            tables: [this.table, this.otherTable!],
-            columns: result.columns,
-            newTableName: result.newTableName,
-          });
-        }
-      );
+    const result: {
+      columns: Array<Array<Column | null>>;
+      newTableName: string;
+    } = await firstValueFrom(dialogRef.afterClosed());
+    this.schemaService.union({
+      tables: [this.table, this.otherTable!],
+      columns: result.columns,
+      newTableName: result.newTableName,
+    });
   }
 }

@@ -104,7 +104,8 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       nodeSep: 40,
       // prevent left ports from being cut off
       marginX: this.portDiameter / 2,
-      rankSep: this.intService.isComparing ? 150 : 60,
+      rankSep:
+        this.intService.isIntegrating && this.intService.isComparing ? 150 : 60,
       rankDir: 'LR',
     });
 
@@ -218,15 +219,11 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   // if you change this, also change graph-element.component.css > .table-head > height
   protected graphElementHeaderHeight: number = 25;
-  private generatePortMarkup({
-    counter,
-    side,
-    table,
-  }: {
-    counter: number;
-    side: PortSide;
-    table: BasicTable;
-  }) {
+  private generatePortMarkup(
+    counter: number,
+    side: PortSide,
+    table: BasicTable
+  ) {
     const cx = side == PortSide.Left ? 0 : this.elementWidth;
     let fill = 'white';
     if (this.intService.isInRightSchema(table)) fill = 'rgb(250, 255, 245)';
@@ -248,19 +245,15 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   private generatePorts(jointjsEl: joint.dia.Element, table: BasicTable) {
     let counter = 0;
     for (let column of this.schemaService.schema.displayedColumnsOf(table)) {
-      let args = { counter, side: PortSide.Left, table };
       jointjsEl.addPort({
         id: column.name + '_left', // generated if `id` value is not present
         group: 'ports-left',
-        args,
-        markup: this.generatePortMarkup(args),
+        markup: this.generatePortMarkup(counter, PortSide.Left, table),
       });
-      args = { counter, side: PortSide.Right, table };
       jointjsEl.addPort({
         id: column.name + '_right', // generated if `id` value is not present
         group: 'ports-right',
-        args,
-        markup: this.generatePortMarkup(args),
+        markup: this.generatePortMarkup(counter, PortSide.Right, table),
       });
       counter++;
     }

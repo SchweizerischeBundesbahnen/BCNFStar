@@ -57,7 +57,14 @@ export default class Schema {
     };
   }
 
-  public constructor(...tables: Array<Table>) {
+  public merge(other: Schema) {
+    const result = new Schema(...this.tables, ...other.tables);
+    result._baseFks = this._baseFks.concat(other._baseFks);
+    result._inds = this._inds.concat(other._inds);
+    return result;
+  }
+
+  public constructor(...tables: Array<BasicTable>) {
     this.addTables(...tables);
   }
 
