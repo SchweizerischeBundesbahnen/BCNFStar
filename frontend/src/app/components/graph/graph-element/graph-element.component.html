@@ -12,10 +12,9 @@
     *ngIf="isPotentialFact()"
     class="extra-button"
     [sbbTooltip]="factTooltip"
-    style="left: 40px; top: 3px"
-  >
-    F
-  </div>
+    [sbbTooltipTrigger]="'click'"
+    style="left: 35px; top: 3px"
+  ></div>
   <div
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"

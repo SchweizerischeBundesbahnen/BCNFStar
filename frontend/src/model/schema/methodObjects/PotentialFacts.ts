@@ -6,7 +6,7 @@ export default class PotentialFacts {
 
   private static weightDirect = 1;
   private static weightIndirect = 0.8;
-  private static k = 1.5;
+  private static k = 1.0;
 
   private connectionTopologyValues = new Map<Table, number>();
 
@@ -35,7 +35,7 @@ export default class PotentialFacts {
       for (const fk of this.schema.fksOf(table, true))
         ctv +=
           PotentialFacts.weightIndirect *
-          this.calculateCTVOf(fk.referencing, [...visitedTables, table]);
+          this.calculateCTVOf(fk.referenced, [...visitedTables, table]);
       this.connectionTopologyValues.set(table, ctv);
     }
     return this.connectionTopologyValues.get(table)!;
