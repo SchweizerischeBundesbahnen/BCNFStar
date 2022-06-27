@@ -53,6 +53,8 @@ export class CheckIndComponent {
 
       this.isValid = false;
       this.isLoading = false;
+      if (this.schemaService.selectedTable instanceof Table)
+        this.referencingTable = this.schemaService.selectedTable!;
     });
   }
 
