@@ -647,7 +647,7 @@ export default class Schema {
         .union(referencedColumns);
 
       //matching (sourceFd -> Fd) and selection
-      for (const sourceFd of this._fds.get(source.table)!) {
+      for (const sourceFd of this._fds.get(source.table) ?? []) {
         const lhs = relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
         if (!lhs) continue;
         const rhs = relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;
