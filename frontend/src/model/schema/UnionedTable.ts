@@ -22,8 +22,7 @@ export default class UnionedTable extends BasicTable {
   public displayedColumns(): Array<Column> {
     return this.columns[0].map((col, i) => {
       const prefIndex = this.rPriority ? 1 : 0;
-      if (this.columns[prefIndex][i] != null)
-        return this.columns[1 - prefIndex][i];
+      if (this.columns[prefIndex][i] != null) return this.columns[prefIndex][i];
       if (this.columns[1 - prefIndex][i] != null)
         return this.columns[1 - prefIndex][i];
       throw Error;
