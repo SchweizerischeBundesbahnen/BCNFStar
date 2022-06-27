@@ -1,5 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
+import IRowCounts from '@server/definitions/IRowCounts';
 import { firstValueFrom } from 'rxjs';
 import AutoNormalizeCommand from '../model/commands/AutoNormalizeCommand';
 import CommandProcessor from '../model/commands/CommandProcessor';
@@ -20,7 +22,8 @@ import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
-import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
+import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
+import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 
 @Injectable({
@@ -70,7 +73,10 @@ export class SchemaService {
     return this._schemaChanged.asObservable();
   }
 
-  constructor(private dialog: SbbDialog) {}
+  constructor(
+    private dialog: SbbDialog,
+    private notification: SbbNotificationToast
+  ) {}
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
@@ -129,23 +135,8 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async split(fd: FunctionalDependency) {
-    const dialogRef = this.dialog.open(SplitDialogComponent, {
-      data: {
-        fd: fd,
-      },
-    });
-
-    const value: { fd: FunctionalDependency; name?: string } =
-      await firstValueFrom(dialogRef.afterClosed());
-    if (!value) return;
-
-    let command = new SplitCommand(
-      this._schema,
-      this.selectedTable!,
-      value.fd,
-      value.name
-    );
+  public split(fd: FunctionalDependency, name?: string) {
+    let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
@@ -211,6 +202,46 @@ export class SchemaService {
     command.onUndo = () => (this.selectedTable = command.oldTables[0]);
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
+  }
+
+  /**
+   * Checks the existance of a fd inside a table. It shows the violations inside a dialog.
+   * @returns whether the fd is valid
+   */
+  public async checkFd(
+    table: Table,
+    fd: FunctionalDependency
+  ): Promise<boolean> {
+    // only check those columns, which are not defined by existing fds
+    const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
+      table,
+      fd.lhs.asArray(),
+      fd.rhs.copy().setMinus(table.hull(fd.lhs)).asArray()
+    );
+
+    const rowCount: IRowCounts | void = await dataQuery
+      .loadRowCount()
+      .catch((e) => {
+        console.error(e);
+      });
+
+    if (!rowCount) {
+      const error_message =
+        'There was a backend error while checking this IND. Check the browser and server logs for details';
+      this.notification.open(error_message, { type: 'error' });
+      throw new Error(error_message);
+    }
+
+    if (rowCount.entries != 0) {
+      this.dialog.open(ViolatingRowsViewComponent, {
+        data: {
+          dataService: dataQuery,
+          rowCount: rowCount,
+        },
+      });
+    }
+
+    return rowCount.entries == 0;
   }
 
   public setSurrogateKey(key: string) {
