@@ -72,6 +72,7 @@ export class ContainedSubtablesComponent {
       data: {
         fd: fd,
       },
+      minWidth: '70%',
     });
 
     const response: SplitDialogResponse = await firstValueFrom(
