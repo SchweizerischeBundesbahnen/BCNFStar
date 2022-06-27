@@ -40,21 +40,21 @@ export function isValidDatatype(): CustomValidator {
 
 export function isValidSql(): CustomValidator {
   return (sqlString: string) => {
-    const sql = sqlString.toLowerCase().trim();
-    const forbiddenSubstrings = [
-      " --",
-      " drop ",
-      " exec ",
-      " view ",
-      " alter ",
+    const sql = sqlString.toLowerCase();
+    const forbiddenSubstrings: string[] = [
+      "--",
+      "drop",
+      "exec",
+      "view",
+      "alter",
     ];
 
-    if (
-      forbiddenSubstrings.every((str) => !sql.toLocaleLowerCase().includes(str))
-    ) {
-      return Promise.reject("This SQL isn't safe to execute");
+    for (const forbidden of forbiddenSubstrings) {
+      if (sql.includes(forbidden) || forbidden.includes(sql)) {
+        return Promise.reject("This SQL isn't safe to execute");
+      }
     }
-    if (sql.length == 0) {
+    if (sql.length == 0 || !sql.startsWith("select")) {
       return Promise.reject("This SQL isn't safe to execute");
     }
     return true;
