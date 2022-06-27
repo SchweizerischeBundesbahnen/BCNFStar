@@ -119,3 +119,15 @@ Cypress.Commands.add("createForeignKey", () => {
     .click();
   cy.get("button").contains("Create Foreign Key").click();
 });
+
+Cypress.Commands.add("visitUnionTab", { prevSubject: false }, () => {
+  cy.contains("Union").click({ force: true });
+});
+
+Cypress.Commands.add(
+  "unionTables",
+  { prevSubject: false },
+  (table1, table2, columnMapping) => {
+    cy.clickOnTable;
+  }
+);
