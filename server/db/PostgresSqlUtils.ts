@@ -264,8 +264,36 @@ from
     columns: Array<string>
   ): Promise<any> {
     const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    // console.log(`SELECT SUM(redundance)
+    // FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
+    // WHERE redundance != 1`)
     const query_result = await this.pool.query<SchemaQueryRow>(
-      `SELECT ${stringColumns}, COUNT(*) from (${table}) as temp_table GROUP BY ${stringColumns}`
+      `SELECT SUM(redundance)
+      FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
+      WHERE redundance != 1`
+    );
+    // console.log(query_result)
+    return query_result.rows;
+  }
+
+  public async getRedundantGroupLengthByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any> {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    console.log(`SELECT COUNT(*)
+    FROM (
+      COUNT(*) as redundance 
+      FROM (${table}) as temp_table 
+      GROUP BY ${stringColumns})
+    as temp_table_2`);
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT COUNT(*)
+      FROM (
+        SELECT COUNT(*) as redundance 
+        FROM (${table}) as temp_table 
+        GROUP BY ${stringColumns})
+      as temp_table_2`
     );
     return query_result.rows;
   }

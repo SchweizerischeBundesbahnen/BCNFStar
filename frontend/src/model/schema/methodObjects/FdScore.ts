@@ -27,13 +27,12 @@ export default class FdScore {
   public calculate(): number {
     //TODO: change score for fds with NULL values to zero
     return (
-      // (this.fdLengthScore() +
-      //   this.keyValueScore() +
-      //   this.fdPositionScore() +
-      //   this.fdDensityScore() +
-      //   this.fdRedundanceScore()) /
-      // 5
-      this.fdRedundanceScoreTeam()
+      (this.fdLengthScore() +
+        this.keyValueScore() +
+        this.fdPositionScore() +
+        this.fdDensityScore() +
+        this.fdRedundanceScoreTeam()) /
+      5
     );
   }
 
@@ -106,24 +105,22 @@ export default class FdScore {
 
   public fdRedundanceScoreTeam(): number {
     console.log(
-      this.table.rowCount - this.fd._redundanceGroups.length,
-      (this.table.rowCount - this.fd._redundanceGroups.length) /
+      this.fd._redundantGroupLength,
+      this.table.rowCount,
+      this.table.rowCount - this.fd._redundantGroupLength,
+      (this.table.rowCount - this.fd._redundantGroupLength) /
         this.table.rowCount
     );
     // get all redundant tuples and normalize by row count
     return (
-      (this.table.rowCount - this.fd._redundanceGroups.length) /
+      (this.table.rowCount - this.fd._redundantGroupLength) /
       this.table.rowCount
     );
   }
 
   // TODO: null values
   public fdRedundanceScoreWeiLink(): number {
-    let redundanceSum = 0;
-    this.fd._redundanceGroups.forEach((num) =>
-      num != 1 ? (redundanceSum += num) : redundanceSum
-    );
-    console.log(this.fd, redundanceSum, this.table.rowCount);
-    return redundanceSum / this.table.rowCount;
+    console.log(this.fd, this.fd._redundantTuples, this.table.rowCount);
+    return this.fd._redundantTuples / this.table.rowCount;
   }
 }

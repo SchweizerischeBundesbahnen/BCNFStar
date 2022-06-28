@@ -30,9 +30,6 @@ export class SplitDialogComponent {
     data: { fd: FunctionalDependency }
   ) {
     this.fd = data.fd.copy();
-    data.fd._redundanceGroups.forEach((num) =>
-      this.fd._redundanceGroups.push(num)
-    );
     this.updateViolations();
     this.fd.rhs
       .copy()

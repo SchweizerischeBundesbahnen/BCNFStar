@@ -33,7 +33,8 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
-import getRankingRedundances from "./routes/rankingRedudance";
+import getRankingRedundanceSum from "./routes/rankingRedundanceSum";
+import getRankingRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
 import getMaxValue from "./routes/maxValue";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
@@ -89,7 +90,12 @@ app.get("/pks", getPksFunction);
 app.get(
   "/redundances",
   [check("tableName").isString(), check("columns").isString()],
-  getRankingRedundances
+  getRankingRedundanceSum
+);
+app.get(
+  "/redundances/length",
+  [check("tableName").isString(), check("columns").isString()],
+  getRankingRedudanceGroupLength
 );
 app.get(
   "/maxValue/column",

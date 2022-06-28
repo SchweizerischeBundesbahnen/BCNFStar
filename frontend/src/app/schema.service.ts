@@ -263,5 +263,6 @@ export class SchemaService {
 
   private notifyAboutSchemaChanges() {
     this._schemaChanged.next();
+    console.log('schema: ', this.schema);
   }
 }

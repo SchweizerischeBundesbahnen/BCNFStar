@@ -71,16 +71,33 @@ export class DatabaseService {
   public async getRedundanceByValueCombinations(
     table: Table,
     lhs: Array<Column>
-  ): Promise<Array<number>> {
+  ): Promise<number> {
     let columns: Array<string> = [];
     lhs.forEach((col) => columns.push('"' + col.name + '"'));
 
     const tableSql = await new TableQuery(table).getTableSQL();
 
     return await firstValueFrom(
-      this.http.get<Array<number>>(
+      this.http.get<number>(
         this.baseUrl +
           `/redundances?tableName=${tableSql}&&fdColumns=[${columns}]`
+      )
+    );
+  }
+
+  public async getRedundanceGroupLengthByValueCombinations(
+    table: Table,
+    lhs: Array<Column>
+  ): Promise<number> {
+    let columns: Array<string> = [];
+    lhs.forEach((col) => columns.push('"' + col.name + '"'));
+
+    const tableSql = await new TableQuery(table).getTableSQL();
+
+    return await firstValueFrom(
+      this.http.get<number>(
+        this.baseUrl +
+          `/redundances/length?tableName=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }

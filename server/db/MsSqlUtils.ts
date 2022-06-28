@@ -250,10 +250,24 @@ export default class MsSqlUtils extends SqlUtils {
   public async getRedundantValuesByColumns(
     table: string,
     columns: Array<string>
-  ) {
+  ): Promise<any> {
     const stringColumns = columns.map((col) => '"' + col + '"').join(",");
     const query_result = await sql.query<SchemaQueryRow>(
-      `SELECT ${stringColumns}, COUNT(*) from (${table}) as temp_table GROUP BY ${stringColumns}`
+      `SELECT SUM(redundance)
+      FROM (COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
+      WHERE redundance != 1`
+    );
+    return query_result;
+  }
+
+  public async getRedundantGroupLengthByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any> {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    const query_result = await sql.query<SchemaQueryRow>(
+      `SELECT COUNT(*)
+      FROM (SELECT ${stringColumns}, COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2`
     );
     return query_result;
   }

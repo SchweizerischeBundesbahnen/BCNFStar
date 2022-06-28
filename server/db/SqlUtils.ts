@@ -86,6 +86,11 @@ export default abstract class SqlUtils {
     columns: Array<string>
   ): Promise<any>;
 
+  public abstract getRedundantGroupLengthByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any>;
+
   public abstract getMaxValueByColumn(
     table: string,
     column: string
