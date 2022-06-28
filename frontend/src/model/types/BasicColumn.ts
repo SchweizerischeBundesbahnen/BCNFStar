@@ -13,3 +13,16 @@ export function surrogateKeyColumn(name: string): BasicColumn {
     dataTypeString: '(integer, not null)',
   };
 }
+
+export function newBasicColumn(
+  name: string,
+  dataType: string,
+  nullable: boolean
+): BasicColumn {
+  return {
+    name: name,
+    dataType: dataType,
+    nullable: nullable,
+    dataTypeString: `(${dataType}, ${nullable ? 'null' : 'not null'})`,
+  };
+}

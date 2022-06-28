@@ -259,11 +259,16 @@ export default class Schema {
    */
   public routesFromFactTo(
     table: Table,
-    onlyDisplayedFks: boolean
+    onlyDisplayedFks: boolean,
+    visitedTables: Array<Table> = []
   ): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
     for (const rel of this.referencesOf(table, onlyDisplayedFks)) {
-      const routes = this.routesFromFactTo(rel.referencing, onlyDisplayedFks);
+      if (visitedTables.includes(rel.referencing)) continue;
+      const routes = this.routesFromFactTo(rel.referencing, onlyDisplayedFks, [
+        ...visitedTables,
+        table,
+      ]);
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
@@ -632,7 +637,7 @@ export default class Schema {
         .union(referencedColumns);
 
       //matching (sourceFd -> Fd) and selection
-      for (const sourceFd of this._fds.get(source.table)!) {
+      for (const sourceFd of this._fds.get(source.table) ?? []) {
         const lhs = relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
         if (!lhs) continue;
         const rhs = relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;
