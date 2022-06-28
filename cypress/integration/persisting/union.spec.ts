@@ -45,6 +45,7 @@ describe("The persist-button should create executable SQL, that UNIONs two table
   });
 
   it("null columns work", () => {
+    const schemaname = unionedSchema + "nullcolumn";
     cy.unionTables(
       "public.nation_region_denormalized",
       "public.part_partsupp_supplier_denormalized",
@@ -54,13 +55,14 @@ describe("The persist-button should create executable SQL, that UNIONs two table
         ["Fill Column with NULL", "ps_suppkey"],
       ]
     );
-    cy.createSchema(unionedSchema);
+    cy.createSchema(schemaname);
 
     cy.visitFrontend();
-    cy.selectSpecificTablesAndGo(unionedSchema, ["nation_region_denormalized"]);
+    cy.selectSpecificTablesAndGo(schemaname, ["nation_region_denormalized"]);
   });
 
   it("allows using same column multiple times", () => {
+    const schemaname = unionedSchema + "multiplecolumns";
     cy.unionTables(
       "public.nation_region_denormalized",
       "public.part_partsupp_supplier_denormalized",
@@ -70,16 +72,14 @@ describe("The persist-button should create executable SQL, that UNIONs two table
         ["n_regionkey", "ps_partkey"],
       ]
     );
-    cy.createSchema(unionedSchema);
+    cy.createSchema(schemaname);
 
     cy.visitFrontend();
-    cy.selectSpecificTablesAndGo(unionedSchema, ["nation_region_denormalized"]);
+    cy.selectSpecificTablesAndGo(schemaname, ["nation_region_denormalized"]);
   });
 
   // TODO maybe we should think about transactions?
   afterEach("database cleanup", () => {
-    const downloadsFolder = Cypress.config("downloadsFolder");
-    cy.task("deleteFolder", downloadsFolder);
     cy.executeSql(`DROP SCHEMA IF EXISTS ${unionedSchema} CASCADE`);
   });
 });
