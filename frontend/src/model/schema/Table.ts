@@ -448,9 +448,10 @@ export default class Table extends BasicTable {
         console.log(fdClusters);
       })
       .finally(() => {
+        fdClusters.forEach((cluster) =>
+          cluster.fds.forEach((fd) => new FdScore(this, fd).get())
+        );
         fdClusters.sort((cluster1, cluster2) => {
-          cluster1.fds.forEach((fd) => new FdScore(this, fd).get());
-          cluster2.fds.forEach((fd) => new FdScore(this, fd).get());
           const bestFdScore1 = Math.max(
             ...cluster1.fds.map((fd) => fd._score || 0)
           );

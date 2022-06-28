@@ -27,12 +27,13 @@ export default class FdScore {
   public calculate(): number {
     //TODO: change score for fds with NULL values to zero
     return (
-      (this.fdLengthScore() +
-        this.keyValueScore() +
-        this.fdPositionScore() +
-        this.fdDensityScore() +
-        this.fdRedundanceScore()) /
-      5
+      // (this.fdLengthScore() +
+      //   this.keyValueScore() +
+      //   this.fdPositionScore() +
+      //   this.fdDensityScore() +
+      //   this.fdRedundanceScore()) /
+      // 5
+      this.fdRedundanceScoreTeam()
     );
   }
 
@@ -99,12 +100,25 @@ export default class FdScore {
   }
 
   public fdDensityScore(): number {
-    //TODO
+    // TOTO
     return 0;
   }
 
+  public fdRedundanceScoreTeam(): number {
+    console.log(
+      this.table.rowCount - this.fd._redundanceGroups.length,
+      (this.table.rowCount - this.fd._redundanceGroups.length) /
+        this.table.rowCount
+    );
+    // get all redundant tuples and normalize by row count
+    return (
+      (this.table.rowCount - this.fd._redundanceGroups.length) /
+      this.table.rowCount
+    );
+  }
+
   // TODO: null values
-  public fdRedundanceScore(): number {
+  public fdRedundanceScoreWeiLink(): number {
     let redundanceSum = 0;
     this.fd._redundanceGroups.forEach((num) =>
       num != 1 ? (redundanceSum += num) : redundanceSum
