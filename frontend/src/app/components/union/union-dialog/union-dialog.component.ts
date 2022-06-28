@@ -55,7 +55,17 @@ export class UnionDialogComponent {
 
   addColumn(column: Column | null, side: Side) {
     this.available[side] = this.available[side].filter((v) => v != column);
-    this.matched[side].push(column);
+    if (column && this.matched[side].includes(column)) {
+      const columnCopy = column.copy();
+      columnCopy.userAlias =
+        column.name +
+        this.matched[side]
+          .filter((c) => c!.name == column.name)
+          .length.toString();
+      this.matched[side].push(columnCopy);
+    } else {
+      this.matched[side].push(column);
+    }
     this.updateAvailable();
   }
 
