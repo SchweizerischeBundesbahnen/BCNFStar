@@ -60,7 +60,7 @@ describe("The persist-button should create executable SQL, that UNIONs two table
     cy.selectSpecificTablesAndGo(unionedSchema, ["nation_region_denormalized"]);
   });
 
-  it.only("allows using same column multiple times", () => {
+  it("allows using same column multiple times", () => {
     cy.unionTables(
       "public.nation_region_denormalized",
       "public.part_partsupp_supplier_denormalized",
