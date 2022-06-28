@@ -83,14 +83,18 @@ export default class FdScore {
   3 columns between this column combination
   because one column bewteen 1 and 3, two columns between 4 and 7 */
   public numAttributesBetween(columns: ColumnCombination): number {
-    let columnsOrderByOrdinalPosition = columns.asArray().sort((col1, col2) => {
-      if (col1.ordinalPosition > col2.ordinalPosition) return 1;
-      return -1;
-    });
-    let firstColumn = columnsOrderByOrdinalPosition[0];
-    let lastColumn = columnsOrderByOrdinalPosition[columns.cardinality - 1];
+    const colArray = this.table.columns.asArray();
+    const columnsOrderByOrdinalPosition = columns
+      .asArray()
+      .sort((col1, col2) => {
+        if (colArray.indexOf(col1) > colArray.indexOf(col2)) return 1;
+        return -1;
+      });
+    const firstColumn = columnsOrderByOrdinalPosition[0];
+    const lastColumn = columnsOrderByOrdinalPosition[columns.cardinality - 1];
 
-    let range = lastColumn.ordinalPosition - firstColumn.ordinalPosition + 1;
+    const range =
+      colArray.indexOf(lastColumn) - colArray.indexOf(firstColumn) + 1;
     return range - columns.cardinality;
   }
 

@@ -59,10 +59,6 @@ export default class Column implements BasicColumn {
     return this.sourceColumn.nullable;
   }
 
-  public get ordinalPosition() {
-    return this.sourceColumn.ordinalPosition;
-  }
-
   public get dataTypeString() {
     return `(${this.dataType}, ${this.nullable == true ? 'null' : 'not null'})`;
   }

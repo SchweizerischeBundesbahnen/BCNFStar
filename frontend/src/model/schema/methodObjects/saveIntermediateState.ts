@@ -84,7 +84,6 @@ interface JSONSourceColumn {
   name: string;
   table: JSONSourceTable;
   dataType: string;
-  ordinalPosition: number;
   nullable: boolean;
 }
 
@@ -287,7 +286,6 @@ export default class SaveSchemaState {
       sc.name,
       newSourceTable,
       sc.dataType,
-      sc.ordinalPosition,
       sc.nullable
     );
 
