@@ -31,6 +31,21 @@ module.exports = (on, config) => {
     dbQuery: (query) =>
       require("cypress-postgres")(query.query, Object.assign({}, db)),
   });
+
+  const { rmdir } = require("fs");
+  on("task", {
+    deleteFolder(folderName) {
+      return new Promise((resolve, reject) => {
+        rmdir(folderName, { maxRetries: 10, recursive: true }, (err) => {
+          if (err) {
+            console.error(err);
+            return reject(err);
+          }
+          resolve(null);
+        });
+      });
+    },
+  });
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
 

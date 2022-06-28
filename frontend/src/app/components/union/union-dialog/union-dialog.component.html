@@ -35,6 +35,7 @@
             class="box"
             *ngFor="let column of available[side]"
             (click)="addColumn(column, side)"
+            id="unionColumn"
             cdkDrag
           >
             <span>{{ column ? column.name : "Fill Column with NULL" }} </span>
