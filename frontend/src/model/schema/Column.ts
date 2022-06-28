@@ -9,12 +9,21 @@ import SourceTableInstance from './SourceTableInstance';
  */
 export default class Column implements BasicColumn {
   public includeSourceName = false;
+  private _maxValue = 0;
 
   public constructor(
     public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
     public userAlias?: string
   ) {}
+
+  public get maxValue() {
+    return this._maxValue;
+  }
+
+  public set maxValue(num: number) {
+    this._maxValue = num;
+  }
 
   public get name() {
     let name = '';
@@ -32,11 +41,14 @@ export default class Column implements BasicColumn {
   }
 
   public copy(): Column {
-    return new Column(
+    let col = new Column(
       this.sourceTableInstance,
       this.sourceColumn,
       this.userAlias
     );
+    // for value ranking, sufficient to update maxValues after splitting
+    col.maxValue = this._maxValue;
+    return col;
   }
 
   public get dataType() {

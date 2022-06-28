@@ -270,6 +270,16 @@ from
     return query_result.rows;
   }
 
+  public async getMaxValueByColumn(
+    table: string,
+    column: string
+  ): Promise<any> {
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT MAX(LENGTH(${column}::text)) from ${table}`
+    );
+    return query_result.rows;
+  }
+
   public override async getViolatingRowsForFDCount(
     sql: string,
     lhs: Array<string>,

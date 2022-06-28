@@ -33,11 +33,9 @@ export default class Split {
       this.generatingName ||
       this.fd.lhs.columnNames().join('_').substring(0, 50);
 
+    // update rowCount for redundance ranking and invalidate cluster for recalculation
     remaining.rowCount = this.table.rowCount;
     generating.rowCount = this.fd._redundanceGroups.length;
-    console.log('slpitttt');
-    console.log(this.fd, generating.rowCount);
-
     remaining._fdClusterValid = false;
     generating._fdClusterValid = false;
 

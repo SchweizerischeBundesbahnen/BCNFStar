@@ -34,6 +34,7 @@ import {
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
 import getRankingRedundances from "./routes/rankingRedudance";
+import getMaxValue from "./routes/maxValue";
 
 const whitelist = ["http://localhost", "http://localhost:4200"];
 
@@ -89,6 +90,11 @@ app.get(
   "/redundances",
   [check("tableName").isString(), check("columns").isString()],
   getRankingRedundances
+);
+app.get(
+  "/maxValue/column",
+  [check("tableName").isString(), check("columnName").isString()],
+  getMaxValue
 );
 
 // Metanome

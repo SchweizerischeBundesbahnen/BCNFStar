@@ -251,8 +251,19 @@ export default class MsSqlUtils extends SqlUtils {
     table: string,
     columns: Array<string>
   ) {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
     const query_result = await sql.query<SchemaQueryRow>(
-      `SELECT ${columns}, COUNT(*) from ${table} group by ${columns}`
+      `SELECT ${stringColumns}, COUNT(*) from (${table}) as temp_table GROUP BY ${stringColumns}`
+    );
+    return query_result;
+  }
+
+  public async getMaxValueByColumn(
+    table: string,
+    column: string
+  ): Promise<any> {
+    const query_result = await sql.query<SchemaQueryRow>(
+      `SELECT MAX(LENGTH(${column}::text)) from ${table}`
     );
     return query_result;
   }

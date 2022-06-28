@@ -5,6 +5,7 @@ import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IPrimaryKey from '@server/definitions/IPrimaryKey';
 import { firstValueFrom } from 'rxjs';
+import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import Schema from '../model/schema/Schema';
 import SourceColumn from '../model/schema/SourceColumn';
@@ -153,6 +154,27 @@ export class SchemaCreationService {
     return result;
   }
 
+  private async getMaxValueOf(tables: Array<Table>) {
+    let maxValuePromises = new Map<Column, Promise<number>>();
+    for (const table of tables) {
+      table.columns.asArray().forEach((col) => {
+        maxValuePromises.set(
+          col,
+          firstValueFrom(
+            this.http.get<number>(
+              this.dataService.baseUrl +
+                `/maxValue/column?tableName=${table.fullName}&&columnName=${col.name}`
+            )
+          )
+        );
+      });
+    }
+
+    for (const [col, promise] of maxValuePromises.entries()) {
+      col.maxValue = await promise;
+    }
+  }
+
   /**
    * Creates InputSchema for use on edit-schema page with the supplied tables
    * @param tables used on edit-schema page
@@ -176,6 +198,7 @@ export class SchemaCreationService {
           column.sourceColumn
         );
     }
+    this.getMaxValueOf(tables);
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);

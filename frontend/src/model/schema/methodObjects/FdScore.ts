@@ -57,8 +57,9 @@ export default class FdScore {
    * @returns score between 0 and 1
    */
   private keyValueScore(): number {
-    //TODO
-    return 0;
+    let maxKeyLength = 0;
+    this.fd.lhs.asArray().forEach((col) => (maxKeyLength += col.maxValue));
+    return maxKeyLength == 0 ? 0 : 1 / Math.max(1, maxKeyLength - 7);
   }
 
   public fdPositionScore(): number {

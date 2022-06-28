@@ -64,6 +64,7 @@ export default class Join {
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
     this.newTable.surrogateKey = this.referencing.surrogateKey;
+    // update rowCount for redundance ranking and invalidate cluster for recalculation
     this.newTable.rowCount = this.referencing.rowCount;
     this.newTable._fdClusterValid = false;
 
@@ -114,6 +115,28 @@ export default class Join {
         )
       );
     }
+
+    // set maxValues after joining
+    const columns = [...this.referencing.columns, ...this.referenced.columns];
+    this.newTable.columns.asArray().forEach((col) => {
+      const filteredColumns = columns.filter((otherCol) =>
+        otherCol.equals(col)
+      );
+      if (filteredColumns.length == 2) {
+        // for foreign key columns use maxValue of referencing table
+        col.maxValue = this.referencing.columns
+          .asArray()
+          .find((rcol) => rcol.equals(col))!.maxValue;
+      }
+      if (filteredColumns.length == 1) {
+        // for non foreign key columns use maxValue of referencing or referenced table
+        col.maxValue = filteredColumns.find((otherCol) =>
+          otherCol.equals(col)
+        )!.maxValue;
+      } else {
+        console.error('column does not exist, max Value could not be setted');
+      }
+    });
   }
 
   private findEquivalentSource(
