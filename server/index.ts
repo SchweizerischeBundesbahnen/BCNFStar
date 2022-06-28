@@ -35,14 +35,13 @@ import {
 import { runMetanome } from "./routes/metanomeResults/run";
 import getSchemaMatching from "./routes/schemaMatching";
 
-const whitelist = ["http://localhost", "http://localhost:4200"];
-
 const corsOptions: CorsOptions = {
   origin(
     origin: string | undefined,
     callback: (a: Error | null, b: boolean) => void
   ) {
-    callback(null, true);
+    if (process.env.NODE_ENV === "development") callback(null, true);
+    else callback(new Error("CORS not allowed!"), false);
   },
   credentials: true,
 };
