@@ -71,7 +71,7 @@ export default abstract class SQLPersisting {
   public dataTransferSql(table: BasicTable): string {
     let Sql = '';
 
-    let columns: Column[] = [];
+    let columns: BasicColumn[] = [];
     if (table instanceof UnionedTable) {
       columns = table.displayedColumns();
     } else if (table instanceof Table) {
@@ -247,7 +247,7 @@ ALTER TABLE ${this.tableIdentifier(
     return Sql;
   }
 
-  public generateColumnString(columns: Column[]): string {
+  public generateColumnString(columns: BasicColumn[]): string {
     return columns.map((c) => this.escape(c.name)).join(', ');
   }
 

@@ -1,3 +1,4 @@
+import BasicColumn, { newBasicColumn } from '../types/BasicColumn';
 import BasicTable from './BasicTable';
 import Column from './Column';
 import Table from './Table';
@@ -19,13 +20,22 @@ export default class UnionedTable extends BasicTable {
     this.columns = [cols1, cols2];
   }
 
-  public displayedColumns(): Array<Column> {
-    return this.columns[0].map((col, i) => {
-      const prefIndex = this.rPriority ? 1 : 0;
-      if (this.columns[prefIndex][i] != null) return this.columns[prefIndex][i];
-      if (this.columns[1 - prefIndex][i] != null)
-        return this.columns[1 - prefIndex][i];
-      throw Error;
-    }) as Array<Column>;
+  public displayedColumns(): Array<BasicColumn> {
+    return [...this.columns[0].keys()].map((i) => this.displayedColumnAt(i));
+  }
+
+  public displayedColumnAt(index: number): BasicColumn {
+    const prefTableIndex = this.rPriority[index] ? 1 : 0;
+    let primaryCol: Column;
+    const prefCol = this.columns[prefTableIndex][index];
+    const altCol = this.columns[1 - prefTableIndex][index];
+    if (prefCol != null) primaryCol = prefCol;
+    else if (altCol != null) primaryCol = altCol;
+    else throw new Error('Two null columns got matched inside a UnionedTable');
+    return newBasicColumn(
+      primaryCol.name,
+      primaryCol.dataType,
+      !prefCol || prefCol.nullable || !altCol || altCol.nullable
+    );
   }
 }
