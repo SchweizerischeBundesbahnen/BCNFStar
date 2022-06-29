@@ -23,10 +23,10 @@
     <sbb-select multiple placeholder="Filter tables" [(ngModel)]="indFilter">
       <app-sbb-option-all
         [(current)]="indFilter"
-        [available]="tablesAsArray()"
+        [available]="schema.regularTables"
       ></app-sbb-option-all>
       <sbb-option
-        *ngFor="let table of tablesAsArray()"
+        *ngFor="let table of schemaService.schema.regularTables"
         [value]="table"
         [sbbTooltip]="table.fullName"
       >

@@ -6,17 +6,13 @@ describe("The foreign keys tab", () => {
     cy.selectTablesAndGo();
     cy.loadMetanomeConfigAndOk();
 
-    cy.get(".table-head-title")
-      .contains("public.nation_region_denormalized")
-      // because we have multiple UI layers with CSS, Cypress may think the element is obstructed
-      // while it isn't
-      .click({ force: true });
+    cy.clickOnTable("public.nation_region_denormalized");
 
     cy.visitPossibleForeignKeysTab();
   });
 
   it("displays valid Inclusion Dependencies", { scrollBehavior: false }, () => {
-    cy.get(".table-head-title").contains("public.part_partsupp").click();
+    cy.clickOnTable("public.part_partsupp");
     cy.contains(
       "(public.part_partsupp_supplier_denormalized) s_nationkey -> (public.nation_region_denormalized) n_nationkey"
     );

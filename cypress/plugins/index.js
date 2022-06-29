@@ -31,6 +31,7 @@ module.exports = (on, config) => {
     dbQuery: (query) =>
       require("cypress-postgres")(query.query, Object.assign({}, db)),
   });
+
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
 

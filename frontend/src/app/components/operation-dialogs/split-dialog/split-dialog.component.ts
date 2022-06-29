@@ -2,6 +2,7 @@ import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
+import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
@@ -61,7 +62,7 @@ export class SplitDialogComponent {
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
   }
 
   public setColumnSelection(column: Column, value: boolean) {

@@ -23,7 +23,7 @@ export class ForeignKeysComponent {
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
   }
 
   public get schema() {
@@ -56,7 +56,7 @@ export class ForeignKeysComponent {
   }
 
   public tablesAsArray() {
-    return [...this.schemaService.schema.tables];
+    return [...this.schemaService.schema.regularTables];
   }
 
   public inds(): Array<SourceRelationship> {

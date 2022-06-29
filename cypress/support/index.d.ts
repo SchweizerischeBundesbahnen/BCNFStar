@@ -57,5 +57,23 @@ declare namespace Cypress {
     visitPossibleForeignKeysTab(): void;
 
     createForeignKey(): void;
+
+    /**
+     * Clicks on a table in the graph to reveal it's sidebar
+     * @param name Part of the name of the table that uniquely identifies it. May be in form schemaname.tablename
+     */
+    clickOnTable(name: string): void;
+
+    /**
+     * Unions two tables starting from the schema editing page.
+     * @param table1 Table to start the union from
+     * @param table2 Table to be selected in the union dropdown
+     * @param columnMapping an array of tuples. Each tuple contains column names of both tables that should be matched
+     */
+    unionTables(
+      table1: string,
+      table2: string,
+      columnMapping: Array<[string, string]>
+    );
   }
 }

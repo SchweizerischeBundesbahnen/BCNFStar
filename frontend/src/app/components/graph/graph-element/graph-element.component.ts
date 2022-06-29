@@ -1,3 +1,4 @@
+import BasicTable from '@/src/model/schema/BasicTable';
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import BasicColumn from '@/src/model/types/BasicColumn';
@@ -10,7 +11,7 @@ import Table from 'src/model/schema/Table';
   styleUrls: ['./graph-element.component.css'],
 })
 export class GraphElementComponent {
-  @Input() public table!: Table;
+  @Input() public table!: BasicTable;
   @Input() public bbox!: Record<string, string>;
 
   constructor(public schemaService: SchemaService) {}
@@ -20,6 +21,7 @@ export class GraphElementComponent {
   }
 
   public isPkColumn(column: BasicColumn): boolean {
+    if (!(this.table instanceof Table)) return false;
     if (this.table.implementsSurrogateKey())
       return column.name == this.table.surrogateKey;
     return (
@@ -60,9 +62,10 @@ export class GraphElementComponent {
     );
   }
 
-  public showMakeDirectDimension(): boolean {
+  public get showMakeDirectDimension() {
     return (
-      this.schemaService.starMode &&
+      this.table instanceof Table &&
+      this.schemaService.schema.starMode &&
       this.schemaService.schema.directDimensionableRoutes(this.table, true)
         .length > 0
     );

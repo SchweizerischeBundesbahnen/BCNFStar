@@ -17,7 +17,7 @@ import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 })
 export class CheckIndComponent {
   public get tables() {
-    return Array.from(this.schemaService.schema.tables);
+    return Array.from(this.schemaService.schema.regularTables);
   }
 
   public rowCount: number = 0;
@@ -40,6 +40,8 @@ export class CheckIndComponent {
     private notification: SbbNotificationToast,
     public dialog: SbbDialog
   ) {
+    if (!(this.schemaService.selectedTable instanceof Table))
+      throw Error('Can only check inds for non-unioned tables');
     this.referencingTable = this.schemaService.selectedTable!;
     this.schemaService.selectedTableChanged.subscribe(() => {
       this.referencedTable = undefined;
@@ -133,7 +135,7 @@ export class CheckIndComponent {
   }
 
   public validTables(): Array<Table> {
-    return [...this.tables].filter((table) => table.sources.length == 1);
+    return this.tables.filter((table) => table.sources.length == 1);
   }
 
   public canCheckIND(): boolean {
