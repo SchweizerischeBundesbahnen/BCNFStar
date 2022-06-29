@@ -39,7 +39,7 @@ const corsOptions: CorsOptions = {
     origin: string | undefined,
     callback: (a: Error | null, b: boolean) => void
   ) {
-    if (process.env.NODE_ENV === "development") callback(null, true);
+    if (process.env.NODE_ENV === "development" || !origin) callback(null, true);
     else callback(new Error("CORS not allowed!"), false);
   },
   credentials: true,
