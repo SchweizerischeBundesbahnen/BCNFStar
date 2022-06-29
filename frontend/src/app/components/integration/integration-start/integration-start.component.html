@@ -1,4 +1,14 @@
 <div class="grid">
+  <div class="start-btn">
+    <button
+      sbb-button
+      (click)="startIntegration()"
+      [disabled]="!(rightSchema && leftSchema)"
+    >
+      Start integration
+    </button>
+  </div>
+
   <h2>Left existing schema</h2>
   <h2>Right existing schema</h2>
   <app-table-selection
@@ -6,20 +16,28 @@
     [withContentPreview]="false"
     (schema)="leftSchema = $event"
   ></app-table-selection>
-  <h2 *ngIf="leftSchema" class="centered">Done</h2>
+  <h2 *ngIf="leftSchema" class="centered">
+    Selected the following tables for the left schema:
+    <ul>
+      <li *ngFor="let table of leftSchema.tables">
+        {{ table.fullName }}
+      </li>
+      <button sbb-button (click)="leftSchema = undefined">Cancel</button>
+    </ul>
+  </h2>
 
   <app-table-selection
     *ngIf="!rightSchema"
     [withContentPreview]="false"
     (schema)="rightSchema = $event"
   ></app-table-selection>
-  <h2 *ngIf="rightSchema" class="centered">Done</h2>
-  <button
-    sbb-button
-    (click)="startIntegration()"
-    class="centered start-btn"
-    [disabled]="!(rightSchema && leftSchema)"
-  >
-    Start integration
-  </button>
+  <h2 *ngIf="rightSchema" class="centered">
+    Selected the following tables for the right schema:
+    <ul>
+      <li *ngFor="let table of rightSchema.tables">
+        {{ table.fullName }}
+      </li>
+      <button sbb-button (click)="rightSchema = undefined">Cancel</button>
+    </ul>
+  </h2>
 </div>
