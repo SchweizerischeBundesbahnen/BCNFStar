@@ -145,6 +145,7 @@ export class SchemaService {
   public split(fd: FunctionalDependency, name?: string) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');
+
     let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
 
     command.onDo = () => (this.selectedTable = command.children![0]);
@@ -208,7 +209,7 @@ export class SchemaService {
   public async makeDirectDimension(table: BasicTable): Promise<void> {
     if (!(table instanceof Table))
       throw Error('directDimension not implemented for unioned tables');
-
+      
     let routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
