@@ -237,7 +237,7 @@ export default class Schema {
   }
 
   public isDirectDimension(table: Table): boolean {
-    return this.referencesOf(table, true).some((reference) =>
+    return this.referencesOf(table, true).every((reference) =>
       this.isFact(reference.referencing, true)
     );
   }

@@ -2,7 +2,7 @@
   <div
     *ngIf="showMakeDirectDimension()"
     class="extra-button"
-    style="left: 10px; top: 3px"
+    style="left: 10px; top: 3px; background-color: green"
     type="button"
     (click)="schemaService.makeDirectDimension(table)"
   >
@@ -11,10 +11,13 @@
   <div
     *ngIf="isPotentialFact()"
     class="extra-button"
+    type="button"
     [sbbTooltip]="factTooltip"
     [sbbTooltipTrigger]="'click'"
-    style="left: 35px; top: 3px"
-  ></div>
+    style="left: 35px; top: 3px; background-color: blue"
+  >
+    F
+  </div>
   <div
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"
