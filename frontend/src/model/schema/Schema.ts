@@ -11,17 +11,19 @@ import SourceTable from './SourceTable';
 import SourceTableInstance from './SourceTableInstance';
 import Column from './Column';
 import Join from './methodObjects/Join';
-import BasicColumn from '../types/BasicColumn';
+import BasicColumn, { surrogateKeyColumn } from '../types/BasicColumn';
 import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import {
   TableFkDerivation,
   SourceFkDerivation,
 } from './methodObjects/FkDerivation';
+import UnionedTable from './UnionedTable';
+import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
 
 export default class Schema {
-  public readonly tables = new Set<Table>();
+  public readonly tables = new Set<BasicTable>();
   public name?: string;
   /**
    * all fks from the actual database and inds that the user validated
@@ -41,9 +43,13 @@ export default class Schema {
   private _tableFksValid = false;
   private _starMode = false;
 
+  private _regularTables?: Array<Table>;
+  private _unionedTables?: Array<UnionedTable>;
+
   public toJSON() {
     return {
-      tables: Array.from(this.tables),
+      regularTables: Array.from(this.regularTables),
+      unionedTables: Array.from(this.unionedTables),
       _baseFks: this._baseFks,
       _tableFks: Array.from(this._tableFks.entries()).filter(
         ([, displayOptions]) =>
@@ -58,18 +64,39 @@ export default class Schema {
     this.addTables(...tables);
   }
 
-  public addTables(...tables: Array<Table>) {
+  public addTables(...tables: Array<BasicTable>) {
     tables.forEach((table) => {
       this.tables.add(table);
     });
     this.relationshipsValid = false;
+    this._regularTables = undefined;
+    this._unionedTables = undefined;
   }
 
-  public deleteTables(...tables: Array<Table>) {
+  public deleteTables(...tables: Array<BasicTable>) {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
     this.relationshipsValid = false;
+    this._regularTables = undefined;
+  }
+
+  public get regularTables(): Array<Table> {
+    if (this._regularTables === undefined) {
+      this._regularTables = [...this.tables].filter(
+        (table) => table instanceof Table
+      ) as Array<Table>;
+    }
+    return this._regularTables;
+  }
+
+  public get unionedTables(): Array<UnionedTable> {
+    if (this._unionedTables === undefined) {
+      this._unionedTables = [...this.tables].filter(
+        (table) => table instanceof UnionedTable
+      ) as Array<UnionedTable>;
+    }
+    return this._unionedTables;
   }
 
   public addFks(...fks: SourceRelationship[]) {
@@ -146,17 +173,19 @@ export default class Schema {
   }
 
   private set tableIndsValid(valid: boolean) {
-    this.tables.forEach((table) => (table._indsValid = valid));
+    this.tables.forEach((table) => {
+      if (table instanceof Table) table._indsValid = valid;
+    });
   }
 
   /**
    * @param onlyDisplayed whether to use only the displayed fks or all fks as a basis for calculation
    */
-  public isFact(table: Table, onlyDisplayed: boolean): boolean {
+  public isFact(table: BasicTable, onlyDisplayed: boolean): boolean {
     return this.referencesOf(table, onlyDisplayed).length == 0;
   }
 
-  public isDirectDimension(table: Table): boolean {
+  public isDirectDimension(table: BasicTable): boolean {
     return this.referencesOf(table, true).some((reference) =>
       this.isFact(reference.referencingTable, true)
     );
@@ -206,9 +235,10 @@ export default class Schema {
    * @param onlyDisplayed whether to use only the displayed fks or all fks
    */
   public referencesOf(
-    table: Table,
+    table: BasicTable,
     onlyDisplayed: boolean
   ): Array<TableRelationship> {
+    if (!(table instanceof Table)) return [];
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
       (fk) => fk.referencedTable == table
@@ -217,10 +247,11 @@ export default class Schema {
     return result;
   }
 
-  /**
-   * @param onlyDisplayed whether to use only the displayed fks or all fks
-   */
-  public fksOf(table: Table, onlyDisplayed: boolean): Array<TableRelationship> {
+  public fksOf(
+    table: BasicTable,
+    onlyDisplayed: boolean
+  ): Array<TableRelationship> {
+    if (!(table instanceof Table)) return [];
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
       (fk) => fk.referencingTable == table
@@ -288,14 +319,14 @@ export default class Schema {
   private calculateFks(): void {
     for (const rel of this._fks) {
       const referencings = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.tables) {
+      for (const table of this.regularTables) {
         const columns = table.columnsEquivalentTo(rel.referencingCols, true);
         if (columns.length > 0) referencings.set(table, columns);
       }
       if ([...referencings.keys()].length == 0) continue;
 
       const referenceds = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.tables) {
+      for (const table of this.regularTables) {
         const columns = table
           .columnsEquivalentTo(rel.referencedCols, false)
           .filter((possibleColumns) =>
@@ -326,8 +357,8 @@ export default class Schema {
    * This method adds these relationships to the tables.
    */
   private calculateTrivialFks(): void {
-    for (const referencingTable of this.tables) {
-      for (const referencedTable of this.tables) {
+    for (const referencingTable of this.regularTables) {
+      for (const referencedTable of this.regularTables) {
         if (referencedTable == referencingTable || !referencedTable.pk)
           continue;
         const pk = referencedTable.pk!.asArray();
@@ -457,7 +488,7 @@ export default class Schema {
       let ccs = table.columnsEquivalentTo(rel.referencingCols, true);
       if (ccs.length == 0) continue;
 
-      for (const otherTable of this.tables) {
+      for (const otherTable of this.regularTables) {
         if (otherTable == table) continue;
         let otherCCs = otherTable
           .columnsEquivalentTo(rel.referencedCols, false)
@@ -631,18 +662,25 @@ export default class Schema {
     return resultingTables;
   }
 
-  public displayedColumnsOf(table: Table): Array<BasicColumn> {
-    const columns = new Array<BasicColumn>();
-    if (table.implementsSurrogateKey())
-      columns.push({ name: table.surrogateKey, dataTypeString: 'integer' });
-    columns.push(...table.columns);
-    for (const fk of this.fksOf(table, true))
-      if (fk.referencedTable.implementsSurrogateKey()) {
-        columns.push({
-          name: fk.referencingName,
-          dataTypeString: 'integer',
-        });
-      }
-    return columns;
+  public displayedColumnsOf(table: BasicTable): Array<BasicColumn> {
+    if (table instanceof Table) {
+      const columns = new Array<BasicColumn>();
+      if (table.implementsSurrogateKey())
+        columns.push(surrogateKeyColumn(table.surrogateKey));
+      columns.push(...table.columns);
+      for (const fk of this.fksOf(table, true))
+        if (fk.referencedTable.implementsSurrogateKey()) {
+          const name =
+            fk.referencedTable.surrogateKey +
+            '_' +
+            fk.relationship.referencing.map((col) => col.name).join('_');
+          columns.push(surrogateKeyColumn(name));
+        }
+      return columns;
+    } else if (table instanceof UnionedTable) {
+      return table.displayedColumns();
+    } else {
+      throw Error;
+    }
   }
 }

@@ -5,6 +5,7 @@ import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import BasicTable from '@/src/model/schema/BasicTable';
 import { SchemaService } from '@/src/app/schema.service';
 
 type GraphStorageItem = {
@@ -28,7 +29,7 @@ export class SchemaGraphComponent implements AfterContentInit {
 
   protected portDiameter = 22.5;
 
-  public graphStorage = new Map<Table, GraphStorageItem>();
+  public graphStorage = new Map<BasicTable, GraphStorageItem>();
 
   protected graph!: joint.dia.Graph;
   protected paper!: joint.dia.Paper;
@@ -269,7 +270,7 @@ export class SchemaGraphComponent implements AfterContentInit {
     }" strokegit ="green" fill="white"/>`;
   }
 
-  private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
+  private generatePorts(jointjsEl: joint.dia.Element, table: BasicTable) {
     let counter = 0;
     for (let column of this.schemaService.schema.displayedColumnsOf(table)) {
       let args = { counter, side: PortSide.Left };
