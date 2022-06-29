@@ -8,7 +8,7 @@
       <tr sbb-row *sbbRowDef="let row; columns: tableColumns"></tr>
       <ng-container *ngFor="let column of tableColumns" [sbbColumnDef]="column">
         <th sbb-header-cell *sbbHeaderCellDef>{{ column }}</th>
-        <td [ngStyle]="dataService.cellStyle[column]" *sbbCellDef="let element">
+        <td [ngStyle]="cellStyle[column]" *sbbCellDef="let element">
           {{ element[column] }}
         </td>
       </ng-container>
