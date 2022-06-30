@@ -80,18 +80,18 @@ export class IntegrationService {
       this.matchings,
       this._schemas[Side.left].regularTables,
       this._schemas[Side.right].regularTables,
-      (column, existingColumn, table, existingTable) => {
-        if (table !== existingTable)
+      (leftColumn, rightColumn, leftTable, rightTable) => {
+        if (leftTable !== rightTable)
           newLinks.push({
             source: {
-              columnName: column.name,
+              columnName: leftColumn.name,
               side: PortSide.Right,
-              table,
+              table: leftTable,
             },
             target: {
-              columnName: existingColumn.name,
+              columnName: rightColumn.name,
               side: PortSide.Left,
-              table: existingTable,
+              table: rightTable,
             },
           });
       }

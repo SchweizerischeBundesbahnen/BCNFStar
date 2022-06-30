@@ -72,18 +72,18 @@ export class SchemaEditingComponent {
   }
 
   public generateGraphContent() {
-    this.tables = this.generateTables();
-    this.links = this.generateLinks();
+    this.tables = this.displayedTables();
+    this.links = this.displayedLinks();
   }
 
-  private generateTables() {
+  private displayedTables() {
     if (this.mergeService.isMerging) return this.mergeService.tables;
     if (this.intService.isIntegrating && this.intService.isComparing)
       return this.intService.tables;
     return this.schemaService.schema.tables;
   }
 
-  private generateLinks() {
+  private displayedLinks() {
     if (this.mergeService.isMerging) return this.mergeService.links;
     if (this.intService.isIntegrating && this.intService.isComparing)
       return this.intService.links;

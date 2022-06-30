@@ -7,11 +7,7 @@ describe("The keys tab", () => {
     cy.selectTablesAndGo();
 
     cy.loadMetanomeConfigAndOk();
-    cy.get(".table-head-title")
-      .contains("public.nation_region_denormalized")
-      // because we have multiple UI layers with CSS, Cypress may think the element is obstructed
-      // while it isn't
-      .click({ force: true });
+    cy.clickOnTable("public.nation_region_denormalized");
   });
 
   it("displays keys", () => {
@@ -55,11 +51,7 @@ describe("The keys tab", () => {
 });
 
 function addFkAndSurrkey() {
-  cy.get(".table-head-title")
-    .contains("public.part_partsupp_supplier")
-    // because we have multiple UI layers with CSS, Cypress may think the element is obstructed
-    // while it isn't
-    .click({ force: true });
+  cy.clickOnTable("public.part_partsupp_supplier");
 
   cy.visitPossibleForeignKeysTab();
   cy.contains(
@@ -67,11 +59,7 @@ function addFkAndSurrkey() {
   ).click();
   cy.contains("Create Foreign Key").click();
 
-  cy.get(".table-head-title")
-    .contains("public.nation_region_denormalized")
-    // because we have multiple UI layers with CSS, Cypress may think the element is obstructed
-    // while it isn't
-    .click({ force: true });
+  cy.clickOnTable("public.nation_region_denormalized");
 
   cy.get(".sbb-tab-label-content").first().click({ force: true });
   cy.get("#surrogate-key-input").type("surrkey");

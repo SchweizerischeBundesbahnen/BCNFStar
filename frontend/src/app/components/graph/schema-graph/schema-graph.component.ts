@@ -7,6 +7,7 @@ import panzoom, { PanZoom, Transform } from 'panzoom';
 import { SchemaService } from '@/src/app/schema.service';
 import BasicTable from '@/src/model/schema/BasicTable';
 import { IntegrationService } from '@/src/app/integration.service';
+import { SchemaMergingService } from '@/src/app/schema-merging.service';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -41,7 +42,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Input() public links: Iterable<LinkDefinition> = [];
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
-  protected portDiameter = 22.5;
+  protected columnHeight = 23;
 
   public graphStorage = new Map<BasicTable, GraphStorageItem>();
 
@@ -52,7 +53,8 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
 
   constructor(
     private schemaService: SchemaService,
-    private intService: IntegrationService
+    private intService: IntegrationService,
+    private mergeService: SchemaMergingService
   ) {}
 
   ngOnChanges() {
@@ -103,9 +105,12 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       graphlib,
       nodeSep: 40,
       // prevent left ports from being cut off
-      marginX: this.portDiameter / 2,
+      marginX: this.columnHeight / 2,
       rankSep:
-        this.intService.isIntegrating && this.intService.isComparing ? 150 : 60,
+        (this.intService.isIntegrating && this.intService.isComparing) ||
+        this.mergeService.isMerging
+          ? 150
+          : 60,
       rankDir: 'LR',
     });
 
@@ -168,7 +173,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       jointjsEl.resize(
         this.elementWidth,
         60 +
-          this.portDiameter *
+          this.columnHeight *
             this.schemaService.schema.displayedColumnsOf(table).length
       );
       this.graphStorage.set(table, {
@@ -232,11 +237,11 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       {
         tagName: 'circle',
         attributes: {
-          r: this.portDiameter / 2,
+          r: this.columnHeight / 2,
           cx,
           fill,
           cy:
-            this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5),
+            this.graphElementHeaderHeight + this.columnHeight * (counter + 0.5),
         },
       },
     ];
