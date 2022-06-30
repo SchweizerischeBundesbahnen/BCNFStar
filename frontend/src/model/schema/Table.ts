@@ -62,11 +62,7 @@ export default class Table extends BasicTable {
   }
 
   public static fromITable(iTable: ITable, rowCount: number): Table {
-    const sourceTable = new SourceTable(
-      iTable.name,
-      iTable.schemaName,
-      rowCount
-    );
+    const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
     iTable.attributes.forEach((iAttribute) => {
@@ -80,7 +76,7 @@ export default class Table extends BasicTable {
     });
     table.name = sourceTable.name;
     table.schemaName = sourceTable.schemaName;
-    table.rowCount = sourceTable.rowCount;
+    table.rowCount = rowCount;
     return table;
   }
 
