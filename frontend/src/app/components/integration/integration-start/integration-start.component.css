@@ -1,14 +1,16 @@
 .grid {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    grid-template-rows: 10vh max-content 10vh;
-    /* justify-items: center; */
-    gap: 10px;
-  }
-  
-  
-  .start-btn {
-    align-self: centetr;
-    justify-self: cemter;
-    grid-column: 1/3;
-  }
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 10vh max-content;
+  gap: 10px;
+}
+
+.grid div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.start-btn {
+  grid-column: 1/3;
+}
