@@ -34,17 +34,6 @@ import {
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
 
-const corsOptions: CorsOptions = {
-  origin(
-    origin: string | undefined,
-    callback: (a: Error | null, b: boolean) => void
-  ) {
-    if (process.env.NODE_ENV === "development" || !origin) callback(null, true);
-    else callback(new Error("CORS not allowed!"), false);
-  },
-  credentials: true,
-};
-
 const app = express();
 
 app.use(bodyParser.json({ strict: true }));
@@ -57,7 +46,7 @@ app.use((error, request, response, next) => {
   return next();
 });
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(
   morgan(
     "dev",
