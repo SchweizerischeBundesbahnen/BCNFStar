@@ -60,7 +60,7 @@ export default abstract class SQLPersisting {
     )});`;
   }
 
-  public dataTransfer(tables: Array<Table | UnionedTable>): string {
+  public dataTransfer(tables: Array<BasicTable>): string {
     let Sql: string = '';
     for (const table of tables) {
       Sql += this.dataTransferSql(table) + '\n';
@@ -68,13 +68,13 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
-  public dataTransferSql(table: Table | UnionedTable): string {
+  public dataTransferSql(table: BasicTable): string {
     let Sql = '';
 
-    let columns: Column[] = [];
+    let columns: BasicColumn[] = [];
     if (table instanceof UnionedTable) {
       columns = table.displayedColumns();
-    } else {
+    } else if (table instanceof Table) {
       columns = table.columns.asArray();
     }
 
@@ -84,22 +84,38 @@ export default abstract class SQLPersisting {
 
     if (table instanceof UnionedTable) {
       Sql += 'SELECT * FROM (';
-      Sql += this.selectStatement(table.tables[0], table.columns[0]);
+      Sql += this.selectStatement(
+        table.tables[0],
+        table.columns[0],
+        table.displayedColumns().map((c) => c.dataType)
+      );
       Sql += '\n UNION \n';
-      Sql += this.selectStatement(table.tables[1], table.columns[1]);
+      Sql += this.selectStatement(
+        table.tables[1],
+        table.columns[1],
+        table.displayedColumns().map((c) => c.dataType)
+      );
       Sql += ') as X';
-    } else {
-      Sql += this.selectStatement(table, table.columns.asArray());
+    } else if (table instanceof Table) {
+      Sql += this.selectStatement(
+        table,
+        table.columns.asArray(),
+        table.columns.asArray().map((c) => c.dataType)
+      );
     }
 
     Sql += ';';
     return Sql;
   }
 
-  public selectStatement(table: Table, columns: Array<Column | null>) {
+  public selectStatement(
+    table: Table,
+    columns: Array<Column | null>,
+    dataTypes: string[] = []
+  ) {
     let Sql = '';
     Sql += `SELECT DISTINCT ${columns
-      .map((col) => `${this.columnIdentifier(col)}`)
+      .map((col, index) => `${this.columnIdentifier(col, dataTypes[index])}`)
       .join(', ')} FROM ${table.sources
       .map((source) => {
         let sourceString = this.sourceTableIdentifier(source.table);
@@ -231,7 +247,7 @@ ALTER TABLE ${this.tableIdentifier(
     return Sql;
   }
 
-  public generateColumnString(columns: Column[]): string {
+  public generateColumnString(columns: BasicColumn[]): string {
     return columns.map((c) => this.escape(c.name)).join(', ');
   }
 
@@ -246,8 +262,11 @@ ALTER TABLE ${this.tableIdentifier(
     return `${this.escape(table.schemaName)}.${this.escape(table.name)}`;
   }
 
-  public columnIdentifier(column: Column | null): string {
-    if (column == null) return ' null ';
+  public columnIdentifier(
+    column: Column | null,
+    dataType: string = ''
+  ): string {
+    if (column == null) return ` CAST (null AS ${dataType}) `;
     return `${this.escape(column.sourceTableInstance.alias)}.${this.escape(
       column.sourceColumn.name
     )}`;

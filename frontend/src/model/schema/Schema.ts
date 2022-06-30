@@ -20,7 +20,7 @@ import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
 
 export default class Schema {
-  public readonly tables = new Set<Table | UnionedTable>();
+  public readonly tables = new Set<BasicTable>();
   public name?: string;
   /**
    * all fks from the actual database and inds that the user validated
@@ -61,7 +61,7 @@ export default class Schema {
     this.addTables(...tables);
   }
 
-  public addTables(...tables: Array<Table | UnionedTable>) {
+  public addTables(...tables: Array<BasicTable>) {
     tables.forEach((table) => {
       this.tables.add(table);
     });
@@ -70,7 +70,7 @@ export default class Schema {
     this._unionedTables = undefined;
   }
 
-  public deleteTables(...tables: Array<Table | UnionedTable>) {
+  public deleteTables(...tables: Array<BasicTable>) {
     tables.forEach((table) => {
       this.tables.delete(table);
     });
@@ -259,11 +259,16 @@ export default class Schema {
    */
   public routesFromFactTo(
     table: Table,
-    onlyDisplayedFks: boolean
+    onlyDisplayedFks: boolean,
+    visitedTables: Array<Table> = []
   ): Array<Array<TableRelationship>> {
     const result = new Array<Array<TableRelationship>>();
     for (const rel of this.referencesOf(table, onlyDisplayedFks)) {
-      const routes = this.routesFromFactTo(rel.referencing, onlyDisplayedFks);
+      if (visitedTables.includes(rel.referencing)) continue;
+      const routes = this.routesFromFactTo(rel.referencing, onlyDisplayedFks, [
+        ...visitedTables,
+        table,
+      ]);
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
@@ -635,7 +640,7 @@ export default class Schema {
         .union(referencedColumns);
 
       //matching (sourceFd -> Fd) and selection
-      for (const sourceFd of this._fds.get(source.table)!) {
+      for (const sourceFd of this._fds.get(source.table) ?? []) {
         const lhs = relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
         if (!lhs) continue;
         const rhs = relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;

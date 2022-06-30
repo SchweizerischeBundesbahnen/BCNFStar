@@ -8,11 +8,7 @@ describe("The table editing side bar", () => {
 
     cy.loadMetanomeConfigAndOk();
 
-    cy.get(".table-head-title")
-      .contains("public.nation_region_denormalized")
-      // because we have multiple UI layers with CSS, Cypress may think the element is obstructed
-      // while it isn't
-      .click({ force: true });
+    cy.clickOnTable("public.nation_region_denormalized");
 
     cy.get(".sbb-tab-label-content").contains("Table Editing").click();
   });
@@ -27,7 +23,7 @@ describe("The table editing side bar", () => {
 
   it("leaves editing mode and not renames table when something changes", () => {
     cy.get("#table-edit-icon").click();
-    cy.get(".table-head-title").contains("part_partsupp").click();
+    cy.clickOnTable("part_partsupp");
     cy.get("h2").contains("part_partsupp");
   });
 });

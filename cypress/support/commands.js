@@ -243,3 +243,55 @@ Cypress.Commands.add("createForeignKey", () => {
     .click();
   cy.get("button").contains("Create Foreign Key").click();
 });
+
+Cypress.Commands.add("visitUnionTab", { prevSubject: false }, () => {
+  cy.contains("Union").click({ force: true });
+});
+
+Cypress.Commands.add(
+  "unionTables",
+  { prevSubject: false },
+  (table1, table2, columnMapping) => {
+    cy.clickOnTable(table1);
+    cy.visitUnionTab();
+    cy.get("#unionTableSelection").click();
+    cy.selectColumns([table2], false);
+
+    cy.get("button").contains("Match Columns").click();
+    for (let i = 0; i < columnMapping.length; i++) {
+      if (i == 1) {
+        cy.get(".sbb-expansion-panel-header-content")
+          .contains("already unioned columns")
+          .click({ multiple: true });
+      }
+      cy.get("#cdk-drop-list-0")
+        .first()
+        .children()
+        .contains(columnMapping[i][0])
+        .click({ force: true });
+      cy.get("#cdk-drop-list-2")
+        .last()
+        .children()
+        .contains(columnMapping[i][1])
+        .click({ force: true });
+    }
+
+    cy.get(".sbb-button").contains("Union").click();
+  }
+);
+
+Cypress.Commands.add("clickOnTable", (tablename) => {
+  cy.get(`.table-head-title:contains("${tablename}")`).click({ force: true });
+});
+
+Cypress.Commands.add(
+  "selectColumns",
+  { prevSubject: false },
+  (columnList, multiselection = true) => {
+    cy.log(columnList.toString());
+    for (const column of columnList) {
+      cy.get(".sbb-option").contains(column).click({ force: true });
+    }
+    if (multiselection) cy.get(".cdk-overlay-backdrop-showing").click();
+  }
+);
