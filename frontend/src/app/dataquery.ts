@@ -135,11 +135,15 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     const data: IRequestBodyINDViolatingRows = {
       referencingTableSql: this.SqlGeneration!.selectStatement(
         this.tableRelationship.referencing,
-        this.tableRelationship.relationship.referencing
+        this.tableRelationship.relationship.referencing,
+        [],
+        true
       ),
       referencedTableSql: this.SqlGeneration!.selectStatement(
         this.tableRelationship.referenced,
-        this.tableRelationship.relationship.referenced
+        this.tableRelationship.relationship.referenced,
+        [],
+        true
       ),
       relationship: this.tableRelationship.relationship.toIRelationship(),
       offset: offset,
@@ -154,11 +158,15 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     const data: IRequestBodyINDViolatingRows = {
       referencingTableSql: this.SqlGeneration!.selectStatement(
         this.tableRelationship.referencing,
-        this.tableRelationship.relationship.referencing
+        this.tableRelationship.relationship.referencing,
+        [],
+        true
       ),
       referencedTableSql: this.SqlGeneration!.selectStatement(
         this.tableRelationship.referenced,
-        this.tableRelationship.relationship.referenced
+        this.tableRelationship.relationship.referenced,
+        [],
+        true
       ),
       relationship: this.tableRelationship.relationship.toIRelationship(),
       offset: 0,
@@ -200,12 +208,14 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     limit: number,
     withSeparators = true
   ): Promise<ITablePage> {
-    const lhsNames = this.lhs.map((c) => c.sourceColumn.name);
-    const rhsNames = this.rhs.map((c) => c.sourceColumn.name);
+    const lhsNames = this.lhs.map((c) => c.name);
+    const rhsNames = this.rhs.map((c) => c.name);
     const data: IRequestBodyFDViolatingRows = {
       sql: this.SqlGeneration!.selectStatement(
         this.table,
-        this.table.columns.asArray()
+        this.table.columns.asArray(),
+        [],
+        true
       ),
       lhs: lhsNames,
       rhs: rhsNames,
@@ -245,10 +255,12 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     const data: IRequestBodyFDViolatingRows = {
       sql: this.SqlGeneration!.selectStatement(
         this.table,
-        this.table.columns.asArray()
+        this.table.columns.asArray(),
+        [],
+        true
       ),
-      lhs: this.lhs.map((c) => c.sourceColumn.name),
-      rhs: this.rhs.map((c) => c.sourceColumn.name),
+      lhs: this.lhs.map((c) => c.name),
+      rhs: this.rhs.map((c) => c.name),
       offset: 0,
       limit: 0,
     };

@@ -53,6 +53,8 @@ export class CheckIndComponent {
 
       this.isValid = false;
       this.isLoading = false;
+      if (this.schemaService.selectedTable instanceof Table)
+        this.referencingTable = this.schemaService.selectedTable!;
     });
   }
 
@@ -141,7 +143,7 @@ export class CheckIndComponent {
   }
 
   public validTables(): Array<Table> {
-    return this.tables;
+    return this.tables as Table[];
   }
 
   public canCheckIND(): boolean {

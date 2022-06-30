@@ -1,5 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
+import IRowCounts from '@server/definitions/IRowCounts';
 import { firstValueFrom } from 'rxjs';
 import AutoNormalizeCommand from '../model/commands/AutoNormalizeCommand';
 import CommandProcessor from '../model/commands/CommandProcessor';
@@ -10,9 +12,9 @@ import IndToFkCommand from '../model/commands/IndToFkCommand';
 import JoinCommand from '../model/commands/JoinCommand';
 import ShowFkCommand from '../model/commands/ShowFkCommand';
 import SplitCommand from '../model/commands/SplitCommand';
+import DeleteTableCommand from '../model/commands/DeleteTableCommand';
 import UnionCommand from '../model/commands/UnionCommand';
 import BasicTable from '../model/schema/BasicTable';
-import DeleteTableCommand from '../model/commands/DeleteTableCommand';
 import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import FunctionalDependency from '../model/schema/FunctionalDependency';
@@ -22,9 +24,10 @@ import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
-import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
-import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
+import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
+import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
+import { ViolatingFDRowsDataQuery } from './dataquery';
 
 @Injectable({
   providedIn: 'root',
@@ -77,7 +80,10 @@ export class SchemaService {
     return this._schemaChanged.asObservable();
   }
 
-  constructor(private dialog: SbbDialog) {}
+  constructor(
+    private dialog: SbbDialog,
+    private notification: SbbNotificationToast
+  ) {}
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
@@ -125,7 +131,10 @@ export class SchemaService {
     const dialogRef = this.dialog.open(DeleteTableDialogComponent);
     const value = await firstValueFrom(dialogRef.afterClosed());
     if (!value) return;
-    const command = new DeleteTableCommand(this.schema, this._selectedTable!);
+    const command = new DeleteTableCommand(
+      this.schema,
+      this._selectedTable! as Table
+    );
     command.onDo = () => {
       this.selectedTable = undefined;
     };
@@ -136,24 +145,10 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async split(fd: FunctionalDependency) {
+  public split(fd: FunctionalDependency, name?: string) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');
-    const dialogRef = this.dialog.open(SplitDialogComponent, {
-      data: {
-        fd: fd,
-      },
-    });
-    const value: { fd: FunctionalDependency; name?: string } =
-      await firstValueFrom(dialogRef.afterClosed());
-    if (!value) return;
-    console.log('fd2: ', value);
-    let command = new SplitCommand(
-      this._schema,
-      this.selectedTable!,
-      value.fd,
-      value.name
-    );
+    let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
@@ -217,23 +212,63 @@ export class SchemaService {
     if (!(table instanceof Table))
       throw Error('directDimension not implemented for unioned tables');
 
-    const routes = this._schema.directDimensionableRoutes(table, true);
+    let routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
         data: { table: table },
       });
 
-      const routes: Array<Array<TableRelationship>> = await firstValueFrom(
-        dialogRef.afterClosed()
-      );
+      const result = await firstValueFrom(dialogRef.afterClosed());
+      routes = result.routes;
       if (!routes) return;
     }
 
     const command = new DirectDimensionCommand(this._schema, routes);
     command.onDo = () => (this.selectedTable = command.newTables[0]);
-    command.onUndo = () => (this.selectedTable = command.newTables[0]);
+    command.onUndo = () => (this.selectedTable = command.oldTables[0]);
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
+  }
+
+  /**
+   * Checks the existance of a fd inside a table. It shows the violations inside a dialog.
+   * @returns whether the fd is valid
+   */
+  public async checkFd(
+    table: Table,
+    fd: FunctionalDependency
+  ): Promise<boolean> {
+    // only check those columns, which are not defined by existing fds
+    const dataQuery: ViolatingFDRowsDataQuery =
+      await ViolatingFDRowsDataQuery.Create(
+        table,
+        fd.lhs.asArray(),
+        fd.rhs.copy().setMinus(table.hull(fd.lhs)).asArray()
+      );
+
+    const rowCount: IRowCounts | void = await dataQuery
+      .loadRowCount()
+      .catch((e) => {
+        console.error(e);
+      });
+
+    if (!rowCount) {
+      const error_message =
+        'There was a backend error while checking this IND. Check the browser and server logs for details';
+      this.notification.open(error_message, { type: 'error' });
+      throw new Error(error_message);
+    }
+
+    if (rowCount.entries != 0) {
+      this.dialog.open(ViolatingRowsViewComponent, {
+        data: {
+          dataService: dataQuery,
+          rowCount: rowCount,
+        },
+      });
+    }
+
+    return rowCount.entries == 0;
   }
 
   public setSurrogateKey(key: string) {

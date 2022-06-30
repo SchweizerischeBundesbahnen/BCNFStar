@@ -25,13 +25,13 @@
           disabled="true"
           id="referencing"
           sbbInput
-          [value]="refColumn.sourceColumn.name"
+          [value]="refColumn.name"
         />
         <input
           disabled="true"
           id="referenced"
           sbbInput
-          [value]="referencedColumns()[i].sourceColumn.name"
+          [value]="referencedColumns()[i].name"
         />
         <button
           sbb-icon-button
@@ -53,8 +53,8 @@
         <sbb-option
           *ngFor="let column of validReferencingColumns()"
           [value]="column"
-          [sbbTooltip]="column.sourceColumn.name"
-          >{{ column.sourceColumn.name }}
+          [sbbTooltip]="column.name"
+          >{{ column.name }}
         </sbb-option>
       </sbb-select>
       <sbb-select
@@ -65,8 +65,8 @@
         <sbb-option
           *ngFor="let column of validReferencedColumns()"
           [value]="column"
-          [sbbTooltip]="column.sourceColumn.name"
-          >{{ column.sourceColumn.name }}
+          [sbbTooltip]="column.name"
+          >{{ column.name }}
         </sbb-option>
       </sbb-select>
 

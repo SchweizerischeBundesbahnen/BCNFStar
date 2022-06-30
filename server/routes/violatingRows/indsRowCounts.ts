@@ -2,12 +2,18 @@ import IRequestBodyINDViolatingRows from "../../definitions/IRequestBodyINDViola
 import { Request, Response } from "express";
 import { sqlUtils } from "../../db";
 import { isIRequestBodyINDViolatingRows } from "@/definitions/IRequestBodyINDViolatingRows.guard";
+import { validationResult } from "express-validator";
 
 export default async function getViolatingRows(
   req: Request,
   res: Response
 ): Promise<void> {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(422).json({ errors: errors.mapped() });
+      return;
+    }
     if (!isIRequestBodyINDViolatingRows(req.body)) {
       res.status(422).json({ errrors: "Invalid request body" });
       return;

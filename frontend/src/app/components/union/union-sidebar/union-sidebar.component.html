@@ -1,5 +1,9 @@
 <div>
-  <sbb-select placeholder="Select table to union with" [(ngModel)]="otherTable">
+  <sbb-select
+    id="unionTableSelection"
+    placeholder="Select table to union with"
+    [(ngModel)]="otherTable"
+  >
     <sbb-option *ngFor="let table of filteredTables()" [value]="table">{{
       table.fullName
     }}</sbb-option>

@@ -37,11 +37,12 @@ describe("The check-ind component should display violating rows for custom inds"
       "public.part_partsupp_supplier_denormalized",
       "public.nation_region_denormalized"
     );
+
     cy.visitSuggestForeignKeyTab();
 
     cy.checkIND("public.part_partsupp_supplier_denormalized", [
-      ["ps_partkey", "r_regionkey"],
-      ["ps_suppkey", "n_regionkey"],
+      ["r_regionkey", "ps_partkey"],
+      ["n_regionkey", "p_partkey"],
     ]);
   });
 

@@ -16,6 +16,7 @@ import { check, body } from "express-validator";
 import {
   isValidFileName,
   isValidDatatype,
+  isValidSql,
 } from "./validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
@@ -37,14 +38,13 @@ import getRankingRedundanceSum from "./routes/rankingRedundanceSum";
 import getRankingRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
 import getMaxValue from "./routes/maxValue";
 
-const whitelist = ["http://localhost", "http://localhost:4200"];
-
 const corsOptions: CorsOptions = {
   origin(
     origin: string | undefined,
     callback: (a: Error | null, b: boolean) => void
   ) {
-    callback(null, true);
+    if (process.env.NODE_ENV === "development") callback(null, true);
+    else callback(new Error("CORS not allowed!"), false);
   },
   credentials: true,
 };
@@ -130,11 +130,33 @@ app.post(
 
 app.post("/unionedkeys", checkUnionedKeys);
 
-app.post("/violatingRows/fd", getViolatingRowsForFD);
-app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
+app.post(
+  "/violatingRows/fd",
+  [body("sql").trim().custom(isValidSql())],
+  getViolatingRowsForFD
+);
+app.post(
+  "/violatingRows/rowcount/fd",
+  [body("sql").trim().custom(isValidSql())],
+  getViolatingRowsForFDCount
+);
 
-app.post("/violatingRows/rowcount/ind", getViolatingRowsForSuggestedINDCount);
-app.post("/violatingRows/ind", getViolatingRowsForSuggestedIND);
+app.post(
+  "/violatingRows/rowcount/ind",
+  [
+    body("referencingTableSql").trim().custom(isValidSql()),
+    body("referencedTableSql").trim().custom(isValidSql()),
+  ],
+  getViolatingRowsForSuggestedINDCount
+);
+app.post(
+  "/violatingRows/ind",
+  [
+    body("referencingTableSql").trim().custom(isValidSql()),
+    body("referencedTableSql").trim().custom(isValidSql()),
+  ],
+  getViolatingRowsForSuggestedIND
+);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 

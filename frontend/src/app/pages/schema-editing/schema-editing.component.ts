@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { SchemaGraphComponent } from '../../components/graph/schema-graph/schema-graph.component';
+
 import { SchemaService } from '../../schema.service';
 
 @Component({
