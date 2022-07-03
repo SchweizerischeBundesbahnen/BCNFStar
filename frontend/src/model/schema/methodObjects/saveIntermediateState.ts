@@ -232,11 +232,7 @@ export default class SaveSchemaState {
   }
 
   private parseSourceTableInstance(sti: JSONSourceTableInstance) {
-    let newSourceTable = new SourceTable(
-      sti.table.name,
-      sti.table.schemaName,
-      sti.table.rowCount
-    );
+    let newSourceTable = new SourceTable(sti.table.name, sti.table.schemaName);
 
     let existing = this.existingSourceTables.find((other) =>
       other.equals(newSourceTable)
@@ -267,11 +263,7 @@ export default class SaveSchemaState {
   }
 
   private parseSourceColumn(sc: JSONSourceColumn) {
-    let newSourceTable = new SourceTable(
-      sc.table.name,
-      sc.table.schemaName,
-      sc.table.rowCount
-    );
+    let newSourceTable = new SourceTable(sc.table.name, sc.table.schemaName);
 
     let existingTab = this.existingSourceTables.find((other) =>
       other.equals(newSourceTable)

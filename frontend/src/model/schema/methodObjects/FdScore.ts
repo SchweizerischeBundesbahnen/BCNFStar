@@ -2,19 +2,13 @@ import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Table from '../Table';
 
-import { InjectorInstance } from '@/src/app/app.module';
-import { DatabaseService } from '@/src/app/database.service';
-
 export default class FdScore {
   private table: Table;
   private fd: FunctionalDependency;
-  protected dataService: DatabaseService;
 
   public constructor(table: Table, fd: FunctionalDependency) {
     this.table = table;
     this.fd = fd;
-
-    this.dataService = InjectorInstance.get<DatabaseService>(DatabaseService);
   }
 
   public get(): number {
@@ -30,8 +24,7 @@ export default class FdScore {
       (this.fdLengthScore() +
         this.keyValueScore() +
         this.fdPositionScore() +
-        this.fdDensityScore() +
-        this.fdRedundanceScoreTeam()) /
+        this.fdRedundanceScoreNaumann()) /
       5
     );
   }
@@ -62,7 +55,7 @@ export default class FdScore {
     return maxKeyLength == 0 ? 0 : 1 / Math.max(1, maxKeyLength - 7);
   }
 
-  public fdPositionScore(): number {
+  private fdPositionScore(): number {
     return (this.lhsPositionScore() + this.rhsPositionScore()) / 2;
   }
 
@@ -82,7 +75,7 @@ export default class FdScore {
   example: sorted ordinal positions of columns 1 3 4 7
   3 columns between this column combination
   because one column bewteen 1 and 3, two columns between 4 and 7 */
-  public numAttributesBetween(columns: ColumnCombination): number {
+  private numAttributesBetween(columns: ColumnCombination): number {
     const colArray = this.table.columns.asArray();
     const columnsOrderByOrdinalPosition = columns
       .asArray()
@@ -98,12 +91,7 @@ export default class FdScore {
     return range - columns.cardinality;
   }
 
-  public fdDensityScore(): number {
-    // TOTO
-    return 0;
-  }
-
-  public fdRedundanceScoreTeam(): number {
+  private fdRedundanceScoreNaumann(): number {
     console.log(
       this.fd._redundantGroupLength,
       this.table.rowCount,
@@ -119,7 +107,7 @@ export default class FdScore {
   }
 
   // TODO: null values
-  public fdRedundanceScoreWeiLink(): number {
+  private fdRedundanceScoreWeiLink(): number {
     console.log(this.fd, this.fd._redundantTuples, this.table.rowCount);
     return this.fd._redundantTuples / this.table.rowCount;
   }

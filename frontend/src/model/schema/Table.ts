@@ -88,7 +88,7 @@ export default class Table extends BasicTable {
     tableName: string,
     rowCount: number
   ) {
-    const sourceTable = new SourceTable(tableName, '', rowCount);
+    const sourceTable = new SourceTable(tableName, '');
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
 
@@ -344,10 +344,10 @@ export default class Table extends BasicTable {
     return fd.rhs.equals(this.columns);
   }
 
-  public minimalDeterminantsOf(
+  public async minimalDeterminantsOf(
     columns: ColumnCombination
-  ): Array<ColumnCombination> {
-    const allClusters = Array.from(this.fdClusters).sort(
+  ): Promise<Array<ColumnCombination>> {
+    const allClusters = Array.from(await this.fdClusters()).sort(
       (cluster1, cluster2) =>
         cluster1.columns.cardinality - cluster2.columns.cardinality
     );
@@ -414,12 +414,13 @@ export default class Table extends BasicTable {
     console.log(!this._fdClusterValid || !this._fdClusters);
     if (!this._fdClusterValid || !this._fdClusters) {
       if (this.pk) {
-        // because lhs is primary key there are no redundant data, so we could set [1] default which results in 0 redundant data
         let newFd = new FunctionalDependency(
           this.pk!.copy(),
           this.columns.copy()
         );
+        // because lhs is primary key there are so much groups like tuples in table
         newFd._redundantGroupLength = this.rowCount;
+        // because lhs is primary key there are no redundant data
         newFd._redundantTuples = 0;
         allFds.push(newFd);
       }
