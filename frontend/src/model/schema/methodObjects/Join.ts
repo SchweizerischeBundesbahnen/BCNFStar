@@ -137,6 +137,8 @@ export default class Join {
         console.error('column does not exist, max Value could not be setted');
       }
     });
+
+    this.newTable.calculateColumnMatching();
   }
 
   private findEquivalentSource(

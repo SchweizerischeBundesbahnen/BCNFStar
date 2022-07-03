@@ -204,6 +204,7 @@ export default class SaveSchemaState {
     });
     table.relationships = newRelationships;
     table.rowCount = jsonTable.rowCount;
+    table.calculateColumnMatching();
 
     return table;
   }

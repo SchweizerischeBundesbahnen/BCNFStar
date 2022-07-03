@@ -14,6 +14,7 @@ import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
 import { DatabaseService } from '@/src/app/database.service';
 import { InjectorInstance } from '@/src/app/app.module';
+import JaroWinklerDistance from './methodObjects/JaroWinklerDistance';
 
 export default class Table extends BasicTable {
   public columns: ColumnCombination;
@@ -29,6 +30,10 @@ export default class Table extends BasicTable {
   public implementsSurrogateKey(): boolean {
     return this.surrogateKey.length >= 1;
   }
+  public columnNameMatchings: Map<
+    { col: SourceColumn; otherCol: SourceColumn },
+    number
+  > = new Map<{ col: SourceColumn; otherCol: SourceColumn }, number>();
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
@@ -61,6 +66,22 @@ export default class Table extends BasicTable {
     this.dataService = InjectorInstance.get<DatabaseService>(DatabaseService);
   }
 
+  // TODO: wo muss überall aufgerufen werden
+  public calculateColumnMatching() {
+    for (let column of this.columns) {
+      for (let otherColumn of this.columns) {
+        this.columnNameMatchings.set(
+          { col: column.sourceColumn, otherCol: otherColumn.sourceColumn },
+          new JaroWinklerDistance(
+            column.sourceColumn.name,
+            otherColumn.sourceColumn.name
+          ).get()
+        );
+      }
+    }
+    console.log('columnNameMatchings', this.columnNameMatchings);
+  }
+
   public static fromITable(iTable: ITable, rowCount: number): Table {
     const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
     const table = new Table();
@@ -77,6 +98,7 @@ export default class Table extends BasicTable {
     table.name = sourceTable.name;
     table.schemaName = sourceTable.schemaName;
     table.rowCount = rowCount;
+    table.calculateColumnMatching();
     return table;
   }
 
@@ -104,6 +126,7 @@ export default class Table extends BasicTable {
     table.name = tableName;
     table.schemaName = '';
     table.rowCount = rowCount;
+    table.calculateColumnMatching();
     return table;
   }
 
@@ -437,13 +460,12 @@ export default class Table extends BasicTable {
       this._fdClusters = fdClusterTree.getAll();
       return await this.scoreFdClusters(this._fdClusters).then(() => {
         console.log('start then');
-        console.log(this._fdClusters);
-        console.log('ready');
         this._fdClusterValid = true;
         if (!this._fdClusters) {
-          console.log(undefined);
           return [];
         }
+        console.log('calculated clusters', this._fdClusters);
+        console.log('ready');
         return this._fdClusters;
       });
     } else {

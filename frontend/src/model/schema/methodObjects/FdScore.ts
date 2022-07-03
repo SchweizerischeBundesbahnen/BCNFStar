@@ -21,11 +21,12 @@ export default class FdScore {
   public calculate(): number {
     //TODO: change score for fds with NULL values to zero
     return (
-      (this.fdLengthScore() +
-        this.keyValueScore() +
-        this.fdPositionScore() +
-        this.fdRedundanceScoreNaumann()) /
-      5
+      // (this.fdLengthScore() +
+      //   this.keyValueScore() +
+      //   this.fdPositionScore() +
+      //   this.fdRedundanceScoreNaumann()) /
+      // 4
+      this.similarityScore()
     );
   }
 
@@ -106,9 +107,36 @@ export default class FdScore {
     );
   }
 
-  // TODO: null values
   private fdRedundanceScoreWeiLink(): number {
     console.log(this.fd, this.fd._redundantTuples, this.table.rowCount);
     return this.fd._redundantTuples / this.table.rowCount;
+  }
+
+  private similarityScore(): number {
+    const simLhs = this.averageSimilarityForCC(this.fd.lhs);
+    const simRhs = this.averageSimilarityForCC(this.fd.rhs);
+    return (1 / 2) * (simLhs + simRhs);
+  }
+
+  private averageSimilarityForCC(fdSide: ColumnCombination): number {
+    console.log(this.table.columnNameMatchings);
+    console.log('start Sim');
+    let sumDistances = 0;
+    let countDistances = 0;
+    for (let col of fdSide) {
+      for (let otherCol of fdSide) {
+        if (col.equals(otherCol)) continue;
+        console.log(col.sourceColumn, otherCol.sourceColumn);
+        const key = Array.from(this.table.columnNameMatchings.keys()).find(
+          (key) =>
+            key.col.equals(col.sourceColumn) &&
+            key.otherCol.equals(otherCol.sourceColumn)
+        )!;
+        sumDistances += this.table.columnNameMatchings.get(key)!;
+        countDistances++;
+      }
+    }
+    console.log(countDistances == 0 ? 0 : sumDistances / countDistances);
+    return countDistances == 0 ? 0 : sumDistances / countDistances;
   }
 }
