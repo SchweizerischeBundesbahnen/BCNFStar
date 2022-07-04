@@ -25,7 +25,7 @@
   </div>
   <app-schema-graph [tables]="tables" [links]="links"></app-schema-graph>
 
-  <div class="item-sidebar" [ngClass]="intService.getBackground()">
+  <div class="item-sidebar" [ngClass]="intService.getIntegrationClass()">
     <div
       class="grid-container-sidebar"
       *ngIf="!mergeService.isMerging; else merging"
@@ -42,8 +42,8 @@
       <ng-template #integrationSidebar>
         <div class="a">
           <h2>
-            Edit the two schemas so that their tables align on the left side.
-            After that you can
+            Edit the two schemas so that their tables align in the graph on the
+            left side. After that you can
           </h2>
           <button class="" sbb-button (click)="mergeService.startMerging()">
             Merge schemas

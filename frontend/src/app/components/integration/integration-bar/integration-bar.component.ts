@@ -17,7 +17,6 @@ export class IntegrationBarComponent {
   public changedMode(mode: SbbRadioChange) {
     if (mode.value === 'compare') {
       this.intService.isComparing = true;
-      this.schemaService.notifyAboutSchemaChanges();
     } else {
       this.intService.isComparing = false;
       this.intService.currentlyEditedSide =

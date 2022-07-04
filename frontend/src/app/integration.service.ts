@@ -27,7 +27,14 @@ export enum Side {
 export class IntegrationService {
   private baseUrl: string;
 
-  public isComparing = true;
+  private _isComparing = true;
+  get isComparing() {
+    return this._isIntegrating && this._isComparing;
+  }
+  set isComparing(comparing: boolean) {
+    this._isComparing = comparing;
+    this.schemaService.notifyAboutSchemaChanges();
+  }
 
   private _schemas?: [Schema, Schema];
   private _currentlyEditedSide: Side = Side.left;
@@ -210,13 +217,13 @@ export class IntegrationService {
    * @param matchings from coma obtained by calling integrationService.getMatching
    * @param tablesLeft tables the matching should be applied to
    * @param tablesRight tables the matching should be applied to
-   * @param cb a function that is called for every pair of columns where a matching exists
+   * @param callback a function that is called for every pair of columns where a matching exists
    */
   forMatch(
     matchings: Map<SourceColumn, SourceColumn>,
     tablesLeft: Iterable<Table>,
     tablesRight: Iterable<Table>,
-    cb: (
+    callback: (
       src: Column,
       target: Column,
       srcTable: Table,
@@ -231,7 +238,7 @@ export class IntegrationService {
             if (
               existingColumn.sourceColumn === matchings.get(column.sourceColumn)
             ) {
-              cb(column, existingColumn, table, existingTable);
+              callback(column, existingColumn, table, existingTable);
             }
           }
       }
@@ -245,12 +252,12 @@ export class IntegrationService {
   }
 
   /**
-   * Can be used with [ngClass]="intService.getBackground(table)" to set an element's background according to
+   * Can be used with [ngClass]="intService.getIntegrationClass(table)" to set an element's background according to
    * which schema it belongs to
    * @param table The table used as basis for coloring
    * @param otherClasses Other classes that shall be applied via ngClass
    */
-  public getBackground(
+  public getIntegrationClass(
     table: BasicTable | undefined = this.schemaService.selectedTable,
     otherClasses: Record<string, boolean> = {}
   ): Record<string, boolean> {

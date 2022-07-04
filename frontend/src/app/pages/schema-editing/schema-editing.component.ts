@@ -78,15 +78,13 @@ export class SchemaEditingComponent {
 
   private displayedTables() {
     if (this.mergeService.isMerging) return this.mergeService.tables;
-    if (this.intService.isIntegrating && this.intService.isComparing)
-      return this.intService.tables;
+    if (this.intService.isComparing) return this.intService.tables;
     return this.schemaService.schema.tables;
   }
 
   private displayedLinks() {
     if (this.mergeService.isMerging) return this.mergeService.links;
-    if (this.intService.isIntegrating && this.intService.isComparing)
-      return this.intService.links;
+    if (this.intService.isComparing) return this.intService.links;
     const newLinks: Array<LinkDefinition> = [];
     for (const table of this.schemaService.schema.tables)
       for (const fk of this.schemaService.schema.fksOf(table, true))
