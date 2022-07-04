@@ -29,10 +29,6 @@ import { ViolatingRowsViewComponent } from './components/operation-dialogs/viola
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 
-export enum EditingMode {
-  normal,
-  star,
-}
 
 @Injectable({
   providedIn: 'root',
@@ -68,16 +64,12 @@ export class SchemaService {
 
   public highlightedColumns?: Map<BasicTable, ColumnCombination>;
 
-  private _mode: EditingMode = EditingMode.normal;
   public get starMode() {
-    return this._mode === EditingMode.star;
+    return this.schema.__starMode
   }
-  public get mode() {
-    return this._mode;
-  }
-  public set mode(mode: EditingMode) {
-    this._mode = mode;
-    this.schema.starMode = this.starMode;
+  
+  public set starMode(mode: boolean) {
+    this.schema.__starMode = this.starMode;
     this.notifyAboutSchemaChanges();
   }
 
@@ -116,7 +108,7 @@ export class SchemaService {
       this.selectedTable = command.newTable;
     };
     command.onUndo = () => {
-      this.selectedTable = fk.referencing;
+      this.selectedTable = fk.referencingTable;
     };
 
     this.commandProcessor.do(command);

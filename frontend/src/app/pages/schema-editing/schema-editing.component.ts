@@ -10,7 +10,7 @@ import {
 } from '../../components/graph/schema-graph/schema-graph.component';
 import { IntegrationService } from '../../integration.service';
 import { SchemaMergingService } from '../../schema-merging.service';
-import { EditingMode, SchemaService } from '../../schema.service';
+import { SchemaService } from '../../schema.service';
 
 export const generateButtonMarkup = (
   selector: string,
@@ -49,10 +49,6 @@ export class SchemaEditingComponent {
   public graph!: SchemaGraphComponent;
 
   public links: Array<LinkDefinition> = [];
-
-  public get EditingMode() {
-    return EditingMode;
-  }
 
   public tables: Iterable<BasicTable> = [];
 
@@ -96,7 +92,7 @@ export class SchemaEditingComponent {
             side: PortSide.Right,
           },
           target: {
-            table: fk.referenced,
+            table: fk.referencedTable,
             columnName: fk.referencedName,
             side: PortSide.Left,
           },

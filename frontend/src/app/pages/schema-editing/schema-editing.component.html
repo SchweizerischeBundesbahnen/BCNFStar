@@ -12,13 +12,13 @@
       Auto-normalize all tables
     </button>
     <sbb-toggle
-      [(ngModel)]="schemaService.mode"
+      [(ngModel)]="schemaService.starMode"
       class="me-1"
       [disabled]="intService.isIntegrating || mergeService.isMerging"
     >
-      <sbb-toggle-option label="Normal Mode" [value]="EditingMode.normal">
+      <sbb-toggle-option label="Normal Mode" [value]="false">
       </sbb-toggle-option>
-      <sbb-toggle-option label="Star Schema Mode" [value]="EditingMode.star">
+      <sbb-toggle-option label="Star Schema Mode" [value]="true">
       </sbb-toggle-option>
     </sbb-toggle>
     <app-undo-redo class="undo-redo"></app-undo-redo>

@@ -48,10 +48,10 @@ export function CDSchema(): Schema {
 
   schema.addTables(cdTracksTable, interpretTable);
   const fk = new SourceRelationship();
-  fk.referencing.push(
+  fk.referencingCols.push(
     cdTracksTable.columns.columnFromName("Interpret").sourceColumn
   );
-  fk.referenced.push(
+  fk.referencedCols.push(
     interpretTable.columns.columnFromName("Interpret").sourceColumn
   );
   schema.addFks(fk);

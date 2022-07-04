@@ -76,7 +76,7 @@ export class GraphElementComponent {
   public get showMakeDirectDimension() {
     return (
       this.table instanceof Table &&
-      this.schemaService.schema.starMode &&
+      this.schemaService.schema.__starMode &&
       this.schemaService.schema.directDimensionableRoutes(this.table, true)
         .length > 0
     );
