@@ -1,13 +1,11 @@
 import { exampleSchemaToJSON, exampleSchema } from "../../utils/exampleTables";
-import SaveIntermediateState from "../../../frontend/src/model/schema/methodObjects/saveIntermediateState";
+import SaveSchemaState from "../../../frontend/src/model/schema/methodObjects/SaveSchemaState";
 
 describe("SaveIntermediateState", () => {
   it("parses an JSON Schema", () => {
     expect(
       exampleSchema() ==
-        new SaveIntermediateState().parseSchema(
-          JSON.parse(exampleSchemaToJSON())
-        )
+        new SaveSchemaState().parseSchema(JSON.parse(exampleSchemaToJSON()))
     );
   });
 });

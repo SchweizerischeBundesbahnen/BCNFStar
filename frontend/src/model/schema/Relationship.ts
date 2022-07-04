@@ -48,8 +48,8 @@ export default class Relationship {
   public sourceRelationship(): SourceRelationship {
     const sourceRel = new SourceRelationship();
     for (const i in this._referencing) {
-      sourceRel.referencing.push(this._referencing[i].sourceColumn);
-      sourceRel.referenced.push(this._referenced[i].sourceColumn);
+      sourceRel.referencingCols.push(this._referencing[i].sourceColumn);
+      sourceRel.referencedCols.push(this._referenced[i].sourceColumn);
     }
     return sourceRel;
   }
@@ -127,7 +127,7 @@ export default class Relationship {
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
-  public columnsMapped(referencingCol: Column, referencedCol: Column): boolean {
+  public mapsColumns(referencingCol: Column, referencedCol: Column): boolean {
     const i = this.referencing.findIndex((otherReferencingCol) =>
       otherReferencingCol.equals(referencingCol)
     );
