@@ -15,25 +15,22 @@ export class GraphElementComponent implements OnInit {
   @Input() public bbox!: Record<string, string>;
   public showMakeDirectDimension: boolean = false;
   public isFact: boolean = false;
-  public isDimension: boolean = false;
   public isDirectDimension: boolean = false;
+  public isIndirectDimension: boolean = false;
 
   constructor(public schemaService: SchemaService) {}
 
   ngOnInit(): void {
+    if (!this.schemaService.starMode) return;
     this.showMakeDirectDimension =
       this.table instanceof Table &&
-      this.schemaService.schema.starMode &&
       this.schemaService.schema.directDimensionableRoutes(this.table, true)
         .length > 0;
-
-    this.isFact =
-      this.schemaService.starMode &&
-      this.schemaService.schema.isFact(this.table, true);
-    this.isDimension = this.schemaService.starMode && !this.isFact;
-    this.isDirectDimension =
-      this.schemaService.starMode &&
-      this.schemaService.schema.isDirectDimension(this.table);
+    this.isFact = this.schemaService.schema.isFact(this.table, true);
+    this.isDirectDimension = this.schemaService.schema.isDirectDimension(
+      this.table
+    );
+    this.isIndirectDimension = !this.isFact && !this.isDirectDimension;
   }
 
   public select() {
