@@ -48,11 +48,11 @@ export class SchemaCreationService {
 
         if (!dependantColumn || !referencedColumn) continue;
 
-        ind.referencing.push(dependantColumn!);
-        ind.referenced.push(referencedColumn!);
+        ind.referencingCols.push(dependantColumn!);
+        ind.referencedCols.push(referencedColumn!);
       }
 
-      if (ind.referencing.length > 0) inds.push(ind);
+      if (ind.referencingCols.length > 0) inds.push(ind);
     });
     return inds;
   }
@@ -145,10 +145,10 @@ export class SchemaCreationService {
         // in case the foreign key is not fully contained in the selection of tables
         if (!referencingColumn || !referencedColumn) continue;
 
-        fk.referencing.push(referencingColumn);
-        fk.referenced.push(referencedColumn);
+        fk.referencingCols.push(referencingColumn);
+        fk.referencedCols.push(referencedColumn);
       }
-      if (fk.referenced.length) result.push(fk);
+      if (fk.referencedCols.length) result.push(fk);
     }
     return result;
   }

@@ -18,7 +18,7 @@ export default class PostgreSQLPersisting extends SQLPersisting {
    * In Postgres, you don't have to specify both tables but use the table you already specified in the UPDATE-Clause.
    */
   public override updateSurrogateKeySource(fk: TableRelationship): string {
-    return this.tableIdentifier(fk.referenced);
+    return this.tableIdentifier(fk.referencedTable);
   }
 
   /** The column is only necessary for the data transfer. We don't want to insert data later.
