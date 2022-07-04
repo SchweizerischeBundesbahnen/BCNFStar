@@ -10,7 +10,7 @@ BCNFStar is a tool for interactive database schema management. It helps you to
   - same for functional dependencies, which are the basis for normalising (splitting) tables
 - integrate new tables into an existing schema (coming soon!)
 
-It makes sure all transformations are valid for a given data instance and generates SQL downloads for transforming
+It ensures that all transformations are valid for a given data instance and generates SQL downloads for transforming
 
 ## Setup
 
