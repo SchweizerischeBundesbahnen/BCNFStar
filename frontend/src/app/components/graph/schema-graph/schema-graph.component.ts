@@ -5,6 +5,7 @@ import * as dagre from 'dagre';
 import * as graphlib from 'graphlib';
 import panzoom, { PanZoom, Transform } from 'panzoom';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import BasicTable from '@/src/model/schema/BasicTable';
 import { SchemaService } from '@/src/app/schema.service';
 
 type GraphStorageItem = {
@@ -26,9 +27,9 @@ enum PortSide {
 export class SchemaGraphComponent implements AfterContentInit {
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
-  protected portDiameter = 22.5;
+  protected columnHeight = 23;
 
-  public graphStorage = new Map<Table, GraphStorageItem>();
+  public graphStorage = new Map<BasicTable, GraphStorageItem>();
 
   protected graph!: joint.dia.Graph;
   protected paper!: joint.dia.Paper;
@@ -85,7 +86,7 @@ export class SchemaGraphComponent implements AfterContentInit {
       graphlib,
       nodeSep: 40,
       // prevent left ports from being cut off
-      marginX: this.portDiameter / 2,
+      marginX: this.columnHeight / 2,
       edgeSep: 80,
       rankSep: 200,
       rankDir: 'LR',
@@ -150,7 +151,7 @@ export class SchemaGraphComponent implements AfterContentInit {
       jointjsEl.resize(
         this.elementWidth,
         60 +
-          this.portDiameter *
+          this.columnHeight *
             this.schemaService.schema.displayedColumnsOf(table).length
       );
       this.graphStorage.set(table, {
@@ -264,12 +265,12 @@ export class SchemaGraphComponent implements AfterContentInit {
     side: PortSide;
   }) {
     const cx = side == PortSide.Left ? 0 : this.elementWidth;
-    return `<circle r="${this.portDiameter / 2}" cx="${cx}" cy="${
-      this.graphElementHeaderHeight + this.portDiameter * (counter + 0.5)
+    return `<circle r="${this.columnHeight / 2}" cx="${cx}" cy="${
+      this.graphElementHeaderHeight + this.columnHeight * (counter + 0.5)
     }" strokegit ="green" fill="white"/>`;
   }
 
-  private generatePorts(jointjsEl: joint.dia.Element, table: Table) {
+  private generatePorts(jointjsEl: joint.dia.Element, table: BasicTable) {
     let counter = 0;
     for (let column of this.schemaService.schema.displayedColumnsOf(table)) {
       let args = { counter, side: PortSide.Left };

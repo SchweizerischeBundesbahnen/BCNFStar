@@ -1,9 +1,9 @@
 import Schema from '../schema/Schema';
-import Table from '../schema/Table';
+import BasicTable from '../schema/BasicTable';
 import Command from './Command';
 
 export default class DeleteTableCommand extends Command {
-  public constructor(private schema: Schema, public table: Table) {
+  public constructor(private schema: Schema, public table: BasicTable) {
     super();
   }
 

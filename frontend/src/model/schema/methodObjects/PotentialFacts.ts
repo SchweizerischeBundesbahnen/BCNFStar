@@ -1,14 +1,14 @@
+import BasicTable from '../BasicTable';
 import Schema from '../Schema';
-import Table from '../Table';
 
 export default class PotentialFacts {
-  public potentialFacts = new Set<Table>();
+  public potentialFacts = new Set<BasicTable>();
 
   private static weightDirect = 1;
   private static weightIndirect = 0.8;
   private static k = 1.0;
 
-  private connectionTopologyValues = new Map<Table, number>();
+  private connectionTopologyValues = new Map<BasicTable, number>();
 
   public constructor(private schema: Schema) {
     for (const table of this.schema.tables) this.calculateCTVOf(table);
@@ -25,8 +25,8 @@ export default class PotentialFacts {
   }
 
   private calculateCTVOf(
-    table: Table,
-    visitedTables: Array<Table> = []
+    table: BasicTable,
+    visitedTables: Array<BasicTable> = []
   ): number {
     if (visitedTables.includes(table)) return 0;
     if (!this.connectionTopologyValues.has(table)) {

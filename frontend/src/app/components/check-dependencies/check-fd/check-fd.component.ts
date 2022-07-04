@@ -5,6 +5,7 @@ import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import { SchemaService } from '@/src/app/schema.service';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
+import Table from '@/src/model/schema/Table';
 
 @Component({
   selector: 'app-check-fd',
@@ -31,7 +32,7 @@ export class CustomFunctionalDependencySideBarComponent {
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
   }
 
   public get lhs() {

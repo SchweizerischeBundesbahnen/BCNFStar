@@ -1,9 +1,9 @@
+import BasicTable from '../schema/BasicTable';
 import Schema from '../schema/Schema';
-import Table from '../schema/Table';
 import Command from './Command';
 
 export default class RejectFactCommand extends Command {
-  public constructor(private schema: Schema, public table: Table) {
+  public constructor(private schema: Schema, public table: BasicTable) {
     super();
   }
 
