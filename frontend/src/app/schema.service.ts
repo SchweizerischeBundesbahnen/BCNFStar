@@ -114,6 +114,8 @@ export class SchemaService {
     };
 
     this.commandProcessor.do(command);
+    if (command.newTable)
+      await this.resetDataForRedundanceRanking([command.newTable!]);
     this.notifyAboutSchemaChanges();
   }
 
@@ -147,7 +149,7 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public split(fd: FunctionalDependency, name?: string) {
+  public async split(fd: FunctionalDependency, name?: string) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');
     let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
@@ -156,6 +158,8 @@ export class SchemaService {
     command.onUndo = () => (this.selectedTable = command.table);
 
     this.commandProcessor.do(command);
+    if (command.children?.length != 0)
+      await this.resetDataForRedundanceRanking(command.children!);
     this.notifyAboutSchemaChanges();
   }
 
@@ -280,66 +284,59 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async resetDataForRedundanceRanking(schema: Schema) {
-    console.log('resetRadundance', schema);
+  public async resetDataForRedundanceRanking(tables: Array<Table>) {
+    console.log('resetRadundance', tables);
     let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
       Promise<number>
     >();
     let fdRedundantGroupLengthsPromises: Array<Promise<number>> = new Array<
       Promise<number>
     >();
-    schema.tables.forEach((table) => {
-      if (table instanceof Table) {
-        table.fdClusters().forEach((cluster) => {
-          fdRedundantTuplePromises.push(
-            this.dataService.getRedundanceByValueCombinations(
-              table,
-              cluster.fds[0].lhs.asArray()
-            )
-          );
-          fdRedundantGroupLengthsPromises.push(
-            this.dataService.getRedundanceGroupLengthByValueCombinations(
-              table,
-              cluster.fds[0].lhs.asArray()
-            )
-          );
-        });
-      }
+    tables.forEach((table) => {
+      console.log('cluster', table.fdClusters());
+      table.fdClusters().forEach((cluster) => {
+        fdRedundantTuplePromises.push(
+          this.dataService.getRedundanceByValueCombinations(
+            table,
+            cluster.fds[0].lhs.asArray()
+          )
+        );
+        fdRedundantGroupLengthsPromises.push(
+          this.dataService.getRedundanceGroupLengthByValueCombinations(
+            table,
+            cluster.fds[0].lhs.asArray()
+          )
+        );
+      });
     });
+
+    console.log(
+      'länngen:',
+      fdRedundantTuplePromises.length,
+      fdRedundantGroupLengthsPromises.length
+    );
+
     let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
     console.log(resultRedundantTuples);
-    let index = 0;
-    schema.tables.forEach((table) => {
-      if (table instanceof Table) {
-        console.log(index);
-        table
-          .fdClusters()
-          .forEach((cluster) =>
-            cluster.fds.forEach(
-              (fd) => (fd._redundantTuples = resultRedundantTuples[index])
-            )
-          );
-        index++;
-      }
+    tables.forEach((table) => {
+      table.fdClusters().forEach((cluster, index) =>
+        cluster.fds.forEach((fd) => {
+          fd._redundantTuples = resultRedundantTuples[index];
+          console.log(fd, resultRedundantTuples[index]);
+        })
+      );
     });
-    index = 0;
     let resultRedundantGroupLengths = await Promise.all(
       fdRedundantGroupLengthsPromises
     );
     console.log(resultRedundantGroupLengths);
-    schema.tables.forEach((table) => {
-      if (table instanceof Table) {
-        console.log(index);
-        table
-          .fdClusters()
-          .forEach((cluster) =>
-            cluster.fds.forEach(
-              (fd) =>
-                (fd._redundantGroupLength = resultRedundantGroupLengths[index])
-            )
-          );
-        index++;
-      }
+    tables.forEach((table) => {
+      table.fdClusters().forEach((cluster, index) =>
+        cluster.fds.forEach((fd) => {
+          fd._redundantGroupLength = resultRedundantGroupLengths[index];
+          console.log(fd, resultRedundantGroupLengths[index]);
+        })
+      );
     });
   }
 

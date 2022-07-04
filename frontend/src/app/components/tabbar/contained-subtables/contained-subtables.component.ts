@@ -36,7 +36,6 @@ export class ContainedSubtablesComponent {
     this.schemaService.selectedTableChanged.subscribe(() => {
       this._fdClusterFilter = [];
     });
-    // this.table.fdClusters().then((cluster) => (this.fdCluster = cluster));
   }
 
   public get table() {
@@ -58,7 +57,6 @@ export class ContainedSubtablesComponent {
   }
 
   public fdClusters(): Array<FdCluster> {
-    // console.log(this.allClusters)
     const cc = this.fdClusterFilter;
     const cluster = this.table
       .rankedFdClusters()

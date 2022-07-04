@@ -219,7 +219,11 @@ export class SchemaCreationService {
 
     for (const table of schema.regularTables) schema.calculateFdsOf(table);
 
-    await this.schemaService.resetDataForRedundanceRanking(schema);
+    await this.schemaService.resetDataForRedundanceRanking(
+      Array.from(schema.tables).filter(
+        (table) => table instanceof Table
+      ) as Array<Table>
+    );
 
     return schema;
   }
