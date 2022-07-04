@@ -14,8 +14,8 @@ export default class Join {
   public sourceMapping = new Map<SourceTableInstance, SourceTableInstance>();
 
   public constructor(fk: TableRelationship, private name?: string) {
-    this.referencing = fk.referencing;
-    this.referenced = fk.referenced;
+    this.referencing = fk.referencingTable;
+    this.referenced = fk.referencedTable;
     this.relationship = fk.relationship;
 
     this.join();

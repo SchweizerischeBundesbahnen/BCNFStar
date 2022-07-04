@@ -35,7 +35,7 @@ export default class PotentialFacts {
       for (const fk of this.schema.fksOf(table, true))
         ctv +=
           PotentialFacts.weightIndirect *
-          this.calculateCTVOf(fk.referenced, [...visitedTables, table]);
+          this.calculateCTVOf(fk.referencedTable, [...visitedTables, table]);
       this.connectionTopologyValues.set(table, ctv);
     }
     return this.connectionTopologyValues.get(table)!;

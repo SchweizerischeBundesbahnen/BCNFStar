@@ -8,12 +8,13 @@ import FunctionalDependency from "../../../frontend/src/model/schema/FunctionalD
 import ColumnCombination from "../../../frontend/src/model/schema/ColumnCombination";
 import DismissFkCommand from "../../../frontend/src/model/commands/DismissFkCommand";
 import ShowFkCommand from "../../../frontend/src/model/commands/ShowFkCommand";
+import BasicTable from "../../../frontend/src/model/schema/BasicTable";
 
 describe("Schema", () => {
   let schema: Schema;
-  let tableA: Table;
-  let tableB: Table;
-  let tableC: Table;
+  let tableA: BasicTable;
+  let tableB: BasicTable;
+  let tableC: BasicTable;
 
   beforeEach(() => {
     schema = exampleSchema();
@@ -26,7 +27,7 @@ describe("Schema", () => {
   it("fds of joined tables contain right fds", () => {
     let join = new JoinCommand(
       schema,
-      schema.fksOf(tableA, true).find((rel) => rel.referenced == tableB)!,
+      schema.fksOf(tableA, true).find((rel) => rel.referencedTable == tableB)!,
       false
     );
     join.do();
@@ -150,8 +151,8 @@ describe("Schema", () => {
     let fks = schema.fksOf(tableA, true);
     expect(fks.length).to.equal(2);
     let fk = fks[0];
-    expect(fk.referencing).to.equal(tableA);
-    expect(fk.referenced).to.equal(tableB);
+    expect(fk.referencingTable).to.equal(tableA);
+    expect(fk.referencedTable).to.equal(tableB);
   });
 
   it("dismisses fks correctly", () => {
@@ -164,7 +165,7 @@ describe("Schema", () => {
   });
 
   it("readds fks correctly", () => {
-    const fk = schema.hiddenFksOf(tableA)[0];
+    const fk = schema.hiddenFksOf(tableA as Table)[0];
     expect(schema.fksOf(tableA, true)).to.not.include(fk);
     const showCommand = new ShowFkCommand(schema, fk);
     showCommand.do();
@@ -174,13 +175,13 @@ describe("Schema", () => {
   });
 
   it("calculates inds of a table correctly", () => {
-    let inds = schema.indsOf(tableA);
+    let inds = schema.indsOf(tableA as Table);
     expect([...inds.keys()].length).to.equal(1);
     const flatInds = Array.from(inds.values()).flat();
     expect(flatInds.length).to.equal(1);
     let ind = flatInds[0];
-    expect(ind.referencing).to.equal(tableA);
-    expect(ind.referenced).to.equal(tableC);
+    expect(ind.referencingTable).to.equal(tableA);
+    expect(ind.referencedTable).to.equal(tableC);
   });
 
   it("checks splittability of fds correctly", () => {
@@ -188,24 +189,35 @@ describe("Schema", () => {
     tableA = [...schema.tables].find((table) => table.name == "TableA")!;
     tableB = [...schema.tables].find((table) => table.name == "TableB")!;
     tableC = [...schema.tables].find((table) => table.name == "TableC")!;
-    expect(tableA.violatingFds().length).to.equal(1);
-    const fd = tableA.violatingFds()[0];
-    expect(schema.splittableFdsOf(tableA).length).to.equal(0);
+    expect((tableA as Table).violatingFds().length).to.equal(1);
+    const fd = (tableA as Table).violatingFds()[0];
+    expect(schema.splittableFdsOf(tableA as Table).length).to.equal(0);
 
-    expect(schema.fdSplitReferenceViolationsOf(fd, tableA).length).to.equal(1);
     expect(
-      schema.fdSplitReferenceViolationsOf(fd, tableA)[0].referencing
+      schema.fdSplitReferenceViolationsOf(fd, tableA as Table).length
+    ).to.equal(1);
+    expect(
+      schema.fdSplitReferenceViolationsOf(fd, tableA as Table)[0]
+        .referencingTable
     ).to.equal(tableC);
 
-    expect(schema.fdSplitFKViolationsOf(fd, tableA).length).to.equal(0);
-
-    fd.rhs.delete(...tableA.columns.columnsFromNames("a_a2", "a_b1"));
-
-    expect(schema.fdSplitReferenceViolationsOf(fd, tableA).length).to.equal(0);
-
-    expect(schema.fdSplitFKViolationsOf(fd, tableA).length).to.equal(1);
-    expect(schema.fdSplitFKViolationsOf(fd, tableA)[0].referenced).to.equal(
-      tableB
+    expect(schema.fdSplitFKViolationsOf(fd, tableA as Table).length).to.equal(
+      0
     );
+
+    fd.rhs.delete(
+      ...(tableA as Table).columns.columnsFromNames("a_a2", "a_b1")
+    );
+
+    expect(
+      schema.fdSplitReferenceViolationsOf(fd, tableA as Table).length
+    ).to.equal(0);
+
+    expect(schema.fdSplitFKViolationsOf(fd, tableA as Table).length).to.equal(
+      1
+    );
+    expect(
+      schema.fdSplitFKViolationsOf(fd, tableA as Table)[0].referencedTable
+    ).to.equal(tableB);
   });
 });

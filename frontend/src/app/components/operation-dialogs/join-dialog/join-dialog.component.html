@@ -5,7 +5,7 @@
     type="text"
     sbbInput
     [(ngModel)]="newTableName"
-    placeholder="{{ fk.referencing.name }}"
+    placeholder="{{ fk.referencingTable.name }}"
   />
   <br />
   Column prefix in case of ambiguous column names
@@ -13,7 +13,7 @@
   <br />
   <div class="sbb-checkbox-group-vertical">
     <sbb-checkbox [(ngModel)]="duplicate">
-      Duplicate {{ fk.referenced.name }} before joining
+      Duplicate {{ fk.referencedTable.name }} before joining
     </sbb-checkbox>
   </div>
 </div>
