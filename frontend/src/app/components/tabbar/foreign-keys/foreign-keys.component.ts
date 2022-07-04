@@ -39,18 +39,18 @@ export class ForeignKeysComponent {
     for (const tableRel of this.schemaService.schema
       .indsOf(this.table)
       .get(rel)!) {
-      if (!map.has(tableRel.referencing)) {
-        map.set(tableRel.referencing, new ColumnCombination());
+      if (!map.has(tableRel.referencingTable)) {
+        map.set(tableRel.referencingTable, new ColumnCombination());
       }
-      if (!map.has(tableRel.referenced)) {
-        map.set(tableRel.referenced, new ColumnCombination());
+      if (!map.has(tableRel.referencedTable)) {
+        map.set(tableRel.referencedTable, new ColumnCombination());
       }
       map
-        .get(tableRel.referencing)!
-        .union(new ColumnCombination(tableRel.relationship.referencing));
+        .get(tableRel.referencingTable)!
+        .union(new ColumnCombination(tableRel.referencingCols));
       map
-        .get(tableRel.referenced)!
-        .union(new ColumnCombination(tableRel.relationship.referenced));
+        .get(tableRel.referencedTable)!
+        .union(new ColumnCombination(tableRel.referencedCols));
     }
     this.schemaService.highlightedColumns = map;
   }
@@ -66,7 +66,7 @@ export class ForeignKeysComponent {
       .filter((sourceRel) =>
         inds
           .get(sourceRel)!
-          .some((ind) => this.indFilter.includes(ind.referenced))
+          .some((ind) => this.indFilter.includes(ind.referencedTable))
       )
       .sort((sourceRel1, sourceRel2) => {
         const score1 = new IndScore(

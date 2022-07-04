@@ -145,7 +145,7 @@ export default abstract class SQLPersisting {
 
     for (const referencingTable of schema.tables) {
       for (const fk of schema.fksOf(referencingTable, true)) {
-        if (fk.referenced.implementsSurrogateKey()) {
+        if (fk.referencedTable.implementsSurrogateKey()) {
           Sql += this.addSkColumnToReferencingSql(fk);
           Sql += this.updateSurrogateKeySql(fk);
           Sql += this.foreignSurrogateKeySql(fk);
@@ -160,7 +160,7 @@ export default abstract class SQLPersisting {
 
   // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
   public addSkColumnToReferencingSql(fk: TableRelationship): string {
-    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)} ADD ${
+    return `ALTER TABLE ${this.tableIdentifier(fk.referencingTable)} ADD ${
       fk.referencingName
     } INT;
     ${this.suffix()}
@@ -172,38 +172,38 @@ export default abstract class SQLPersisting {
    */
   public updateSurrogateKeySql(fk: TableRelationship): string {
     return `
-    UPDATE ${this.tableIdentifier(fk.referencing)}
-    SET ${fk.referencingName} = ${this.tableIdentifier(fk.referenced)}.${
-      fk.referenced.surrogateKey
+    UPDATE ${this.tableIdentifier(fk.referencingTable)}
+    SET ${fk.referencingName} = ${this.tableIdentifier(fk.referencedTable)}.${
+      fk.referencedTable.surrogateKey
     }
     FROM ${this.updateSurrogateKeySource(fk)}
-    WHERE ${fk.relationship.referencing
+    WHERE ${fk.referencingCols
       .map(
         (c: Column, i: number) =>
           `${this.schemaWideColumnIdentifier(
-            fk.referencing,
+            fk.referencingTable,
             c
           )} = ${this.schemaWideColumnIdentifier(
-            fk.referenced,
-            fk.relationship.referenced[i]
+            fk.referencedTable,
+            fk.referencedCols[i]
           )}`
       )
       .join(' AND ')};`;
   }
 
   public updateSurrogateKeySource(fk: TableRelationship): string {
-    return `${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
-      fk.referenced
-    )}`;
+    return `${this.tableIdentifier(
+      fk.referencingTable
+    )}, ${this.tableIdentifier(fk.referencedTable)}`;
   }
 
   public foreignSurrogateKeySql(fk: TableRelationship) {
     return `
-    ALTER TABLE ${this.tableIdentifier(fk.referencing)}
+    ALTER TABLE ${this.tableIdentifier(fk.referencingTable)}
     ADD CONSTRAINT ${this.randomFkName()}
     FOREIGN KEY (${fk.referencingName})
-    REFERENCES ${this.tableIdentifier(fk.referenced)} (${
-      fk.referenced.surrogateKey
+    REFERENCES ${this.tableIdentifier(fk.referencedTable)} (${
+      fk.referencedTable.surrogateKey
     });`;
   }
 
@@ -218,18 +218,18 @@ export default abstract class SQLPersisting {
   public uniqueConstraint(fk: TableRelationship): string {
     return `
 ALTER TABLE ${this.tableIdentifier(
-      fk.referenced
-    )} ADD UNIQUE (${this.generateColumnString(fk.relationship.referenced)});
+      fk.referencedTable
+    )} ADD UNIQUE (${this.generateColumnString(fk.referencedCols)});
 `;
   }
 
   public foreignKeySql(fk: TableRelationship): string {
-    return `ALTER TABLE ${this.tableIdentifier(fk.referencing)}
+    return `ALTER TABLE ${this.tableIdentifier(fk.referencingTable)}
       ADD CONSTRAINT ${this.randomFkName()}
-      FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
+      FOREIGN KEY (${this.generateColumnString(fk.referencingCols)})
       REFERENCES ${this.tableIdentifier(
-        fk.referenced
-      )} (${this.generateColumnString(fk.relationship.referenced)});`;
+        fk.referencedTable
+      )} (${this.generateColumnString(fk.referencedCols)});`;
   }
 
   public primaryKeys(tables: Table[]): string {

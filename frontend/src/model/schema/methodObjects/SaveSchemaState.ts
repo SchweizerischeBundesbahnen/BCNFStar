@@ -27,8 +27,8 @@ interface JSONSourceFunctionalDependency {
 }
 
 interface JSONSourceRelationship {
-  referencing: Array<JSONSourceColumn>;
-  referenced: Array<JSONSourceColumn>;
+  _referencingCols: Array<JSONSourceColumn>;
+  _referencedCols: Array<JSONSourceColumn>;
 }
 
 interface JSONTableRelationship {
@@ -324,12 +324,9 @@ export default class SaveSchemaState {
   }
 
   private parseSourceRelationship(sr: JSONSourceRelationship) {
-    let newSourceRelationship = new SourceRelationship();
-    newSourceRelationship.referenced = this.parseSourceColumnArray(
-      sr.referenced
-    );
-    newSourceRelationship.referencing = this.parseSourceColumnArray(
-      sr.referencing
+    let newSourceRelationship = new SourceRelationship(
+      this.parseSourceColumnArray(sr._referencingCols),
+      this.parseSourceColumnArray(sr._referencedCols)
     );
 
     let existing = this.existingSourceRelationships.find((other) =>

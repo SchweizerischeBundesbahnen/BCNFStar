@@ -108,7 +108,7 @@ export class SchemaService {
       this.selectedTable = command.newTable;
     };
     command.onUndo = () => {
-      this.selectedTable = fk.referencing;
+      this.selectedTable = fk.referencingTable;
     };
 
     this.commandProcessor.do(command);
@@ -209,7 +209,7 @@ export class SchemaService {
   public async makeDirectDimension(table: BasicTable): Promise<void> {
     if (!(table instanceof Table))
       throw Error('directDimension not implemented for unioned tables');
-      
+
     let routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
