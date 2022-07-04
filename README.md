@@ -16,7 +16,7 @@ It makes sure all transformations are valid for a given data instance and genera
 
 ### Java
 
-This project uses [metanome](https://github.com/sekruse/metanome-cli), which requires [java](https://www.java.com/de/download/manual.jsp). We recommand Java 8 -11
+This project uses [metanome](https://github.com/sekruse/metanome-cli), which requires [java](https://www.java.com/de/download/manual.jsp). We recommend Java 8-11.
 
 ### Node
 
@@ -57,7 +57,7 @@ npm run start
 
 ### Docker
 
-If want to use a docker container for deployment you can skip the steps bellow. Just follow the next commands.
+If want to use a docker container for deployment you can skip the steps above. Just follow the next commands.
 
 First set up your personal DB configuration in [](docker-compose.yml). By default we use a standard postgres database configuration.
 
