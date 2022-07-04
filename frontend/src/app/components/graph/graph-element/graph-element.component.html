@@ -11,9 +11,9 @@
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"
     [ngClass]="{
-      fact: isFact(),
-      directDimension: isDirectDimension(),
-      dimension: isDimension() && !isDirectDimension(),
+      fact: isFact,
+      directDimension: isDirectDimension,
+      dimension: isDimension && !isDirectDimension,
       'table-head-highlight': schemaService.selectedTable === table
     }"
   >

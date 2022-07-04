@@ -2,7 +2,7 @@ import BasicTable from '@/src/model/schema/BasicTable';
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import BasicColumn from '@/src/model/types/BasicColumn';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import Table from 'src/model/schema/Table';
 
 @Component({
@@ -10,13 +10,33 @@ import Table from 'src/model/schema/Table';
   templateUrl: './graph-element.component.html',
   styleUrls: ['./graph-element.component.css'],
 })
-export class GraphElementComponent {
+export class GraphElementComponent implements OnInit {
   @Input() public table!: BasicTable;
   @Input() public bbox!: Record<string, string>;
+  public showMakeDirectDimension: boolean = false;
+  public isFact: boolean = false;
+  public isDimension: boolean = false;
+  public isDirectDimension: boolean = false;
 
   constructor(public schemaService: SchemaService) {}
 
-  select() {
+  ngOnInit(): void {
+    this.showMakeDirectDimension =
+      this.table instanceof Table &&
+      this.schemaService.schema.starMode &&
+      this.schemaService.schema.directDimensionableRoutes(this.table, true)
+        .length > 0;
+
+    this.isFact =
+      this.schemaService.starMode &&
+      this.schemaService.schema.isFact(this.table, true);
+    this.isDimension = this.schemaService.starMode && !this.isFact;
+    this.isDirectDimension =
+      this.schemaService.starMode &&
+      this.schemaService.schema.isDirectDimension(this.table);
+  }
+
+  public select() {
     this.schemaService.selectedTable = this.table;
   }
 
@@ -39,35 +59,5 @@ export class GraphElementComponent {
     );
     if (!highlightedCols) return false;
     return highlightedCols.includes(column);
-  }
-
-  public isFact(): boolean {
-    return (
-      this.schemaService.starMode &&
-      this.schemaService.schema.isFact(this.table, true)
-    );
-  }
-
-  public isDirectDimension(): boolean {
-    return (
-      this.schemaService.starMode &&
-      this.schemaService.schema.isDirectDimension(this.table)
-    );
-  }
-
-  public isDimension(): boolean {
-    return (
-      this.schemaService.starMode &&
-      !this.schemaService.schema.isFact(this.table, true)
-    );
-  }
-
-  public get showMakeDirectDimension() {
-    return (
-      this.table instanceof Table &&
-      this.schemaService.schema.starMode &&
-      this.schemaService.schema.directDimensionableRoutes(this.table, true)
-        .length > 0
-    );
   }
 }
