@@ -134,13 +134,13 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
   ): Promise<ITablePage> {
     const data: IRequestBodyINDViolatingRows = {
       referencingTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referencing,
+        this.tableRelationship.referencingTable,
         this.tableRelationship.relationship.referencing,
         [],
         true
       ),
       referencedTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referenced,
+        this.tableRelationship.referencedTable,
         this.tableRelationship.relationship.referenced,
         [],
         true
@@ -157,13 +157,13 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
   public override async loadRowCount(): Promise<IRowCounts> {
     const data: IRequestBodyINDViolatingRows = {
       referencingTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referencing,
+        this.tableRelationship.referencingTable,
         this.tableRelationship.relationship.referencing,
         [],
         true
       ),
       referencedTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referenced,
+        this.tableRelationship.referencedTable,
         this.tableRelationship.relationship.referenced,
         [],
         true

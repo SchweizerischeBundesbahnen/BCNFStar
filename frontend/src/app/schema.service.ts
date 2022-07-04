@@ -28,11 +28,18 @@ import { DeleteTableDialogComponent } from './components/operation-dialogs/delet
 import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
+import { DatabaseService } from './database.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SchemaService {
+  constructor(
+    private dialog: SbbDialog,
+    private notification: SbbNotificationToast,
+    private dataService: DatabaseService
+  ) {}
+
   private _schema: Schema = new Schema();
   public setSchema(schema: Schema) {
     this._schema = schema;
@@ -79,11 +86,6 @@ export class SchemaService {
   get schemaChanged() {
     return this._schemaChanged.asObservable();
   }
-
-  constructor(
-    private dialog: SbbDialog,
-    private notification: SbbNotificationToast
-  ) {}
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
@@ -276,6 +278,69 @@ export class SchemaService {
       throw Error('surrogate keys not implemented for unioned tables');
     this.selectedTable!.surrogateKey = key;
     this.notifyAboutSchemaChanges();
+  }
+
+  public async resetDataForRedundanceRanking(schema: Schema) {
+    console.log('resetRadundance', schema);
+    let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
+      Promise<number>
+    >();
+    let fdRedundantGroupLengthsPromises: Array<Promise<number>> = new Array<
+      Promise<number>
+    >();
+    schema.tables.forEach((table) => {
+      if (table instanceof Table) {
+        table.fdClusters().forEach((cluster) => {
+          fdRedundantTuplePromises.push(
+            this.dataService.getRedundanceByValueCombinations(
+              table,
+              cluster.fds[0].lhs.asArray()
+            )
+          );
+          fdRedundantGroupLengthsPromises.push(
+            this.dataService.getRedundanceGroupLengthByValueCombinations(
+              table,
+              cluster.fds[0].lhs.asArray()
+            )
+          );
+        });
+      }
+    });
+    let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
+    console.log(resultRedundantTuples);
+    let index = 0;
+    schema.tables.forEach((table) => {
+      if (table instanceof Table) {
+        console.log(index);
+        table
+          .fdClusters()
+          .forEach((cluster) =>
+            cluster.fds.forEach(
+              (fd) => (fd._redundantTuples = resultRedundantTuples[index])
+            )
+          );
+        index++;
+      }
+    });
+    index = 0;
+    let resultRedundantGroupLengths = await Promise.all(
+      fdRedundantGroupLengthsPromises
+    );
+    console.log(resultRedundantGroupLengths);
+    schema.tables.forEach((table) => {
+      if (table instanceof Table) {
+        console.log(index);
+        table
+          .fdClusters()
+          .forEach((cluster) =>
+            cluster.fds.forEach(
+              (fd) =>
+                (fd._redundantGroupLength = resultRedundantGroupLengths[index])
+            )
+          );
+        index++;
+      }
+    });
   }
 
   public canUndo() {

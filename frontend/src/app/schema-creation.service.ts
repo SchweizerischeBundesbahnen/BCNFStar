@@ -13,12 +13,17 @@ import SourceFunctionalDependency from '../model/schema/SourceFunctionalDependen
 import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import { DatabaseService } from './database.service';
+import { SchemaService } from './schema.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SchemaCreationService {
-  constructor(private http: HttpClient, private dataService: DatabaseService) {}
+  constructor(
+    private http: HttpClient,
+    private dataService: DatabaseService,
+    private schemaService: SchemaService
+  ) {}
 
   private getMetanomeResult<T>(fileName: string): Promise<T> {
     return firstValueFrom(
@@ -213,6 +218,9 @@ export class SchemaCreationService {
     for (const [table, pk] of (await pkPromise).entries()) table.pk = pk;
 
     for (const table of schema.regularTables) schema.calculateFdsOf(table);
+
+    await this.schemaService.resetDataForRedundanceRanking(schema);
+
     return schema;
   }
 }

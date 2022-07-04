@@ -64,9 +64,8 @@ export default class Join {
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
     this.newTable.surrogateKey = this.referencing.surrogateKey;
-    // update rowCount for redundance ranking and invalidate cluster for recalculation
+    // update rowCount for redundance ranking
     this.newTable.rowCount = this.referencing.rowCount;
-    this.newTable._fdClusterValid = false;
 
     // inherit sources, relationships and columns from referencing table
     this.referencing.sources.forEach((source) => {

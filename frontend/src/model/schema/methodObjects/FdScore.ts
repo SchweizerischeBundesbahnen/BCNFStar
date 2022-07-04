@@ -19,14 +19,20 @@ export default class FdScore {
   }
 
   public calculate(): number {
+    // console.log("length: ", this.fdLengthScore());
+    // console.log("keyvalue: ", this.fdKeyValueScore());
+    // console.log("position: ", this.fdPositionScore());
+    // console.log("redundance naumann: ", this.fdRedundanceScoreNaumann());
+    // console.log("redundance link: ", this.fdRedundanceScoreWeiLink());
+    // console.log("similarity: ", this.fdSimilarityScore());
     //TODO: change score for fds with NULL values to zero
     return (
-      // (this.fdLengthScore() +
-      //   this.keyValueScore() +
-      //   this.fdPositionScore() +
-      //   this.fdRedundanceScoreNaumann()) /
-      // 4
-      this.similarityScore()
+      (this.fdLengthScore() +
+        this.fdKeyValueScore() +
+        this.fdPositionScore() +
+        this.fdRedundanceScoreNaumann() +
+        this.fdSimilarityScore()) /
+      5
     );
   }
 
@@ -50,7 +56,7 @@ export default class FdScore {
    * 1 for keys where all key columns have values of length at most 1, less if values can be longer
    * @returns score between 0 and 1
    */
-  private keyValueScore(): number {
+  private fdKeyValueScore(): number {
     let maxKeyLength = 0;
     this.fd.lhs.asArray().forEach((col) => (maxKeyLength += col.maxValue));
     return maxKeyLength == 0 ? 0 : 1 / Math.max(1, maxKeyLength - 7);
@@ -93,13 +99,6 @@ export default class FdScore {
   }
 
   private fdRedundanceScoreNaumann(): number {
-    console.log(
-      this.fd._redundantGroupLength,
-      this.table.rowCount,
-      this.table.rowCount - this.fd._redundantGroupLength,
-      (this.table.rowCount - this.fd._redundantGroupLength) /
-        this.table.rowCount
-    );
     // get all redundant tuples and normalize by row count
     return (
       (this.table.rowCount - this.fd._redundantGroupLength) /
@@ -108,25 +107,24 @@ export default class FdScore {
   }
 
   private fdRedundanceScoreWeiLink(): number {
-    console.log(this.fd, this.fd._redundantTuples, this.table.rowCount);
     return this.fd._redundantTuples / this.table.rowCount;
   }
 
-  private similarityScore(): number {
+  private fdSimilarityScore(): number {
     const simLhs = this.averageSimilarityForCC(this.fd.lhs);
     const simRhs = this.averageSimilarityForCC(this.fd.rhs);
     return (1 / 2) * (simLhs + simRhs);
   }
 
   private averageSimilarityForCC(fdSide: ColumnCombination): number {
-    console.log(this.table.columnNameMatchings);
-    console.log('start Sim');
+    // console.log(this.table.columnNameMatchings);
+    // console.log('start Sim');
     let sumDistances = 0;
     let countDistances = 0;
     for (let col of fdSide) {
       for (let otherCol of fdSide) {
         if (col.equals(otherCol)) continue;
-        console.log(col.sourceColumn, otherCol.sourceColumn);
+        // console.log(col.sourceColumn, otherCol.sourceColumn);
         const key = Array.from(this.table.columnNameMatchings.keys()).find(
           (key) =>
             key.col.equals(col.sourceColumn) &&
@@ -136,7 +134,7 @@ export default class FdScore {
         countDistances++;
       }
     }
-    console.log(countDistances == 0 ? 0 : sumDistances / countDistances);
+    // console.log(countDistances == 0 ? 0 : sumDistances / countDistances);
     return countDistances == 0 ? 0 : sumDistances / countDistances;
   }
 }

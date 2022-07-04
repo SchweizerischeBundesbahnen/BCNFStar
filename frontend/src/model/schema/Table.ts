@@ -43,8 +43,6 @@ export default class Table extends BasicTable {
    */
   public _indsValid = false;
 
-  public _fdClusterValid = false;
-
   public dataService: DatabaseService;
 
   public toJSON() {
@@ -431,121 +429,181 @@ export default class Table extends BasicTable {
    * @returns FdClusters, which group functional dependencies that have the same right hand side
    * Used in UI to make functional dependencies easier to discover
    */
-  public async fdClusters(): Promise<Array<FdCluster>> {
-    console.log('Cluster build');
+  public fdClusters(): Array<FdCluster> {
     let allFds: Array<FunctionalDependency> = this.violatingFds();
-    console.log(!this._fdClusterValid || !this._fdClusters);
-    if (!this._fdClusterValid || !this._fdClusters) {
-      if (this.pk) {
-        let newFd = new FunctionalDependency(
-          this.pk!.copy(),
-          this.columns.copy()
-        );
-        // because lhs is primary key there are so much groups like tuples in table
-        newFd._redundantGroupLength = this.rowCount;
-        // because lhs is primary key there are no redundant data
-        newFd._redundantTuples = 0;
-        allFds.push(newFd);
-      }
-
-      const fdClusterTree = new ColumnsTree<FdCluster>();
-      for (let fd of allFds) {
-        let cluster = fdClusterTree.get(fd.rhs);
-        if (!cluster) {
-          cluster = { columns: fd.rhs.copy(), fds: new Array() };
-          fdClusterTree.add(cluster, cluster.columns);
-        }
-        cluster.fds.push(fd);
-      }
-      this._fdClusters = fdClusterTree.getAll();
-      return await this.scoreFdClusters(this._fdClusters).then(() => {
-        console.log('start then');
-        this._fdClusterValid = true;
-        if (!this._fdClusters) {
-          return [];
-        }
-        console.log('calculated clusters', this._fdClusters);
-        console.log('ready');
-        return this._fdClusters;
-      });
-    } else {
-      console.log('else');
-      return this._fdClusters;
+    if (this.pk) {
+      let newFd = new FunctionalDependency(
+        this.pk!.copy(),
+        this.columns.copy()
+      );
+      // because lhs is primary key there are so much groups like tuples in table
+      newFd._redundantGroupLength = this.rowCount;
+      // because lhs is primary key there are no redundant data
+      newFd._redundantTuples = 0;
+      allFds.push(newFd);
     }
+
+    const fdClusterTree = new ColumnsTree<FdCluster>();
+    for (let fd of allFds) {
+      let cluster = fdClusterTree.get(fd.rhs);
+      if (!cluster) {
+        cluster = { columns: fd.rhs.copy(), fds: new Array() };
+        fdClusterTree.add(cluster, cluster.columns);
+      }
+      cluster.fds.push(fd);
+    }
+    return fdClusterTree.getAll();
   }
 
-  private async scoreFdClusters(fdClusters: Array<FdCluster>) {
-    let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
-      Promise<number>
-    >();
-    let fdRedundantGroupLengthPromises: Array<Promise<number>> = new Array<
-      Promise<number>
-    >();
-    fdClusters.forEach((cluster) => {
-      fdRedundantTuplePromises.push(
-        this.dataService.getRedundanceByValueCombinations(
-          this,
-          cluster.fds[0].lhs.asArray()
-        )
+  public rankedFdClusters(): Array<FdCluster> {
+    console.log('test ranking');
+    let clustersWithFdScore = this.scoreFdInFdClusters(this.fdClusters());
+
+    // sort clusters by best ranked fd per cluster
+    clustersWithFdScore.sort((cluster1: FdCluster, cluster2: FdCluster) => {
+      const bestFdScore1 = Math.max(
+        ...cluster1.fds.map((fd) => fd._score || 0)
       );
-      fdRedundantGroupLengthPromises.push(
-        this.dataService.getRedundanceGroupLengthByValueCombinations(
-          this,
-          cluster.fds[0].lhs.asArray()
-        )
+      const bestFdScore2 = Math.max(
+        ...cluster2.fds.map((fd) => fd._score || 0)
       );
+      if (bestFdScore1 < bestFdScore2) return 1;
+      if (bestFdScore1 > bestFdScore2) return -1;
+      return 0;
     });
-    return Promise.all(fdRedundantTuplePromises)
-      .then((res) => {
-        for (let i = 0; i < fdClusters.length; i++) {
-          fdClusters[i].fds.forEach((fd) => {
-            fd._redundantTuples = res[i];
-          });
-        }
-        console.log('sum', fdClusters);
+
+    // sort fds in cluster descending
+    clustersWithFdScore.forEach((cluster) =>
+      cluster.fds.sort((fd1, fd2) => (fd2._score || 0) - (fd1._score || 0))
+    );
+
+    return clustersWithFdScore;
+  }
+
+  // public async fdCluster(): Promise<Array<FdCluster>> {
+  //   console.log('Cluster build');
+  //   let allFds: Array<FunctionalDependency> = this.violatingFds();
+  //   console.log( !this._fdClusters);
+  //   if (!this._fdClusters) {
+  //     if (this.pk) {
+  //       let newFd = new FunctionalDependency(
+  //         this.pk!.copy(),
+  //         this.columns.copy()
+  //       );
+  //       // because lhs is primary key there are so much groups like tuples in table
+  //       newFd._redundantGroupLength = this.rowCount;
+  //       // because lhs is primary key there are no redundant data
+  //       newFd._redundantTuples = 0;
+  //       allFds.push(newFd);
+  //     }
+
+  //     const fdClusterTree = new ColumnsTree<FdCluster>();
+  //     for (let fd of allFds) {
+  //       let cluster = fdClusterTree.get(fd.rhs);
+  //       if (!cluster) {
+  //         cluster = { columns: fd.rhs.copy(), fds: new Array() };
+  //         fdClusterTree.add(cluster, cluster.columns);
+  //       }
+  //       cluster.fds.push(fd);
+  //     }
+  //     this._fdClusters = fdClusterTree.getAll();
+  //     return await this.scoreFdClusters(this._fdClusters).then(() => {
+  //       console.log('start then');
+  //       if (!this._fdClusters) {
+  //         return [];
+  //       }
+  //       console.log('calculated clusters', this._fdClusters);
+  //       console.log('ready');
+  //       return this._fdClusters;
+  //     });
+  //   } else {
+  //     console.log('else');
+  //     return this._fdClusters;
+  //   }
+  // }
+
+  private scoreFdInFdClusters(fdClusters: Array<FdCluster>): Array<FdCluster> {
+    fdClusters.forEach((cluster) =>
+      cluster.fds.forEach((fd) => {
+        new FdScore(this, fd).get();
+        // console.log(
+        //   "lhs" + fd.lhs.asArray().map((col) => col.name) + "\n" +
+        //   "rhs" + fd.lhs.asArray().map((col) => col.name) + "\n"
+        // );
       })
-      .finally(() => {
-        Promise.all(fdRedundantGroupLengthPromises)
-          .then((res) => {
-            for (let i = 0; i < fdClusters.length; i++) {
-              fdClusters[i].fds.forEach((fd) => {
-                fd._redundantGroupLength = res[i];
-                console.log('res', res[i]);
-              });
-            }
-            console.log('count', fdClusters);
-          })
-          .finally(() => {
-            fdClusters.forEach((cluster) =>
-              cluster.fds.forEach((fd) => {
-                new FdScore(this, fd).get();
-                console.log(
-                  fd.lhs.asArray().map((col) => col.name),
-                  fd._redundantGroupLength,
-                  fd._redundantTuples,
-                  fd._score
-                );
-              })
-            );
-            fdClusters.sort((cluster1, cluster2) => {
-              const bestFdScore1 = Math.max(
-                ...cluster1.fds.map((fd) => fd._score || 0)
-              );
-              const bestFdScore2 = Math.max(
-                ...cluster2.fds.map((fd) => fd._score || 0)
-              );
-              if (bestFdScore1 < bestFdScore2) return 1;
-              if (bestFdScore1 > bestFdScore2) return -1;
-              return 0;
-            });
-            fdClusters.forEach((cluster) =>
-              cluster.fds.sort(
-                (fd1, fd2) => (fd2._score || 0) - (fd1._score || 0)
-              )
-            );
-            console.log('end score  ');
-          });
-      });
+    );
+    return fdClusters;
+    // let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
+    //   Promise<number>
+    // >();
+    // let fdRedundantGroupLengthPromises: Array<Promise<number>> = new Array<
+    //   Promise<number>
+    // >();
+    // fdClusters.forEach((cluster) => {
+    //   fdRedundantTuplePromises.push(
+    //     this.dataService.getRedundanceByValueCombinations(
+    //       this,
+    //       cluster.fds[0].lhs.asArray()
+    //     )
+    //   );
+    //   fdRedundantGroupLengthPromises.push(
+    //     this.dataService.getRedundanceGroupLengthByValueCombinations(
+    //       this,
+    //       cluster.fds[0].lhs.asArray()
+    //     )
+    //   );
+    // });
+    // return Promise.all(fdRedundantTuplePromises)
+    //   .then((res) => {
+    //     for (let i = 0; i < fdClusters.length; i++) {
+    //       fdClusters[i].fds.forEach((fd) => {
+    //         fd._redundantTuples = res[i];
+    //       });
+    //     }
+    //     console.log('sum', fdClusters);
+    //   })
+    //   .finally(() => {
+    //     Promise.all(fdRedundantGroupLengthPromises)
+    //       .then((res) => {
+    //         for (let i = 0; i < fdClusters.length; i++) {
+    //           fdClusters[i].fds.forEach((fd) => {
+    //             fd._redundantGroupLength = res[i];
+    //             console.log('res', res[i]);
+    //           });
+    //         }
+    //         console.log('count', fdClusters);
+    //       })
+    //       .finally(() => {
+    //         fdClusters.forEach((cluster) =>
+    //           cluster.fds.forEach((fd) => {
+    //             new FdScore(this, fd).get();
+    //             console.log(
+    //               fd.lhs.asArray().map((col) => col.name),
+    //               fd._redundantGroupLength,
+    //               fd._redundantTuples,
+    //               fd._score
+    //             );
+    //           })
+    //         );
+    //         fdClusters.sort((cluster1, cluster2) => {
+    //           const bestFdScore1 = Math.max(
+    //             ...cluster1.fds.map((fd) => fd._score || 0)
+    //           );
+    //           const bestFdScore2 = Math.max(
+    //             ...cluster2.fds.map((fd) => fd._score || 0)
+    //           );
+    //           if (bestFdScore1 < bestFdScore2) return 1;
+    //           if (bestFdScore1 > bestFdScore2) return -1;
+    //           return 0;
+    //         });
+    //         fdClusters.forEach((cluster) =>
+    //           cluster.fds.sort(
+    //             (fd1, fd2) => (fd2._score || 0) - (fd1._score || 0)
+    //           )
+    //         );
+    //         console.log('end score  ');
+    //       });
+    //   });
   }
 
   public hull(columns: ColumnCombination): ColumnCombination {

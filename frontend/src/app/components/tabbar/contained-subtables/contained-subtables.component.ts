@@ -35,9 +35,8 @@ export class ContainedSubtablesComponent {
   constructor(public schemaService: SchemaService, private dialog: SbbDialog) {
     this.schemaService.selectedTableChanged.subscribe(() => {
       this._fdClusterFilter = [];
-      this.table.fdClusters().then((cluster) => (this.fdCluster = cluster));
     });
-    this.table.fdClusters().then((cluster) => (this.fdCluster = cluster));
+    // this.table.fdClusters().then((cluster) => (this.fdCluster = cluster));
   }
 
   public get table() {
@@ -61,7 +60,8 @@ export class ContainedSubtablesComponent {
   public fdClusters(): Array<FdCluster> {
     // console.log(this.allClusters)
     const cc = this.fdClusterFilter;
-    const cluster = this.fdCluster
+    const cluster = this.table
+      .rankedFdClusters()
       .filter((cluster) => cc.isSubsetOf(cluster.columns))
       .map((value, index) => [value, index] as [FdCluster, number]);
     if (cc.asArray().length > 0) {
@@ -95,7 +95,6 @@ export class ContainedSubtablesComponent {
     switch (response.type) {
       case 'fdSplit': {
         const fdResponse = response as FdSplitResponse;
-        console.log(response);
         this.schemaService.split(fdResponse.fd, fdResponse.name);
         break;
       }
