@@ -1,5 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
+import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
+import IRowCounts from '@server/definitions/IRowCounts';
 import { firstValueFrom } from 'rxjs';
 import AutoNormalizeCommand from '../model/commands/AutoNormalizeCommand';
 import CommandProcessor from '../model/commands/CommandProcessor';
@@ -10,6 +12,8 @@ import IndToFkCommand from '../model/commands/IndToFkCommand';
 import JoinCommand from '../model/commands/JoinCommand';
 import ShowFkCommand from '../model/commands/ShowFkCommand';
 import SplitCommand from '../model/commands/SplitCommand';
+import UnionCommand from '../model/commands/UnionCommand';
+import BasicTable from '../model/schema/BasicTable';
 import DeleteTableCommand from '../model/commands/DeleteTableCommand';
 import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
@@ -20,7 +24,9 @@ import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
-import { SplitDialogComponent } from './components/operation-dialogs/split-dialog/split-dialog.component';
+import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
+import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
+import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 
 @Injectable({
@@ -44,16 +50,20 @@ export class SchemaService {
   public get selectedTableChanged() {
     return this._selectedTableChanged.asObservable();
   }
-  private _selectedTable?: Table;
+  private _selectedTable?: BasicTable;
   public get selectedTable() {
     return this._selectedTable;
   }
-  public set selectedTable(val: Table | undefined) {
+  public set selectedTable(val: BasicTable | undefined) {
     this._selectedTable = val;
     this._selectedTableChanged.emit();
   }
 
-  public highlightedColumns?: Map<Table, ColumnCombination>;
+  public hasSelectedRegularTable() {
+    return !!this.selectedTable && this.selectedTable instanceof Table;
+  }
+
+  public highlightedColumns?: Map<BasicTable, ColumnCombination>;
 
   public get starMode() {
     return this._schema.starMode;
@@ -70,7 +80,10 @@ export class SchemaService {
     return this._schemaChanged.asObservable();
   }
 
-  constructor(private dialog: SbbDialog) {}
+  constructor(
+    private dialog: SbbDialog,
+    private notification: SbbNotificationToast
+  ) {}
 
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
@@ -95,7 +108,7 @@ export class SchemaService {
       this.selectedTable = command.newTable;
     };
     command.onUndo = () => {
-      this.selectedTable = fk.referencing;
+      this.selectedTable = fk.referencingTable;
     };
 
     this.commandProcessor.do(command);
@@ -129,23 +142,11 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async split(fd: FunctionalDependency) {
-    const dialogRef = this.dialog.open(SplitDialogComponent, {
-      data: {
-        fd: fd,
-      },
-    });
+  public split(fd: FunctionalDependency, name?: string) {
+    if (!(this.selectedTable instanceof Table))
+      throw Error('splitting not implemented for unioned tables');
 
-    const value: { fd: FunctionalDependency; name?: string } =
-      await firstValueFrom(dialogRef.afterClosed());
-    if (!value) return;
-
-    let command = new SplitCommand(
-      this._schema,
-      this.selectedTable!,
-      value.fd,
-      value.name
-    );
+    let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
@@ -162,6 +163,8 @@ export class SchemaService {
   }
 
   public deleteColumn(column: Column) {
+    if (!(this.selectedTable instanceof Table))
+      throw Error('deleteColumn not implemented for unioned tables');
     let command = new DeleteColumnCommand(
       this._schema,
       this.selectedTable!,
@@ -175,13 +178,9 @@ export class SchemaService {
   }
 
   public autoNormalize(
-    selectedTables: Set<Table> | Table = this._schema.tables
+    selectedTables: Iterable<Table> = this._schema.regularTables
   ): void {
-    const tablesToNormalize =
-      selectedTables.constructor.name == 'Set'
-        ? Array.from(selectedTables as Set<Table>)
-        : [selectedTables as Table];
-    let command = new AutoNormalizeCommand(this._schema, ...tablesToNormalize);
+    let command = new AutoNormalizeCommand(this._schema, ...selectedTables);
     let self = this;
     let previousSelectedTable = this.selectedTable;
     command.onDo = function () {
@@ -194,7 +193,23 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async makeDirectDimension(table: Table): Promise<void> {
+  public union(spec: unionSpec) {
+    const command = new UnionCommand(
+      this.schema,
+      spec.tables,
+      spec.columns,
+      spec.newTableName
+    );
+    command.onDo = () => (this.selectedTable = command.newTable);
+    command.onUndo = () => (this.selectedTable = command.tables[0]);
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public async makeDirectDimension(table: BasicTable): Promise<void> {
+    if (!(table instanceof Table))
+      throw Error('directDimension not implemented for unioned tables');
+
     let routes = this._schema.directDimensionableRoutes(table, true);
     if (routes.length !== 1) {
       const dialogRef = this.dialog.open(DirectDimensionDialogComponent, {
@@ -213,7 +228,49 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  /**
+   * Checks the existance of a fd inside a table. It shows the violations inside a dialog.
+   * @returns whether the fd is valid
+   */
+  public async checkFd(
+    table: Table,
+    fd: FunctionalDependency
+  ): Promise<boolean> {
+    // only check those columns, which are not defined by existing fds
+    const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
+      table,
+      fd.lhs.asArray(),
+      fd.rhs.copy().setMinus(table.hull(fd.lhs)).asArray()
+    );
+
+    const rowCount: IRowCounts | void = await dataQuery
+      .loadRowCount()
+      .catch((e) => {
+        console.error(e);
+      });
+
+    if (!rowCount) {
+      const error_message =
+        'There was a backend error while checking this IND. Check the browser and server logs for details';
+      this.notification.open(error_message, { type: 'error' });
+      throw new Error(error_message);
+    }
+
+    if (rowCount.entries != 0) {
+      this.dialog.open(ViolatingRowsViewComponent, {
+        data: {
+          dataService: dataQuery,
+          rowCount: rowCount,
+        },
+      });
+    }
+
+    return rowCount.entries == 0;
+  }
+
   public setSurrogateKey(key: string) {
+    if (!(this.selectedTable instanceof Table))
+      throw Error('surrogate keys not implemented for unioned tables');
     this.selectedTable!.surrogateKey = key;
     this.notifyAboutSchemaChanges();
   }

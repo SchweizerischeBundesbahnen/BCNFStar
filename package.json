@@ -10,7 +10,7 @@
     "dev": "run-p dev:*",
     "install": "run-p install:*",
     "test:dev": "cross-env CYPRESS_FRONTEND_BASEURL=http://localhost:4200 CYPRESS_BACKEND_BASEURL=http://localhost run-p dev:* cypress:open",
-    "test:prod": "cross-env CYPRESS_FRONTEND_BASEURL=http://localhost CYPRESS_BACKEND_BASEURL=http://localhost run-p start:coverage cypress:open",
+    "test:prod": "cross-env CYPRESS_FRONTEND_BASEURL=http://localhost CYPRESS_BACKEND_BASEURL=http://localhost run-p start:coverage cypress:run",
     "start:coverage": "nyc npm run start",
     "prebuild": "npm run generateTypeGuards",
     "postinstall": "npm run generateTypeGuards",

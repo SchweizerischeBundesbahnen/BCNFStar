@@ -10,9 +10,11 @@ import SourceTable from '../SourceTable';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 import TableRelationship from '../TableRelationship';
+import UnionedTable from '../UnionedTable';
 
 interface JSONSchema {
-  tables: Array<JSONTable>;
+  regularTables: Array<JSONTable>;
+  unionedTables: Array<JSONUnionedTable>;
   _baseFks: Array<JSONSourceRelationship>;
   _tableFks: Array<[JSONTableRelationship, FkDisplayOptions]>;
   _inds: Array<JSONSourceRelationship>;
@@ -25,8 +27,8 @@ interface JSONSourceFunctionalDependency {
 }
 
 interface JSONSourceRelationship {
-  referencing: Array<JSONSourceColumn>;
-  referenced: Array<JSONSourceColumn>;
+  _referencingCols: Array<JSONSourceColumn>;
+  _referencedCols: Array<JSONSourceColumn>;
 }
 
 interface JSONTableRelationship {
@@ -43,6 +45,14 @@ interface JSONTable {
   sk: string;
   relationships: Array<JSONRelationship>;
   sources: Array<JSONSourceTableInstance>;
+}
+
+interface JSONUnionedTable {
+  name: string;
+  schemaName: string;
+  tables: [JSONTable, JSONTable];
+  columns: [Array<JSONColumn | null>, Array<JSONColumn | null>];
+  rPriority: Array<boolean>;
 }
 
 interface JSONRelationship {
@@ -87,7 +97,10 @@ export default class SaveSchemaState {
   constructor() {}
 
   public parseSchema(schema: JSONSchema) {
-    this.newSchema.addTables(...this.parseTableArray(schema.tables));
+    this.newSchema.addTables(...this.parseTableArray(schema.regularTables));
+    this.newSchema.addTables(
+      ...schema.unionedTables.map((table) => this.parseUnionedTable(table))
+    );
     this.newSchema.addFks(
       ...this.parseSourceRelationshipArray(schema._baseFks)
     );
@@ -95,11 +108,14 @@ export default class SaveSchemaState {
     this.parseTableFds(schema._fds).forEach((sfd) => {
       this.newSchema.addFd(sfd);
     });
-    this.newSchema.tables.forEach((table) => {
+    this.newSchema.regularTables.forEach((table) => {
       this.newSchema.calculateFdsOf(table);
     });
     this.newSchema.updateFks(
-      this.parseTableFks(schema._tableFks, Array.from(this.newSchema.tables))
+      this.parseTableFks(
+        schema._tableFks,
+        Array.from(this.newSchema.regularTables)
+      )
     );
     return this.newSchema;
   }
@@ -141,6 +157,26 @@ export default class SaveSchemaState {
       newTables.push(this.parseTable(table));
     });
     return newTables;
+  }
+
+  private parseUnionedTable(table: JSONUnionedTable) {
+    const parsedTables = table.tables.map((table) => this.parseTable(table));
+    const parsedColumns = table.columns.map((columns, i) =>
+      columns.map((column) => {
+        if (column === null) return null;
+        return this.parseColumn(column, parsedTables[i]);
+      })
+    );
+    const newTable = new UnionedTable(
+      parsedTables[0],
+      parsedColumns[0],
+      parsedTables[1],
+      parsedColumns[1]
+    );
+    newTable.schemaName = table.schemaName;
+    newTable.name = table.name;
+    newTable.rPriority = table.rPriority;
+    return newTable;
   }
 
   private parseTable(jsonTable: JSONTable) {
@@ -288,12 +324,9 @@ export default class SaveSchemaState {
   }
 
   private parseSourceRelationship(sr: JSONSourceRelationship) {
-    let newSourceRelationship = new SourceRelationship();
-    newSourceRelationship.referenced = this.parseSourceColumnArray(
-      sr.referenced
-    );
-    newSourceRelationship.referencing = this.parseSourceColumnArray(
-      sr.referencing
+    let newSourceRelationship = new SourceRelationship(
+      this.parseSourceColumnArray(sr._referencingCols),
+      this.parseSourceColumnArray(sr._referencedCols)
     );
 
     let existing = this.existingSourceRelationships.find((other) =>
