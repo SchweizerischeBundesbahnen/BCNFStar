@@ -26,7 +26,7 @@ export async function getMetanomeResults(req: Request, res: Response) {
 export async function sendMetanomeResult(res: Response, fileName: string) {
   const path = join(MetanomeAlgorithm.resultsFolder, fileName);
   const fileStream = createReadStream(path, { encoding: "utf-8" });
-  fileStream.on("error", (err) => {
+  fileStream.on("error", () => {
     res.status(404).json({ message: "File not found!" });
   });
   const lines = readline.createInterface({
@@ -36,13 +36,10 @@ export async function sendMetanomeResult(res: Response, fileName: string) {
 
   let firstLine = true;
   res.statusCode = 200;
-
+  res.setHeader("Content-Type", "application/json");
+  res.write("[");
   for await (const line of lines) {
     if (!firstLine) res.write(",");
-    else {
-      res.setHeader("Content-Type", "application/json");
-      res.write("[");
-    }
     firstLine = false;
     res.write(line);
   }
