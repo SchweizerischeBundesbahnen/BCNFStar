@@ -7,7 +7,7 @@ describe("FunctionalDependency", () => {
   let table: Table;
 
   beforeEach(() => {
-    table = Table.fromColumnNames(["A", "B", "C", "D"], "table1");
+    table = Table.fromColumnNames(["A", "B", "C", "D"], "table1", 0);
     table.addFd(
       new FunctionalDependency(
         new ColumnCombination(table.columns.columnsFromNames("A")),

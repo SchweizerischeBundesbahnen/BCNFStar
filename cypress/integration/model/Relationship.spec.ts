@@ -9,8 +9,8 @@ describe("Relationship", () => {
   let relationship: Relationship;
 
   beforeEach(() => {
-    table1 = Table.fromColumnNames(["A", "B1", "C1"], "table1");
-    table2 = Table.fromColumnNames(["B2", "C2", "D"], "table2");
+    table1 = Table.fromColumnNames(["A", "B1", "C1"], "table1", 0);
+    table2 = Table.fromColumnNames(["B2", "C2", "D"], "table2", 0);
     relationship = new Relationship(
       table1.columns.columnsFromNames("B1", "C1"),
       table2.columns.columnsFromNames("B2", "C2")
@@ -18,8 +18,8 @@ describe("Relationship", () => {
   });
 
   it("checks equality correctly", () => {
-    const otherTable1 = Table.fromColumnNames(["A", "B1", "C1"], "table1");
-    const otherTable2 = Table.fromColumnNames(["B2", "C2", "D"], "table2");
+    const otherTable1 = Table.fromColumnNames(["A", "B1", "C1"], "table1", 0);
+    const otherTable2 = Table.fromColumnNames(["B2", "C2", "D"], "table2", 0);
     const otherRelationship = new Relationship(
       otherTable1.columns.columnsFromNames("B1", "C1"),
       otherTable2.columns.columnsFromNames("B2", "C2")

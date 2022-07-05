@@ -18,7 +18,23 @@ export default class FdScore {
     return this.fd._score;
   }
 
-  public calculate(): number {
+  /**
+   * should be only used for testing
+   * @returns all single scores and the combination of it
+   */
+  public testingScore() {
+    return {
+      length: this.fdLengthScore(),
+      keyValue: this.fdKeyValueScore(),
+      position: this.fdPositionScore(),
+      redundanceNaumann: this.fdRedundanceScoreNaumann(),
+      redundanceWeiLink: this.fdRedundanceScoreWeiLink(),
+      similarity: this.fdSimilarityScore(),
+      all: this.calculate(),
+    };
+  }
+
+  private calculate(): number {
     // console.log("length: ", this.fdLengthScore());
     // console.log("keyvalue: ", this.fdKeyValueScore());
     // console.log("position: ", this.fdPositionScore());
@@ -113,7 +129,7 @@ export default class FdScore {
   private fdSimilarityScore(): number {
     const simLhs = this.averageSimilarityForCC(this.fd.lhs);
     const simRhs = this.averageSimilarityForCC(this.fd.rhs);
-    return (1 / 2) * (simLhs + simRhs);
+    return (simLhs + simRhs) / 2;
   }
 
   private averageSimilarityForCC(fdSide: ColumnCombination): number {
