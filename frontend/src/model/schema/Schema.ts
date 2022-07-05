@@ -21,6 +21,7 @@ import {
 import UnionedTable from './UnionedTable';
 import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
+import BasicTableRelationship from './BasicTableRelationship';
 
 export default class Schema {
   public readonly tables = new Set<BasicTable>();
@@ -247,17 +248,21 @@ export default class Schema {
     return result;
   }
 
-  public fksOf(
-    table: BasicTable,
-    onlyDisplayed: boolean
-  ): Array<TableRelationship> {
-    if (!(table instanceof Table)) return [];
+  public fksOf(table: Table, onlyDisplayed: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
       (fk) => fk.referencingTable == table
     );
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
     return result;
+  }
+
+  public basicFksOf(
+    table: BasicTable,
+    onlyDisplayed: boolean
+  ): Array<BasicTableRelationship> {
+    if (table instanceof Table) return this.fksOf(table, onlyDisplayed);
+    return [];
   }
 
   public hiddenFksOf(table: Table): Array<TableRelationship> {
@@ -673,7 +678,7 @@ export default class Schema {
           const name =
             fk.referencedTable.surrogateKey +
             '_' +
-            fk.relationship.referencing.map((col) => col.name).join('_');
+            fk.referencingCols.map((col) => col.name).join('_');
           columns.push(surrogateKeyColumn(name));
         }
       return columns;

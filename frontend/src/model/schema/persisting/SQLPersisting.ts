@@ -6,6 +6,7 @@ import Table from '../Table';
 import BasicTable from '../BasicTable';
 import UnionedTable from '../UnionedTable';
 import BasicColumn from '../../types/BasicColumn';
+import BasicTableRelationship from '../BasicTableRelationship';
 
 export default abstract class SQLPersisting {
   public constructor(protected schemaName: string) {}
@@ -144,11 +145,15 @@ export default abstract class SQLPersisting {
     let Sql: string = '';
 
     for (const referencingTable of schema.tables) {
-      for (const fk of schema.fksOf(referencingTable, true)) {
-        if (fk.referencedTable.implementsSurrogateKey()) {
-          Sql += this.addSkColumnToReferencingSql(fk);
-          Sql += this.updateSurrogateKeySql(fk);
-          Sql += this.foreignSurrogateKeySql(fk);
+      for (const fk of schema.basicFksOf(referencingTable, true)) {
+        if (
+          fk.referencingTable instanceof Table &&
+          fk.referencedTable instanceof Table &&
+          fk.referencedTable.implementsSurrogateKey()
+        ) {
+          Sql += this.addSkColumnToReferencingSql(fk as TableRelationship);
+          Sql += this.updateSurrogateKeySql(fk as TableRelationship);
+          Sql += this.foreignSurrogateKeySql(fk as TableRelationship);
         } else {
           Sql += this.uniqueConstraint(fk);
           Sql += this.foreignKeySql(fk);
@@ -215,7 +220,7 @@ export default abstract class SQLPersisting {
 
   /** Relevant if you want to reference columns, which aren't the primary key.
    */
-  public uniqueConstraint(fk: TableRelationship): string {
+  public uniqueConstraint(fk: BasicTableRelationship): string {
     return `
 ALTER TABLE ${this.tableIdentifier(
       fk.referencedTable
@@ -223,7 +228,7 @@ ALTER TABLE ${this.tableIdentifier(
 `;
   }
 
-  public foreignKeySql(fk: TableRelationship): string {
+  public foreignKeySql(fk: BasicTableRelationship): string {
     return `ALTER TABLE ${this.tableIdentifier(fk.referencingTable)}
       ADD CONSTRAINT ${this.randomFkName()}
       FOREIGN KEY (${this.generateColumnString(fk.referencingCols)})

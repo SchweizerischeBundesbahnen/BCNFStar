@@ -11,7 +11,7 @@ import { SchemaService } from '@/src/app/schema.service';
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
   style: Record<string, any>;
-  links: Map<Table, joint.dia.Link>;
+  links: Map<BasicTable, joint.dia.Link>;
 };
 
 enum PortSide {
@@ -225,7 +225,7 @@ export class SchemaGraphComponent implements AfterContentInit {
 
   private generateLinks() {
     for (const table of this.schemaService.schema.tables) {
-      for (const fk of this.schemaService.schema.fksOf(table, true)) {
+      for (const fk of this.schemaService.schema.basicFksOf(table, true)) {
         let link = new joint.shapes.standard.Link({
           source: {
             id: this.graphStorage.get(table)?.jointjsEl.id,
@@ -250,7 +250,8 @@ export class SchemaGraphComponent implements AfterContentInit {
         });
         this.graphStorage.get(table)?.links.set(fk.referencedTable, link);
         this.graph.addCell(link);
-        this.addJoinButtonAndRemoveButton(link, fk);
+        if (fk instanceof TableRelationship)
+          this.addJoinButtonAndRemoveButton(link, fk);
       }
     }
   }
