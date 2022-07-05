@@ -12,8 +12,6 @@ import BasicTable from './BasicTable';
 import ColumnsTree from './ColumnsTree';
 import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
-import { DatabaseService } from '@/src/app/database.service';
-import { InjectorInstance } from '@/src/app/app.module';
 import JaroWinklerDistance from './methodObjects/JaroWinklerDistance';
 
 export default class Table extends BasicTable {
@@ -43,8 +41,6 @@ export default class Table extends BasicTable {
    */
   public _indsValid = false;
 
-  public dataService: DatabaseService;
-
   public toJSON() {
     return {
       name: this.name,
@@ -61,7 +57,6 @@ export default class Table extends BasicTable {
   public constructor(columns?: ColumnCombination) {
     super();
     this.columns = columns || new ColumnCombination();
-    this.dataService = InjectorInstance.get<DatabaseService>(DatabaseService);
   }
 
   // TODO: wo muss überall aufgerufen werden
@@ -438,7 +433,7 @@ export default class Table extends BasicTable {
         this.columns.copy()
       );
       // because lhs is primary key there are so much groups like tuples in table
-      newFd._redundantGroupLength = this.rowCount;
+      newFd._uniqueTuplesLhs = this.rowCount;
       // because lhs is primary key there are no redundant data
       newFd._redundantTuples = 0;
       allFds.push(newFd);

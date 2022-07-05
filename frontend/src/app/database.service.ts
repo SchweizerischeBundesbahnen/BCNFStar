@@ -85,7 +85,7 @@ export class DatabaseService {
     );
   }
 
-  public async getRedundanceGroupLengthByValueCombinations(
+  public async getUniqueTuplesOfValueCombinations(
     table: Table,
     lhs: Array<Column>
   ): Promise<number> {

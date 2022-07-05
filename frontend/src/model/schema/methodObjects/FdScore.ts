@@ -27,10 +27,9 @@ export default class FdScore {
       length: this.fdLengthScore(),
       keyValue: this.fdKeyValueScore(),
       position: this.fdPositionScore(),
-      redundanceNaumann: this.fdRedundanceScoreNaumann(),
+      redundanceTeam: this.fdRedundanceScoreTeam(),
       redundanceWeiLink: this.fdRedundanceScoreWeiLink(),
       similarity: this.fdSimilarityScore(),
-      all: this.calculate(),
     };
   }
 
@@ -46,7 +45,7 @@ export default class FdScore {
       (this.fdLengthScore() +
         this.fdKeyValueScore() +
         this.fdPositionScore() +
-        this.fdRedundanceScoreNaumann() +
+        this.fdRedundanceScoreTeam() +
         this.fdSimilarityScore()) /
       5
     );
@@ -87,7 +86,7 @@ export default class FdScore {
   }
 
   private rhsPositionScore(): number {
-    return this.coherenceScore(this.fd.rhs);
+    return this.coherenceScore(this.fd.rhs.copy().setMinus(this.fd.lhs));
   }
 
   private coherenceScore(columns: ColumnCombination): number {
@@ -114,13 +113,16 @@ export default class FdScore {
     return range - columns.cardinality;
   }
 
-  private fdRedundanceScoreNaumann(): number {
+  private fdRedundanceScoreTeam(): number {
     // get all redundant tuples and normalize by row count
     return (
-      (this.table.rowCount - this.fd._redundantGroupLength) /
-      this.table.rowCount
+      (this.table.rowCount - this.fd._uniqueTuplesLhs) / this.table.rowCount
     );
   }
+
+  // private fdRedundanceScoreMetanome(): number {
+  //   return (2 - (this.fd._uniqueTuplesLhs / this.table.rowCount) - (this.fd._uniqueTuplesLhs / this.table.rowCount)) / 2
+  // }
 
   private fdRedundanceScoreWeiLink(): number {
     return this.fd._redundantTuples / this.table.rowCount;
@@ -128,19 +130,27 @@ export default class FdScore {
 
   private fdSimilarityScore(): number {
     const simLhs = this.averageSimilarityForCC(this.fd.lhs);
-    const simRhs = this.averageSimilarityForCC(this.fd.rhs);
+    const simRhs = this.averageSimilarityForCC(
+      this.fd.rhs.copy().setMinus(this.fd.lhs)
+    );
+    console.log(simLhs, simRhs);
     return (simLhs + simRhs) / 2;
   }
 
   private averageSimilarityForCC(fdSide: ColumnCombination): number {
+    const fdSideArray = Array.from(fdSide);
+
+    if (fdSideArray.length == 1) return 1;
+
     let sumDistances = 0;
     let countDistances = 0;
-    for (let col of fdSide) {
-      for (let otherCol of fdSide) {
+    for (let i = 0; i < fdSideArray.length; i++) {
+      for (let j = i + 1; j < fdSideArray.length; j++) {
+        console.log(fdSideArray[i].name, fdSideArray[j].name);
         const key = Array.from(this.table.columnNameMatchings.keys()).find(
           (key) =>
-            key.col.equals(col.sourceColumn) &&
-            key.otherCol.equals(otherCol.sourceColumn)
+            key.col.equals(fdSideArray[i].sourceColumn) &&
+            key.otherCol.equals(fdSideArray[j].sourceColumn)
         )!;
         sumDistances += this.table.columnNameMatchings.get(key)!;
         countDistances++;

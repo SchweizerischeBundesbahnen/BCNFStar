@@ -1,5 +1,3 @@
-import Column from "../../../frontend/src/model/schema/Column";
-import ColumnCombination from "../../../frontend/src/model/schema/ColumnCombination";
 import Relationship from "../../../frontend/src/model/schema/Relationship";
 import Table from "../../../frontend/src/model/schema/Table";
 
