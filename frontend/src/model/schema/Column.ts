@@ -2,6 +2,7 @@ import IAttribute from '@server/definitions/IAttribute';
 import BasicColumn from '../types/BasicColumn';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
+import BloomFilter from './methodObjects/BloomFilter';
 
 /**
  * These objects uniquely identify a column within a table.
@@ -10,12 +11,25 @@ import SourceTableInstance from './SourceTableInstance';
 export default class Column implements BasicColumn {
   public includeSourceName = false;
   private _maxValue = 0;
+  private _bloomFilterExpectedFpp: number = 0;
 
   public constructor(
     public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
     public userAlias?: string
   ) {}
+
+  public get bloomFilterExpectedFpp() {
+    return this._bloomFilterExpectedFpp;
+  }
+
+  public setBloomFilterFpp(sample: Array<string>) {
+    console.log(this.name, sample);
+    let bf = new BloomFilter(1000, 0.5);
+    sample.forEach((e) => bf.add(e));
+
+    this._bloomFilterExpectedFpp = bf.expectedFpp();
+  }
 
   public get maxValue() {
     return this._maxValue;

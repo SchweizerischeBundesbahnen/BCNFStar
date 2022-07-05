@@ -473,6 +473,7 @@ export default class Table extends BasicTable {
         cluster.fds.sort((fd1, fd2) => (fd2._score || 0) - (fd1._score || 0))
       );
     }
+    console.log(this._fdClusters);
     return this._fdClusters;
   }
 

@@ -42,12 +42,13 @@ export default class FdScore {
     // console.log("similarity: ", this.fdSimilarityScore());
     //TODO: change score for fds with NULL values to zero
     return (
-      (this.fdLengthScore() +
-        this.fdKeyValueScore() +
-        this.fdPositionScore() +
-        this.fdRedundanceScoreTeam() +
-        this.fdSimilarityScore()) /
-      5
+      // (this.fdLengthScore() +
+      //   this.fdKeyValueScore() +
+      //   this.fdPositionScore() +
+      //   this.fdRedundanceScoreTeam() +
+      //   this.fdSimilarityScore()) /
+      // 5
+      this.fdRedundanceScoreMetanome()
     );
   }
 
@@ -120,9 +121,20 @@ export default class FdScore {
     );
   }
 
-  // private fdRedundanceScoreMetanome(): number {
-  //   return (2 - (this.fd._uniqueTuplesLhs / this.table.rowCount) - (this.fd._uniqueTuplesLhs / this.table.rowCount)) / 2
-  // }
+  private fdRedundanceScoreMetanome(): number {
+    return (
+      (this.densityScore(this.fd.lhs) +
+        this.densityScore(this.fd.rhs.copy().setMinus(this.fd.lhs))) /
+      2
+    );
+  }
+
+  private densityScore(fdSide: ColumnCombination): number {
+    let densityScore = 0;
+    const fdSideArray = Array.from(fdSide);
+    fdSideArray.forEach((col) => (densityScore += col.bloomFilterExpectedFpp));
+    return 1 - densityScore / fdSideArray.length;
+  }
 
   private fdRedundanceScoreWeiLink(): number {
     return this.fd._redundantTuples / this.table.rowCount;
@@ -133,7 +145,7 @@ export default class FdScore {
     const simRhs = this.averageSimilarityForCC(
       this.fd.rhs.copy().setMinus(this.fd.lhs)
     );
-    console.log(simLhs, simRhs);
+    // console.log(simLhs, simRhs);
     return (simLhs + simRhs) / 2;
   }
 
@@ -146,7 +158,7 @@ export default class FdScore {
     let countDistances = 0;
     for (let i = 0; i < fdSideArray.length; i++) {
       for (let j = i + 1; j < fdSideArray.length; j++) {
-        console.log(fdSideArray[i].name, fdSideArray[j].name);
+        // console.log(fdSideArray[i].name, fdSideArray[j].name);
         const key = Array.from(this.table.columnNameMatchings.keys()).find(
           (key) =>
             key.col.equals(fdSideArray[i].sourceColumn) &&

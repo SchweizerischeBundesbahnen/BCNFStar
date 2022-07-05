@@ -37,6 +37,7 @@ import { runMetanome } from "./routes/metanomeResults/run";
 import getRankingRedundanceSum from "./routes/rankingRedundanceSum";
 import getRankingRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
 import getMaxValue from "./routes/maxValue";
+import getColumnSample from "./routes/columnSample";
 
 const app = express();
 
@@ -90,6 +91,12 @@ app.get(
   "/maxValue/column",
   [check("tableName").isString(), check("columnName").isString()],
   getMaxValue
+);
+
+app.get(
+  "/samples",
+  [check("tableName").isString(), check("columnName").isString()],
+  getColumnSample
 );
 
 // Metanome

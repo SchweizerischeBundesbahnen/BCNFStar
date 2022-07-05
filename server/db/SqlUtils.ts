@@ -96,6 +96,8 @@ export default abstract class SqlUtils {
     column: string
   ): Promise<any>;
 
+  public abstract getColumnSample(table: string, column: string): Promise<any>;
+
   public abstract testKeyUnionability(
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability>;

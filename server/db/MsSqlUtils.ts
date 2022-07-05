@@ -282,6 +282,13 @@ export default class MsSqlUtils extends SqlUtils {
     return query_result;
   }
 
+  public async getColumnSample(table: string, column: string): Promise<any> {
+    const query_result = await sql.query<SchemaQueryRow>(
+      `SELECT ${column} from ${table} LIMIT 1000`
+    );
+    return query_result;
+  }
+
   public override async getViolatingRowsForFD(
     _sql: string,
     lhs: Array<string>,

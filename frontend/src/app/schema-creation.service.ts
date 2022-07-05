@@ -180,6 +180,26 @@ export class SchemaCreationService {
     }
   }
 
+  private async getColumnSamples(tables: Array<Table>) {
+    let samplePromises = new Map<Column, Promise<Array<string>>>();
+    tables.forEach((table) => {
+      Array.from(table.columns).forEach((col) => {
+        samplePromises.set(
+          col,
+          firstValueFrom(
+            this.http.get<Array<string>>(
+              this.dataService.baseUrl +
+                `/samples?tableName=${table.fullName}&&columnName=${col.name}`
+            )
+          )
+        );
+      });
+    });
+    for (const [col, promise] of samplePromises.entries()) {
+      col.setBloomFilterFpp(await promise);
+    }
+  }
+
   /**
    * Creates InputSchema for use on edit-schema page with the supplied tables
    * @param tables used on edit-schema page
@@ -203,7 +223,9 @@ export class SchemaCreationService {
           column.sourceColumn
         );
     }
+
     this.getMaxValueOf(tables);
+    this.getColumnSamples(tables);
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);
@@ -224,7 +246,6 @@ export class SchemaCreationService {
         (table) => table instanceof Table
       ) as Array<Table>
     );
-
     return schema;
   }
 }

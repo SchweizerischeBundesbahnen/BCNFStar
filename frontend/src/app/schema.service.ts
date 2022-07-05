@@ -286,77 +286,75 @@ export class SchemaService {
 
   public async resetDataForRedundanceRanking(tables: Array<Table>) {
     console.log('resetRadundance', tables);
-    let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
-      Promise<number>
-    >();
-    let fdUniqueTuplesLhsPromises: Array<Promise<number>> = new Array<
-      Promise<number>
-    >();
+    // let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
+    //   Promise<number>
+    // >();
+    // let fdUniqueTuplesLhsPromises: Array<Promise<number>> = new Array<
+    //   Promise<number>
+    // >();
     // let fdUniqueTuplesRhsPromises: Array<Promise<number>> = new Array<
     //   Promise<number>
     // >();
-    tables.forEach((table) => {
-      console.log('cluster', table.fdClusters());
-      table.fdClusters().forEach((cluster) => {
-        fdRedundantTuplePromises.push(
-          this.dataService.getRedundanceByValueCombinations(
-            table,
-            cluster.fds[0].lhs.asArray()
-          )
-        );
-        fdUniqueTuplesLhsPromises.push(
-          this.dataService.getUniqueTuplesOfValueCombinations(
-            table,
-            cluster.fds[0].lhs.asArray()
-          )
-        );
-        // fdUniqueTuplesRhsPromises.push(
-        //   this.dataService.getUniqueTuplesOfValueCombinations(
-        //     table,
-        //     cluster.fds[0].lhs.asArray()
-        //   )
-        // );
-      });
-    });
-
-    console.log(
-      'länngen:',
-      fdRedundantTuplePromises.length,
-      fdUniqueTuplesLhsPromises.length
-    );
-
-    let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
-    console.log(resultRedundantTuples);
-    tables.forEach((table) => {
-      table.fdClusters().forEach((cluster, index) =>
-        cluster.fds.forEach((fd) => {
-          fd._redundantTuples = resultRedundantTuples[index];
-          console.log(fd, resultRedundantTuples[index]);
-        })
-      );
-    });
-    let resultUniqueTuplesLhs = await Promise.all(fdUniqueTuplesLhsPromises);
-    console.log(resultUniqueTuplesLhs);
-    tables.forEach((table) => {
-      table.fdClusters().forEach((cluster, index) =>
-        cluster.fds.forEach((fd) => {
-          fd._uniqueTuplesLhs = resultUniqueTuplesLhs[index];
-          console.log(fd, resultUniqueTuplesLhs[index]);
-        })
-      );
-    });
-    // let resultUniqueTuplesRhs = await Promise.all(
-    //   fdUniqueTuplesRhsPromises
+    // tables.forEach((table) => {
+    //   console.log('cluster', table.fdClusters());
+    //   table.fdClusters().forEach((cluster) => {
+    // fdRedundantTuplePromises.push(
+    //   this.dataService.getRedundanceByValueCombinations(
+    //     table,
+    //     cluster.fds[0].lhs.asArray()
+    //   )
     // );
-    // console.log(resultUniqueTuplesRhs);
+    // fdUniqueTuplesLhsPromises.push(
+    //   this.dataService.getUniqueTuplesOfValueCombinations(
+    //     table,
+    //     cluster.fds[0].lhs.asArray()
+    //   )
+    // );
+    // fdUniqueTuplesRhsPromises.push(
+    //   this.dataService.getUniqueTuplesOfValueCombinations(
+    //     table,
+    //     cluster.fds[0].lhs.asArray()
+    //   )
+    // );
+    //   });
+    // });
+    // console.log(
+    //   'länngen:',
+    //   fdRedundantTuplePromises.length,
+    //   fdUniqueTuplesLhsPromises.length
+    // );
+    // let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
+    // console.log(resultRedundantTuples);
     // tables.forEach((table) => {
     //   table.fdClusters().forEach((cluster, index) =>
     //     cluster.fds.forEach((fd) => {
-    //       fd._uniqueTuplesRhs = resultUniqueTuplesRhs[index];
-    //       console.log(fd, resultUniqueTuplesRhs[index]);
+    //       fd._redundantTuples = resultRedundantTuples[index];
+    //       console.log(fd, resultRedundantTuples[index]);
     //     })
     //   );
     // });
+    // let resultUniqueTuplesLhs = await Promise.all(fdUniqueTuplesLhsPromises);
+    // console.log(resultUniqueTuplesLhs);
+    // tables.forEach((table) => {
+    //   table.fdClusters().forEach((cluster, index) =>
+    //     cluster.fds.forEach((fd) => {
+    //       fd._uniqueTuplesLhs = resultUniqueTuplesLhs[index];
+    //       console.log(fd, resultUniqueTuplesLhs[index]);
+    //     })
+    //   );
+    // });
+    // // let resultUniqueTuplesRhs = await Promise.all(
+    // //   fdUniqueTuplesRhsPromises
+    // // );
+    // // console.log(resultUniqueTuplesRhs);
+    // // tables.forEach((table) => {
+    // //   table.fdClusters().forEach((cluster, index) =>
+    // //     cluster.fds.forEach((fd) => {
+    // //       fd._uniqueTuplesRhs = resultUniqueTuplesRhs[index];
+    // //       console.log(fd, resultUniqueTuplesRhs[index]);
+    // //     })
+    // //   );
+    // // });
   }
 
   public canUndo() {
@@ -379,6 +377,6 @@ export class SchemaService {
 
   private notifyAboutSchemaChanges() {
     this._schemaChanged.next();
-    console.log('schema: ', this.schema);
+    console.log('schema: ', this.schema.tables);
   }
 }
