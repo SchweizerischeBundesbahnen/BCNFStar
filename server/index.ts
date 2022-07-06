@@ -33,6 +33,7 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
+import getIndScoreMetadata from "./routes/indScore";
 
 const corsOptions: CorsOptions = {
   origin(
@@ -79,6 +80,7 @@ app.get(
   [check("limit").isNumeric(), check("offset").isNumeric()],
   getTablePage
 );
+app.get("/indScore/metadata", getIndScoreMetadata);
 
 app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
