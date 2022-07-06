@@ -57,4 +57,20 @@ describe("The /unionedkeys route", () => {
       });
     });
   });
+
+  it("returns error on empty sql", () => {
+    cy.fixture("unionedKeysBody.json").then((body) => {
+      body.table1Sql = "";
+      body.unionedColumns = [
+        ["n_nationkey", "n_regionkey", "r_comment"],
+        ["null", "n_nationkey", "r_comment"],
+      ];
+      cy.request({
+        method: "post",
+        url: route,
+        body: body,
+        failOnStatusCode: false,
+      });
+    });
+  });
 });
