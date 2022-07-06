@@ -254,9 +254,6 @@ export default class MsSqlUtils extends SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    // if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
-    //   throw Error("Columns don't exist in table.");
-    // }
     const table: string = await this.createTempTable(_sql, "X");
 
     const result: sql.IResult<any> = await sql.query(
@@ -279,25 +276,6 @@ export default class MsSqlUtils extends SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    // if (
-    //   !this.columnsExistInTable(
-    //     referencingTable.schemaName,
-    //     referencingTable.name,
-    //     columnRelationships.map((c) => c.referencingColumn)
-    //   )
-    // ) {
-    //   throw Error("Columns don't exist in referencing.");
-    // }
-    // if (
-    //   !this.columnsExistInTable(
-    //     referencedTable.schemaName,
-    //     referencedTable.name,
-    //     columnRelationships.map((c) => c.referencedColumn)
-    //   )
-    // ) {
-    //   throw Error("Columns don't exist in referenced.");
-    // }
-
     const result: sql.IResult<any> = await sql.query(
       this.violatingRowsForSuggestedIND_SQL(
         referencingTableSql,
