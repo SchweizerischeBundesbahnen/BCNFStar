@@ -109,7 +109,14 @@ app.post(
   testTypeCasting
 );
 
-app.post("/unionedkeys", checkUnionedKeys);
+app.post(
+  "/unionedkeys",
+  [
+    body("table1Sql").trim().custom(isValidSql()),
+    body("table2Sql").trim().custom(isValidSql()),
+  ],
+  checkUnionedKeys
+);
 
 app.post(
   "/violatingRows/fd",

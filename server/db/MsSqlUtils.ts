@@ -139,8 +139,15 @@ export default class MsSqlUtils extends SqlUtils {
   public override async testKeyUnionability(
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability> {
-    const _sql: string = this.testKeyUnionabilitySql(t);
+    const table1: string = await this.createTempTable(t.table1Sql);
+    const table2: string = await this.createTempTable(t.table2Sql);
+
+    const _sql: string = this.testKeyUnionabilitySql(t, table1, table2);
     const result: sql.IResult<any> = await sql.query(_sql);
+
+    await this.dropTempTable(table1);
+    await this.dropTempTable(table2);
+
     if (result.recordset[0].count == 0) return KeyUnionability.allowed;
     return KeyUnionability.forbidden;
   }
