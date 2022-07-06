@@ -41,13 +41,7 @@ export function isValidDatatype(): CustomValidator {
 export function isValidSql(): CustomValidator {
   return (sqlString: string) => {
     const sql = sqlString.toLowerCase();
-    const forbiddenSubstrings: string[] = [
-      "--",
-      "drop",
-      "exec",
-      "view",
-      "alter",
-    ];
+    const forbiddenSubstrings: string[] = ["--", "drop", "exec"];
 
     for (const forbidden of forbiddenSubstrings) {
       if (sql.includes(forbidden) || forbidden.includes(sql)) {
