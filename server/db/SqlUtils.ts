@@ -91,6 +91,10 @@ export default abstract class SqlUtils {
     return columns.map((c) => this.escape(c)).join(", ");
   }
 
+  public dropTable_SQL(tableName: string): string {
+    return `DROP TABLE IF EXISTS ${tableName};`;
+  }
+
   public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
     const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
     // Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int)
@@ -215,7 +219,7 @@ export default abstract class SqlUtils {
    * @param sql The Sql that queries the information the temp-table should contain
    * @param name The name of the temp-table. Relevant for multiple temp-table in one query
    */
-  public abstract createTempTable(sql: string, name: string): Promise<string>;
+  public abstract createTempTable(sql: string): Promise<string>;
 
   public abstract dropTempTable(name: string): Promise<void>;
 

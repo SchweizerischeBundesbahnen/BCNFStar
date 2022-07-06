@@ -78,7 +78,8 @@ export default class PostgresSqlUtils extends SqlUtils {
     return `__${name}__`;
   }
 
-  public tempTableScripts(Sql: string, name: string): ITemptableScript {
+  public tempTableScripts(Sql: string): ITemptableScript {
+    const name: string = this.randomName();
     const ITemptableScript: ITemptableScript = {
       name: this.tempTableName(name),
       createScript: `
@@ -86,23 +87,18 @@ export default class PostgresSqlUtils extends SqlUtils {
       CREATE TEMP TABLE ${this.tempTableName(name)} AS
       ${Sql};
       `,
-      dropScript: `DROP TABLE IF EXISTS ${this.tempTableName(name)};`,
     };
     return ITemptableScript;
   }
 
-  public override async createTempTable(
-    _sql: string,
-    name: string
-  ): Promise<string> {
-    const x: ITemptableScript = this.tempTableScripts(_sql, name);
+  public override async createTempTable(_sql: string): Promise<string> {
+    const x: ITemptableScript = this.tempTableScripts(_sql);
     await this.pool.query(x.createScript);
     return x.name;
   }
 
   public override async dropTempTable(name: string): Promise<void> {
-    const x: ITemptableScript = this.tempTableScripts("", name);
-    await this.pool.query(x.dropScript);
+    await this.pool.query(this.dropTable_SQL(name));
   }
 
   public async tableExistsInSchema(
@@ -251,10 +247,7 @@ from
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const tableName: string = await this.createTempTable(
-      _sql,
-      this.randomName()
-    );
+    const tableName: string = await this.createTempTable(_sql);
     const query_result = await this.pool.query(
       this.violatingRowsForFD_SQL(tableName, lhs, rhs) +
         `ORDER BY ${lhs.join(",")}
@@ -274,10 +267,7 @@ from
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<{ entries: number; groups: number }> {
-    const tempTable: string = await this.createTempTable(
-      sql,
-      this.randomName()
-    );
+    const tempTable: string = await this.createTempTable(sql);
     const result = await this.pool.query<{ entries: number; groups: number }>(
       this.getViolatingRowsForFDCount_Sql(tempTable, lhs, rhs)
     );
@@ -293,12 +283,10 @@ from
     limit: number
   ): Promise<ITablePage> {
     const referencingTempTable: string = await this.createTempTable(
-      referencingTableSql,
-      this.randomName()
+      referencingTableSql
     );
     const referencedTempTable: string = await this.createTempTable(
-      referencedTableSql,
-      this.randomName()
+      referencedTableSql
     );
 
     const query_result = await this.pool.query(
@@ -330,12 +318,10 @@ from
     columnRelationships: IColumnRelationship[]
   ): Promise<IRowCounts> {
     const referencingTable: string = await this.createTempTable(
-      referencingTableSql,
-      this.randomName()
+      referencingTableSql
     );
     const referencedTable: string = await this.createTempTable(
-      referencedTableSql,
-      this.randomName()
+      referencedTableSql
     );
 
     const count = await this.pool.query<IRowCounts>(
