@@ -70,6 +70,8 @@ export default class MsSqlUtils extends SqlUtils {
       DROP TABLE IF EXISTS ${this.tempTableName(name)}; 
       SELECT * INTO ${this.tempTableName(name)} FROM (${Sql}) AS X;
       `,
+      dropScript: `DROP TABLE IF EXISTS ${this.tempTableName(name)}; 
+      `,
     };
     return ITemptableScript;
   }
@@ -81,6 +83,11 @@ export default class MsSqlUtils extends SqlUtils {
     const x: ITemptableScript = this.tempTableScripts(_sql, name);
     await sql.query(x.createScript);
     return x.name;
+  }
+
+  public override async dropTempTable(name: string): Promise<void> {
+    const x: ITemptableScript = this.tempTableScripts("", name);
+    await sql.query(x.dropScript);
   }
 
   public async getSchema(): Promise<Array<SchemaQueryRow>> {
@@ -254,7 +261,7 @@ export default class MsSqlUtils extends SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const table: string = await this.createTempTable(_sql, "X");
+    const table: string = await this.createTempTable(_sql, this.randomName());
 
     const result: sql.IResult<any> = await sql.query(
       this.violatingRowsForFD_SQL(table, lhs, rhs) +
@@ -263,6 +270,7 @@ export default class MsSqlUtils extends SqlUtils {
           FETCH NEXT ${limit} ROWS ONLY
         `
     );
+    await this.dropTempTable(table);
     return {
       rows: result.recordset,
       attributes: Object.keys(result.recordset.columns),
@@ -276,10 +284,19 @@ export default class MsSqlUtils extends SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage> {
+    const referencingTable: string = await this.createTempTable(
+      referencingTableSql,
+      this.randomName()
+    );
+    const referencedTable: string = await this.createTempTable(
+      referencedTableSql,
+      this.randomName()
+    );
+
     const result: sql.IResult<any> = await sql.query(
       this.violatingRowsForSuggestedIND_SQL(
-        referencingTableSql,
-        referencedTableSql,
+        referencingTable,
+        referencedTable,
         columnRelationships
       ) +
         ` ORDER BY ${columnRelationships
@@ -289,6 +306,9 @@ export default class MsSqlUtils extends SqlUtils {
           FETCH NEXT ${limit} ROWS ONLY
         `
     );
+
+    this.dropTempTable(referencingTable);
+    this.dropTempTable(referencedTable);
     return {
       rows: result.recordset,
       attributes: Object.keys(result.recordset.columns),
@@ -302,11 +322,11 @@ export default class MsSqlUtils extends SqlUtils {
   ): Promise<IRowCounts> {
     const referencingTable: string = await this.createTempTable(
       referencingTableSql,
-      "X"
+      this.randomName()
     );
     const referencedTable: string = await this.createTempTable(
       referencedTableSql,
-      "Y"
+      this.randomName()
     );
     const result = await sql.query<IRowCounts>(
       this.getViolatingRowsForINDCount_Sql(
@@ -315,6 +335,9 @@ export default class MsSqlUtils extends SqlUtils {
         columnRelationships
       )
     );
+    await this.dropTempTable(referencingTable);
+    await this.dropTempTable(referencedTable);
+
     return result.recordset[0];
   }
 
@@ -323,9 +346,11 @@ export default class MsSqlUtils extends SqlUtils {
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<IRowCounts> {
+    const table: string = await this.createTempTable(_sql, this.randomName());
     const result = await sql.query<IRowCounts>(
       this.getViolatingRowsForFDCount_Sql(_sql, lhs, rhs)
     );
+    this.dropTempTable(table);
     return result.recordset[0];
   }
 

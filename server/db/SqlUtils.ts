@@ -217,6 +217,12 @@ export default abstract class SqlUtils {
    */
   public abstract createTempTable(sql: string, name: string): Promise<string>;
 
+  public abstract dropTempTable(name: string): Promise<void>;
+
+  protected randomName(): string {
+    return (Math.random() + 1).toString(36).substring(7);
+  }
+
   protected violatingRowsForFD_SQL(
     tableName: string,
     lhs: Array<string>,

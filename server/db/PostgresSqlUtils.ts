@@ -86,6 +86,7 @@ export default class PostgresSqlUtils extends SqlUtils {
       CREATE TEMP TABLE ${this.tempTableName(name)} AS
       ${Sql};
       `,
+      dropScript: `DROP TABLE IF EXISTS ${this.tempTableName(name)};`,
     };
     return ITemptableScript;
   }
@@ -97,6 +98,11 @@ export default class PostgresSqlUtils extends SqlUtils {
     const x: ITemptableScript = this.tempTableScripts(_sql, name);
     await this.pool.query(x.createScript);
     return x.name;
+  }
+
+  public override async dropTempTable(name: string): Promise<void> {
+    const x: ITemptableScript = this.tempTableScripts("", name);
+    await this.pool.query(x.dropScript);
   }
 
   public async tableExistsInSchema(
@@ -245,7 +251,10 @@ from
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const tableName: string = await this.createTempTable(_sql, "X");
+    const tableName: string = await this.createTempTable(
+      _sql,
+      this.randomName()
+    );
     const query_result = await this.pool.query(
       this.violatingRowsForFD_SQL(tableName, lhs, rhs) +
         `ORDER BY ${lhs.join(",")}
@@ -253,6 +262,7 @@ from
         OFFSET ${offset}
         `
     );
+    await this.dropTempTable(tableName);
     return {
       rows: query_result.rows,
       attributes: query_result.fields.map((v) => v.name),
@@ -264,10 +274,14 @@ from
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<{ entries: number; groups: number }> {
-    const tempTable: string = await this.createTempTable(sql, "X");
+    const tempTable: string = await this.createTempTable(
+      sql,
+      this.randomName()
+    );
     const result = await this.pool.query<{ entries: number; groups: number }>(
       this.getViolatingRowsForFDCount_Sql(tempTable, lhs, rhs)
     );
+    await this.dropTempTable(tempTable);
     return result.rows[0];
   }
 
@@ -280,11 +294,11 @@ from
   ): Promise<ITablePage> {
     const referencingTempTable: string = await this.createTempTable(
       referencingTableSql,
-      "X"
+      this.randomName()
     );
     const referencedTempTable: string = await this.createTempTable(
       referencedTableSql,
-      "Y"
+      this.randomName()
     );
 
     const query_result = await this.pool.query(
@@ -301,6 +315,9 @@ from
         OFFSET ${offset}
         `
     );
+    this.dropTempTable(referencingTempTable);
+    this.dropTempTable(referencedTempTable);
+
     return {
       rows: query_result.rows,
       attributes: query_result.fields.map((v) => v.name),
@@ -314,11 +331,11 @@ from
   ): Promise<IRowCounts> {
     const referencingTable: string = await this.createTempTable(
       referencingTableSql,
-      "X"
+      this.randomName()
     );
     const referencedTable: string = await this.createTempTable(
       referencedTableSql,
-      "Y"
+      this.randomName()
     );
 
     const count = await this.pool.query<IRowCounts>(
@@ -328,6 +345,8 @@ from
         columnRelationships
       )
     );
+    await this.dropTempTable(referencingTable);
+    await this.dropTempTable(referencedTable);
     return count.rows[0];
   }
 
