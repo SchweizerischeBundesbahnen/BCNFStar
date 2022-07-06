@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 import IRowCounts from '@server/definitions/IRowCounts';
+import IINDScoreMetadata from '@server/definitions/IINDScoreMetadata';
 
 @Injectable({
   providedIn: 'root',
@@ -44,6 +45,12 @@ export class DatabaseService {
     );
     const tables = iTables.map((iTable) => Table.fromITable(iTable));
     return tables;
+  }
+
+  public async getINDScoreMetadata(): Promise<IINDScoreMetadata> {
+    return await firstValueFrom(
+      this.http.get<IINDScoreMetadata>(this.baseUrl + '/indScore/metadata')
+    );
   }
 
   public async runMetanome(entry: IIndexFileEntry) {
