@@ -57,12 +57,12 @@ export default class MsSqlUtils extends SqlUtils {
     return "varchar(max)";
   }
 
+  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
+   */
   public override tempTableName(name: string): string {
     return `#${name}`;
   }
 
-  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
-   */
   public tempTableScripts(Sql: string): ITemptableScript {
     const name: string = this.randomName();
     const ITemptableScript: ITemptableScript = {
