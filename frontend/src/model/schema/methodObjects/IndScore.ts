@@ -1,22 +1,37 @@
+import { InjectorInstance } from '@/src/app/app.module';
+import { DatabaseService } from '@/src/app/database.service';
+import IINDScoreMetadata from '@server/definitions/IINDScoreMetadata';
 import ColumnCombination from '../ColumnCombination';
 import Relationship from '../Relationship';
 
 export default class IndScore {
   private relationship: Relationship;
+  protected dataService: DatabaseService;
 
   public constructor(relationship: Relationship) {
     this.relationship = relationship;
+    this.dataService = InjectorInstance.get<DatabaseService>(DatabaseService);
   }
 
-  public get(): number {
+  public async get(): Promise<number> {
     if (!this.relationship._score) {
-      this.relationship._score = this.calculate();
+      this.relationship._score = await this.calculate();
     }
     return this.relationship._score;
   }
 
-  public calculate(): number {
-    return (this.keyIdScore() + this.matchingScore()) / 2;
+  public async calculate(): Promise<number> {
+    let indScoreMetadata: IINDScoreMetadata =
+      await this.dataService.getINDScoreMetadata();
+    return Number(
+      this.keyIdScore() +
+        this.matchingScore() +
+        indScoreMetadata.coverage +
+        indScoreMetadata.distinctDependantValues +
+        indScoreMetadata.outOfRange +
+        indScoreMetadata.tableSizeRatio +
+        indScoreMetadata.valueLengthDiff
+    );
   }
 
   /**
