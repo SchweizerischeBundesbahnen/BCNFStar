@@ -159,6 +159,110 @@ export default class MsSqlUtils extends SqlUtils {
     }
   }
 
+  public async getDistinctValuesForCCCount(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): Promise<number> {
+    if (await this.columnsExistInTable(schema, table, columns)) {
+      const SQL = this.distinctValuesCount_Sql(schema, table, columns);
+      return await (
+        await sql.query<{ count: number }>(SQL)
+      ).recordset[0].count;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
+  }
+
+  public averageLenghtOfDistinctValues_Sql(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): string {
+    return `SELECT AVG(LEN(x.cc)) as averagelength
+      FROM (SELECT DISTINCT CONCAT(${columns.join(
+        ","
+      )}) as cc FROM ${schema}.${table}) AS x`;
+  }
+
+  public async getAverageLengthDistinctValuesForCC(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): Promise<number> {
+    if (await this.columnsExistInTable(schema, table, columns)) {
+      const SQL = this.averageLenghtOfDistinctValues_Sql(
+        schema,
+        table,
+        columns
+      );
+      return await (
+        await sql.query<{ averagelength: number }>(SQL)
+      ).recordset[0].averagelength;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
+  }
+
+  public async getCoverageForIND(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): Promise<number> {
+    if (
+      (await this.columnsExistInTable(
+        referencing.schemaName,
+        referencing.name,
+        cr.map((cr) => cr.referencingColumn)
+      )) &&
+      (await this.columnsExistInTable(
+        referenced.schemaName,
+        referenced.name,
+        cr.map((cr) => cr.referencedColumn)
+      ))
+    ) {
+      const SQL = this.getCoveredValuesCount_Sql(referencing, referenced, cr);
+      const coveredValues: number = (await sql.query<{ count: number }>(SQL))
+        .recordset[0].count;
+      const Sql_distinct: string = this.distinctValuesCount_Sql(
+        referenced.schemaName,
+        referenced.name,
+        cr.map((cr) => cr.referencedColumn)
+      );
+      const distinctValues: number = (
+        await sql.query<{ count: number }>(Sql_distinct)
+      ).recordset[0].count;
+
+      return coveredValues / distinctValues;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
+  }
+
+  public async getOutOfRangeValuePercentage(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): Promise<number> {
+    if (
+      (await this.columnsExistInTable(
+        referencing.schemaName,
+        referencing.name,
+        cr.map((cr) => cr.referencingColumn)
+      )) &&
+      (await this.columnsExistInTable(
+        referenced.schemaName,
+        referenced.name,
+        cr.map((cr) => cr.referencedColumn)
+      ))
+    ) {
+      const SQL = this.getOutOfRangeValueCount_Sql(referencing, referenced, cr);
+      return (await sql.query<{ count: number }>(SQL)).recordset[0].count;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
+  }
+
   /**
    * This also checks if table and schema exist in database.
    */

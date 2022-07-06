@@ -10,6 +10,7 @@ import {
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
+import { QueryResult } from "pg";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -49,6 +50,7 @@ export default abstract class SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage>;
+
   public abstract getTableRowCount(
     table: string,
     schema: string
@@ -86,6 +88,97 @@ export default abstract class SqlUtils {
 
   public generateColumnString(columns: string[]): string {
     return columns.map((c) => this.escape(c)).join(", ");
+  }
+
+  public abstract getDistinctValuesForCCCount(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): Promise<number>;
+
+  public distinctValuesCount_Sql(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): string {
+    return `SELECT COUNT(DISTINCT ${columns.join(
+      ","
+    )}) as count FROM ${schema}.${table}`;
+  }
+
+  public abstract getAverageLengthDistinctValuesForCC(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): Promise<number>;
+
+  public abstract averageLenghtOfDistinctValues_Sql(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): string;
+
+  public abstract getCoverageForIND(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): Promise<number>;
+
+  public getCoveredValuesCount_Sql(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): string {
+    return `
+    SELECT COUNT(DISTINCT ${cr
+      .map((cr) => "y." + cr.referencedColumn)
+      .join(",")}) as count
+    FROM 
+    ${referencing.schemaName}.${referencing.name} AS x,
+    ${referenced.schemaName}.${referenced.name} AS y
+    WHERE 
+    ${cr
+      .map((cr) => `y.${cr.referencedColumn} = x.${cr.referencingColumn}`)
+      .join(" AND ")}`;
+  }
+
+  public abstract getOutOfRangeValuePercentage(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): Promise<number>;
+
+  public getMinValueForColumn_Sql(table: ITable, column: string): string {
+    return `(SELECT MIN(${table.name}.${column}) FROM ${table.schemaName}.${table.name})`;
+  }
+
+  public getMaxValueForColumn_Sql(table: ITable, column: string): string {
+    return `(SELECT MAX(${table.name}.${column}) FROM ${table.schemaName}.${table.name})`;
+  }
+
+  public getOutOfRangeValueCount_Sql(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): string {
+    return `SELECT COUNT(DISTINCT ${cr
+      .map((cr) => "y." + cr.referencedColumn)
+      .join(",")}) as count
+    FROM 
+    ${referencing.schemaName}.${referencing.name} AS x,
+    ${referenced.schemaName}.${referenced.name} AS y
+    WHERE
+    ${cr
+      .map(
+        (cr) =>
+          `y.` +
+          cr.referencedColumn +
+          ` NOT BETWEEN ` +
+          this.getMinValueForColumn_Sql(referencing, cr.referencingColumn) +
+          ` AND ` +
+          this.getMaxValueForColumn_Sql(referencing, cr.referencingColumn)
+      )
+      .join(" OR ")}`;
   }
 
   public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {

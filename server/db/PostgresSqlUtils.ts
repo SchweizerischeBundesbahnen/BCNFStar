@@ -4,7 +4,7 @@ import SqlUtils, {
   PrimaryKeyResult,
   SchemaQueryRow,
 } from "./SqlUtils";
-import { Pool, QueryConfig, PoolConfig } from "pg";
+import { Pool, QueryConfig, PoolConfig, QueryResult } from "pg";
 
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
@@ -18,6 +18,7 @@ import {
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
+import { rows } from "mssql";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -67,6 +68,113 @@ export default class PostgresSqlUtils extends SqlUtils {
       []
     );
     return query_result.rows;
+  }
+
+  public async getDistinctValuesForCCCount(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): Promise<number> {
+    if (await this.columnsExistInTable(schema, table, columns)) {
+      const SQL = this.distinctValuesCount_Sql(schema, table, columns);
+      let result = (await this.pool.query<{ count: number }>(SQL)).rows[0]
+        .count;
+      return result;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
+  }
+
+  public averageLenghtOfDistinctValues_Sql(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): string {
+    return `SELECT AVG(LENGTH(x.cc)) as averageLength
+      FROM (SELECT DISTINCT CONCAT(${columns.join(
+        ","
+      )}) as cc FROM ${schema}.${table}) AS x`;
+  }
+
+  public async getAverageLengthDistinctValuesForCC(
+    schema: string,
+    table: string,
+    columns: string[]
+  ): Promise<number> {
+    if (await this.columnsExistInTable(schema, table, columns)) {
+      const SQL = this.averageLenghtOfDistinctValues_Sql(
+        schema,
+        table,
+        columns
+      );
+      let averageLength = (
+        await this.pool.query<{ averagelength: number }>(SQL)
+      ).rows[0].averagelength;
+      console.log(averageLength);
+      return averageLength;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
+  }
+
+  public async getCoverageForIND(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): Promise<number> {
+    if (
+      (await this.columnsExistInTable(
+        referencing.schemaName,
+        referencing.name,
+        cr.map((cr) => cr.referencingColumn)
+      )) &&
+      (await this.columnsExistInTable(
+        referenced.schemaName,
+        referenced.name,
+        cr.map((cr) => cr.referencedColumn)
+      ))
+    ) {
+      const SQL = this.getCoveredValuesCount_Sql(referencing, referenced, cr);
+      const coveredValues: number = (
+        await this.pool.query<{ count: number }>(SQL)
+      ).rows[0].count;
+      const Sql_distinct: string = this.distinctValuesCount_Sql(
+        referenced.schemaName,
+        referenced.name,
+        cr.map((cr) => cr.referencedColumn)
+      );
+      const distinctValues: number = (
+        await this.pool.query<{ count: number }>(Sql_distinct)
+      ).rows[0].count;
+
+      return coveredValues / distinctValues;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
+  }
+
+  public async getOutOfRangeValuePercentage(
+    referencing: ITable,
+    referenced: ITable,
+    cr: IColumnRelationship[]
+  ): Promise<number> {
+    if (
+      (await this.columnsExistInTable(
+        referencing.schemaName,
+        referencing.name,
+        cr.map((cr) => cr.referencingColumn)
+      )) &&
+      (await this.columnsExistInTable(
+        referenced.schemaName,
+        referenced.name,
+        cr.map((cr) => cr.referencedColumn)
+      ))
+    ) {
+      const SQL = this.getOutOfRangeValueCount_Sql(referencing, referenced, cr);
+      return (await this.pool.query<{ count: number }>(SQL)).rows[0].count;
+    } else {
+      console.error("Error: columns don't exist in table");
+    }
   }
 
   public UNIVERSAL_DATATYPE(): string {
