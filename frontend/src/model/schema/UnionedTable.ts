@@ -1,7 +1,9 @@
 import BasicColumn, { newBasicColumn } from '../types/BasicColumn';
 import BasicTable from './BasicTable';
+import BasicTableRelationship from './BasicTableRelationship';
 import Column from './Column';
 import Table from './Table';
+import TableRelationship from './TableRelationship';
 
 export default class UnionedTable extends BasicTable {
   public tables: [Table, Table];
@@ -37,5 +39,40 @@ export default class UnionedTable extends BasicTable {
       primaryCol.dataType,
       !prefCol || prefCol.nullable || !altCol || altCol.nullable
     );
+  }
+
+  public matchedColumn(column: Column) {
+    const i = this.columns[0].indexOf(column);
+    return this.columns[1][i];
+  }
+
+  public equivalentFk(
+    fk1: TableRelationship,
+    fk2: TableRelationship
+  ): BasicTableRelationship | undefined {
+    if (fk1.referencedTable != fk2.referencedTable) return undefined;
+    if (fk1.referencingCols.length != fk2.referencingCols.length)
+      return undefined;
+    for (const i in fk1.referencingCols) {
+      const referencingCol2 = this.matchedColumn(fk1.referencingCols[i]);
+      if (!referencingCol2) return undefined;
+      const referencedCol2 = fk2.relationship.columnsReferencedBy([
+        referencingCol2,
+      ])[0];
+      if (!referencedCol2) return undefined;
+      if (fk1.referencedCols[i] != referencedCol2) return undefined;
+    }
+    const newReferencingCols = fk1.referencingCols.map((col) =>
+      this.displayedColumnAt(this.columns[0].indexOf(col))
+    );
+    return {
+      referencingTable: this,
+      referencingCols: newReferencingCols,
+      referencingName: newReferencingCols[0].name,
+
+      referencedTable: fk1.referencedTable,
+      referencedCols: fk1.referencedCols,
+      referencedName: fk1.referencedName,
+    };
   }
 }

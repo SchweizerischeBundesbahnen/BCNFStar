@@ -245,8 +245,7 @@ export default class Schema {
    */
   public referencesOf(
     table: BasicTable,
-    onlyDisplayed: boolean,
-    allowDecomposition: boolean = false
+    onlyDisplayed: boolean
   ): Array<TableRelationship> {
     if (!(table instanceof Table)) return [];
     if (!this._tableFksValid) this.updateFks();
@@ -254,23 +253,17 @@ export default class Schema {
       (fk) => fk.referencedTable == table
     );
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
-    if (!allowDecomposition)
-      result = result.filter((fk) => this.tables.has(fk.referencingTable));
+    result = result.filter((fk) => this.tables.has(fk.referencingTable));
     return result;
   }
 
-  public fksOf(
-    table: Table,
-    onlyDisplayed: boolean,
-    allowDecomposition: boolean = false
-  ): Array<TableRelationship> {
+  public fksOf(table: Table, onlyDisplayed: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
       (fk) => fk.referencingTable == table
     );
+    result = result.filter((fk) => this.tables.has(fk.referencedTable));
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
-    if (!allowDecomposition)
-      result = result.filter((fk) => this.tables.has(fk.referencedTable));
     return result;
   }
 
@@ -278,8 +271,23 @@ export default class Schema {
     table: BasicTable,
     onlyDisplayed: boolean
   ): Array<BasicTableRelationship> {
-    if (table instanceof Table) return this.fksOf(table, onlyDisplayed);
-    return [];
+    let result = new Array<BasicTableRelationship>();
+    if (table instanceof Table) {
+      result.push(...this.fksOf(table, onlyDisplayed));
+      // for (let otherTable of this.unionedTables) {
+      //   let fks1 = this.fksBetween(table, otherTable.tables[0]);
+      //   let fks2 = this.fksBetween(table, otherTable.tables[1]);
+      // }
+    }
+    if (table instanceof UnionedTable) {
+      for (const fk1 of this.fksOf(table.tables[0], onlyDisplayed)) {
+        for (const fk2 of this.fksOf(table.tables[1], onlyDisplayed)) {
+          const newFk = table.equivalentFk(fk1, fk2);
+          if (newFk) result.push(newFk);
+        }
+      }
+    }
+    return result;
   }
 
   public hiddenFksOf(table: Table): Array<TableRelationship> {
