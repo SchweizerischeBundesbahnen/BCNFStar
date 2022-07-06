@@ -57,7 +57,7 @@ export default class MsSqlUtils extends SqlUtils {
     return "varchar(max)";
   }
 
-  public tempTableName(name: string): string {
+  public override tempTableName(name: string): string {
     return `#${name}`;
   }
 
