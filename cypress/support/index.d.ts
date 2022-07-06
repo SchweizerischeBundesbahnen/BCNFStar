@@ -56,6 +56,16 @@ declare namespace Cypress {
 
     visitPossibleForeignKeysTab(): void;
 
+    visitCheckContainedSubtableTab(): void;
+
+    checkFD(lhs: Array<string>, rhs: Array<string>);
+
+    visitSuggestForeignKeyTab(): void;
+
+    checkIND(referencedTable: string, columnRelationship: Array<Array<string>>);
+
+    joinTablesByFirstIND(referencingTable: string, referencedTable: string);
+
     createForeignKey(): void;
 
     /**
