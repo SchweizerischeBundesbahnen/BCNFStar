@@ -11,7 +11,7 @@
       id="referencedTableSelection"
     >
       <sbb-option
-        *ngFor="let table of validTables()"
+        *ngFor="let table of this.tables"
         [value]="table"
         [sbbTooltip]="table.fullName"
         >{{ table.fullName }}</sbb-option

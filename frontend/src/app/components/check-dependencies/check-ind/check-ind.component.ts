@@ -84,12 +84,12 @@ export class CheckIndComponent {
   public async checkInd(): Promise<void> {
     if (this.canAddColumnRelation()) this.addColumnRelation();
 
-    const relationShip: TableRelationship = new TableRelationship(
+    const relationship: TableRelationship = new TableRelationship(
       this.relationship,
       this.referencingTable,
       this.referencedTable!
     );
-    const dataQuery = await ViolatingINDRowsDataQuery.Create(relationShip);
+    const dataQuery = await ViolatingINDRowsDataQuery.Create(relationship);
 
     this.isLoading = true;
     const rowCount: IRowCounts | void = await dataQuery
@@ -140,10 +140,6 @@ export class CheckIndComponent {
 
   public tableSelected(): boolean {
     return this.referencedTable != undefined;
-  }
-
-  public validTables(): Array<Table> {
-    return this.tables as Table[];
   }
 
   public canCheckIND(): boolean {
