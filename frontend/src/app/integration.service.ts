@@ -38,6 +38,8 @@ export class IntegrationService {
 
   private _schemas?: [Schema, Schema];
   private _currentlyEditedSide: Side = Side.left;
+
+  private thesaurus?: string;
   set currentlyEditedSide(side: Side) {
     this._currentlyEditedSide = side;
     this.schemaService.schema = this._schemas![this._currentlyEditedSide];
@@ -115,8 +117,19 @@ export class IntegrationService {
     this.baseUrl = dataService.baseUrl;
   }
 
-  public startIntegration(schemaLeft: Schema, schemaRight: Schema) {
+  /**
+   *
+   * @param schemaLeft schema to be integrated that is referred to as left schema in UI
+   * @param schemaRight schema to be integrated that is referred to as right schema in UI
+   * @param thesaurus explanation: see server/definitions/ISchemaMatchingRequest.ts
+   */
+  public startIntegration(
+    schemaLeft: Schema,
+    schemaRight: Schema,
+    thesaurus?: string
+  ) {
     this._schemas = [schemaLeft, schemaRight];
+    this.thesaurus = thesaurus;
     this._isIntegrating = true;
     this.schemaService.schema = this._schemas[this._currentlyEditedSide];
     this.getColumnMatching().then((result) => {
@@ -127,6 +140,7 @@ export class IntegrationService {
 
   stopIntegration() {
     this._isIntegrating = false;
+    this.thesaurus = undefined;
     this._currentlyEditedSide = Side.left;
   }
 
@@ -201,6 +215,7 @@ export class IntegrationService {
     const body: ISchemaMatchingRequest = {
       srcSql: srcPersister.tableCreation(srcSchema, src, true),
       targetSql: targetPersister.tableCreation(targetSchema, target, true),
+      thesaurus: this.thesaurus,
     };
     const result = await firstValueFrom(
       this.http.post<Array<ISchemaMatchingResponse>>(
