@@ -1,5 +1,3 @@
-<app-integration-bar *ngIf="intService.isIntegrating"></app-integration-bar>
-
 <div class="grid-container">
   <div class="grid-container-graphmenu">
     <button sbb-button id="reset-btn" class="me-1">Reset view</button>
@@ -11,8 +9,10 @@
     >
       Auto-normalize all tables
     </button>
+    <app-integration-bar *ngIf="intService.isIntegrating"></app-integration-bar>
     <sbb-toggle
       [(ngModel)]="schemaService.starMode"
+      *ngIf="!intService.isIntegrating"
       class="me-1"
       [disabled]="intService.isIntegrating || mergeService.isMerging"
     >
