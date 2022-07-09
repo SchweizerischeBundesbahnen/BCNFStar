@@ -31,6 +31,21 @@ export class SchemaMergingService {
   }
 
   public get links(): Array<LinkDefinition> {
+    const coveredTables: Map<BasicTable, Set<BasicTable>> = new Map();
+
+    /**
+     * Checks whether a union button exists already for this pair of tables
+     * If not, markss this pair as covered now as well
+     */
+    const isNotCoveredYet = (linkDef: LinkDefinition) => {
+      if (coveredTables.get(linkDef.source.table)?.has(linkDef.target.table))
+        return false;
+      if (!coveredTables.has(linkDef.source.table))
+        coveredTables.set(linkDef.source.table, new Set());
+      coveredTables.get(linkDef.source.table)?.add(linkDef.target.table);
+      return true;
+    };
+
     return this.intService.links
       .filter(
         (linkDef) =>
@@ -38,8 +53,8 @@ export class SchemaMergingService {
           this.combinedSchema?.tables.has(linkDef.target.table)
       )
       .map((linkDef) => {
-        const button: Partial<LinkDefinition> = {
-          tool: new joint.dia.ToolsView({
+        if (isNotCoveredYet(linkDef))
+          linkDef.tool = new joint.dia.ToolsView({
             tools: [
               new joint.linkTools.Button({
                 markup: generateButtonMarkup('join-button', '#006400', 'U'),
@@ -51,9 +66,9 @@ export class SchemaMergingService {
                   ]),
               }),
             ],
-          }),
-        };
-        return Object.assign(button, linkDef);
+          });
+
+        return linkDef;
       });
   }
 
