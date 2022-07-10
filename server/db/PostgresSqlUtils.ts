@@ -310,9 +310,8 @@ from
 
   public async getColumnSample(table: string, column: string): Promise<any> {
     const query_result = await this.pool.query<SchemaQueryRow>(
-      `SELECT ${column} from ${table} LIMIT 1000`
+      `SELECT ${column} from ${table} LIMIT 1000000`
     );
-    console.log(`SELECT ${column} from ${table} LIMIT 1000`);
     return query_result.rows;
   }
 

@@ -7,13 +7,18 @@ export default class BloomFilter {
   public bitArray: Array<boolean>;
 
   constructor(private itemCount: number, private fpp: number) {
-    this.size = this.getSize(itemCount, fpp);
-    this.hashCount = this.getHashCount(this.size, itemCount);
+    this.size = this.getSize(this.itemCount, this.fpp);
+    this.hashCount = this.getHashCount(this.size, this.itemCount);
     this.bitArray = new Array<boolean>(this.size);
-    this.bitArray.forEach((pos, index) => (this.bitArray[index] = false));
+    for (let i = 0; i < this.size; i++) {
+      this.bitArray[i] = false;
+    }
   }
 
   private getSize(n: number, p: number): number {
+    if (p <= 0) {
+      p = 4.9e-324;
+    }
     const m = (-n * Math.log(p)) / Math.log(2) ** 2;
     return Math.floor(m);
   }
@@ -24,25 +29,18 @@ export default class BloomFilter {
   }
 
   public add(item: string) {
-    let digests = [];
     for (let i = 0; i < this.hashCount; i++) {
-      const digest = murmurHash3.x86.hash128(item, i) % this.size;
-      digests.push(digest);
+      if (isNaN(parseInt(murmurHash3.x86.hash128(item, i), 16))) {
+        console.log(
+          'hash',
+          murmurHash3.x86.hash128(item, i),
+          parseInt(murmurHash3.x86.hash128(item, i), 16)
+        );
+        console.error('hash not a number');
+      }
+      const digest = parseInt(murmurHash3.x86.hash128(item, i), 16) % this.size;
       this.bitArray[digest] = true;
     }
-  }
-
-  public approximateElementCount() {
-    /**
-     * Each insertion is expected to reduce the # of clear bits by a factor of
-     * `numHashFunctions/bitSize`. So, after n insertions, expected bitCount is `bitSize * (1 - (1 -
-     * numHashFunctions/bitSize)^n)`. Solving that for n, and approximating `ln x` as `x - 1` when x
-     * is close to 1 (why?), gives the following formula.
-     */
-    const fractionOfBitsSet = this.settedBitInBitArray() / this.size;
-    return Math.round(
-      (-Math.log1p(-fractionOfBitsSet) * this.size) / this.hashCount
-    );
   }
 
   private settedBitInBitArray(): number {
@@ -56,6 +54,12 @@ export default class BloomFilter {
   }
 
   public expectedFpp(): number {
+    console.log(
+      'count: ',
+      this.settedBitInBitArray(),
+      'bitarray: ',
+      this.bitArray
+    );
     return Math.pow(this.settedBitInBitArray() / this.size, this.hashCount);
   }
 }
