@@ -80,7 +80,7 @@ app.get(
   [check("limit").isNumeric(), check("offset").isNumeric()],
   getTablePage
 );
-app.get("/indScore/metadata", getIndScoreMetadata);
+app.post("/indScore/metadata", getIndScoreMetadata);
 
 app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);

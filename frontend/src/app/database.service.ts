@@ -7,6 +7,7 @@ import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 import IRowCounts from '@server/definitions/IRowCounts';
 import IINDScoreMetadata from '@server/definitions/IINDScoreMetadata';
+import IINDScoreMetadataRequestBody from '@server/definitions/IINDScoreMetadataRequestBody';
 
 @Injectable({
   providedIn: 'root',
@@ -47,9 +48,14 @@ export class DatabaseService {
     return tables;
   }
 
-  public async getINDScoreMetadata(): Promise<IINDScoreMetadata> {
+  public async getINDScoreMetadata(
+    body: IINDScoreMetadataRequestBody
+  ): Promise<IINDScoreMetadata> {
     return await firstValueFrom(
-      this.http.get<IINDScoreMetadata>(this.baseUrl + '/indScore/metadata')
+      this.http.post<IINDScoreMetadata>(
+        this.baseUrl + '/indScore/metadata',
+        body
+      )
     );
   }
 
