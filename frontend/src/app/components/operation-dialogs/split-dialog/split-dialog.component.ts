@@ -1,9 +1,24 @@
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
+import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
+import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
+
+export interface SplitDialogResponse {
+  type: string;
+}
+
+export interface FdSplitResponse extends SplitDialogResponse {
+  fd: FunctionalDependency;
+  name: string;
+}
+
+export interface ChangeKeyResponse extends SplitDialogResponse {
+  rhs: ColumnCombination;
+}
 
 @Component({
   selector: 'app-split-dialog',
@@ -16,30 +31,38 @@ export class SplitDialogComponent {
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
 
-  public selectedColumns = new Map<Column, Boolean>();
+  public minimalDeterminants!: Array<ColumnCombination>;
+  public hull!: ColumnCombination;
+
+  public selectedColumns = new Map<Column, boolean>();
 
   public tableName: string;
 
   constructor(
     // eslint-disable-next-line no-unused-vars
-    public dialogRef: SbbDialogRef<SplitDialogComponent>,
+    public dialogRef: SbbDialogRef<
+      SplitDialogComponent,
+      FdSplitResponse | ChangeKeyResponse
+    >,
     public schemaService: SchemaService,
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA)
     data: { fd: FunctionalDependency }
   ) {
     this.fd = data.fd.copy();
-    this.updateViolations();
-    this.fd.rhs
-      .copy()
-      .setMinus(this.fd.lhs)
-      .asArray()
-      .forEach((column) => this.selectedColumns.set(column, true));
+    this.table.columns.asArray().forEach((column) => {
+      this.selectedColumns.set(column, false);
+    });
+    this.hull = this.table.hull(this.fd.lhs);
+    this.fd.rhs.asArray().forEach((column) => {
+      this.selectedColumns.set(column, true);
+    });
     this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
+    this.updateViolations();
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
   }
 
   public setColumnSelection(column: Column, value: boolean) {
@@ -49,7 +72,22 @@ export class SplitDialogComponent {
     this.updateViolations();
   }
 
+  public selectedColumnsCC() {
+    return new ColumnCombination(
+      this.table.columns
+        .asArray()
+        .filter((column) => this.selectedColumns.get(column))
+    );
+  }
+
+  public isKeyNonMinimal() {
+    return !this.minimalDeterminants.some((det) => det.equals(this.fd.lhs));
+  }
+
   public updateViolations() {
+    this.minimalDeterminants = this.table.minimalDeterminantsOf(
+      this.selectedColumnsCC()
+    );
     this.pkViolation = this.schemaService.schema.fdSplitPKViolationOf(
       this.fd,
       this.table
@@ -65,11 +103,30 @@ export class SplitDialogComponent {
       );
   }
 
+  public isFullyDetermined() {
+    return this.selectedColumnsCC().isSubsetOf(this.hull);
+  }
+
   public canConfirm() {
-    return [...this.selectedColumns.values()].some((bool) => bool);
+    return (
+      [...this.selectedColumns.values()].some((bool) => bool) &&
+      this.isFullyDetermined()
+    );
   }
 
   public confirm() {
-    this.dialogRef.close({ fd: this.fd, name: this.tableName });
+    this.dialogRef.close({
+      type: 'fdSplit',
+      fd: this.fd,
+      name: this.tableName,
+    });
+  }
+
+  public showViolations() {
+    this.schemaService.checkFd(this.table, this.fd);
+  }
+
+  public otherKey() {
+    this.dialogRef.close({ type: 'changeKey', rhs: this.fd.rhs });
   }
 }

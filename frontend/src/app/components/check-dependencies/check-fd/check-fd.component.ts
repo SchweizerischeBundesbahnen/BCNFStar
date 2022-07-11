@@ -1,13 +1,11 @@
 import Column from '@/src/model/schema/Column';
 import { Component } from '@angular/core';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { ViolatingRowsViewComponent } from '../../operation-dialogs/violating-rows-view/violating-rows-view.component';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
-import { ViolatingFDRowsDataQuery } from '../../../dataquery';
 import { SchemaService } from '@/src/app/schema.service';
-import IRowCounts from '@server/definitions/IRowCounts';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
+import Table from '@/src/model/schema/Table';
 
 @Component({
   selector: 'app-check-fd',
@@ -34,7 +32,7 @@ export class CustomFunctionalDependencySideBarComponent {
   }
 
   public get table() {
-    return this.schemaService.selectedTable!;
+    return this.schemaService.selectedTable as Table;
   }
 
   public get lhs() {
@@ -61,47 +59,16 @@ export class CustomFunctionalDependencySideBarComponent {
 
   public async checkFd(): Promise<void> {
     // only check those columns, which are not defined by existing fds
-    const rhs_copy = this.rhs.filter(
-      (c) => !this.table.hull(new ColumnCombination(this.lhs)).includes(c)
-    );
-
-    const dataQuery: ViolatingFDRowsDataQuery = new ViolatingFDRowsDataQuery(
-      this.table,
-      this.lhs,
-      rhs_copy
-    );
 
     this.isLoading = true;
-    const rowCount: IRowCounts | void = await dataQuery
-      .loadRowCount()
-      .catch((e) => {
-        console.error(e);
-      });
+    const valid = await this.schemaService.checkFd(
+      this.table,
+      new FunctionalDependency(
+        new ColumnCombination(this.lhs),
+        new ColumnCombination(this.rhs)
+      )
+    );
     this.isLoading = false;
-    if (!rowCount) {
-      this.notification.open(
-        'There was a backend error while checking this IND. Check the browser and server logs for details',
-        { type: 'error' }
-      );
-      return;
-    }
-
-    if (rowCount.entries == 0) {
-      this.isValid = true;
-      this.table.addFd(
-        new FunctionalDependency(
-          new ColumnCombination(Array.from(this.lhs)),
-          new ColumnCombination(Array.from(this.rhs))
-        )
-      );
-    } else {
-      this.isValid = false;
-      this.dialog.open(ViolatingRowsViewComponent, {
-        data: {
-          dataService: dataQuery,
-          rowCount: rowCount,
-        },
-      });
-    }
+    this.isValid = valid;
   }
 }
