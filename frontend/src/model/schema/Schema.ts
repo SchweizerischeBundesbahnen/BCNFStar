@@ -1,7 +1,6 @@
 import TableRelationship from './TableRelationship';
 import SplitCommand from '../commands/SplitCommand';
 import FunctionalDependency from './FunctionalDependency';
-import IndScore from './methodObjects/IndScore';
 import Relationship from './Relationship';
 import SourceRelationship from './SourceRelationship';
 import Table from './Table';
@@ -16,6 +15,7 @@ import ColumnsTree from './ColumnsTree';
 import DirectDimension from './methodObjects/DirectDimension';
 import SourceColumn from './SourceColumn';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
+import { IndRankingService } from '@/src/app/ind-ranking.service';
 
 export default class Schema {
   public readonly tables = new Set<Table>();
@@ -37,6 +37,8 @@ export default class Schema {
   private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
   private _starMode = false;
+
+  private indRankingService: IndRankingService = new IndRankingService();
 
   public toJSON() {
     return {
@@ -531,11 +533,7 @@ export default class Schema {
 
     table._inds = this.matchSourceRelationships(table, onlyInds);
     for (const rels of table._inds.values()) {
-      rels.sort((ind1, ind2) => {
-        const score1 = new IndScore(ind1.relationship).get();
-        const score2 = new IndScore(ind2.relationship).get();
-        return score2 - score1;
-      });
+      this.indRankingService.rankTableRelationships(rels);
     }
   }
 
