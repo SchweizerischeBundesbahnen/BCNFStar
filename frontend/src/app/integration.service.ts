@@ -129,7 +129,7 @@ export class IntegrationService {
     thesaurus?: string
   ) {
     this._schemas = [schemaLeft, schemaRight];
-    this.thesaurus = thesaurus;
+    this.thesaurus = thesaurus ?? this.thesaurus;
     this._isIntegrating = true;
     this.schemaService.schema = this._schemas[this._currentlyEditedSide];
     this.getColumnMatching().then((result) => {
@@ -140,7 +140,6 @@ export class IntegrationService {
 
   stopIntegration() {
     this._isIntegrating = false;
-    this.thesaurus = undefined;
     this._currentlyEditedSide = Side.left;
   }
 

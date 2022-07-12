@@ -107,7 +107,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
       // prevent left ports from being cut off
       marginX: this.columnHeight / 2,
       rankSep:
-        this.intService.isComparing || this.mergeService.isMerging ? 150 : 60,
+        this.intService.isComparing || this.mergeService.isMerging ? 200 : 100,
       rankDir: 'LR',
     });
 
