@@ -28,12 +28,12 @@ export default class IndScore {
   public async calculate(): Promise<number> {
     let iTableReferencing: ITable = {
       name: this.tabRel.referencingName,
-      schemaName: this.tabRel.referencing.schemaName,
+      schemaName: this.tabRel.referencingTable.schemaName,
       attributes: [],
     };
     let iTableReferenced: ITable = {
       name: this.tabRel.referencedName,
-      schemaName: this.tabRel.referenced.schemaName,
+      schemaName: this.tabRel.referencedTable.schemaName,
       attributes: [],
     };
     let colRels: IColumnRelationship[] =
