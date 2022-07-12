@@ -1,7 +1,6 @@
 import { IndRankingService } from '@/src/app/ind-ranking.service';
 import { SchemaService } from '@/src/app/schema.service';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
-import IndScore from '@/src/model/schema/methodObjects/IndScore';
 import SourceRelationship from '@/src/model/schema/SourceRelationship';
 import Table from '@/src/model/schema/Table';
 import { Component, ViewChild } from '@angular/core';

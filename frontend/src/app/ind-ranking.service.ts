@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DatabaseService } from './database.service';
 import { InjectorInstance } from './app.module';
-import TableRelationship from '../model/schema/TableRelationship';
 import IndScore from '../model/schema/methodObjects/IndScore';
 import SourceRelationship from '../model/schema/SourceRelationship';
 
