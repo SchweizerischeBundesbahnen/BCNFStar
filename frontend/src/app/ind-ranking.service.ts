@@ -3,6 +3,7 @@ import { DatabaseService } from './database.service';
 import { InjectorInstance } from './app.module';
 import TableRelationship from '../model/schema/TableRelationship';
 import IndScore from '../model/schema/methodObjects/IndScore';
+import SourceRelationship from '../model/schema/SourceRelationship';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class IndRankingService {
     this.dbService = InjectorInstance.get<DatabaseService>(DatabaseService);
   }
 
-  public rankTableRelationships(inds: TableRelationship[]): void {
+  public rankTableRelationships(inds: SourceRelationship[]): void {
     let scores: Array<Promise<number>> = [];
     inds.forEach((ind) => scores.push(new IndScore(ind, this.dbService).get()));
     Promise.all(scores).then((values) =>

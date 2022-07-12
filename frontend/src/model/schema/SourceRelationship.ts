@@ -1,14 +1,29 @@
+import Relationship from './Relationship';
 import SourceColumn from './SourceColumn';
+import Column from './Column';
+import SourceTableInstance from './SourceTableInstance';
 
 export default class SourceRelationship {
   /**
    * these arrays are linked, the column in referencing has the same index as the
    * corresponding column in referenced
    */
+
+  public relationship: Relationship;
+
   public constructor(
     private _referencingCols = new Array<SourceColumn>(),
     private _referencedCols = new Array<SourceColumn>()
-  ) {}
+  ) {
+    this.relationship = new Relationship(
+      _referencingCols.map(
+        (col) => new Column(new SourceTableInstance(col.table), col)
+      ),
+      _referencedCols.map(
+        (col) => new Column(new SourceTableInstance(col.table), col)
+      )
+    );
+  }
 
   public equals(other: SourceRelationship): boolean {
     if (this == other) return true;

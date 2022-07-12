@@ -464,9 +464,9 @@ export default class Schema {
     );
 
     table._inds = this.matchSourceRelationships(table, onlyInds);
-    for (const rels of table._inds.values()) {
-      this.indRankingService.rankTableRelationships(rels);
-    }
+    // for (const rels of table._inds.values()) {
+    //   this.indRankingService.rankTableRelationships(rels);
+    // }
   }
 
   /**

@@ -4,45 +4,46 @@ import IINDScoreMetadataRequestBody from '@server/definitions/IINDScoreMetadataR
 import { IColumnRelationship } from '@server/definitions/IRelationship';
 import ITable from '@server/definitions/ITable';
 import ColumnCombination from '../ColumnCombination';
-import TableRelationship from '../TableRelationship';
+import SourceRelationship from '../SourceRelationship';
 
 export default class IndScore {
-  private tabRel: TableRelationship;
+  private rel: SourceRelationship;
   protected dataService: DatabaseService;
 
   public constructor(
-    relationship: TableRelationship,
+    relationship: SourceRelationship,
     dbService: DatabaseService
   ) {
-    this.tabRel = relationship;
+    this.rel = relationship;
     this.dataService = dbService;
   }
 
   public async get(): Promise<number> {
-    if (!this.tabRel.relationship._score) {
-      this.tabRel.relationship._score = await this.calculate();
+    if (!this.rel.relationship._score) {
+      this.rel.relationship._score = await this.calculate();
     }
-    return this.tabRel.relationship._score;
+    return this.rel.relationship._score;
   }
 
   public async calculate(): Promise<number> {
     let iTableReferencing: ITable = {
-      name: this.tabRel.referencingName,
-      schemaName: this.tabRel.referencingTable.schemaName,
+      name: this.rel.referencingCols[0].table.name,
+      schemaName: this.rel.referencingCols[0].table.schemaName,
       attributes: [],
     };
     let iTableReferenced: ITable = {
-      name: this.tabRel.referencedName,
-      schemaName: this.tabRel.referencedTable.schemaName,
+      name: this.rel.referencedCols[0].table.name,
+      schemaName: this.rel.referencedCols[0].table.schemaName,
       attributes: [],
     };
-    let colRels: IColumnRelationship[] =
-      this.tabRel.relationship.referencing.map((col, i) => {
+    let colRels: IColumnRelationship[] = this.rel.relationship.referencing.map(
+      (col, i) => {
         return {
           referencingColumn: col.name,
-          referencedColumn: this.tabRel.relationship.referenced[i].name,
+          referencedColumn: this.rel.relationship.referenced[i].name,
         } as IColumnRelationship;
-      });
+      }
+    );
     let body: IINDScoreMetadataRequestBody = {
       tableReferencing: iTableReferencing,
       tableReferenced: iTableReferenced,
@@ -67,8 +68,8 @@ export default class IndScore {
   public keyIdScore(): number {
     let sum = 0;
     for (let cc of [
-      new ColumnCombination(this.tabRel.relationship.referenced),
-      new ColumnCombination(this.tabRel.relationship.referencing),
+      new ColumnCombination(this.rel.relationship.referenced),
+      new ColumnCombination(this.rel.relationship.referencing),
     ]) {
       sum += cc
         .columnNames()
@@ -78,7 +79,7 @@ export default class IndScore {
             String(name).toLowerCase().includes('id')
         ).length;
     }
-    return sum / (this.tabRel.relationship.referenced.length * 2);
+    return sum / (this.rel.relationship.referenced.length * 2);
   }
 
   /**
@@ -87,18 +88,18 @@ export default class IndScore {
    */
   public matchingScore(): number {
     let sum = 0;
-    new ColumnCombination(this.tabRel.relationship.referenced)
+    new ColumnCombination(this.rel.relationship.referenced)
       .columnNames()
       .forEach((name) => {
         let minDist = 1;
-        new ColumnCombination(this.tabRel.relationship.referencing)
+        new ColumnCombination(this.rel.relationship.referencing)
           .columnNames()
           .forEach((name2) => {
             minDist = Math.min(minDist, this.levenshteinDistance(name, name2));
           });
         sum += 1 - minDist;
       });
-    return sum / this.tabRel.relationship.referenced.length;
+    return sum / this.rel.relationship.referenced.length;
   }
 
   /**

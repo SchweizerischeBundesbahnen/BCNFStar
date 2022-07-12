@@ -1,3 +1,4 @@
+import { IndRankingService } from '@/src/app/ind-ranking.service';
 import { SchemaService } from '@/src/app/schema.service';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import IndScore from '@/src/model/schema/methodObjects/IndScore';
@@ -15,6 +16,7 @@ export class ForeignKeysComponent {
   public indFilter = this.tablesAsArray();
   @ViewChild('indSelection', { read: SbbRadioGroup })
   private indSelectionGroup!: SbbRadioGroup;
+  private indRankingService: IndRankingService = new IndRankingService();
 
   constructor(public schemaService: SchemaService) {
     this.schemaService.schemaChanged.subscribe(() => {
@@ -62,21 +64,24 @@ export class ForeignKeysComponent {
   public inds(): Array<SourceRelationship> {
     const inds = this.schemaService.schema.indsOf(this.table);
 
-    return Array.from(inds.keys())
-      .filter((sourceRel) =>
-        inds
-          .get(sourceRel)!
-          .some((ind) => this.indFilter.includes(ind.referencedTable))
-      )
-      .sort((sourceRel1, sourceRel2) => {
-        const score1 = new IndScore(
-          inds.get(sourceRel1)![0].relationship
-        ).get();
-        const score2 = new IndScore(
-          inds.get(sourceRel2)![0].relationship
-        ).get();
-        return score2 - score1;
-      });
+    let ar = Array.from(inds.keys()).filter((sourceRel) =>
+      inds
+        .get(sourceRel)!
+        .some((ind) => this.indFilter.includes(ind.referencedTable))
+    );
+    this.indRankingService.rankTableRelationships(ar);
+
+    return ar;
+
+    // .sort((sourceRel1, sourceRel2) => {
+    //   const score1 = new IndScore(
+    //     inds.get(sourceRel1)![0].relationship
+    //   ).get();
+    //   const score2 = new IndScore(
+    //     inds.get(sourceRel2)![0].relationship
+    //   ).get();
+    //   return score2 - score1;
+    // });
   }
 
   public transformIndToFk(): void {
