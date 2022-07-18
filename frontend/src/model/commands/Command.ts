@@ -1,10 +1,10 @@
-export default abstract class Command {
+export default class Command {
   public onDo: Function = function () {};
   public onUndo: Function = function () {};
 
-  protected abstract _do(): void;
-  protected abstract _undo(): void;
-  protected abstract _redo(): void;
+  protected _do(): void {}
+  protected _undo(): void {}
+  protected _redo(): void {}
 
   public do(): void {
     this._do();

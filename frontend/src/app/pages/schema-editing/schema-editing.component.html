@@ -4,6 +4,7 @@
     <button
       type="button"
       sbb-button
+      *ngIf="!mergeService.isMerging"
       (click)="schemaService.autoNormalize()"
       class="me-1"
     >
@@ -12,7 +13,7 @@
     <app-integration-bar *ngIf="intService.isIntegrating"></app-integration-bar>
     <sbb-toggle
       [(ngModel)]="schemaService.starMode"
-      *ngIf="!intService.isIntegrating"
+      *ngIf="!intService.isIntegrating && !mergeService.isMerging"
       class="me-1"
       [disabled]="intService.isIntegrating || mergeService.isMerging"
     >

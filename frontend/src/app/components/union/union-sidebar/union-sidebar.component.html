@@ -1,4 +1,7 @@
-<div *ngIf="!intService.isIntegrating; else intModeMessage">
+<div
+  *ngIf="!intService.isIntegrating; else intModeMessage"
+  class="union-sidebar-grid"
+>
   <sbb-select
     id="unionTableSelection"
     placeholder="Select table to union with"

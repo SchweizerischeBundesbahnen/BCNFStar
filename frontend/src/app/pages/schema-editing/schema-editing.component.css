@@ -3,6 +3,10 @@ element::-webkit-scrollbar {
   /* for Chrome, Safari, and Opera */
 }
 
+app-union-sidebar {
+  margin: 1rem;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: calc(66.66% - 2px) calc(33.33% - 2px);
