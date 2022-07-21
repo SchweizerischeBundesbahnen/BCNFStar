@@ -29,7 +29,6 @@ import { ViolatingRowsViewComponent } from './components/operation-dialogs/viola
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -65,11 +64,11 @@ export class SchemaService {
   public highlightedColumns?: Map<BasicTable, ColumnCombination>;
 
   public get starMode() {
-    return this.schema.__starMode
+    return this.schema.__starMode;
   }
-  
+
   public set starMode(mode: boolean) {
-    this.schema.__starMode = this.starMode;
+    this.schema.__starMode = mode;
     this.notifyAboutSchemaChanges();
   }
 
