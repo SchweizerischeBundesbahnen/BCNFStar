@@ -264,15 +264,12 @@ from
     columns: Array<string>
   ): Promise<any> {
     const stringColumns = columns.map((col) => '"' + col + '"').join(",");
-    // console.log(`SELECT SUM(redundance)
-    // FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
-    // WHERE redundance != 1`)
     const query_result = await this.pool.query<SchemaQueryRow>(
       `SELECT SUM(redundance)
       FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
       WHERE redundance != 1`
     );
-    // console.log(query_result)
+
     return query_result.rows;
   }
 
@@ -310,7 +307,7 @@ from
 
   public async getColumnSample(table: string, column: string): Promise<any> {
     const query_result = await this.pool.query<SchemaQueryRow>(
-      `SELECT ${column} from ${table} LIMIT 1000000`
+      `SELECT ${column} from ${table} LIMIT 5000000`
     );
     return query_result.rows;
   }

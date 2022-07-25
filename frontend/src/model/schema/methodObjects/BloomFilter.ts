@@ -54,12 +54,6 @@ export default class BloomFilter {
   }
 
   public expectedFpp(): number {
-    console.log(
-      'count: ',
-      this.settedBitInBitArray(),
-      'bitarray: ',
-      this.bitArray
-    );
     return Math.pow(this.settedBitInBitArray() / this.size, this.hashCount);
   }
 }

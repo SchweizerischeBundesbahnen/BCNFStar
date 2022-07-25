@@ -3,7 +3,7 @@ import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
-import FdScore from './methodObjects/FdScore';
+import FdScore, { defaultRankingWeights } from './methodObjects/FdScore';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
@@ -61,18 +61,19 @@ export default class Table extends BasicTable {
 
   // TODO: wo muss überall aufgerufen werden
   public calculateColumnMatching() {
-    for (let column of this.columns) {
-      for (let otherColumn of this.columns) {
-        this.columnNameMatchings.set(
-          { col: column.sourceColumn, otherCol: otherColumn.sourceColumn },
-          new JaroWinklerDistance(
-            column.sourceColumn.name,
-            otherColumn.sourceColumn.name
-          ).get()
-        );
+    if (defaultRankingWeights.similarity) {
+      for (let column of this.columns) {
+        for (let otherColumn of this.columns) {
+          this.columnNameMatchings.set(
+            { col: column.sourceColumn, otherCol: otherColumn.sourceColumn },
+            new JaroWinklerDistance(
+              column.sourceColumn.name,
+              otherColumn.sourceColumn.name
+            ).get()
+          );
+        }
       }
     }
-    // console.log('columnNameMatchings', this.columnNameMatchings);
   }
 
   public static fromITable(iTable: ITable, rowCount: number): Table {
@@ -120,6 +121,7 @@ export default class Table extends BasicTable {
     table.schemaName = '';
     table.rowCount = rowCount;
     table.calculateColumnMatching();
+
     return table;
   }
 
@@ -480,12 +482,7 @@ export default class Table extends BasicTable {
   private scoreFdInFdClusters(fdClusters: Array<FdCluster>): Array<FdCluster> {
     fdClusters.forEach((cluster) =>
       cluster.fds.forEach((fd) => {
-        // console.log(
-        //   "lhs" + fd.lhs.asArray().map((col) => col.name) + "\n" +
-        //   "rhs" + fd.rhs.asArray().map((col) => col.name) + "\n"
-        // );
         new FdScore(this, fd).get();
-        // console.log("\n")
       })
     );
     return fdClusters;

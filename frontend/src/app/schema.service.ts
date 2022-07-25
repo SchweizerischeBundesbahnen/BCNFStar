@@ -29,6 +29,7 @@ import { unionSpec } from './components/union/union-sidebar/union-sidebar.compon
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DatabaseService } from './database.service';
+import { defaultRankingWeights } from '../model/schema/methodObjects/FdScore';
 
 @Injectable({
   providedIn: 'root',
@@ -285,76 +286,62 @@ export class SchemaService {
   }
 
   public async resetDataForRedundanceRanking(tables: Array<Table>) {
-    console.log('resetRadundance', tables);
-    // let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
-    //   Promise<number>
-    // >();
-    // let fdUniqueTuplesLhsPromises: Array<Promise<number>> = new Array<
-    //   Promise<number>
-    // >();
-    // let fdUniqueTuplesRhsPromises: Array<Promise<number>> = new Array<
-    //   Promise<number>
-    // >();
-    // tables.forEach((table) => {
-    //   console.log('cluster', table.fdClusters());
-    //   table.fdClusters().forEach((cluster) => {
-    // fdRedundantTuplePromises.push(
-    //   this.dataService.getRedundanceByValueCombinations(
-    //     table,
-    //     cluster.fds[0].lhs.asArray()
-    //   )
-    // );
-    // fdUniqueTuplesLhsPromises.push(
-    //   this.dataService.getUniqueTuplesOfValueCombinations(
-    //     table,
-    //     cluster.fds[0].lhs.asArray()
-    //   )
-    // );
-    // fdUniqueTuplesRhsPromises.push(
-    //   this.dataService.getUniqueTuplesOfValueCombinations(
-    //     table,
-    //     cluster.fds[0].lhs.asArray()
-    //   )
-    // );
-    //   });
-    // });
-    // console.log(
-    //   'länngen:',
-    //   fdRedundantTuplePromises.length,
-    //   fdUniqueTuplesLhsPromises.length
-    // );
-    // let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
-    // console.log(resultRedundantTuples);
-    // tables.forEach((table) => {
-    //   table.fdClusters().forEach((cluster, index) =>
-    //     cluster.fds.forEach((fd) => {
-    //       fd._redundantTuples = resultRedundantTuples[index];
-    //       console.log(fd, resultRedundantTuples[index]);
-    //     })
-    //   );
-    // });
-    // let resultUniqueTuplesLhs = await Promise.all(fdUniqueTuplesLhsPromises);
-    // console.log(resultUniqueTuplesLhs);
-    // tables.forEach((table) => {
-    //   table.fdClusters().forEach((cluster, index) =>
-    //     cluster.fds.forEach((fd) => {
-    //       fd._uniqueTuplesLhs = resultUniqueTuplesLhs[index];
-    //       console.log(fd, resultUniqueTuplesLhs[index]);
-    //     })
-    //   );
-    // });
-    // // let resultUniqueTuplesRhs = await Promise.all(
-    // //   fdUniqueTuplesRhsPromises
-    // // );
-    // // console.log(resultUniqueTuplesRhs);
-    // // tables.forEach((table) => {
-    // //   table.fdClusters().forEach((cluster, index) =>
-    // //     cluster.fds.forEach((fd) => {
-    // //       fd._uniqueTuplesRhs = resultUniqueTuplesRhs[index];
-    // //       console.log(fd, resultUniqueTuplesRhs[index]);
-    // //     })
-    // //   );
-    // // });
+    let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
+      Promise<number>
+    >();
+    let fdUniqueTuplesLhsPromises: Array<Promise<number>> = new Array<
+      Promise<number>
+    >();
+
+    if (
+      defaultRankingWeights.redundanceTeam > 0 ||
+      defaultRankingWeights.redundanceWeiLink > 0
+    ) {
+      tables.forEach((table) => {
+        table.fdClusters().forEach((cluster) => {
+          if (defaultRankingWeights.redundanceTeam > 0) {
+            fdUniqueTuplesLhsPromises.push(
+              this.dataService.getUniqueTuplesOfValueCombinations(
+                table,
+                cluster.fds[0].lhs.asArray()
+              )
+            );
+          }
+          if (defaultRankingWeights.redundanceWeiLink > 0) {
+            fdRedundantTuplePromises.push(
+              this.dataService.getRedundanceByValueCombinations(
+                table,
+                cluster.fds[0].lhs.asArray()
+              )
+            );
+          }
+        });
+      });
+
+      if (defaultRankingWeights.redundanceTeam) {
+        let resultUniqueTuplesLhs = await Promise.all(
+          fdUniqueTuplesLhsPromises
+        );
+        tables.forEach((table) => {
+          table.fdClusters().forEach((cluster, index) =>
+            cluster.fds.forEach((fd) => {
+              fd._uniqueTuplesLhs = resultUniqueTuplesLhs[index];
+            })
+          );
+        });
+      }
+
+      if (defaultRankingWeights.redundanceWeiLink > 0) {
+        let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
+        tables.forEach((table) => {
+          table.fdClusters().forEach((cluster, index) =>
+            cluster.fds.forEach((fd) => {
+              fd._redundantTuples = resultRedundantTuples[index];
+            })
+          );
+        });
+      }
+    }
   }
 
   public canUndo() {

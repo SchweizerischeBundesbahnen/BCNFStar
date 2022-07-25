@@ -2,6 +2,32 @@ import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Table from '../Table';
 
+interface RankingWeigths {
+  length: number;
+  keyValue: number;
+  position: number;
+  redundanceTeam: number;
+  redundanceWeiLink: number;
+  redundanceMetanome: number;
+  similarity: number;
+}
+
+/* 
+  COSTUMIZE YOUR RANKING:
+  uses only keyValue ranking by default
+  every attrubute should be >= 0 and smaller <= 1
+  in sum all attributes should be 1
+*/
+export const defaultRankingWeights: RankingWeigths = {
+  length: 0,
+  keyValue: 1,
+  position: 0,
+  redundanceTeam: 0,
+  redundanceWeiLink: 0,
+  redundanceMetanome: 0,
+  similarity: 0,
+};
+
 export default class FdScore {
   private table: Table;
   private fd: FunctionalDependency;
@@ -29,26 +55,22 @@ export default class FdScore {
       position: this.fdPositionScore(),
       redundanceTeam: this.fdRedundanceScoreTeam(),
       redundanceWeiLink: this.fdRedundanceScoreWeiLink(),
+      redundanceMetanome: this.fdRedundanceScoreMetanome(),
       similarity: this.fdSimilarityScore(),
     };
   }
 
   private calculate(): number {
-    // console.log("length: ", this.fdLengthScore());
-    // console.log("keyvalue: ", this.fdKeyValueScore());
-    // console.log("position: ", this.fdPositionScore());
-    // console.log("redundance naumann: ", this.fdRedundanceScoreNaumann());
-    // console.log("redundance link: ", this.fdRedundanceScoreWeiLink());
-    // console.log("similarity: ", this.fdSimilarityScore());
-    //TODO: change score for fds with NULL values to zero
     return (
-      // (this.fdLengthScore() +
-      //   this.fdKeyValueScore() +
-      //   this.fdPositionScore() +
-      //   this.fdRedundanceScoreTeam() +
-      //   this.fdSimilarityScore()) /
-      // 5
-      this.fdRedundanceScoreMetanome()
+      defaultRankingWeights.length * this.fdLengthScore() +
+      defaultRankingWeights.keyValue * this.fdKeyValueScore() +
+      defaultRankingWeights.position * this.fdPositionScore() +
+      defaultRankingWeights.redundanceTeam * this.fdRedundanceScoreTeam() +
+      defaultRankingWeights.redundanceWeiLink *
+        this.fdRedundanceScoreWeiLink() +
+      defaultRankingWeights.redundanceMetanome *
+        this.fdRedundanceScoreMetanome() +
+      defaultRankingWeights.similarity * this.fdSimilarityScore()
     );
   }
 
@@ -145,7 +167,6 @@ export default class FdScore {
     const simRhs = this.averageSimilarityForCC(
       this.fd.rhs.copy().setMinus(this.fd.lhs)
     );
-    // console.log(simLhs, simRhs);
     return (simLhs + simRhs) / 2;
   }
 
@@ -158,7 +179,6 @@ export default class FdScore {
     let countDistances = 0;
     for (let i = 0; i < fdSideArray.length; i++) {
       for (let j = i + 1; j < fdSideArray.length; j++) {
-        // console.log(fdSideArray[i].name, fdSideArray[j].name);
         const key = Array.from(this.table.columnNameMatchings.keys()).find(
           (key) =>
             key.col.equals(fdSideArray[i].sourceColumn) &&

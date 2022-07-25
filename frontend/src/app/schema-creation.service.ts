@@ -14,6 +14,7 @@ import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import { DatabaseService } from './database.service';
 import { SchemaService } from './schema.service';
+import { defaultRankingWeights } from '../model/schema/methodObjects/FdScore';
 
 @Injectable({
   providedIn: 'root',
@@ -160,43 +161,47 @@ export class SchemaCreationService {
   }
 
   private async getMaxValueOf(tables: Array<Table>) {
-    let maxValuePromises = new Map<Column, Promise<number>>();
-    for (const table of tables) {
-      table.columns.asArray().forEach((col) => {
-        maxValuePromises.set(
-          col,
-          firstValueFrom(
-            this.http.get<number>(
-              this.dataService.baseUrl +
-                `/maxValue/column?tableName=${table.fullName}&&columnName=${col.name}`
+    if (defaultRankingWeights.keyValue > 0) {
+      let maxValuePromises = new Map<Column, Promise<number>>();
+      for (const table of tables) {
+        table.columns.asArray().forEach((col) => {
+          maxValuePromises.set(
+            col,
+            firstValueFrom(
+              this.http.get<number>(
+                this.dataService.baseUrl +
+                  `/maxValue/column?tableName=${table.fullName}&&columnName=${col.name}`
+              )
             )
-          )
-        );
-      });
-    }
+          );
+        });
+      }
 
-    for (const [col, promise] of maxValuePromises.entries()) {
-      col.maxValue = await promise;
+      for (const [col, promise] of maxValuePromises.entries()) {
+        col.maxValue = await promise;
+      }
     }
   }
 
   private async getColumnSamples(tables: Array<Table>) {
-    let samplePromises = new Map<Column, Promise<Array<string>>>();
-    tables.forEach((table) => {
-      Array.from(table.columns).forEach((col) => {
-        samplePromises.set(
-          col,
-          firstValueFrom(
-            this.http.get<Array<string>>(
-              this.dataService.baseUrl +
-                `/samples?tableName=${table.fullName}&&columnName=${col.name}`
+    if (defaultRankingWeights.redundanceMetanome > 0) {
+      let samplePromises = new Map<Column, Promise<Array<string>>>();
+      tables.forEach((table) => {
+        Array.from(table.columns).forEach((col) => {
+          samplePromises.set(
+            col,
+            firstValueFrom(
+              this.http.get<Array<string>>(
+                this.dataService.baseUrl +
+                  `/samples?tableName=${table.fullName}&&columnName=${col.name}`
+              )
             )
-          )
-        );
+          );
+        });
       });
-    });
-    for (const [col, promise] of samplePromises.entries()) {
-      col.setBloomFilterFpp(await promise);
+      for (const [col, promise] of samplePromises.entries()) {
+        col.setBloomFilterFpp(await promise);
+      }
     }
   }
 

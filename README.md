@@ -86,6 +86,10 @@ to create docker containers for redis and BCNFStar.
 
 You can open BCNFStar on `http://localhost/#/`.
 
+### Configure FD-Ranking
+
+To better assess the subject-specific correctness of functional dependencies, the functional dependencies can be evaluated using various ranking approaches. The defaultRankingWeights constant in the [FdScore.ts](frontend/src/model/schema/methodObjects/FdScore.ts) file can be used to specify whether and to what extent a ranking approach is included in the overall ranking calculation. By default, only the keyValue ranking is used. The attributes of defaultRankingWeights may only have values between 0 and 1 and the sum of all attributes must be 1.
+
 ### Troubleshooting
 
 Something doesn't work? Always try to run `npm install && npm run build` first.

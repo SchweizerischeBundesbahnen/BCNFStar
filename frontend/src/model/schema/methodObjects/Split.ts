@@ -35,7 +35,6 @@ export default class Split {
 
     // update rowCount for redundance ranking
     remaining.rowCount = this.table.rowCount;
-    console.log('split: ', this.fd);
     generating.rowCount = this.fd._uniqueTuplesLhs;
 
     this.substitute(generating, this.fd.lhs);

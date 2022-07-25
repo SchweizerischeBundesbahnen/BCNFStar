@@ -24,12 +24,10 @@ export default class Column implements BasicColumn {
   }
 
   public setBloomFilterFpp(sample: Array<string>) {
-    console.log(this.name, sample);
-    let bf = new BloomFilter(Math.min(sample.length, 1000000), 0.5);
+    let bf = new BloomFilter(sample.length, 0.5);
     sample.forEach((e) => bf.add(e ? e.toString() : 'null'));
 
     this._bloomFilterExpectedFpp = bf.expectedFpp();
-    console.log('FPP:', this._bloomFilterExpectedFpp);
   }
 
   public get maxValue() {
