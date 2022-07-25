@@ -28,9 +28,8 @@ export class GraphElementComponent implements OnInit {
       this.schemaService.schema.directDimensionableRoutes(this.table, true)
         .length > 0;
     this.isFact = this.schemaService.schema.isFact(this.table, true);
-    this.isDirectDimension = this.schemaService.schema.isDirectDimension(
-      this.table
-    );
+    this.isDirectDimension =
+      !this.isFact && this.schemaService.schema.isDirectDimension(this.table);
     this.isIndirectDimension = !this.isFact && !this.isDirectDimension;
     this.isPotentialFact =
       !this.isFact && this.schemaService.schema.isPotentialFact(this.table);
