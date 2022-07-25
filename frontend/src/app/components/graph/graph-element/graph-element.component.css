@@ -27,6 +27,23 @@
   line-height: unset;
 }
 
+#makeDirectDimension {
+  left: 10px;
+  top: 3px;
+  background-color: green;
+}
+
+#potentialFact {
+  left: 35px;
+  top: 3px;
+  background-color: blue;
+}
+
+#potentialFactTooltip {
+  display: flex;
+  justify-content: space-evenly;
+}
+
 .fact {
   background-color: #ffde1577 !important;
 }
