@@ -139,14 +139,12 @@ export default class PostgresSqlUtils extends SqlUtils {
   public override async testKeyUnionability(
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability> {
-    const table1: string = await this.createTempTable(t.table1Sql);
-    const table2: string = await this.createTempTable(t.table2Sql);
+    const table: string = await this.createTempTable(t.tableSql);
 
-    const _sql: string = this.testKeyUnionabilitySql(t, table1, table2);
+    const _sql: string = this.testKeyUnionabilitySql(table, t.key);
     const result = await this.pool.query<{ count: number }>(_sql);
 
-    await this.dropTempTable(table1);
-    await this.dropTempTable(table2);
+    await this.dropTempTable(table);
 
     if (result.rows[0].count == 0) return KeyUnionability.allowed;
     return KeyUnionability.forbidden;
