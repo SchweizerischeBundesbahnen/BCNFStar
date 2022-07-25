@@ -35,16 +35,12 @@
   background-color: #f27e0077 !important;
 }
 
-.dimension {
+.indirect-dimension {
   background-color: #e84e10df !important;
 }
 
 .pk {
   text-decoration: underline;
-}
-
-.fact-col {
-  font-weight: bold;
 }
 
 .fk {

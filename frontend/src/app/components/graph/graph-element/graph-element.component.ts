@@ -35,21 +35,6 @@ export class GraphElementComponent {
     return this.schemaService.schema.isFkColumn(this.table, column);
   }
 
-  public isFactColumn(column: BasicColumn) {
-    if (!this.isFact()) return false;
-    return (
-      !this.isFkColumn(column) &&
-      !(
-        this.table instanceof Table &&
-        this.table.implementsSurrogateKey() &&
-        column.name == this.table.surrogateKey
-      ) &&
-      !(
-        this.table instanceof Table && this.table.pk?.includes(column as Column)
-      )
-    );
-  }
-
   public isHighlightedColumn(column: BasicColumn): boolean {
     if (!(column instanceof Column) || !this.schemaService.highlightedColumns)
       return false;
@@ -75,7 +60,7 @@ export class GraphElementComponent {
     );
   }
 
-  public isDimension(): boolean {
+  public isIndirectDimension(): boolean {
     return (
       this.schemaService.starMode &&
       !this.schemaService.schema.isFact(this.table, true) &&

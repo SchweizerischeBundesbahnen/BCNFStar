@@ -24,7 +24,7 @@
     [ngClass]="{
       fact: isFact(),
       'direct-dimension': isDirectDimension(),
-      dimension: isDimension(),
+      'indirect-dimension': isIndirectDimension(),
       'table-head-highlight': schemaService.selectedTable === table
     }"
   >
@@ -41,7 +41,6 @@
       [ngClass]="{
         pk: isPkColumn(column),
         fk: isFkColumn(column),
-        'fact-col': isFactColumn(column),
         highlighted: isHighlightedColumn(column)
       }"
       class="ellipsis"
