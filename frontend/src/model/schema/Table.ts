@@ -3,7 +3,7 @@ import ColumnCombination from './ColumnCombination';
 import FunctionalDependency from './FunctionalDependency';
 import ITable from '@server/definitions/ITable';
 import Relationship from './Relationship';
-import FdScore, { defaultRankingWeights } from './methodObjects/FdScore';
+import FdScore from './methodObjects/FdScore';
 import SourceTable from './SourceTable';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
@@ -51,6 +51,7 @@ export default class Table extends BasicTable {
       relationships: this.relationships,
       sources: this.sources,
       rowCount: this.rowCount,
+      // fds: this.fds
     };
   }
 
@@ -59,19 +60,16 @@ export default class Table extends BasicTable {
     this.columns = columns || new ColumnCombination();
   }
 
-  // TODO: wo muss überall aufgerufen werden
   public calculateColumnMatching() {
-    if (defaultRankingWeights.similarity) {
-      for (let column of this.columns) {
-        for (let otherColumn of this.columns) {
-          this.columnNameMatchings.set(
-            { col: column.sourceColumn, otherCol: otherColumn.sourceColumn },
-            new JaroWinklerDistance(
-              column.sourceColumn.name,
-              otherColumn.sourceColumn.name
-            ).get()
-          );
-        }
+    for (let column of this.columns) {
+      for (let otherColumn of this.columns) {
+        this.columnNameMatchings.set(
+          { col: column.sourceColumn, otherCol: otherColumn.sourceColumn },
+          new JaroWinklerDistance(
+            column.sourceColumn.name,
+            otherColumn.sourceColumn.name
+          ).get()
+        );
       }
     }
   }
@@ -475,7 +473,6 @@ export default class Table extends BasicTable {
         cluster.fds.sort((fd1, fd2) => (fd2._score || 0) - (fd1._score || 0))
       );
     }
-    console.log(this._fdClusters);
     return this._fdClusters;
   }
 

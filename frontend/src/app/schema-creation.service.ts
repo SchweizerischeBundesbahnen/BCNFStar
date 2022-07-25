@@ -14,7 +14,6 @@ import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import { DatabaseService } from './database.service';
 import { SchemaService } from './schema.service';
-import { defaultRankingWeights } from '../model/schema/methodObjects/FdScore';
 
 @Injectable({
   providedIn: 'root',
@@ -161,7 +160,7 @@ export class SchemaCreationService {
   }
 
   private async getMaxValueOf(tables: Array<Table>) {
-    if (defaultRankingWeights.keyValue > 0) {
+    if ((window as any).DEFAULT_RANKING_WEIGHTS.keyValue > 0) {
       let maxValuePromises = new Map<Column, Promise<number>>();
       for (const table of tables) {
         table.columns.asArray().forEach((col) => {
@@ -184,7 +183,7 @@ export class SchemaCreationService {
   }
 
   private async getColumnSamples(tables: Array<Table>) {
-    if (defaultRankingWeights.redundanceMetanome > 0) {
+    if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome > 0) {
       let samplePromises = new Map<Column, Promise<Array<string>>>();
       tables.forEach((table) => {
         Array.from(table.columns).forEach((col) => {

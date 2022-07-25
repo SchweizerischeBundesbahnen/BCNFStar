@@ -36,6 +36,6 @@ describe("Bloomfilter", () => {
     bloomFilter.add("Luna");
     bloomFilter.add("Kiara");
 
-    expect(bloomFilter.expectedFpp()).to.equal(0.0625);
+    expect(bloomFilter.expectedFpp()).to.equal(0.0029916118921497177);
   });
 });

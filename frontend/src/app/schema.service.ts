@@ -29,7 +29,6 @@ import { unionSpec } from './components/union/union-sidebar/union-sidebar.compon
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DatabaseService } from './database.service';
-import { defaultRankingWeights } from '../model/schema/methodObjects/FdScore';
 
 @Injectable({
   providedIn: 'root',
@@ -294,12 +293,12 @@ export class SchemaService {
     >();
 
     if (
-      defaultRankingWeights.redundanceTeam > 0 ||
-      defaultRankingWeights.redundanceWeiLink > 0
+      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam > 0 ||
+      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink > 0
     ) {
       tables.forEach((table) => {
         table.fdClusters().forEach((cluster) => {
-          if (defaultRankingWeights.redundanceTeam > 0) {
+          if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam > 0) {
             fdUniqueTuplesLhsPromises.push(
               this.dataService.getUniqueTuplesOfValueCombinations(
                 table,
@@ -307,7 +306,7 @@ export class SchemaService {
               )
             );
           }
-          if (defaultRankingWeights.redundanceWeiLink > 0) {
+          if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink > 0) {
             fdRedundantTuplePromises.push(
               this.dataService.getRedundanceByValueCombinations(
                 table,
@@ -318,7 +317,7 @@ export class SchemaService {
         });
       });
 
-      if (defaultRankingWeights.redundanceTeam) {
+      if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam) {
         let resultUniqueTuplesLhs = await Promise.all(
           fdUniqueTuplesLhsPromises
         );
@@ -331,7 +330,7 @@ export class SchemaService {
         });
       }
 
-      if (defaultRankingWeights.redundanceWeiLink > 0) {
+      if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink > 0) {
         let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
         tables.forEach((table) => {
           table.fdClusters().forEach((cluster, index) =>
@@ -364,6 +363,6 @@ export class SchemaService {
 
   private notifyAboutSchemaChanges() {
     this._schemaChanged.next();
-    console.log('schema: ', this.schema.tables);
+    console.log('schema: ', this.schema);
   }
 }

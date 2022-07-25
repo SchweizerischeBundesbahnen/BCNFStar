@@ -23,6 +23,10 @@ export default class Column implements BasicColumn {
     return this._bloomFilterExpectedFpp;
   }
 
+  public set bloomFilterExpectedFpp(num: number) {
+    this._bloomFilterExpectedFpp = num;
+  }
+
   public setBloomFilterFpp(sample: Array<string>) {
     let bf = new BloomFilter(sample.length, 0.5);
     sample.forEach((e) => bf.add(e ? e.toString() : 'null'));

@@ -7,6 +7,16 @@ describe("FdScore", () => {
   let table: Table;
 
   beforeEach(() => {
+    (window as any).DEFAULT_RANKING_WEIGHTS = {
+      length: 1 / 7,
+      keyValue: 1 / 7,
+      position: 1 / 7,
+      redundanceTeam: 1 / 7,
+      redundanceWeiLink: 1 / 7,
+      redundanceMetanome: 1 / 7,
+      similarity: 1 / 7,
+    };
+
     table = Table.fromColumnNames(
       ["p_A", "p_B", "c_C", "c_D", "c_E"],
       "table1",
@@ -77,14 +87,14 @@ describe("FdScore", () => {
     ).to.equal(0);
   });
 
-  // it("calculates redundance metanome score correct", () => {
-  //   expect(new FdScore(table, table.fds[0]).testingScore().redundanceMetanome).to.equal(
-  //     0.4
-  //   );
-  //   expect(new FdScore(table, table.fds[1]).testingScore().redundanceMetanome).to.equal(
-  //     0
-  //   );
-  // });
+  it("calculates redundance metanome score correct", () => {
+    expect(
+      new FdScore(table, table.fds[0]).testingScore().redundanceMetanome
+    ).to.equal(1);
+    expect(
+      new FdScore(table, table.fds[1]).testingScore().redundanceMetanome
+    ).to.equal(1);
+  });
 
   it("calculates redundance wei link score correct", () => {
     expect(

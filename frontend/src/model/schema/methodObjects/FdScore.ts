@@ -2,29 +2,19 @@ import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Table from '../Table';
 
-interface RankingWeigths {
-  length: number;
-  keyValue: number;
-  position: number;
-  redundanceTeam: number;
-  redundanceWeiLink: number;
-  redundanceMetanome: number;
-  similarity: number;
-}
-
 /* 
   COSTUMIZE YOUR RANKING:
   uses only keyValue ranking by default
   every attrubute should be >= 0 and smaller <= 1
   in sum all attributes should be 1
 */
-export const defaultRankingWeights: RankingWeigths = {
+(window as any).DEFAULT_RANKING_WEIGHTS = {
   length: 0,
-  keyValue: 1,
+  keyValue: 0,
   position: 0,
-  redundanceTeam: 0,
-  redundanceWeiLink: 0,
-  redundanceMetanome: 0,
+  redundanceTeam: 0.5,
+  redundanceWeiLink: 0.25,
+  redundanceMetanome: 0.25,
   similarity: 0,
 };
 
@@ -62,15 +52,19 @@ export default class FdScore {
 
   private calculate(): number {
     return (
-      defaultRankingWeights.length * this.fdLengthScore() +
-      defaultRankingWeights.keyValue * this.fdKeyValueScore() +
-      defaultRankingWeights.position * this.fdPositionScore() +
-      defaultRankingWeights.redundanceTeam * this.fdRedundanceScoreTeam() +
-      defaultRankingWeights.redundanceWeiLink *
+      (window as any).DEFAULT_RANKING_WEIGHTS.length * this.fdLengthScore() +
+      (window as any).DEFAULT_RANKING_WEIGHTS.keyValue *
+        this.fdKeyValueScore() +
+      (window as any).DEFAULT_RANKING_WEIGHTS.position *
+        this.fdPositionScore() +
+      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam *
+        this.fdRedundanceScoreTeam() +
+      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink *
         this.fdRedundanceScoreWeiLink() +
-      defaultRankingWeights.redundanceMetanome *
+      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome *
         this.fdRedundanceScoreMetanome() +
-      defaultRankingWeights.similarity * this.fdSimilarityScore()
+      (window as any).DEFAULT_RANKING_WEIGHTS.similarity *
+        this.fdSimilarityScore()
     );
   }
 
@@ -173,6 +167,7 @@ export default class FdScore {
   private averageSimilarityForCC(fdSide: ColumnCombination): number {
     const fdSideArray = Array.from(fdSide);
 
+    if ((window as any).DEFAULT_RANKING_WEIGHTS.similarity == 0) return 0;
     if (fdSideArray.length == 1) return 1;
 
     let sumDistances = 0;
