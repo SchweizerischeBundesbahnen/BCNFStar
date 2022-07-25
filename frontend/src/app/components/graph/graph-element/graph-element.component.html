@@ -9,7 +9,7 @@
     D
   </div>
   <div
-    *ngIf="isPotentialFact()"
+    *ngIf="isPotentialFact"
     class="extra-button"
     type="button"
     [sbbTooltip]="factTooltip"
@@ -22,9 +22,9 @@
     class="table-head ellipsis"
     [sbbTooltip]="table.fullName"
     [ngClass]="{
-      fact: isFact(),
-      'direct-dimension': isDirectDimension(),
-      'indirect-dimension': isIndirectDimension(),
+      fact: isFact,
+      'direct-dimension': isDirectDimension,
+      'indirect-dimension': isIndirectDimension,
       'table-head-highlight': schemaService.selectedTable === table
     }"
   >

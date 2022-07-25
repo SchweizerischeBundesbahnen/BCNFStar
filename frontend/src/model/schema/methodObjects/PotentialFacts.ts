@@ -6,7 +6,7 @@ export default class PotentialFacts {
 
   private static weightDirect = 1;
   private static weightIndirect = 0.8;
-  private static k = 1.0;
+  private static k = 1.5;
 
   private connectionTopologyValues = new Map<BasicTable, number>();
 
