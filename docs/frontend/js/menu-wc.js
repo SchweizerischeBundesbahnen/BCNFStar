@@ -1,19 +1,17 @@
-"use strict";
+'use strict';
 
-customElements.define(
-  "compodoc-menu",
-  class extends HTMLElement {
+customElements.define('compodoc-menu', class extends HTMLElement {
     constructor() {
-      super();
-      this.isNormalMode = this.getAttribute("mode") === "normal";
+        super();
+        this.isNormalMode = this.getAttribute('mode') === 'normal';
     }
 
     connectedCallback() {
-      this.render(this.isNormalMode);
+        this.render(this.isNormalMode);
     }
 
     render(isNormalMode) {
-      let tp = lithtml.html(`
+        let tp = lithtml.html(`
         <nav>
             <ul class="list">
                 <li class="title">
@@ -21,11 +19,7 @@ customElements.define(
                 </li>
 
                 <li class="divider"></li>
-                ${
-                  isNormalMode
-                    ? `<div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>`
-                    : ""
-                }
+                ${ isNormalMode ? `<div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>` : '' }
                 <li class="chapter">
                     <a data-type="chapter-link" href="index.html"><span class="icon ion-ios-home"></span>Getting started</a>
                     <ul class="links">
@@ -53,38 +47,25 @@ customElements.define(
                 </li>
                     <li class="chapter modules">
                         <a data-type="chapter-link" href="modules.html">
-                            <div class="menu-toggler linked" data-toggle="collapse" ${
-                              isNormalMode
-                                ? 'data-target="#modules-links"'
-                                : 'data-target="#xs-modules-links"'
-                            }>
+                            <div class="menu-toggler linked" data-toggle="collapse" ${ isNormalMode ?
+                                'data-target="#modules-links"' : 'data-target="#xs-modules-links"' }>
                                 <span class="icon ion-ios-archive"></span>
                                 <span class="link-name">Modules</span>
                                 <span class="icon ion-ios-arrow-down"></span>
                             </div>
                         </a>
-                        <ul class="links collapse " ${
-                          isNormalMode
-                            ? 'id="modules-links"'
-                            : 'id="xs-modules-links"'
-                        }>
+                        <ul class="links collapse " ${ isNormalMode ? 'id="modules-links"' : 'id="xs-modules-links"' }>
                             <li class="link">
                                 <a href="modules/AppModule.html" data-type="entity-link" >AppModule</a>
                                     <li class="chapter inner">
-                                        <div class="simple menu-toggler" data-toggle="collapse" ${
-                                          isNormalMode
-                                            ? 'data-target="#components-links-module-AppModule-f0b672a85f3be61df96f63cefb03e64be190dc269c79c7d66e7afe87de5b4d780a6d412a13e82c27654b5a6518994bfae1df0de298312ae51462f01ff15bc792"'
-                                            : 'data-target="#xs-components-links-module-AppModule-f0b672a85f3be61df96f63cefb03e64be190dc269c79c7d66e7afe87de5b4d780a6d412a13e82c27654b5a6518994bfae1df0de298312ae51462f01ff15bc792"'
-                                        }>
+                                        <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ?
+                                            'data-target="#components-links-module-AppModule-9bff974f0598f56f287d4f78091478f7896feec5e37b4f3823b63adb2b3c5f7f27757056eda8e7a51678bafe6c5085bdb19a267d1d0a4860d6c5fc5ecbd9a167"' : 'data-target="#xs-components-links-module-AppModule-9bff974f0598f56f287d4f78091478f7896feec5e37b4f3823b63adb2b3c5f7f27757056eda8e7a51678bafe6c5085bdb19a267d1d0a4860d6c5fc5ecbd9a167"' }>
                                             <span class="icon ion-md-cog"></span>
                                             <span>Components</span>
                                             <span class="icon ion-ios-arrow-down"></span>
                                         </div>
-                                        <ul class="links collapse" ${
-                                          isNormalMode
-                                            ? 'id="components-links-module-AppModule-f0b672a85f3be61df96f63cefb03e64be190dc269c79c7d66e7afe87de5b4d780a6d412a13e82c27654b5a6518994bfae1df0de298312ae51462f01ff15bc792"'
-                                            : 'id="xs-components-links-module-AppModule-f0b672a85f3be61df96f63cefb03e64be190dc269c79c7d66e7afe87de5b4d780a6d412a13e82c27654b5a6518994bfae1df0de298312ae51462f01ff15bc792"'
-                                        }>
+                                        <ul class="links collapse" ${ isNormalMode ? 'id="components-links-module-AppModule-9bff974f0598f56f287d4f78091478f7896feec5e37b4f3823b63adb2b3c5f7f27757056eda8e7a51678bafe6c5085bdb19a267d1d0a4860d6c5fc5ecbd9a167"' :
+                                            'id="xs-components-links-module-AppModule-9bff974f0598f56f287d4f78091478f7896feec5e37b4f3823b63adb2b3c5f7f27757056eda8e7a51678bafe6c5085bdb19a267d1d0a4860d6c5fc5ecbd9a167"' }>
                                             <li class="link">
                                                 <a href="components/AppComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >AppComponent</a>
                                             </li>
@@ -99,6 +80,9 @@ customElements.define(
                                             </li>
                                             <li class="link">
                                                 <a href="components/DatabaseTableViewerComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >DatabaseTableViewerComponent</a>
+                                            </li>
+                                            <li class="link">
+                                                <a href="components/DeleteTableDialogComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >DeleteTableDialogComponent</a>
                                             </li>
                                             <li class="link">
                                                 <a href="components/DirectDimensionDialogComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >DirectDimensionDialogComponent</a>
@@ -158,6 +142,12 @@ customElements.define(
                                                 <a href="components/UndoRedoComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >UndoRedoComponent</a>
                                             </li>
                                             <li class="link">
+                                                <a href="components/UnionDialogComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >UnionDialogComponent</a>
+                                            </li>
+                                            <li class="link">
+                                                <a href="components/UnionSidebarComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >UnionSidebarComponent</a>
+                                            </li>
+                                            <li class="link">
                                                 <a href="components/ViolatingRowsViewComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >ViolatingRowsViewComponent</a>
                                             </li>
                                             <li class="link">
@@ -172,22 +162,18 @@ customElements.define(
                 </ul>
                 </li>
                     <li class="chapter">
-                        <div class="simple menu-toggler" data-toggle="collapse" ${
-                          isNormalMode
-                            ? 'data-target="#classes-links"'
-                            : 'data-target="#xs-classes-links"'
-                        }>
+                        <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ? 'data-target="#classes-links"' :
+                            'data-target="#xs-classes-links"' }>
                             <span class="icon ion-ios-paper"></span>
                             <span>Classes</span>
                             <span class="icon ion-ios-arrow-down"></span>
                         </div>
-                        <ul class="links collapse " ${
-                          isNormalMode
-                            ? 'id="classes-links"'
-                            : 'id="xs-classes-links"'
-                        }>
+                        <ul class="links collapse " ${ isNormalMode ? 'id="classes-links"' : 'id="xs-classes-links"' }>
                             <li class="link">
                                 <a href="classes/AutoNormalizeCommand.html" data-type="entity-link" >AutoNormalizeCommand</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/BasicTable.html" data-type="entity-link" >BasicTable</a>
                             </li>
                             <li class="link">
                                 <a href="classes/Column.html" data-type="entity-link" >Column</a>
@@ -214,13 +200,22 @@ customElements.define(
                                 <a href="classes/DeleteColumnCommand.html" data-type="entity-link" >DeleteColumnCommand</a>
                             </li>
                             <li class="link">
+                                <a href="classes/DeleteTableCommand.html" data-type="entity-link" >DeleteTableCommand</a>
+                            </li>
+                            <li class="link">
                                 <a href="classes/DirectDimension.html" data-type="entity-link" >DirectDimension</a>
                             </li>
                             <li class="link">
                                 <a href="classes/DirectDimensionCommand.html" data-type="entity-link" >DirectDimensionCommand</a>
                             </li>
                             <li class="link">
+                                <a href="classes/DismissFkCommand.html" data-type="entity-link" >DismissFkCommand</a>
+                            </li>
+                            <li class="link">
                                 <a href="classes/FdScore.html" data-type="entity-link" >FdScore</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/FkDerivation.html" data-type="entity-link" >FkDerivation</a>
                             </li>
                             <li class="link">
                                 <a href="classes/FunctionalDependency.html" data-type="entity-link" >FunctionalDependency</a>
@@ -253,7 +248,13 @@ customElements.define(
                                 <a href="classes/Schema.html" data-type="entity-link" >Schema</a>
                             </li>
                             <li class="link">
+                                <a href="classes/ShowFkCommand.html" data-type="entity-link" >ShowFkCommand</a>
+                            </li>
+                            <li class="link">
                                 <a href="classes/SourceColumn.html" data-type="entity-link" >SourceColumn</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/SourceFkDerivation.html" data-type="entity-link" >SourceFkDerivation</a>
                             </li>
                             <li class="link">
                                 <a href="classes/SourceFunctionalDependency.html" data-type="entity-link" >SourceFunctionalDependency</a>
@@ -280,7 +281,19 @@ customElements.define(
                                 <a href="classes/Table.html" data-type="entity-link" >Table</a>
                             </li>
                             <li class="link">
+                                <a href="classes/TableFkDerivation.html" data-type="entity-link" >TableFkDerivation</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/TablePreviewDataQuery.html" data-type="entity-link" >TablePreviewDataQuery</a>
+                            </li>
+                            <li class="link">
                                 <a href="classes/TableRelationship.html" data-type="entity-link" >TableRelationship</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/UnionCommand.html" data-type="entity-link" >UnionCommand</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/UnionedTable.html" data-type="entity-link" >UnionedTable</a>
                             </li>
                             <li class="link">
                                 <a href="classes/ViolatingFDRowsDataQuery.html" data-type="entity-link" >ViolatingFDRowsDataQuery</a>
@@ -291,48 +304,52 @@ customElements.define(
                         </ul>
                     </li>
                         <li class="chapter">
-                            <div class="simple menu-toggler" data-toggle="collapse" ${
-                              isNormalMode
-                                ? 'data-target="#injectables-links"'
-                                : 'data-target="#xs-injectables-links"'
-                            }>
+                            <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ? 'data-target="#injectables-links"' :
+                                'data-target="#xs-injectables-links"' }>
                                 <span class="icon ion-md-arrow-round-down"></span>
                                 <span>Injectables</span>
                                 <span class="icon ion-ios-arrow-down"></span>
                             </div>
-                            <ul class="links collapse " ${
-                              isNormalMode
-                                ? 'id="injectables-links"'
-                                : 'id="xs-injectables-links"'
-                            }>
+                            <ul class="links collapse " ${ isNormalMode ? 'id="injectables-links"' : 'id="xs-injectables-links"' }>
                                 <li class="link">
                                     <a href="injectables/DatabaseService.html" data-type="entity-link" >DatabaseService</a>
                                 </li>
                                 <li class="link">
                                     <a href="injectables/SchemaCreationService.html" data-type="entity-link" >SchemaCreationService</a>
                                 </li>
+                                <li class="link">
+                                    <a href="injectables/SchemaService.html" data-type="entity-link" >SchemaService</a>
+                                </li>
                             </ul>
                         </li>
                     <li class="chapter">
-                        <div class="simple menu-toggler" data-toggle="collapse" ${
-                          isNormalMode
-                            ? 'data-target="#interfaces-links"'
-                            : 'data-target="#xs-interfaces-links"'
-                        }>
+                        <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ? 'data-target="#interfaces-links"' :
+                            'data-target="#xs-interfaces-links"' }>
                             <span class="icon ion-md-information-circle-outline"></span>
                             <span>Interfaces</span>
                             <span class="icon ion-ios-arrow-down"></span>
                         </div>
-                        <ul class="links collapse " ${
-                          isNormalMode
-                            ? ' id="interfaces-links"'
-                            : 'id="xs-interfaces-links"'
-                        }>
+                        <ul class="links collapse " ${ isNormalMode ? ' id="interfaces-links"' : 'id="xs-interfaces-links"' }>
                             <li class="link">
                                 <a href="interfaces/BasicColumn.html" data-type="entity-link" >BasicColumn</a>
                             </li>
                             <li class="link">
+                                <a href="interfaces/ChangeKeyResponse.html" data-type="entity-link" >ChangeKeyResponse</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/Comparable.html" data-type="entity-link" >Comparable</a>
+                            </li>
+                            <li class="link">
                                 <a href="interfaces/FdCluster.html" data-type="entity-link" >FdCluster</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/FdSplitResponse.html" data-type="entity-link" >FdSplitResponse</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/FkDisplayOptions.html" data-type="entity-link" >FkDisplayOptions</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/IRel.html" data-type="entity-link" >IRel</a>
                             </li>
                             <li class="link">
                                 <a href="interfaces/JSONColumn.html" data-type="entity-link" >JSONColumn</a>
@@ -364,23 +381,28 @@ customElements.define(
                             <li class="link">
                                 <a href="interfaces/JSONTable.html" data-type="entity-link" >JSONTable</a>
                             </li>
+                            <li class="link">
+                                <a href="interfaces/JSONTableRelationship.html" data-type="entity-link" >JSONTableRelationship</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/JSONUnionedTable.html" data-type="entity-link" >JSONUnionedTable</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/SplitDialogResponse.html" data-type="entity-link" >SplitDialogResponse</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/unionSpec.html" data-type="entity-link" >unionSpec</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="chapter">
-                        <div class="simple menu-toggler" data-toggle="collapse" ${
-                          isNormalMode
-                            ? 'data-target="#miscellaneous-links"'
-                            : 'data-target="#xs-miscellaneous-links"'
-                        }>
+                        <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ? 'data-target="#miscellaneous-links"'
+                            : 'data-target="#xs-miscellaneous-links"' }>
                             <span class="icon ion-ios-cube"></span>
                             <span>Miscellaneous</span>
                             <span class="icon ion-ios-arrow-down"></span>
                         </div>
-                        <ul class="links collapse " ${
-                          isNormalMode
-                            ? 'id="miscellaneous-links"'
-                            : 'id="xs-miscellaneous-links"'
-                        }>
+                        <ul class="links collapse " ${ isNormalMode ? 'id="miscellaneous-links"' : 'id="xs-miscellaneous-links"' }>
                             <li class="link">
                                 <a href="miscellaneous/enumerations.html" data-type="entity-link">Enums</a>
                             </li>
@@ -410,7 +432,6 @@ customElements.define(
             </ul>
         </nav>
         `);
-      this.innerHTML = tp.strings;
+        this.innerHTML = tp.strings;
     }
-  }
-);
+});

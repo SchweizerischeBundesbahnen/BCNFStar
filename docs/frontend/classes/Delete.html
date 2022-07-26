@@ -293,8 +293,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="71"
-                            class="link-to-prism">src/model/schema/methodObjects/Delete.ts:71</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="70"
+                            class="link-to-prism">src/model/schema/methodObjects/Delete.ts:70</a></div>
                 </td>
             </tr>
 
@@ -332,8 +332,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="38"
-                            class="link-to-prism">src/model/schema/methodObjects/Delete.ts:38</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="37"
+                            class="link-to-prism">src/model/schema/methodObjects/Delete.ts:37</a></div>
                 </td>
             </tr>
 
@@ -379,16 +379,15 @@ export default class Delete {
   }
 
   private delete() {
-    this.newTable &#x3D; new Table(
-      this.table.columns.deepCopy().setMinus(this.columns)
-    );
+    this.newTable &#x3D; new Table(this.table.columns.copy().setMinus(this.columns));
 
     this.projectSources();
 
     this.projectFds();
 
+    this.newTable.surrogateKey &#x3D; this.table.surrogateKey;
     this.newTable.pk &#x3D; this.table.pk?.isSubsetOf(this.newTable.columns)
-      ? this.table.pk.deepCopy()
+      ? this.table.pk.copy()
       : undefined;
 
     this.newTable.schemaName &#x3D; this.table.schemaName;

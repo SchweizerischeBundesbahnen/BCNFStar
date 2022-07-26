@@ -74,25 +74,6 @@
     <h3 id="index">Index</h3>
     <table class="table table-sm table-bordered index-table">
         <tbody>
-                <tr>
-                    <td class="col-md-4">
-                        <h6><b>Properties</b></h6>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <ul class="index-list">
-                            <li>
-                                    <span class="modifier">Public</span>
-                                <a href="#referenced" >referenced</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
-                                <a href="#referencing" >referencing</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
 
                 <tr>
                     <td class="col-md-4">
@@ -108,7 +89,11 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
-                                <a href="#sourceColumnsMapped" >sourceColumnsMapped</a>
+                                <a href="#isConnected" >isConnected</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#mapsColumns" >mapsColumns</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -133,6 +118,12 @@
                                 <li>
                                     <a href="#isTrivial" >isTrivial</a>
                                 </li>
+                                <li>
+                                    <a href="#referencingCols" >referencingCols</a>
+                                </li>
+                                <li>
+                                    <a href="#referencedCols" >referencedCols</a>
+                                </li>
                             </ul>
                         </td>
                     </tr>
@@ -147,7 +138,7 @@
                 <tr>
                     <td class="col-md-4">
                                 <span class="modifier">Public</span>
-                        <code>constructor(referencing, referenced)</code>
+                        <code>constructor(_referencingCols, _referencedCols)</code>
                     </td>
                 </tr>
                         <tr>
@@ -172,7 +163,7 @@ corresponding column in referenced</p>
                                         </thead>
                                         <tbody>
                                                 <tr>
-                                                        <td>referencing</td>
+                                                        <td>_referencingCols</td>
                                                   
                                                   
                                                     <td>
@@ -181,7 +172,7 @@ corresponding column in referenced</p>
                                                     
                                                 </tr>
                                                 <tr>
-                                                        <td>referenced</td>
+                                                        <td>_referencedCols</td>
                                                   
                                                   
                                                     <td>
@@ -198,64 +189,6 @@ corresponding column in referenced</p>
         </table>
 </section>
 
-            <section>
-    
-    <h3 id="inputs">
-        Properties
-    </h3>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="referenced"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>referenced</b></span>
-                        <a href="#referenced"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Default value : </i><code>new Array&lt;SourceColumn&gt;()</code>
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/model/schema/SourceRelationship.ts:10</a></div>
-                        </td>
-                    </tr>
-
-
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="referencing"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>referencing</b></span>
-                        <a href="#referencing"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Default value : </i><code>new Array&lt;SourceColumn&gt;()</code>
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="9" class="link-to-prism">src/model/schema/SourceRelationship.ts:9</a></div>
-                        </td>
-                    </tr>
-
-
-        </tbody>
-    </table>
-</section>
 
             <section>
     
@@ -337,26 +270,99 @@ corresponding column in referenced</p>
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="sourceColumnsMapped"></a>
+                    <a name="isConnected"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
-                        <span ><b>sourceColumnsMapped</b></span>
-                        <a href="#sourceColumnsMapped"><span class="icon ion-ios-link"></span></a>
+                        <span ><b>isConnected</b></span>
+                        <a href="#isConnected"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>sourceColumnsMapped(referencingCol: <a href="../classes/SourceColumn.html" target="_self">SourceColumn</a>, referencedCol: <a href="../classes/SourceColumn.html" target="_self">SourceColumn</a>)</code>
+                    <code>isConnected(other: <a href="../classes/SourceRelationship.html" target="_self">SourceRelationship</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="30"
-                            class="link-to-prism">src/model/schema/SourceRelationship.ts:30</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="66"
+                            class="link-to-prism">src/model/schema/SourceRelationship.ts:66</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>whether @other can be transitively extended by composing this relationship with @other</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>other</td>
+                                    <td>
+                                                <code><a href="../classes/SourceRelationship.html" target="_self" >SourceRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="mapsColumns"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>mapsColumns</b></span>
+                        <a href="#mapsColumns"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>mapsColumns(referencingCol: <a href="../classes/SourceColumn.html" target="_self">SourceColumn</a>, referencedCol: <a href="../classes/SourceColumn.html" target="_self">SourceColumn</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="35"
+                            class="link-to-prism">src/model/schema/SourceRelationship.ts:35</a></div>
                 </td>
             </tr>
 
@@ -438,8 +444,8 @@ corresponding column in referenced</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="48"
-                            class="link-to-prism">src/model/schema/SourceRelationship.ts:48</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="53"
+                            class="link-to-prism">src/model/schema/SourceRelationship.ts:53</a></div>
                 </td>
             </tr>
 
@@ -481,7 +487,51 @@ corresponding column in referenced</p>
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="41" class="link-to-prism">src/model/schema/SourceRelationship.ts:41</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="46" class="link-to-prism">src/model/schema/SourceRelationship.ts:46</a></div>
+                                </td>
+                            </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="referencingCols"></a>
+                        <span class="name"><b>referencingCols</b><a href="#referencingCols"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>referencingCols()</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="72" class="link-to-prism">src/model/schema/SourceRelationship.ts:72</a></div>
+                                </td>
+                            </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="referencedCols"></a>
+                        <span class="name"><b>referencedCols</b><a href="#referencedCols"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>referencedCols()</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="76" class="link-to-prism">src/model/schema/SourceRelationship.ts:76</a></div>
                                 </td>
                             </tr>
 
@@ -500,53 +550,75 @@ export default class SourceRelationship {
    * corresponding column in referenced
    */
   public constructor(
-    public referencing &#x3D; new Array&lt;SourceColumn&gt;(),
-    public referenced &#x3D; new Array&lt;SourceColumn&gt;()
+    private _referencingCols &#x3D; new Array&lt;SourceColumn&gt;(),
+    private _referencedCols &#x3D; new Array&lt;SourceColumn&gt;()
   ) {}
 
   public equals(other: SourceRelationship): boolean {
     if (this &#x3D;&#x3D; other) return true;
-    if (!this.referencing[0].table.equals(other.referencing[0].table))
+    if (!this.referencingCols[0].table.equals(other.referencingCols[0].table))
       return false;
-    if (!this.referenced[0].table.equals(other.referenced[0].table))
+    if (!this.referencedCols[0].table.equals(other.referencedCols[0].table))
       return false;
-    if (this.referencing.length !&#x3D; other.referencing.length) return false;
+    if (this.referencingCols.length !&#x3D; other.referencingCols.length)
+      return false;
 
-    const pairs &#x3D; this.referencing
-      .map((column, index) &#x3D;&gt; &#x60;${column.name}.${this.referenced[index].name}&#x60;)
+    const pairs &#x3D; this.referencingCols
+      .map(
+        (column, index) &#x3D;&gt; &#x60;${column.name}.${this.referencedCols[index].name}&#x60;
+      )
       .sort();
-    const otherPairs &#x3D; other.referencing
-      .map((column, index) &#x3D;&gt; &#x60;${column.name}.${other.referenced[index].name}&#x60;)
+    const otherPairs &#x3D; other.referencingCols
+      .map(
+        (column, index) &#x3D;&gt; &#x60;${column.name}.${other.referencedCols[index].name}&#x60;
+      )
       .sort();
     return pairs.every((pair, index) &#x3D;&gt; pair &#x3D;&#x3D; otherPairs[index]);
   }
 
-  public sourceColumnsMapped(
+  public mapsColumns(
     referencingCol: SourceColumn,
     referencedCol: SourceColumn
   ): boolean {
-    const i &#x3D; this.referencing.findIndex((otherReferencingCol) &#x3D;&gt;
+    const i &#x3D; this.referencingCols.findIndex((otherReferencingCol) &#x3D;&gt;
       otherReferencingCol.equals(referencingCol)
     );
     if (i &#x3D;&#x3D; -1) return false;
-    return this.referenced[i].equals(referencedCol);
+    return this.referencedCols[i].equals(referencedCol);
   }
 
   public get isTrivial(): boolean {
-    for (const i in this.referencing) {
-      if (!this.referencing[i].equals(this.referenced[i])) return false;
+    for (const i in this.referencingCols) {
+      if (!this.referencingCols[i].equals(this.referencedCols[i])) return false;
     }
     return true;
   }
 
   public toString(): string {
-    const lhsString &#x3D; this.referencing.map((col) &#x3D;&gt; col.name).join(&#x27;, &#x27;);
-    const rhsString &#x3D; this.referenced.map((col) &#x3D;&gt; col.name).join(&#x27;, &#x27;);
+    const lhsString &#x3D; this.referencingCols.map((col) &#x3D;&gt; col.name).join(&#x27;, &#x27;);
+    const rhsString &#x3D; this.referencedCols.map((col) &#x3D;&gt; col.name).join(&#x27;, &#x27;);
 
-    const lhsSourceTable &#x3D; this.referencing[0].table.fullName;
-    const rhsSourceTable &#x3D; this.referenced[0].table.fullName;
+    const lhsSourceTable &#x3D; this.referencingCols[0].table.fullName;
+    const rhsSourceTable &#x3D; this.referencedCols[0].table.fullName;
 
     return &#x60;(${lhsSourceTable}) ${lhsString} -&gt; (${rhsSourceTable}) ${rhsString}&#x60;;
+  }
+
+  /**
+   * whether @other can be transitively extended by composing this relationship with @other
+   */
+  public isConnected(other: SourceRelationship): boolean {
+    return other.referencingCols.every((otherCol) &#x3D;&gt;
+      this.referencedCols.some((col) &#x3D;&gt; col.equals(otherCol))
+    );
+  }
+
+  public get referencingCols(): Array&lt;SourceColumn&gt; {
+    return this._referencingCols;
+  }
+
+  public get referencedCols(): Array&lt;SourceColumn&gt; {
+    return this._referencedCols;
   }
 }
 </code></pre>

@@ -147,6 +147,10 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
+                                <a href="#selectStatement" >selectStatement</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
                                 <a href="#sourceTableIdentifier" >sourceTableIdentifier</a>
                             </li>
                             <li>
@@ -165,10 +169,6 @@
                             <li>
                                     <span class="modifier">Public</span>
                                 <a href="#tableIdentifier" >tableIdentifier</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
-                                <a href="#transferTargetColumns" >transferTargetColumns</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -206,7 +206,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="7" class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:7</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:10</a></div>
                             </td>
                         </tr>
 
@@ -272,8 +272,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="117"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:117</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="162"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:162</a></div>
                 </td>
             </tr>
 
@@ -336,15 +336,15 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>columnIdentifier(column: <a href="../classes/Column.html" target="_self">Column</a>)</code>
+                    <code>columnIdentifier(column: <a href="../classes/Column.html" target="_self">Column | null</a>, dataType: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="220"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:220</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="265"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:265</a></div>
                 </td>
             </tr>
 
@@ -361,19 +361,37 @@
                                     <td>Name</td>
                                     <td>Type</td>
                                     <td>Optional</td>
+                                    <td>Default value</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>column</td>
                                     <td>
-                                                <code><a href="../classes/Column.html" target="_self" >Column</a></code>
+                                                <code><a href="../classes/Column.html" target="_self" >Column | null</a></code>
                                     </td>
 
                                     <td>
                                         No
                                     </td>
 
+                                    <td>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>dataType</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>&#x27;&#x27;</code>
+                                    </td>
 
                                 </tr>
                             </tbody>
@@ -414,8 +432,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="12"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:12</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="15"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:15</a></div>
                 </td>
             </tr>
 
@@ -478,15 +496,15 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>createTableSql(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>createTableSql(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="32"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:32</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="35"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:35</a></div>
                 </td>
             </tr>
 
@@ -509,7 +527,7 @@
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -549,15 +567,15 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>dataTransfer(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                    <code>dataTransfer(tables: Array<BasicTable>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="53"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:53</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="63"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:63</a></div>
                 </td>
             </tr>
 
@@ -580,7 +598,7 @@
                                 <tr>
                                     <td>tables</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                            <code>Array&lt;BasicTable&gt;</code>
                                     </td>
 
                                     <td>
@@ -620,15 +638,15 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>dataTransferSql(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>dataTransferSql(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="61"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:61</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="71"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:71</a></div>
                 </td>
             </tr>
 
@@ -651,7 +669,7 @@
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -699,8 +717,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="10"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:10</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="13"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:13</a></div>
                 </td>
             </tr>
 
@@ -770,8 +788,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="98"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:98</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="143"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:143</a></div>
                 </td>
             </tr>
 
@@ -841,8 +859,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="181"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:181</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="226"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:226</a></div>
                 </td>
             </tr>
 
@@ -912,8 +930,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="155"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:155</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="200"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:200</a></div>
                 </td>
             </tr>
 
@@ -976,15 +994,15 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>generateColumnString(columns: <a href="../classes/Column.html" target="_self">Column[]</a>)</code>
+                    <code>generateColumnString(columns: <a href="../interfaces/BasicColumn.html" target="_self">BasicColumn[]</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="205"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:205</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="250"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:250</a></div>
                 </td>
             </tr>
 
@@ -1007,7 +1025,7 @@
                                 <tr>
                                     <td>columns</td>
                                     <td>
-                                                <code><a href="../classes/Column.html" target="_self" >Column[]</a></code>
+                                                <code><a href="../interfaces/BasicColumn.html" target="_self" >BasicColumn[]</a></code>
                                     </td>
 
                                     <td>
@@ -1054,8 +1072,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="190"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:190</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="235"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:235</a></div>
                 </td>
             </tr>
 
@@ -1125,8 +1143,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="167"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:167</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="212"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:212</a></div>
                 </td>
             </tr>
 
@@ -1168,8 +1186,8 @@ Those aren&#39;t visible to the user</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="22"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:22</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="25"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:25</a></div>
                 </td>
             </tr>
 
@@ -1239,8 +1257,8 @@ Those aren&#39;t visible to the user</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="228"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:228</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="277"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:277</a></div>
                 </td>
             </tr>
 
@@ -1304,6 +1322,109 @@ Those aren&#39;t visible to the user</p>
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="selectStatement"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>selectStatement</b></span>
+                        <a href="#selectStatement"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>selectStatement(table: <a href="../classes/Table.html" target="_self">Table</a>, columns: <a href="../classes/Column.html" target="_self">Array&lt;Column | null&gt;</a>, dataTypes: string[])</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="111"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:111</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Default value</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>columns</td>
+                                    <td>
+                                                <code><a href="../classes/Column.html" target="_self" >Array&lt;Column | null&gt;</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>dataTypes</td>
+                                    <td>
+                                            <code>string[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>[]</code>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="sourceTableIdentifier"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
@@ -1322,8 +1443,8 @@ Those aren&#39;t visible to the user</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="216"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:216</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="261"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:261</a></div>
                 </td>
             </tr>
 
@@ -1393,8 +1514,8 @@ Those aren&#39;t visible to the user</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="234"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:234</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="283"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:283</a></div>
                 </td>
             </tr>
 
@@ -1433,8 +1554,8 @@ Those aren&#39;t visible to the user</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="226"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:226</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="275"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:275</a></div>
                 </td>
             </tr>
 
@@ -1497,15 +1618,15 @@ Those aren&#39;t visible to the user</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>tableCreation(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                    <code>tableCreation(tables: Array<BasicTable>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="24"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:24</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="27"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:27</a></div>
                 </td>
             </tr>
 
@@ -1528,7 +1649,7 @@ Those aren&#39;t visible to the user</p>
                                 <tr>
                                     <td>tables</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                            <code>Array&lt;BasicTable&gt;</code>
                                     </td>
 
                                     <td>
@@ -1568,15 +1689,15 @@ Those aren&#39;t visible to the user</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>tableIdentifier(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>tableIdentifier(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="212"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:212</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="257"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:257</a></div>
                 </td>
             </tr>
 
@@ -1602,78 +1723,7 @@ For example: If you want to update the Surrogate-Key columns, you want to refere
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="transferTargetColumns"></a>
-                    <span class="name">
-                        <span class="modifier">Public</span>
-                        <span ><b>transferTargetColumns</b></span>
-                        <a href="#transferTargetColumns"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>transferTargetColumns(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="94"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:94</a></div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>table</td>
-                                    <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -1720,8 +1770,8 @@ For example: If you want to update the Surrogate-Key columns, you want to refere
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="173"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:173</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="218"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:218</a></div>
                 </td>
             </tr>
 
@@ -1793,8 +1843,8 @@ For example: If you want to update the Surrogate-Key columns, you want to refere
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="149"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:149</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="194"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:194</a></div>
                 </td>
             </tr>
 
@@ -1864,8 +1914,8 @@ For example: If you want to update the Surrogate-Key columns, you want to refere
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="128"
-                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:128</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="173"
+                            class="link-to-prism">src/model/schema/persisting/SQLPersisting.ts:173</a></div>
                 </td>
             </tr>
 
@@ -1931,6 +1981,9 @@ import Column from &#x27;../Column&#x27;;
 import Schema from &#x27;../Schema&#x27;;
 import SourceTable from &#x27;../SourceTable&#x27;;
 import Table from &#x27;../Table&#x27;;
+import BasicTable from &#x27;../BasicTable&#x27;;
+import UnionedTable from &#x27;../UnionedTable&#x27;;
+import BasicColumn from &#x27;../../types/BasicColumn&#x27;;
 
 export default abstract class SQLPersisting {
   public constructor(protected schemaName: string) {}
@@ -1942,14 +1995,14 @@ export default abstract class SQLPersisting {
     SQL +&#x3D; this.schemaPreparation(schema);
     SQL +&#x3D; this.tableCreation([...schema.tables]);
     SQL +&#x3D; this.dataTransfer([...schema.tables]);
-    SQL +&#x3D; this.primaryKeys([...schema.tables]);
+    SQL +&#x3D; this.primaryKeys([...schema.regularTables]);
     SQL +&#x3D; this.foreignKeys(schema);
     return SQL;
   }
 
   public abstract schemaPreparation(schema: Schema): string;
 
-  public tableCreation(tables: Array&lt;Table&gt;): string {
+  public tableCreation(tables: Array&lt;BasicTable&gt;): string {
     let Sql: string &#x3D; &#x27;&#x27;;
     for (const table of tables) {
       Sql +&#x3D; this.createTableSql(table) + &#x27;\n&#x27;;
@@ -1957,16 +2010,23 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
-  public createTableSql(table: Table): string {
+  public createTableSql(table: BasicTable): string {
     let columnStrings: string[] &#x3D; [];
 
-    if (table.implementsSurrogateKey()) {
-      columnStrings.push(this.surrogateKeyString(table.surrogateKey));
+    let columns: Array&lt;BasicColumn&gt; &#x3D; [];
+
+    if (table instanceof Table) {
+      if (table.implementsSurrogateKey()) {
+        columnStrings.push(this.surrogateKeyString(table.surrogateKey));
+      }
+      columns &#x3D; Array.from(table.columns);
+    } else if (table instanceof UnionedTable) {
+      columns &#x3D; table.displayedColumns();
     }
 
-    for (const column of table.columns) {
+    for (const column of columns) {
       let columnString: string &#x3D; &#x60;${column.name} ${column.dataType} &#x60;;
-      if (table.pk?.includes(column) || !column.nullable) {
+      if (!column.nullable) {
         columnString +&#x3D; &#x27;NOT &#x27;;
       }
       columnString +&#x3D; &#x27;NULL&#x27;;
@@ -1978,7 +2038,7 @@ export default abstract class SQLPersisting {
     )});&#x60;;
   }
 
-  public dataTransfer(tables: Array&lt;Table&gt;): string {
+  public dataTransfer(tables: Array&lt;BasicTable&gt;): string {
     let Sql: string &#x3D; &#x27;&#x27;;
     for (const table of tables) {
       Sql +&#x3D; this.dataTransferSql(table) + &#x27;\n&#x27;;
@@ -1986,14 +2046,54 @@ export default abstract class SQLPersisting {
     return Sql;
   }
 
-  public dataTransferSql(table: Table): string {
+  public dataTransferSql(table: BasicTable): string {
     let Sql &#x3D; &#x27;&#x27;;
+
+    let columns: BasicColumn[] &#x3D; [];
+    if (table instanceof UnionedTable) {
+      columns &#x3D; table.displayedColumns();
+    } else if (table instanceof Table) {
+      columns &#x3D; table.columns.asArray();
+    }
 
     Sql &#x3D; &#x60;INSERT INTO ${this.tableIdentifier(
       table
-    )} ${this.transferTargetColumns(table)} SELECT DISTINCT ${table.columns
-      .asArray()
-      .map((col) &#x3D;&gt; &#x60;${this.columnIdentifier(col)}&#x60;)
+    )} (${this.generateColumnString(columns)}) &#x60;;
+
+    if (table instanceof UnionedTable) {
+      Sql +&#x3D; &#x27;SELECT * FROM (&#x27;;
+      Sql +&#x3D; this.selectStatement(
+        table.tables[0],
+        table.columns[0],
+        table.displayedColumns().map((c) &#x3D;&gt; c.dataType)
+      );
+      Sql +&#x3D; &#x27;\n UNION \n&#x27;;
+      Sql +&#x3D; this.selectStatement(
+        table.tables[1],
+        table.columns[1],
+        table.displayedColumns().map((c) &#x3D;&gt; c.dataType)
+      );
+      Sql +&#x3D; &#x27;) as X&#x27;;
+    } else if (table instanceof Table) {
+      Sql +&#x3D; this.selectStatement(
+        table,
+        table.columns.asArray(),
+        table.columns.asArray().map((c) &#x3D;&gt; c.dataType)
+      );
+    }
+
+    Sql +&#x3D; &#x27;;&#x27;;
+    return Sql;
+  }
+
+  public selectStatement(
+    table: Table,
+    columns: Array&lt;Column | null&gt;,
+    dataTypes: string[] &#x3D; []
+  ) {
+    let Sql &#x3D; &#x27;&#x27;;
+    Sql +&#x3D; &#x60;SELECT DISTINCT ${columns
+      .map((col, index) &#x3D;&gt; &#x60;${this.columnIdentifier(col, dataTypes[index])}&#x60;)
       .join(&#x27;, &#x27;)} FROM ${table.sources
       .map((source) &#x3D;&gt; {
         let sourceString &#x3D; this.sourceTableIdentifier(source.table);
@@ -2015,12 +2115,7 @@ export default abstract class SQLPersisting {
             .join(&#x27; AND &#x27;)
         )
         .join(&#x27; AND &#x27;)}&#x60;;
-    Sql +&#x3D; &#x27;;&#x27;;
     return Sql;
-  }
-
-  public transferTargetColumns(table: Table) {
-    return &#x60;(${this.generateColumnString(table.columns.asArray())})&#x60;;
   }
 
   public foreignKeys(schema: Schema): string {
@@ -2028,7 +2123,7 @@ export default abstract class SQLPersisting {
 
     for (const referencingTable of schema.tables) {
       for (const fk of schema.fksOf(referencingTable, true)) {
-        if (fk.referenced.implementsSurrogateKey()) {
+        if (fk.referencedTable.implementsSurrogateKey()) {
           Sql +&#x3D; this.addSkColumnToReferencingSql(fk);
           Sql +&#x3D; this.updateSurrogateKeySql(fk);
           Sql +&#x3D; this.foreignSurrogateKeySql(fk);
@@ -2043,7 +2138,7 @@ export default abstract class SQLPersisting {
 
   // TODO: Duplicate column-names possible if one table references two different tables with same sk-name.
   public addSkColumnToReferencingSql(fk: TableRelationship): string {
-    return &#x60;ALTER TABLE ${this.tableIdentifier(fk.referencing)} ADD ${
+    return &#x60;ALTER TABLE ${this.tableIdentifier(fk.referencingTable)} ADD ${
       fk.referencingName
     } INT;
     ${this.suffix()}
@@ -2055,38 +2150,38 @@ export default abstract class SQLPersisting {
    */
   public updateSurrogateKeySql(fk: TableRelationship): string {
     return &#x60;
-    UPDATE ${this.tableIdentifier(fk.referencing)}
-    SET ${fk.referencingName} &#x3D; ${this.tableIdentifier(fk.referenced)}.${
-      fk.referenced.surrogateKey
+    UPDATE ${this.tableIdentifier(fk.referencingTable)}
+    SET ${fk.referencingName} &#x3D; ${this.tableIdentifier(fk.referencedTable)}.${
+      fk.referencedTable.surrogateKey
     }
     FROM ${this.updateSurrogateKeySource(fk)}
-    WHERE ${fk.relationship.referencing
+    WHERE ${fk.referencingCols
       .map(
         (c: Column, i: number) &#x3D;&gt;
           &#x60;${this.schemaWideColumnIdentifier(
-            fk.referencing,
+            fk.referencingTable,
             c
           )} &#x3D; ${this.schemaWideColumnIdentifier(
-            fk.referenced,
-            fk.relationship.referenced[i]
+            fk.referencedTable,
+            fk.referencedCols[i]
           )}&#x60;
       )
       .join(&#x27; AND &#x27;)};&#x60;;
   }
 
   public updateSurrogateKeySource(fk: TableRelationship): string {
-    return &#x60;${this.tableIdentifier(fk.referencing)}, ${this.tableIdentifier(
-      fk.referenced
-    )}&#x60;;
+    return &#x60;${this.tableIdentifier(
+      fk.referencingTable
+    )}, ${this.tableIdentifier(fk.referencedTable)}&#x60;;
   }
 
   public foreignSurrogateKeySql(fk: TableRelationship) {
     return &#x60;
-    ALTER TABLE ${this.tableIdentifier(fk.referencing)}
+    ALTER TABLE ${this.tableIdentifier(fk.referencingTable)}
     ADD CONSTRAINT ${this.randomFkName()}
     FOREIGN KEY (${fk.referencingName})
-    REFERENCES ${this.tableIdentifier(fk.referenced)} (${
-      fk.referenced.surrogateKey
+    REFERENCES ${this.tableIdentifier(fk.referencedTable)} (${
+      fk.referencedTable.surrogateKey
     });&#x60;;
   }
 
@@ -2101,18 +2196,18 @@ export default abstract class SQLPersisting {
   public uniqueConstraint(fk: TableRelationship): string {
     return &#x60;
 ALTER TABLE ${this.tableIdentifier(
-      fk.referenced
-    )} ADD UNIQUE (${this.generateColumnString(fk.relationship.referenced)});
+      fk.referencedTable
+    )} ADD UNIQUE (${this.generateColumnString(fk.referencedCols)});
 &#x60;;
   }
 
   public foreignKeySql(fk: TableRelationship): string {
-    return &#x60;ALTER TABLE ${this.tableIdentifier(fk.referencing)}
+    return &#x60;ALTER TABLE ${this.tableIdentifier(fk.referencingTable)}
       ADD CONSTRAINT ${this.randomFkName()}
-      FOREIGN KEY (${this.generateColumnString(fk.relationship.referencing)})
+      FOREIGN KEY (${this.generateColumnString(fk.referencingCols)})
       REFERENCES ${this.tableIdentifier(
-        fk.referenced
-      )} (${this.generateColumnString(fk.relationship.referenced)});&#x60;;
+        fk.referencedTable
+      )} (${this.generateColumnString(fk.referencedCols)});&#x60;;
   }
 
   public primaryKeys(tables: Table[]): string {
@@ -2130,14 +2225,14 @@ ALTER TABLE ${this.tableIdentifier(
     return Sql;
   }
 
-  public generateColumnString(columns: Column[]): string {
+  public generateColumnString(columns: BasicColumn[]): string {
     return columns.map((c) &#x3D;&gt; this.escape(c.name)).join(&#x27;, &#x27;);
   }
 
   /** Returns the Identifier of the persisted-table
    * For example: If you want to update the Surrogate-Key columns, you want to reference the already created tables.
    */
-  public tableIdentifier(table: Table): string {
+  public tableIdentifier(table: BasicTable): string {
     return &#x60;${this.escape(this.schemaName)}.${this.escape(table.name)}&#x60;;
   }
 
@@ -2145,7 +2240,11 @@ ALTER TABLE ${this.tableIdentifier(
     return &#x60;${this.escape(table.schemaName)}.${this.escape(table.name)}&#x60;;
   }
 
-  public columnIdentifier(column: Column): string {
+  public columnIdentifier(
+    column: Column | null,
+    dataType: string &#x3D; &#x27;&#x27;
+  ): string {
+    if (column &#x3D;&#x3D; null) return &#x60; CAST (null AS ${dataType}) &#x60;;
     return &#x60;${this.escape(column.sourceTableInstance.alias)}.${this.escape(
       column.sourceColumn.name
     )}&#x60;;

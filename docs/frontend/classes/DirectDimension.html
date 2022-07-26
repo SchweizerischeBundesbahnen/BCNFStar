@@ -362,8 +362,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="41"
-                            class="link-to-prism">src/model/schema/methodObjects/DirectDimension.ts:41</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="45"
+                            class="link-to-prism">src/model/schema/methodObjects/DirectDimension.ts:45</a></div>
                 </td>
             </tr>
 
@@ -444,7 +444,7 @@ export default class DirectDimension {
   private join!: Join;
 
   public constructor(private routes: Array&lt;Array&lt;TableRelationship&gt;&gt;) {
-    this.oldTable &#x3D; routes[0][0].referencing;
+    this.oldTable &#x3D; routes[0][0].referencingTable;
     for (const i in this.routes) {
       this.newTable &#x3D; this.directDimension(+i);
       this.mapOtherRoutes(+i, this.join);
@@ -453,21 +453,25 @@ export default class DirectDimension {
 
   private directDimension(i: number): Table {
     const route &#x3D; this.routes[i];
-    let oldTable &#x3D; route[0].referencing;
+    let oldTable &#x3D; route[0].referencingTable;
+    let originalColumns &#x3D; oldTable.columns;
     let newTable &#x3D; oldTable;
     let newRel &#x3D; route[0].relationship;
     for (let j &#x3D; 0; j &lt; route.length - 1; j++) {
       this.join &#x3D; new Join(
-        new TableRelationship(newRel, newTable!, route[j].referenced)
+        new TableRelationship(newRel, newTable!, route[j].referencedTable)
       );
       newTable &#x3D; this.join.newTable;
       newRel &#x3D; route[j + 1].relationship.applySourceMapping(
         this.join.sourceMapping
       );
+      originalColumns &#x3D; originalColumns.applySourceMapping(
+        this.join.sourceMapping
+      );
     }
     newTable.columns.intersect(
       new ColumnCombination(new Array(...newRel.referencing)).union(
-        oldTable.columns
+        originalColumns
       )
     );
     return newTable;
@@ -476,7 +480,7 @@ export default class DirectDimension {
   private mapOtherRoutes(i: number, join: Join) {
     for (let j &#x3D; i + 1; j &lt; this.routes.length; j++) {
       const nextRouteFk &#x3D; this.routes[j][0];
-      nextRouteFk.referencing &#x3D; join.newTable;
+      nextRouteFk.referencingTable &#x3D; join.newTable;
       nextRouteFk.relationship.referencing &#x3D;
         nextRouteFk.relationship.referencing.map(
           (col) &#x3D;&gt;

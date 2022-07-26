@@ -120,6 +120,20 @@
 
 
 
+                    <tr>
+                        <td class="col-md-4">
+                            <h6><b>Accessors</b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <ul class="index-list">
+                                <li>
+                                    <a href="#cellStyle" >cellStyle</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
         </tbody>
     </table>
 </section>
@@ -135,7 +149,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/app/dataquery.ts:14</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/app/dataquery.ts:15</a></div>
                             </td>
                         </tr>
 
@@ -173,7 +187,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/app/dataquery.ts:13</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/app/dataquery.ts:14</a></div>
                         </td>
                     </tr>
 
@@ -200,7 +214,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/app/dataquery.ts:14</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/app/dataquery.ts:15</a></div>
                         </td>
                     </tr>
 
@@ -237,8 +251,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="24"
-                            class="link-to-prism">src/app/dataquery.ts:24</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="25"
+                            class="link-to-prism">src/app/dataquery.ts:25</a></div>
                 </td>
             </tr>
 
@@ -247,7 +261,7 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>    <code>Promise&lt;number&gt;</code>
+                        <b>Returns : </b>    <code>Promise&lt;IRowCounts&gt;</code>
 
                     </div>
                 </td>
@@ -277,8 +291,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="19"
-                            class="link-to-prism">src/app/dataquery.ts:19</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="20"
+                            class="link-to-prism">src/app/dataquery.ts:20</a></div>
                 </td>
             </tr>
 
@@ -344,6 +358,46 @@
 
 
 
+            <section>
+    <h3 id="accessors">
+        Accessors
+    </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="cellStyle"></a>
+                        <span class="name"><b>cellStyle</b><a href="#cellStyle"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>cellStyle()</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="32" class="link-to-prism">src/app/dataquery.ts:32</a></div>
+                                </td>
+                            </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-description"><p> the styling which should be applied to cells in this column</p>
+</div>
+
+                                <div>
+                                </div>
+                                <div class="io-description">
+                                    <b>Returns : </b>    <code>Record&lt;string, Record&lt;string, any&gt;&gt;</code>
+
+                                </div>
+                        </td>
+                    </tr>
+
+            </tbody>
+        </table>
+</section>
     </div>
 
 
@@ -352,6 +406,7 @@
 import { isDevMode } from &#x27;@angular/core&#x27;;
 import IRequestBodyFDViolatingRows from &#x27;@server/definitions/IRequestBodyFDViolatingRows&#x27;;
 import IRequestBodyINDViolatingRows from &#x27;@server/definitions/IRequestBodyINDViolatingRows&#x27;;
+import IRowCounts from &#x27;@server/definitions/IRowCounts&#x27;;
 import ITablePage from &#x27;@server/definitions/ITablePage&#x27;;
 import { firstValueFrom } from &#x27;rxjs&#x27;;
 import Column from &#x27;../model/schema/Column&#x27;;
@@ -371,14 +426,54 @@ export abstract class DataQuery {
     limit: number
   ): Promise&lt;ITablePage&gt;;
 
-  public abstract loadRowCount(): Promise&lt;number&gt;;
+  public abstract loadRowCount(): Promise&lt;IRowCounts&gt;;
+
+  /**
+   *
+   * @returns an object where a key is an attribute and the value is
+   *  the styling which should be applied to cells in this column
+   */
+  public get cellStyle(): Record&lt;string, Record&lt;string, any&gt;&gt; {
+    return {};
+  }
+}
+
+export class TablePreviewDataQuery extends DataQuery {
+  constructor(protected table: Table) {
+    super();
+  }
+  public loadTablePage(offset: number, limit: number): Promise&lt;ITablePage&gt; {
+    return firstValueFrom(
+      this.http.get&lt;ITablePage&gt;(
+        &#x60;${this.baseUrl}/tables/page?schema&#x3D;${this.table.schemaName}&amp;table&#x3D;${this.table.name}&amp;offset&#x3D;${offset}&amp;limit&#x3D;${limit}&#x60;
+      )
+    );
+  }
+  public loadRowCount(): Promise&lt;IRowCounts&gt; {
+    return Promise.reject(
+      &#x27;not implemented. use loadTableRowCounts from database-service instead&#x27;
+    );
+  }
+  public override get cellStyle(): Record&lt;string, Record&lt;string, any&gt;&gt; {
+    function isNumeric(dataType: string): boolean {
+      return (
+        !!dataType &amp;&amp;
+        (dataType.toLowerCase().startsWith(&#x27;numeric&#x27;) ||
+          dataType.toLowerCase().startsWith(&#x27;int&#x27;))
+      );
+    }
+    const result: Record&lt;string, Record&lt;string, any&gt;&gt; &#x3D; {};
+    for (const column of this.table.columns)
+      result[column.name] &#x3D; isNumeric(column.dataType)
+        ? { &#x27;text-align&#x27;: &#x27;end&#x27; }
+        : {};
+    return result;
+  }
 }
 
 export class ViolatingINDRowsDataQuery extends DataQuery {
-  protected relationship: Relationship;
-  constructor(relationship: Relationship) {
+  constructor(protected relationship: Relationship) {
     super();
-    this.relationship &#x3D; relationship;
   }
 
   public override async loadTablePage(
@@ -395,14 +490,17 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     );
   }
 
-  public override async loadRowCount(): Promise&lt;number&gt; {
+  public override async loadRowCount(): Promise&lt;IRowCounts&gt; {
     const data: IRequestBodyINDViolatingRows &#x3D; {
       relationship: this.relationship.toIRelationship(),
       offset: 0,
       limit: 0,
     };
     return firstValueFrom(
-      this.http.post&lt;number&gt;(&#x60;${this.baseUrl}/violatingRows/rowcount/ind&#x60;, data)
+      this.http.post&lt;IRowCounts&gt;(
+        &#x60;${this.baseUrl}/violatingRows/rowcount/ind&#x60;,
+        data
+      )
     );
   }
 }
@@ -465,7 +563,7 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     return result;
   }
 
-  public override async loadRowCount(): Promise&lt;number&gt; {
+  public override async loadRowCount(): Promise&lt;IRowCounts&gt; {
     // currently supports only check on &quot;sourceTables&quot;.
     if (this.table.sources.length !&#x3D; 1)
       throw Error(&#x27;Not Implemented Exception&#x27;);
@@ -478,7 +576,10 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
       limit: 0,
     };
     return firstValueFrom(
-      this.http.post&lt;number&gt;(&#x60;${this.baseUrl}/violatingRows/rowcount/fd&#x60;, data)
+      this.http.post&lt;IRowCounts&gt;(
+        &#x60;${this.baseUrl}/violatingRows/rowcount/fd&#x60;,
+        data
+      )
     );
   }
 }

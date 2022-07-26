@@ -257,8 +257,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="75"
-                            class="link-to-prism">src/model/schema/methodObjects/Split.ts:75</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="67"
+                            class="link-to-prism">src/model/schema/methodObjects/Split.ts:67</a></div>
                 </td>
             </tr>
 
@@ -369,8 +369,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="52"
-                            class="link-to-prism">src/model/schema/methodObjects/Split.ts:52</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="44"
+                            class="link-to-prism">src/model/schema/methodObjects/Split.ts:44</a></div>
                 </td>
             </tr>
 
@@ -469,18 +469,10 @@ export default class Split {
       this.table,
       this.table.columns.copy().setMinus(this.fd.rhs)
     ).newTable;
-    remaining.surrogateKey &#x3D; this.table.surrogateKey;
-    remaining.pk &#x3D; this.table.pk?.isSubsetOf(remaining.columns)
-      ? this.table.pk.deepCopy()
-      : undefined;
+    generating.surrogateKey &#x3D; &#x27;&#x27;;
     generating.pk &#x3D;
-      this.fd.lhs.cardinality &gt; 0 ? this.fd.lhs.deepCopy() : undefined;
+      this.fd.lhs.cardinality &gt; 0 ? this.fd.lhs.copy() : undefined;
     this.reorderColumnsOf(generating);
-
-    remaining.schemaName &#x3D; this.table.schemaName;
-    generating.schemaName &#x3D; this.table.schemaName;
-
-    remaining.name &#x3D; this.table.name;
     generating.name &#x3D;
       this.generatingName ||
       this.fd.lhs.columnNames().join(&#x27;_&#x27;).substring(0, 50);

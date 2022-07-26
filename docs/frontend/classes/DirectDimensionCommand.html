@@ -93,7 +93,7 @@
                                 <a href="#newTables" >newTables</a>
                             </li>
                             <li>
-                                    <span class="modifier">Private</span>
+                                    <span class="modifier">Public</span>
                                 <a href="#oldTables" >oldTables</a>
                             </li>
                             <li>
@@ -258,7 +258,7 @@
                 <td class="col-md-4">
                     <a name="oldTables"></a>
                     <span class="name">
-                            <span class="modifier">Private</span>
+                            <span class="modifier">Public</span>
                         <span ><b>oldTables</b></span>
                         <a href="#oldTables"><span class="icon ion-ios-link"></span></a>
                     </span>
@@ -679,7 +679,7 @@ import TableRelationship from &#x27;../schema/TableRelationship&#x27;;
 import Command from &#x27;./Command&#x27;;
 
 export default class DirectDimensionCommand extends Command {
-  private oldTables &#x3D; new Array&lt;Table&gt;();
+  public oldTables &#x3D; new Array&lt;Table&gt;();
   public newTables &#x3D; new Array&lt;Table&gt;();
   private routes &#x3D; new Map&lt;Table, Array&lt;Array&lt;TableRelationship&gt;&gt;&gt;();
 
@@ -689,7 +689,7 @@ export default class DirectDimensionCommand extends Command {
   ) {
     super();
     for (const route of routes) {
-      const fact &#x3D; route[0].referencing;
+      const fact &#x3D; route[0].referencingTable;
       if (!this.oldTables.includes(fact)) {
         this.oldTables.push(fact);
         this.routes.set(fact, new Array());

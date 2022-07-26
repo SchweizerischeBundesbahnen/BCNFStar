@@ -84,7 +84,7 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Private</span>
-                                <a href="#_databaseFks" >_databaseFks</a>
+                                <a href="#_baseFks" >_baseFks</a>
                             </li>
                             <li>
                                     <span class="modifier">Private</span>
@@ -100,11 +100,25 @@
                             </li>
                             <li>
                                     <span class="modifier">Private</span>
+                                    <span class="modifier">Optional</span>
+                                <a href="#_regularTables" >_regularTables</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
                                 <a href="#_starMode" >_starMode</a>
                             </li>
                             <li>
                                     <span class="modifier">Private</span>
+                                <a href="#_tableFks" >_tableFks</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
                                 <a href="#_tableFksValid" >_tableFksValid</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                    <span class="modifier">Optional</span>
+                                <a href="#_unionedTables" >_unionedTables</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -129,16 +143,8 @@
                     <td class="col-md-4">
                         <ul class="index-list">
                             <li>
-                                    <span class="modifier">Private</span>
-                                <a href="#addCurrentFkAndDerive" >addCurrentFkAndDerive</a>
-                            </li>
-                            <li>
                                     <span class="modifier">Public</span>
                                 <a href="#addFd" >addFd</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Private</span>
-                                <a href="#addFkAndDerive" >addFkAndDerive</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -149,6 +155,10 @@
                                 <a href="#addInds" >addInds</a>
                             </li>
                             <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#addTableFk" >addTableFk</a>
+                            </li>
+                            <li>
                                     <span class="modifier">Public</span>
                                 <a href="#addTables" >addTables</a>
                             </li>
@@ -157,16 +167,12 @@
                                 <a href="#autoNormalize" >autoNormalize</a>
                             </li>
                             <li>
-                                    <span class="modifier">Private</span>
-                                <a href="#basicAddCurrentFk" >basicAddCurrentFk</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Private</span>
-                                <a href="#basicAddFk" >basicAddFk</a>
-                            </li>
-                            <li>
                                     <span class="modifier">Public</span>
                                 <a href="#calculateFdsOf" >calculateFdsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#calculateFkDisplayOptions" >calculateFkDisplayOptions</a>
                             </li>
                             <li>
                                     <span class="modifier">Private</span>
@@ -214,7 +220,7 @@
                             </li>
                             <li>
                                     <span class="modifier">Private</span>
-                                <a href="#filterFks" >filterFks</a>
+                                <a href="#findEquivalentFk" >findEquivalentFk</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -222,7 +228,19 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
+                                <a href="#getFkDisplayOptions" >getFkDisplayOptions</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#hiddenFksOf" >hiddenFksOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
                                 <a href="#indsOf" >indsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#isDirectDimension" >isDirectDimension</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -231,6 +249,10 @@
                             <li>
                                     <span class="modifier">Private</span>
                                 <a href="#isFdSplittable" >isFdSplittable</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#isFkDisplayed" >isFkDisplayed</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -257,8 +279,12 @@
                                 <a href="#routesFromFactTo" >routesFromFactTo</a>
                             </li>
                             <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#setFkDisplayOptions" >setFkDisplayOptions</a>
+                            </li>
+                            <li>
                                     <span class="modifier">Private</span>
-                                <a href="#sourceColumnSubset" >sourceColumnSubset</a>
+                                <a href="#shouldBeFiltered" >shouldBeFiltered</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -269,7 +295,7 @@
                                 <a href="#toJSON" >toJSON</a>
                             </li>
                             <li>
-                                    <span class="modifier">Private</span>
+                                    <span class="modifier">Public</span>
                                 <a href="#updateFks" >updateFks</a>
                             </li>
                             <li>
@@ -292,6 +318,12 @@
                     <tr>
                         <td class="col-md-4">
                             <ul class="index-list">
+                                <li>
+                                    <a href="#regularTables" >regularTables</a>
+                                </li>
+                                <li>
+                                    <a href="#unionedTables" >unionedTables</a>
+                                </li>
                                 <li>
                                     <a href="#starMode" >starMode</a>
                                 </li>
@@ -320,7 +352,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="36" class="link-to-prism">src/model/schema/Schema.ts:36</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="61" class="link-to-prism">src/model/schema/Schema.ts:61</a></div>
                             </td>
                         </tr>
 
@@ -367,11 +399,11 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="_databaseFks"></a>
+                    <a name="_baseFks"></a>
                     <span class="name">
                             <span class="modifier">Private</span>
-                        <span ><b>_databaseFks</b></span>
-                        <a href="#_databaseFks"><span class="icon ion-ios-link"></span></a>
+                        <span ><b>_baseFks</b></span>
+                        <a href="#_baseFks"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
@@ -382,10 +414,16 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="22" class="link-to-prism">src/model/schema/Schema.ts:22</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="31" class="link-to-prism">src/model/schema/Schema.ts:31</a></div>
                         </td>
                     </tr>
 
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>all fks from the actual database and inds that the user validated</p>
+</div>
+                </td>
+            </tr>
 
         </tbody>
     </table>
@@ -408,7 +446,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/model/schema/Schema.ts:25</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="42" class="link-to-prism">src/model/schema/Schema.ts:42</a></div>
                         </td>
                     </tr>
 
@@ -434,10 +472,16 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="23" class="link-to-prism">src/model/schema/Schema.ts:23</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="35" class="link-to-prism">src/model/schema/Schema.ts:35</a></div>
                         </td>
                     </tr>
 
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>all fks that can be derived from _baseFks</p>
+</div>
+                </td>
+            </tr>
 
         </tbody>
     </table>
@@ -460,7 +504,35 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="24" class="link-to-prism">src/model/schema/Schema.ts:24</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="41" class="link-to-prism">src/model/schema/Schema.ts:41</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_regularTables"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                            <span class="modifier">Optional</span>
+                        <span ><b>_regularTables</b></span>
+                        <a href="#_regularTables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="46" class="link-to-prism">src/model/schema/Schema.ts:46</a></div>
                         </td>
                     </tr>
 
@@ -486,10 +558,43 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/model/schema/Schema.ts:27</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/model/schema/Schema.ts:44</a></div>
                         </td>
                     </tr>
 
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_tableFks"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_tableFks</b></span>
+                        <a href="#_tableFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>new Map&lt;TableRelationship, FkDisplayOptions&gt;()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="40" class="link-to-prism">src/model/schema/Schema.ts:40</a></div>
+                        </td>
+                    </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>all fks in the form of TableRelationship that are valid among the current tables
+mapped to filtered, blacklisted, whitelisted</p>
+</div>
+                </td>
+            </tr>
 
         </tbody>
     </table>
@@ -512,7 +617,35 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/model/schema/Schema.ts:26</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="43" class="link-to-prism">src/model/schema/Schema.ts:43</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_unionedTables"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                            <span class="modifier">Optional</span>
+                        <span ><b>_unionedTables</b></span>
+                        <a href="#_unionedTables"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Array&lt;UnionedTable&gt;</code>
+
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="47" class="link-to-prism">src/model/schema/Schema.ts:47</a></div>
                         </td>
                     </tr>
 
@@ -540,7 +673,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="21" class="link-to-prism">src/model/schema/Schema.ts:21</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/model/schema/Schema.ts:27</a></div>
                         </td>
                     </tr>
 
@@ -562,12 +695,12 @@
             </tr>
                 <tr>
                     <td class="col-md-4">
-                        <i>Default value : </i><code>new Set&lt;Table&gt;()</code>
+                        <i>Default value : </i><code>new Set&lt;BasicTable&gt;()</code>
                     </td>
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/model/schema/Schema.ts:20</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/model/schema/Schema.ts:26</a></div>
                         </td>
                     </tr>
 
@@ -581,89 +714,6 @@
     <h3 id="methods">
         Methods
     </h3>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="addCurrentFkAndDerive"></a>
-                    <span class="name">
-                        <span class="modifier">Private</span>
-                        <span ><b>addCurrentFkAndDerive</b></span>
-                        <a href="#addCurrentFkAndDerive"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>addCurrentFkAndDerive(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>, result: Array<TableRelationship>)</code>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="280"
-                            class="link-to-prism">src/model/schema/Schema.ts:280</a></div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>fk</td>
-                                    <td>
-                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                                <tr>
-                                    <td>result</td>
-                                    <td>
-                                            <code>Array&lt;TableRelationship&gt;</code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
     <table class="table table-sm table-bordered">
         <tbody>
             <tr>
@@ -686,8 +736,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="133"
-                            class="link-to-prism">src/model/schema/Schema.ts:133</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="130"
+                            class="link-to-prism">src/model/schema/Schema.ts:130</a></div>
                 </td>
             </tr>
 
@@ -739,77 +789,6 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="addFkAndDerive"></a>
-                    <span class="name">
-                        <span class="modifier">Private</span>
-                        <span ><b>addFkAndDerive</b></span>
-                        <a href="#addFkAndDerive"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>addFkAndDerive(fk: <a href="../classes/SourceRelationship.html" target="_self">SourceRelationship</a>)</code>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="67"
-                            class="link-to-prism">src/model/schema/Schema.ts:67</a></div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>fk</td>
-                                    <td>
-                                                <code><a href="../classes/SourceRelationship.html" target="_self" >SourceRelationship</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
                     <a name="addFks"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
@@ -828,8 +807,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="56"
-                            class="link-to-prism">src/model/schema/Schema.ts:56</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="102"
+                            class="link-to-prism">src/model/schema/Schema.ts:102</a></div>
                 </td>
             </tr>
 
@@ -899,8 +878,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="128"
-                            class="link-to-prism">src/model/schema/Schema.ts:128</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="125"
+                            class="link-to-prism">src/model/schema/Schema.ts:125</a></div>
                 </td>
             </tr>
 
@@ -952,6 +931,77 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="addTableFk"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>addTableFk</b></span>
+                        <a href="#addTableFk"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addTableFk(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="432"
+                            class="link-to-prism">src/model/schema/Schema.ts:432</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="addTables"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
@@ -963,15 +1013,15 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>addTables(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                    <code>addTables(...tables: Array<BasicTable>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="42"
-                            class="link-to-prism">src/model/schema/Schema.ts:42</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="67"
+                            class="link-to-prism">src/model/schema/Schema.ts:67</a></div>
                 </td>
             </tr>
 
@@ -994,7 +1044,7 @@
                                 <tr>
                                     <td>tables</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                            <code>Array&lt;BasicTable&gt;</code>
                                     </td>
 
                                     <td>
@@ -1094,160 +1144,6 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="basicAddCurrentFk"></a>
-                    <span class="name">
-                        <span class="modifier">Private</span>
-                        <span ><b>basicAddCurrentFk</b></span>
-                        <a href="#basicAddCurrentFk"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>basicAddCurrentFk(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>, result: Array<TableRelationship>)</code>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="339"
-                            class="link-to-prism">src/model/schema/Schema.ts:339</a></div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>fk</td>
-                                    <td>
-                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                                <tr>
-                                    <td>result</td>
-                                    <td>
-                                            <code>Array&lt;TableRelationship&gt;</code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="basicAddFk"></a>
-                    <span class="name">
-                        <span class="modifier">Private</span>
-                        <span ><b>basicAddFk</b></span>
-                        <a href="#basicAddFk"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>basicAddFk(fk: <a href="../classes/SourceRelationship.html" target="_self">SourceRelationship</a>)</code>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="103"
-                            class="link-to-prism">src/model/schema/Schema.ts:103</a></div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>fk</td>
-                                    <td>
-                                                <code><a href="../classes/SourceRelationship.html" target="_self" >SourceRelationship</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
                     <a name="calculateFdsOf"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
@@ -1266,8 +1162,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="512"
-                            class="link-to-prism">src/model/schema/Schema.ts:512</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="518"
+                            class="link-to-prism">src/model/schema/Schema.ts:518</a></div>
                 </td>
             </tr>
 
@@ -1319,26 +1215,26 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="calculateFks"></a>
+                    <a name="calculateFkDisplayOptions"></a>
                     <span class="name">
                         <span class="modifier">Private</span>
-                        <span ><b>calculateFks</b></span>
-                        <a href="#calculateFks"><span class="icon ion-ios-link"></span></a>
+                        <span ><b>calculateFkDisplayOptions</b></span>
+                        <a href="#calculateFkDisplayOptions"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>calculateFks(result: Array<TableRelationship>)</code>
+                    <code>calculateFkDisplayOptions(oldFks: <a href="../interfaces/FkDisplayOptions.html" target="_self">Map&lt;TableRelationship | FkDisplayOptions&gt;</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="244"
-                            class="link-to-prism">src/model/schema/Schema.ts:244</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="302"
+                            class="link-to-prism">src/model/schema/Schema.ts:302</a></div>
                 </td>
             </tr>
 
@@ -1359,9 +1255,9 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>result</td>
+                                    <td>oldFks</td>
                                     <td>
-                                            <code>Array&lt;TableRelationship&gt;</code>
+                                                <code><a href="../interfaces/FkDisplayOptions.html" target="_self" >Map&lt;TableRelationship | FkDisplayOptions&gt;</a></code>
                                     </td>
 
                                     <td>
@@ -1390,6 +1286,45 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="calculateFks"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>calculateFks</b></span>
+                        <a href="#calculateFks"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>calculateFks()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="319"
+                            class="link-to-prism">src/model/schema/Schema.ts:319</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="calculateIndsOf"></a>
                     <span class="name">
                         <span class="modifier">Private</span>
@@ -1408,8 +1343,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="454"
-                            class="link-to-prism">src/model/schema/Schema.ts:454</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="460"
+                            class="link-to-prism">src/model/schema/Schema.ts:460</a></div>
                 </td>
             </tr>
 
@@ -1475,15 +1410,15 @@ except for the ones that are already foreign keys</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>calculateTrivialFks(result: Array<TableRelationship>)</code>
+                    <code>calculateTrivialFks()</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="364"
-                            class="link-to-prism">src/model/schema/Schema.ts:364</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="359"
+                            class="link-to-prism">src/model/schema/Schema.ts:359</a></div>
                 </td>
             </tr>
 
@@ -1495,40 +1430,8 @@ This method adds these relationships to the tables.</p>
 </div>
 
                     <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>result</td>
-                                    <td>
-                                            <code>Array&lt;TableRelationship&gt;</code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
                         <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
 
-                    </div>
-                    <div class="io-description">
-                        
                     </div>
                 </td>
             </tr>
@@ -1556,8 +1459,8 @@ This method adds these relationships to the tables.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="122"
-                            class="link-to-prism">src/model/schema/Schema.ts:122</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="108"
+                            class="link-to-prism">src/model/schema/Schema.ts:108</a></div>
                 </td>
             </tr>
 
@@ -1620,15 +1523,15 @@ This method adds these relationships to the tables.</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>deleteTables(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                    <code>deleteTables(...tables: Array<BasicTable>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="49"
-                            class="link-to-prism">src/model/schema/Schema.ts:49</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="76"
+                            class="link-to-prism">src/model/schema/Schema.ts:76</a></div>
                 </td>
             </tr>
 
@@ -1651,7 +1554,7 @@ This method adds these relationships to the tables.</p>
                                 <tr>
                                     <td>tables</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                            <code>Array&lt;BasicTable&gt;</code>
                                     </td>
 
                                     <td>
@@ -1691,15 +1594,15 @@ This method adds these relationships to the tables.</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>deriveFks()</code>
+                    <code>deriveFks(fks: SourceRelationship[])</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="62"
-                            class="link-to-prism">src/model/schema/Schema.ts:62</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="115"
+                            class="link-to-prism">src/model/schema/Schema.ts:115</a></div>
                 </td>
             </tr>
 
@@ -1708,8 +1611,40 @@ This method adds these relationships to the tables.</p>
                 <td class="col-md-4">
 
                     <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fks</td>
+                                    <td>
+                                            <code>SourceRelationship[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
                         <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
 
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
@@ -1730,15 +1665,15 @@ This method adds these relationships to the tables.</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>directDimensionableRoutes(table: <a href="../classes/Table.html" target="_self">Table</a>, filteredFks: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                    <code>directDimensionableRoutes(table: <a href="../classes/Table.html" target="_self">Table</a>, onlyDisplayedFks: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="167"
-                            class="link-to-prism">src/model/schema/Schema.ts:167</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="199"
+                            class="link-to-prism">src/model/schema/Schema.ts:199</a></div>
                 </td>
             </tr>
 
@@ -1777,7 +1712,7 @@ or routes that would add no extra information to the fact table when joined comp
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>filteredFks</td>
+                                    <td>onlyDisplayedFks</td>
                                     <td>
                                                 <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
                                     </td>
@@ -1788,7 +1723,7 @@ or routes that would add no extra information to the fact table when joined comp
 
 
                                     <td>
-                                        <p>whether or not to use filteredFks as a basis for route calculation</p>
+                                        <p>whether to use only the displayed fks or all fks as a basis for route calculation</p>
 
                                     </td>
                                 </tr>
@@ -1823,7 +1758,7 @@ or routes that would add no extra information to the fact table when joined comp
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>displayedColumnsOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>displayedColumnsOf(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
@@ -1854,7 +1789,7 @@ or routes that would add no extra information to the fact table when joined comp
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -1901,8 +1836,8 @@ or routes that would add no extra information to the fact table when joined comp
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="611"
-                            class="link-to-prism">src/model/schema/Schema.ts:611</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="617"
+                            class="link-to-prism">src/model/schema/Schema.ts:617</a></div>
                 </td>
             </tr>
 
@@ -1984,8 +1919,8 @@ or routes that would add no extra information to the fact table when joined comp
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="607"
-                            class="link-to-prism">src/model/schema/Schema.ts:607</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="613"
+                            class="link-to-prism">src/model/schema/Schema.ts:613</a></div>
                 </td>
             </tr>
 
@@ -2067,8 +2002,8 @@ or routes that would add no extra information to the fact table when joined comp
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="624"
-                            class="link-to-prism">src/model/schema/Schema.ts:624</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="627"
+                            class="link-to-prism">src/model/schema/Schema.ts:627</a></div>
                 </td>
             </tr>
 
@@ -2132,26 +2067,26 @@ or routes that would add no extra information to the fact table when joined comp
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="filterFks"></a>
+                    <a name="findEquivalentFk"></a>
                     <span class="name">
                         <span class="modifier">Private</span>
-                        <span ><b>filterFks</b></span>
-                        <a href="#filterFks"><span class="icon ion-ios-link"></span></a>
+                        <span ><b>findEquivalentFk</b></span>
+                        <a href="#findEquivalentFk"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>filterFks()</code>
+                    <code>findEquivalentFk(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="394"
-                            class="link-to-prism">src/model/schema/Schema.ts:394</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="137"
+                            class="link-to-prism">src/model/schema/Schema.ts:137</a></div>
                 </td>
             </tr>
 
@@ -2160,8 +2095,40 @@ or routes that would add no extra information to the fact table when joined comp
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
 
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
@@ -2182,15 +2149,169 @@ or routes that would add no extra information to the fact table when joined comp
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>fksOf(table: <a href="../classes/Table.html" target="_self">Table</a>, filtered: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                    <code>fksOf(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>, onlyDisplayed: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="204"
-                            class="link-to-prism">src/model/schema/Schema.ts:204</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="250"
+                            class="link-to-prism">src/model/schema/Schema.ts:250</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>onlyDisplayed</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;TableRelationship&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getFkDisplayOptions"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>getFkDisplayOptions</b></span>
+                        <a href="#getFkDisplayOptions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getFkDisplayOptions(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="144"
+                            class="link-to-prism">src/model/schema/Schema.ts:144</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="hiddenFksOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>hiddenFksOf</b></span>
+                        <a href="#hiddenFksOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>hiddenFksOf(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="263"
+                            class="link-to-prism">src/model/schema/Schema.ts:263</a></div>
                 </td>
             </tr>
 
@@ -2214,18 +2335,6 @@ or routes that would add no extra information to the fact table when joined comp
                                     <td>table</td>
                                     <td>
                                                 <code><a href="../classes/Table.html" target="_self" >Table</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                                <tr>
-                                    <td>filtered</td>
-                                    <td>
-                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
                                     </td>
 
                                     <td>
@@ -2272,8 +2381,8 @@ or routes that would add no extra information to the fact table when joined comp
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="214"
-                            class="link-to-prism">src/model/schema/Schema.ts:214</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="282"
+                            class="link-to-prism">src/model/schema/Schema.ts:282</a></div>
                 </td>
             </tr>
 
@@ -2329,26 +2438,26 @@ state of the schema.</p>
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="isFact"></a>
+                    <a name="isDirectDimension"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
-                        <span ><b>isFact</b></span>
-                        <a href="#isFact"><span class="icon ion-ios-link"></span></a>
+                        <span ><b>isDirectDimension</b></span>
+                        <a href="#isDirectDimension"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>isFact(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>isDirectDimension(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="158"
-                            class="link-to-prism">src/model/schema/Schema.ts:158</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="188"
+                            class="link-to-prism">src/model/schema/Schema.ts:188</a></div>
                 </td>
             </tr>
 
@@ -2371,7 +2480,7 @@ state of the schema.</p>
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -2379,6 +2488,96 @@ state of the schema.</p>
                                     </td>
 
 
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isFact"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>isFact</b></span>
+                        <a href="#isFact"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isFact(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>, onlyDisplayed: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="184"
+                            class="link-to-prism">src/model/schema/Schema.ts:184</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>onlyDisplayed</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>whether to use only the displayed fks or all fks as a basis for calculation</p>
+
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -2483,6 +2682,77 @@ state of the schema.</p>
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="isFkDisplayed"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>isFkDisplayed</b></span>
+                        <a href="#isFkDisplayed"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>isFkDisplayed(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="270"
+                            class="link-to-prism">src/model/schema/Schema.ts:270</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="isRelationshipValid"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
@@ -2501,8 +2771,8 @@ state of the schema.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="351"
-                            class="link-to-prism">src/model/schema/Schema.ts:351</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="447"
+                            class="link-to-prism">src/model/schema/Schema.ts:447</a></div>
                 </td>
             </tr>
 
@@ -2572,8 +2842,8 @@ state of the schema.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="443"
-                            class="link-to-prism">src/model/schema/Schema.ts:443</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="425"
+                            class="link-to-prism">src/model/schema/Schema.ts:425</a></div>
                 </td>
             </tr>
 
@@ -2643,8 +2913,8 @@ state of the schema.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="408"
-                            class="link-to-prism">src/model/schema/Schema.ts:408</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="390"
+                            class="link-to-prism">src/model/schema/Schema.ts:390</a></div>
                 </td>
             </tr>
 
@@ -2747,8 +3017,8 @@ state of the schema.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="476"
-                            class="link-to-prism">src/model/schema/Schema.ts:476</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="482"
+                            class="link-to-prism">src/model/schema/Schema.ts:482</a></div>
                 </td>
             </tr>
 
@@ -2826,15 +3096,15 @@ is referencing some other table. Uses a list of relationships that apply to the 
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>referencesOf(table: <a href="../classes/Table.html" target="_self">Table</a>, filtered: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                    <code>referencesOf(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>, onlyDisplayed: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="196"
-                            class="link-to-prism">src/model/schema/Schema.ts:196</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="237"
+                            class="link-to-prism">src/model/schema/Schema.ts:237</a></div>
                 </td>
             </tr>
 
@@ -2851,13 +3121,14 @@ is referencing some other table. Uses a list of relationships that apply to the 
                                     <td>Name</td>
                                     <td>Type</td>
                                     <td>Optional</td>
+                                    <td>Description</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -2865,9 +3136,11 @@ is referencing some other table. Uses a list of relationships that apply to the 
                                     </td>
 
 
+                                    <td>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td>filtered</td>
+                                    <td>onlyDisplayed</td>
                                     <td>
                                                 <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
                                     </td>
@@ -2877,6 +3150,10 @@ is referencing some other table. Uses a list of relationships that apply to the 
                                     </td>
 
 
+                                    <td>
+                                        <p>whether to use only the displayed fks or all fks</p>
+
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -2909,15 +3186,15 @@ is referencing some other table. Uses a list of relationships that apply to the 
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>routesFromFactTo(table: <a href="../classes/Table.html" target="_self">Table</a>, filteredFks: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                    <code>routesFromFactTo(table: <a href="../classes/Table.html" target="_self">Table</a>, onlyDisplayedFks: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>, visitedTables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="182"
-                            class="link-to-prism">src/model/schema/Schema.ts:182</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="214"
+                            class="link-to-prism">src/model/schema/Schema.ts:214</a></div>
                 </td>
             </tr>
 
@@ -2934,6 +3211,7 @@ is referencing some other table. Uses a list of relationships that apply to the 
                                     <td>Name</td>
                                     <td>Type</td>
                                     <td>Optional</td>
+                                    <td>Default value</td>
                                     <td>Description</td>
                                 </tr>
                             </thead>
@@ -2948,12 +3226,14 @@ is referencing some other table. Uses a list of relationships that apply to the 
                                         No
                                     </td>
 
+                                    <td>
+                                    </td>
 
                                     <td>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>filteredFks</td>
+                                    <td>onlyDisplayedFks</td>
                                     <td>
                                                 <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
                                     </td>
@@ -2962,10 +3242,29 @@ is referencing some other table. Uses a list of relationships that apply to the 
                                         No
                                     </td>
 
+                                    <td>
+                                    </td>
 
                                     <td>
-                                        <p>whether or not to use filteredFks as a basis for route calculation</p>
+                                        <p>whether to use only the displayed fks or all fks as a basis for route calculation</p>
 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>visitedTables</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>[]</code>
+                                    </td>
+
+                                    <td>
                                     </td>
                                 </tr>
                             </tbody>
@@ -2989,26 +3288,26 @@ is referencing some other table. Uses a list of relationships that apply to the 
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="sourceColumnSubset"></a>
+                    <a name="setFkDisplayOptions"></a>
                     <span class="name">
-                        <span class="modifier">Private</span>
-                        <span ><b>sourceColumnSubset</b></span>
-                        <a href="#sourceColumnSubset"><span class="icon ion-ios-link"></span></a>
+                        <span class="modifier">Public</span>
+                        <span ><b>setFkDisplayOptions</b></span>
+                        <a href="#setFkDisplayOptions"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>sourceColumnSubset(subset: Array<SourceColumn>, superset: Array<SourceColumn>)</code>
+                    <code>setFkDisplayOptions(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>, blacklisted: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>, whitelisted: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="111"
-                            class="link-to-prism">src/model/schema/Schema.ts:111</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="149"
+                            class="link-to-prism">src/model/schema/Schema.ts:149</a></div>
                 </td>
             </tr>
 
@@ -3029,9 +3328,9 @@ is referencing some other table. Uses a list of relationships that apply to the 
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>subset</td>
+                                    <td>fk</td>
                                     <td>
-                                            <code>Array&lt;SourceColumn&gt;</code>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
                                     </td>
 
                                     <td>
@@ -3041,9 +3340,92 @@ is referencing some other table. Uses a list of relationships that apply to the 
 
                                 </tr>
                                 <tr>
-                                    <td>superset</td>
+                                    <td>blacklisted</td>
                                     <td>
-                                            <code>Array&lt;SourceColumn&gt;</code>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>whitelisted</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="shouldBeFiltered"></a>
+                    <span class="name">
+                        <span class="modifier">Private</span>
+                        <span ><b>shouldBeFiltered</b></span>
+                        <a href="#shouldBeFiltered"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>shouldBeFiltered(fk: <a href="../classes/TableRelationship.html" target="_self">TableRelationship</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="385"
+                            class="link-to-prism">src/model/schema/Schema.ts:385</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fk</td>
+                                    <td>
+                                                <code><a href="../classes/TableRelationship.html" target="_self" >TableRelationship</a></code>
                                     </td>
 
                                     <td>
@@ -3090,8 +3472,8 @@ is referencing some other table. Uses a list of relationships that apply to the 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="603"
-                            class="link-to-prism">src/model/schema/Schema.ts:603</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="609"
+                            class="link-to-prism">src/model/schema/Schema.ts:609</a></div>
                 </td>
             </tr>
 
@@ -3161,8 +3543,8 @@ is referencing some other table. Uses a list of relationships that apply to the 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="29"
-                            class="link-to-prism">src/model/schema/Schema.ts:29</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="49"
+                            class="link-to-prism">src/model/schema/Schema.ts:49</a></div>
                 </td>
             </tr>
 
@@ -3171,7 +3553,7 @@ is referencing some other table. Uses a list of relationships that apply to the 
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>    <code>{ tables: any; _fks: any; _inds: any; _fds: any; }</code>
+                        <b>Returns : </b>        <code><a href="../classes/Table.html" target="_self" >{ regularTables: any; unionedTables: any; _baseFks: any; _tableFks: any; _inds: any; _fds: any; }</a></code>
 
                     </div>
                 </td>
@@ -3184,7 +3566,7 @@ is referencing some other table. Uses a list of relationships that apply to the 
                 <td class="col-md-4">
                     <a name="updateFks"></a>
                     <span class="name">
-                        <span class="modifier">Private</span>
+                        <span class="modifier">Public</span>
                         <span ><b>updateFks</b></span>
                         <a href="#updateFks"><span class="icon ion-ios-link"></span></a>
                     </span>
@@ -3193,15 +3575,15 @@ is referencing some other table. Uses a list of relationships that apply to the 
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>updateFks()</code>
+                    <code>updateFks(oldFks)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="226"
-                            class="link-to-prism">src/model/schema/Schema.ts:226</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="294"
+                            class="link-to-prism">src/model/schema/Schema.ts:294</a></div>
                 </td>
             </tr>
 
@@ -3210,8 +3592,40 @@ is referencing some other table. Uses a list of relationships that apply to the 
                 <td class="col-md-4">
 
                     <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Default value</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>oldFks</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>this._tableFks</code>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
                         <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
 
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
@@ -3239,8 +3653,8 @@ is referencing some other table. Uses a list of relationships that apply to the 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="221"
-                            class="link-to-prism">src/model/schema/Schema.ts:221</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="289"
+                            class="link-to-prism">src/model/schema/Schema.ts:289</a></div>
                 </td>
             </tr>
 
@@ -3302,6 +3716,50 @@ is referencing some other table. Uses a list of relationships that apply to the 
             <tbody>
                 <tr>
                     <td class="col-md-4">
+                        <a name="regularTables"></a>
+                        <span class="name"><b>regularTables</b><a href="#regularTables"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>regularTables()</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="84" class="link-to-prism">src/model/schema/Schema.ts:84</a></div>
+                                </td>
+                            </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="unionedTables"></a>
+                        <span class="name"><b>unionedTables</b><a href="#unionedTables"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>unionedTables()</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="93" class="link-to-prism">src/model/schema/Schema.ts:93</a></div>
+                                </td>
+                            </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
                         <a name="starMode"></a>
                         <span class="name"><b>starMode</b><a href="#starMode"><span class="icon ion-ios-link"></span></a></span>
                     </td>
@@ -3314,7 +3772,7 @@ is referencing some other table. Uses a list of relationships that apply to the 
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="140" class="link-to-prism">src/model/schema/Schema.ts:140</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="160" class="link-to-prism">src/model/schema/Schema.ts:160</a></div>
                                 </td>
                             </tr>
 
@@ -3325,7 +3783,7 @@ is referencing some other table. Uses a list of relationships that apply to the 
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="144" class="link-to-prism">src/model/schema/Schema.ts:144</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="164" class="link-to-prism">src/model/schema/Schema.ts:164</a></div>
                                 </td>
                             </tr>
                     <tr>
@@ -3384,7 +3842,7 @@ is referencing some other table. Uses a list of relationships that apply to the 
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="149" class="link-to-prism">src/model/schema/Schema.ts:149</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="170" class="link-to-prism">src/model/schema/Schema.ts:170</a></div>
                                 </td>
                             </tr>
                     <tr>
@@ -3443,7 +3901,7 @@ is referencing some other table. Uses a list of relationships that apply to the 
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="154" class="link-to-prism">src/model/schema/Schema.ts:154</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="175" class="link-to-prism">src/model/schema/Schema.ts:175</a></div>
                                 </td>
                             </tr>
                     <tr>
@@ -3503,27 +3961,52 @@ import SourceTable from &#x27;./SourceTable&#x27;;
 import SourceTableInstance from &#x27;./SourceTableInstance&#x27;;
 import Column from &#x27;./Column&#x27;;
 import Join from &#x27;./methodObjects/Join&#x27;;
-import BasicColumn from &#x27;../types/BasicColumn&#x27;;
+import BasicColumn, { surrogateKeyColumn } from &#x27;../types/BasicColumn&#x27;;
 import ColumnsTree from &#x27;./ColumnsTree&#x27;;
 import DirectDimension from &#x27;./methodObjects/DirectDimension&#x27;;
-import SourceColumn from &#x27;./SourceColumn&#x27;;
+import {
+  TableFkDerivation,
+  SourceFkDerivation,
+} from &#x27;./methodObjects/FkDerivation&#x27;;
+import UnionedTable from &#x27;./UnionedTable&#x27;;
+import BasicTable from &#x27;./BasicTable&#x27;;
+import { FkDisplayOptions } from &#x27;../types/FkDisplayOptions&#x27;;
 
 export default class Schema {
-  public readonly tables &#x3D; new Set&lt;Table&gt;();
+  public readonly tables &#x3D; new Set&lt;BasicTable&gt;();
   public name?: string;
-  private _databaseFks &#x3D; new Array&lt;SourceRelationship&gt;();
+  /**
+   * all fks from the actual database and inds that the user validated
+   */
+  private _baseFks &#x3D; new Array&lt;SourceRelationship&gt;();
+  /**
+   * all fks that can be derived from _baseFks
+   */
   private _fks &#x3D; new Array&lt;SourceRelationship&gt;();
+  /**
+   * all fks in the form of TableRelationship that are valid among the current tables
+   * mapped to filtered, blacklisted, whitelisted
+   */
+  private _tableFks &#x3D; new Map&lt;TableRelationship, FkDisplayOptions&gt;();
   private _inds &#x3D; new Array&lt;SourceRelationship&gt;();
   private _fds &#x3D; new Map&lt;SourceTable, Array&lt;SourceFunctionalDependency&gt;&gt;();
   private _tableFksValid &#x3D; false;
   private _starMode &#x3D; false;
 
+  private _regularTables?: Array&lt;Table&gt;;
+  private _unionedTables?: Array&lt;UnionedTable&gt;;
+
   public toJSON() {
     return {
-      tables: Array.from(this.tables),
-      _fks: Array.from(this._databaseFks),
-      _inds: Array.from(this._inds),
-      _fds: [...this._fds.values()].flat(),
+      regularTables: Array.from(this.regularTables),
+      unionedTables: Array.from(this.unionedTables),
+      _baseFks: this._baseFks,
+      _tableFks: Array.from(this._tableFks.entries()).filter(
+        ([, displayOptions]) &#x3D;&gt;
+          displayOptions.blacklisted || displayOptions.whitelisted
+      ),
+      _inds: this._inds,
+      _fds: Array.from(this._fds.values()).flat(),
     };
   }
 
@@ -3531,90 +4014,62 @@ export default class Schema {
     this.addTables(...tables);
   }
 
-  public addTables(...tables: Array&lt;Table&gt;) {
+  public addTables(...tables: Array&lt;BasicTable&gt;) {
     tables.forEach((table) &#x3D;&gt; {
       this.tables.add(table);
     });
     this.relationshipsValid &#x3D; false;
+    this._regularTables &#x3D; undefined;
+    this._unionedTables &#x3D; undefined;
   }
 
-  public deleteTables(...tables: Array&lt;Table&gt;) {
+  public deleteTables(...tables: Array&lt;BasicTable&gt;) {
     tables.forEach((table) &#x3D;&gt; {
       this.tables.delete(table);
     });
     this.relationshipsValid &#x3D; false;
+    this._regularTables &#x3D; undefined;
+  }
+
+  public get regularTables(): Array&lt;Table&gt; {
+    if (this._regularTables &#x3D;&#x3D;&#x3D; undefined) {
+      this._regularTables &#x3D; [...this.tables].filter(
+        (table) &#x3D;&gt; table instanceof Table
+      ) as Array&lt;Table&gt;;
+    }
+    return this._regularTables;
+  }
+
+  public get unionedTables(): Array&lt;UnionedTable&gt; {
+    if (this._unionedTables &#x3D;&#x3D;&#x3D; undefined) {
+      this._unionedTables &#x3D; [...this.tables].filter(
+        (table) &#x3D;&gt; table instanceof UnionedTable
+      ) as Array&lt;UnionedTable&gt;;
+    }
+    return this._unionedTables;
   }
 
   public addFks(...fks: SourceRelationship[]) {
-    this._databaseFks.push(...fks);
-    this.deriveFks();
+    this._baseFks.push(...fks);
+    this.deriveFks(fks);
     this.relationshipsValid &#x3D; false;
-  }
-
-  private deriveFks() {
-    this._fks &#x3D; new Array();
-    for (const fk of this._databaseFks) this.addFkAndDerive(fk);
-  }
-
-  private addFkAndDerive(fk: SourceRelationship) {
-    if (!this.basicAddFk(fk)) return;
-    const fksToReferencing &#x3D; this._fks.filter(
-      (otherFk) &#x3D;&gt;
-        otherFk &#x3D;&#x3D; fk ||
-        this.sourceColumnSubset(fk.referencing, otherFk.referenced)
-    );
-    const fksFromReferenced &#x3D; this._fks.filter(
-      (otherFk) &#x3D;&gt;
-        otherFk &#x3D;&#x3D; fk ||
-        this.sourceColumnSubset(otherFk.referencing, fk.referenced)
-    );
-    for (const fkToReferencing of fksToReferencing) {
-      for (const fkFromReferenced of fksFromReferenced) {
-        if (fkToReferencing &#x3D;&#x3D; fkFromReferenced) continue;
-        const newRelReferencing &#x3D; new Array();
-        for (const referencedCol of fkFromReferenced.referencing) {
-          const i &#x3D; fkToReferencing.referenced.findIndex((referencingCol) &#x3D;&gt; {
-            if (fkToReferencing &#x3D;&#x3D; fk || fkFromReferenced &#x3D;&#x3D; fk)
-              return referencingCol.equals(referencedCol);
-            else return fk.sourceColumnsMapped(referencingCol, referencedCol);
-          });
-          if (i &#x3D;&#x3D; -1) break;
-          newRelReferencing.push(fkToReferencing.referencing[i]);
-        }
-        if (newRelReferencing.length &#x3D;&#x3D; fkFromReferenced.referenced.length)
-          this.basicAddFk(
-            new SourceRelationship(
-              newRelReferencing,
-              Array.from(fkFromReferenced.referenced)
-            )
-          );
-      }
-    }
-  }
-
-  private basicAddFk(fk: SourceRelationship): boolean {
-    if (!this._fks.some((existingFk) &#x3D;&gt; existingFk.equals(fk))) {
-      this._fks.push(fk);
-      return true;
-    }
-    return false;
-  }
-
-  private sourceColumnSubset(
-    subset: Array&lt;SourceColumn&gt;,
-    superset: Array&lt;SourceColumn&gt;
-  ): boolean {
-    for (const subsetCol of subset) {
-      if (!superset.some((supersetCol) &#x3D;&gt; supersetCol.equals(subsetCol)))
-        return false;
-    }
-    return true;
   }
 
   public deleteFk(fk: SourceRelationship) {
-    this._databaseFks &#x3D; this._databaseFks.filter((fk1) &#x3D;&gt; fk1 !&#x3D; fk);
-    this.deriveFks();
+    this._baseFks &#x3D; this._baseFks.filter((existingFk) &#x3D;&gt; existingFk !&#x3D; fk);
+    this._fks &#x3D; new Array();
+    this.deriveFks(this._baseFks);
     this.relationshipsValid &#x3D; false;
+  }
+
+  private deriveFks(fks: SourceRelationship[]) {
+    for (const fk of fks) {
+      for (const actualFk of new SourceFkDerivation(this._fks, fk).result) {
+        if (!this._fks.some((existingFk) &#x3D;&gt; existingFk.equals(actualFk))) {
+          this._fks.push(actualFk);
+        }
+      }
+    }
   }
 
   public addInds(...inds: SourceRelationship[]) {
@@ -3629,13 +4084,37 @@ export default class Schema {
     this._fds.get(fd.rhs[0].table)!.push(fd);
   }
 
+  private findEquivalentFk(fk: TableRelationship) {
+    if (this._tableFks.has(fk)) return fk;
+    return Array.from(this._tableFks.keys()).find((otherFk) &#x3D;&gt;
+      otherFk.equals(fk)
+    )!;
+  }
+
+  public getFkDisplayOptions(fk: TableRelationship) {
+    fk &#x3D; this.findEquivalentFk(fk);
+    return this._tableFks.get(fk)!;
+  }
+
+  public setFkDisplayOptions(
+    fk: TableRelationship,
+    blacklisted: boolean,
+    whitelisted: boolean
+  ) {
+    fk &#x3D; this.findEquivalentFk(fk);
+    const displayOptions &#x3D; this._tableFks.get(fk)!;
+    displayOptions.blacklisted &#x3D; blacklisted;
+    displayOptions.whitelisted &#x3D; whitelisted;
+  }
+
   public get starMode(): boolean {
     return this._starMode;
   }
 
   public set starMode(value: boolean) {
     this._starMode &#x3D; value;
-    this._tableFksValid &#x3D; false;
+    for (const [fk, displayOptions] of this._tableFks.entries())
+      displayOptions.filtered &#x3D; this.shouldBeFiltered(fk);
   }
 
   private set relationshipsValid(valid: boolean) {
@@ -3644,23 +4123,34 @@ export default class Schema {
   }
 
   private set tableIndsValid(valid: boolean) {
-    this.tables.forEach((table) &#x3D;&gt; (table._indsValid &#x3D; valid));
+    this.tables.forEach((table) &#x3D;&gt; {
+      if (table instanceof Table) table._indsValid &#x3D; valid;
+    });
   }
 
-  public isFact(table: Table): boolean {
-    return this.referencesOf(table, true).length &#x3D;&#x3D; 0;
+  /**
+   * @param onlyDisplayed whether to use only the displayed fks or all fks as a basis for calculation
+   */
+  public isFact(table: BasicTable, onlyDisplayed: boolean): boolean {
+    return this.referencesOf(table, onlyDisplayed).length &#x3D;&#x3D; 0;
+  }
+
+  public isDirectDimension(table: BasicTable): boolean {
+    return this.referencesOf(table, true).some((reference) &#x3D;&gt;
+      this.isFact(reference.referencingTable, true)
+    );
   }
 
   /**
    * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
    * or routes that would add no extra information to the fact table when joined completely
-   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
+   * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public directDimensionableRoutes(
     table: Table,
-    filteredFks: boolean
+    onlyDisplayedFks: boolean
   ): Array&lt;Array&lt;TableRelationship&gt;&gt; {
-    return this.routesFromFactTo(table, filteredFks).filter((route) &#x3D;&gt; {
+    return this.routesFromFactTo(table, onlyDisplayedFks).filter((route) &#x3D;&gt; {
       if (route.length &lt;&#x3D; 1) return false;
       const dd &#x3D; new DirectDimension([route]);
       return dd.newTable.columns.cardinality &gt; dd.oldTable.columns.cardinality;
@@ -3669,15 +4159,21 @@ export default class Schema {
 
   /**
    * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
-   * @param filteredFks whether or not to use filteredFks as a basis for route calculation
+   * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public routesFromFactTo(
     table: Table,
-    filteredFks: boolean
+    onlyDisplayedFks: boolean,
+    visitedTables: Array&lt;Table&gt; &#x3D; []
   ): Array&lt;Array&lt;TableRelationship&gt;&gt; {
     const result &#x3D; new Array&lt;Array&lt;TableRelationship&gt;&gt;();
-    for (const rel of this.referencesOf(table, filteredFks)) {
-      const routes &#x3D; this.routesFromFactTo(rel.referencing, filteredFks);
+    for (const rel of this.referencesOf(table, onlyDisplayedFks)) {
+      if (visitedTables.includes(rel.referencingTable)) continue;
+      const routes &#x3D; this.routesFromFactTo(
+        rel.referencingTable,
+        onlyDisplayedFks,
+        [...visitedTables, table]
+      );
       routes.forEach((route) &#x3D;&gt; route.push(rel));
       result.push(...routes);
     }
@@ -3685,17 +4181,47 @@ export default class Schema {
     return result;
   }
 
+  /**
+   * @param onlyDisplayed whether to use only the displayed fks or all fks
+   */
   public referencesOf(
-    table: Table,
-    filtered: boolean
+    table: BasicTable,
+    onlyDisplayed: boolean
   ): Array&lt;TableRelationship&gt; {
+    if (!(table instanceof Table)) return [];
     if (!this._tableFksValid) this.updateFks();
-    return filtered ? table._filteredReferences : table._references;
+    let result &#x3D; Array.from(this._tableFks.keys()).filter(
+      (fk) &#x3D;&gt; fk.referencedTable &#x3D;&#x3D; table
+    );
+    if (onlyDisplayed) result &#x3D; result.filter((fk) &#x3D;&gt; this.isFkDisplayed(fk));
+    return result;
   }
 
-  public fksOf(table: Table, filtered: boolean): Array&lt;TableRelationship&gt; {
+  public fksOf(
+    table: BasicTable,
+    onlyDisplayed: boolean
+  ): Array&lt;TableRelationship&gt; {
+    if (!(table instanceof Table)) return [];
     if (!this._tableFksValid) this.updateFks();
-    return filtered ? table._filteredFks : table._fks;
+    let result &#x3D; Array.from(this._tableFks.keys()).filter(
+      (fk) &#x3D;&gt; fk.referencingTable &#x3D;&#x3D; table
+    );
+    if (onlyDisplayed) result &#x3D; result.filter((fk) &#x3D;&gt; this.isFkDisplayed(fk));
+    return result;
+  }
+
+  public hiddenFksOf(table: Table): Array&lt;TableRelationship&gt; {
+    if (!this._tableFksValid) this.updateFks();
+    return Array.from(this._tableFks.keys()).filter(
+      (fk) &#x3D;&gt; fk.referencingTable &#x3D;&#x3D; table &amp;&amp; !this.isFkDisplayed(fk)
+    );
+  }
+
+  public isFkDisplayed(fk: TableRelationship) {
+    const displayOptions &#x3D; this.getFkDisplayOptions(fk)!;
+    if (displayOptions.whitelisted) return true;
+    if (displayOptions.blacklisted || displayOptions.filtered) return false;
+    return true;
   }
 
   /**
@@ -3715,37 +4241,44 @@ export default class Schema {
     table._indsValid &#x3D; true;
   }
 
-  private updateFks(): void {
-    for (const table of this.tables) {
-      table._fks &#x3D; new Array();
-      table._references &#x3D; new Array();
-      table._filteredFks &#x3D; new Array();
-      table._filteredReferences &#x3D; new Array();
-    }
-    const currentFks &#x3D; new Array&lt;TableRelationship&gt;();
-    this.calculateFks(currentFks);
-    this.calculateTrivialFks(currentFks);
-    for (const fk of currentFks) {
-      fk.referencing._fks.push(fk);
-      fk.referenced._references.push(fk);
-    }
+  public updateFks(oldFks &#x3D; this._tableFks): void {
+    this._tableFks &#x3D; new Map&lt;TableRelationship, FkDisplayOptions&gt;();
+    this.calculateFks();
+    this.calculateTrivialFks();
     this._tableFksValid &#x3D; true;
-    this.filterFks();
+    this.calculateFkDisplayOptions(oldFks);
   }
 
-  private calculateFks(result: Array&lt;TableRelationship&gt;): void {
+  private calculateFkDisplayOptions(
+    oldFks: Map&lt;TableRelationship, FkDisplayOptions&gt;
+  ) {
+    for (const fk of Array.from(this._tableFks.keys())) {
+      const equivalentOldFk &#x3D; Array.from(oldFks.keys()).find((otherFk) &#x3D;&gt;
+        otherFk.equals(fk)
+      );
+      if (equivalentOldFk)
+        this._tableFks.set(fk, {
+          filtered: false,
+          blacklisted: oldFks.get(equivalentOldFk)!.blacklisted,
+          whitelisted: oldFks.get(equivalentOldFk)!.whitelisted,
+        });
+      this._tableFks.get(fk)!.filtered &#x3D; this.shouldBeFiltered(fk);
+    }
+  }
+
+  private calculateFks(): void {
     for (const rel of this._fks) {
       const referencings &#x3D; new Map&lt;Table, Array&lt;Array&lt;Column&gt;&gt;&gt;();
-      for (const table of this.tables) {
-        const columns &#x3D; table.columnsEquivalentTo(rel.referencing, true);
+      for (const table of this.regularTables) {
+        const columns &#x3D; table.columnsEquivalentTo(rel.referencingCols, true);
         if (columns.length &gt; 0) referencings.set(table, columns);
       }
       if ([...referencings.keys()].length &#x3D;&#x3D; 0) continue;
 
       const referenceds &#x3D; new Map&lt;Table, Array&lt;Array&lt;Column&gt;&gt;&gt;();
-      for (const table of this.tables) {
+      for (const table of this.regularTables) {
         const columns &#x3D; table
-          .columnsEquivalentTo(rel.referenced, false)
+          .columnsEquivalentTo(rel.referencedCols, false)
           .filter((possibleColumns) &#x3D;&gt;
             table.isKey(new ColumnCombination(possibleColumns))
           );
@@ -3764,98 +4297,18 @@ export default class Schema {
                 referencedTable
               );
               if (this.isRelationshipValid(relationship))
-                this.addCurrentFkAndDerive(relationship, result);
+                this.addTableFk(relationship);
             }
     }
-  }
-
-  private addCurrentFkAndDerive(
-    fk: TableRelationship,
-    result: Array&lt;TableRelationship&gt;
-  ) {
-    if (!this.basicAddCurrentFk(fk, result)) return;
-    const fksToReferencing &#x3D; result.filter(
-      (otherFk) &#x3D;&gt;
-        otherFk &#x3D;&#x3D; fk ||
-        (fk.referencing &#x3D;&#x3D; otherFk.referenced &amp;&amp;
-          new ColumnCombination(fk.relationship.referencing).isSubsetOf(
-            new ColumnCombination(otherFk.relationship.referenced)
-          ))
-    );
-    const fksFromReferenced &#x3D; result.filter(
-      (otherFk) &#x3D;&gt;
-        otherFk &#x3D;&#x3D; fk ||
-        (otherFk.referencing &#x3D;&#x3D; fk.referenced &amp;&amp;
-          new ColumnCombination(otherFk.relationship.referencing).isSubsetOf(
-            new ColumnCombination(fk.relationship.referenced)
-          ))
-    );
-    for (const fkToReferencing of fksToReferencing) {
-      for (const fkFromReferenced of fksFromReferenced) {
-        if (fkToReferencing &#x3D;&#x3D; fkFromReferenced) continue;
-        const newRelReferencing &#x3D; new Array();
-        for (const referencedCol of fkFromReferenced.relationship.referencing) {
-          const i &#x3D; fkToReferencing.relationship.referenced.findIndex(
-            (referencingCol) &#x3D;&gt; {
-              if (fkToReferencing &#x3D;&#x3D; fk || fkFromReferenced &#x3D;&#x3D; fk)
-                return referencingCol.equals(referencedCol);
-              else
-                return fk.relationship.columnsMapped(
-                  referencingCol,
-                  referencedCol
-                );
-            }
-          );
-          if (i &#x3D;&#x3D; -1) break;
-          newRelReferencing.push(fkToReferencing.relationship.referencing[i]);
-        }
-        if (
-          newRelReferencing.length &#x3D;&#x3D;
-          fkFromReferenced.relationship.referenced.length
-        )
-          this.basicAddCurrentFk(
-            new TableRelationship(
-              new Relationship(
-                newRelReferencing,
-                Array.from(fkFromReferenced.relationship.referenced)
-              ),
-              fkToReferencing.referencing,
-              fkFromReferenced.referenced
-            ),
-            result
-          );
-      }
-    }
-  }
-
-  private basicAddCurrentFk(
-    fk: TableRelationship,
-    result: Array&lt;TableRelationship&gt;
-  ) {
-    if (fk.referencing &#x3D;&#x3D; fk.referenced) return false;
-    if (!result.some((existingFk) &#x3D;&gt; existingFk.equals(fk))) {
-      result.push(fk);
-      return true;
-    }
-    return false;
-  }
-
-  public isRelationshipValid(relationship: TableRelationship): boolean {
-    const newTable &#x3D; new Join(relationship).newTable;
-    return (
-      newTable.columns.cardinality &gt;
-        relationship.referencing.columns.cardinality &amp;&amp;
-      relationship.referenced !&#x3D; relationship.referencing
-    );
   }
 
   /**
    * A table which has the same columns as another tables pk has a relationship with this table.
    * This method adds these relationships to the tables.
    */
-  private calculateTrivialFks(result: Array&lt;TableRelationship&gt;): void {
-    for (const referencingTable of this.tables) {
-      for (const referencedTable of this.tables) {
+  private calculateTrivialFks(): void {
+    for (const referencingTable of this.regularTables) {
+      for (const referencedTable of this.regularTables) {
         if (referencedTable &#x3D;&#x3D; referencingTable || !referencedTable.pk)
           continue;
         const pk &#x3D; referencedTable.pk!.asArray();
@@ -3868,33 +4321,20 @@ export default class Schema {
               referencingTable,
               referencedTable
             );
-            if (
-              !referencingTable._fks.some(
-                (otherRel) &#x3D;&gt;
-                  otherRel.referenced &#x3D;&#x3D; relationship.referenced &amp;&amp;
-                  otherRel.relationship.equals(relationship.relationship)
-              ) &amp;&amp;
-              this.isRelationshipValid(relationship)
-            ) {
-              this.addCurrentFkAndDerive(relationship, result);
-            }
+            if (this.isRelationshipValid(relationship))
+              for (const newFk of new TableFkDerivation(
+                Array.from(this._tableFks.keys()),
+                relationship
+              ).result)
+                this.addTableFk(newFk);
           });
       }
     }
   }
 
-  private filterFks() {
-    const shouldBeFiltered &#x3D; this.starMode
-      ? this.isStarViolatingFk
-      : this.isTransitiveFk;
-    for (const table of this.tables) {
-      table._filteredFks &#x3D; table._fks.filter(
-        (fk) &#x3D;&gt; !shouldBeFiltered.apply(this, [fk])
-      );
-      for (const filteredFk of table._filteredFks) {
-        filteredFk.referenced._filteredReferences.push(filteredFk);
-      }
-    }
+  private shouldBeFiltered(fk: TableRelationship) {
+    if (this.starMode) return this.isStarViolatingFk(fk);
+    else return this.isTransitiveFk(fk);
   }
 
   private isTransitiveFk(
@@ -3902,15 +4342,15 @@ export default class Schema {
     visitedTables: Array&lt;Table&gt; &#x3D; [],
     firstIteration: boolean &#x3D; true
   ): boolean {
-    if (visitedTables.includes(fk.referencing)) return false;
-    visitedTables.push(fk.referencing);
-    for (const otherFk of fk.referencing._fks) {
+    if (visitedTables.includes(fk.referencingTable)) return false;
+    visitedTables.push(fk.referencingTable);
+    for (const otherFk of this.fksOf(fk.referencingTable, false)) {
       if (otherFk.equals(fk)) {
         if (firstIteration) continue;
         else return true;
       }
       const newReferencing &#x3D; otherFk.relationship.columnsReferencedBy(
-        fk.relationship.referencing
+        fk.referencingCols
       );
       if (newReferencing.some((col) &#x3D;&gt; !col)) continue;
       if (
@@ -3918,10 +4358,10 @@ export default class Schema {
           new TableRelationship(
             new Relationship(
               newReferencing as Array&lt;Column&gt;,
-              fk.relationship.referenced
+              fk.referencedCols
             ),
-            otherFk.referenced,
-            fk.referenced
+            otherFk.referencedTable,
+            fk.referencedTable
           ),
           visitedTables,
           false
@@ -3933,9 +4373,33 @@ export default class Schema {
   }
 
   private isStarViolatingFk(fk: TableRelationship) {
-    if (fk.referencing._references.length &#x3D;&#x3D; 0) return false;
-    return !this.directDimensionableRoutes(fk.referenced, false).some(
+    if (this.isFact(fk.referencingTable, false)) return false;
+    return !this.directDimensionableRoutes(fk.referencedTable, false).some(
       (route) &#x3D;&gt; route[route.length - 1] &#x3D;&#x3D; fk
+    );
+  }
+
+  private addTableFk(fk: TableRelationship) {
+    if (fk.referencingTable &#x3D;&#x3D; fk.referencedTable) return;
+    if (
+      !Array.from(this._tableFks.keys()).some((existingFk) &#x3D;&gt;
+        existingFk.equals(fk)
+      )
+    ) {
+      this._tableFks.set(fk, {
+        filtered: false,
+        blacklisted: false,
+        whitelisted: false,
+      });
+    }
+  }
+
+  public isRelationshipValid(relationship: TableRelationship): boolean {
+    const newTable &#x3D; new Join(relationship).newTable;
+    return (
+      newTable.columns.cardinality &gt;
+        relationship.referencingTable.columns.cardinality &amp;&amp;
+      relationship.referencedTable !&#x3D; relationship.referencingTable
     );
   }
 
@@ -3971,13 +4435,13 @@ export default class Schema {
   ): Map&lt;SourceRelationship, Array&lt;TableRelationship&gt;&gt; {
     let result &#x3D; new Map&lt;SourceRelationship, Array&lt;TableRelationship&gt;&gt;();
     for (const rel of relationships) {
-      let ccs &#x3D; table.columnsEquivalentTo(rel.referencing, true);
+      let ccs &#x3D; table.columnsEquivalentTo(rel.referencingCols, true);
       if (ccs.length &#x3D;&#x3D; 0) continue;
 
-      for (const otherTable of this.tables) {
+      for (const otherTable of this.regularTables) {
         if (otherTable &#x3D;&#x3D; table) continue;
         let otherCCs &#x3D; otherTable
-          .columnsEquivalentTo(rel.referenced, false)
+          .columnsEquivalentTo(rel.referencedCols, false)
           .filter((otherCC) &#x3D;&gt;
             otherTable.isKey(new ColumnCombination(otherCC))
           );
@@ -4025,7 +4489,7 @@ export default class Schema {
         .union(referencedColumns);
 
       //matching (sourceFd -&gt; Fd) and selection
-      for (const sourceFd of this._fds.get(source.table)!) {
+      for (const sourceFd of this._fds.get(source.table) ?? []) {
         const lhs &#x3D; relevantColumns.columnsEquivalentTo(sourceFd.lhs, true);
         if (!lhs) continue;
         const rhs &#x3D; relevantColumns.columnsEquivalentTo(sourceFd.rhs, false)!;
@@ -4106,10 +4570,7 @@ export default class Schema {
   ): Array&lt;TableRelationship&gt; {
     return this.fksOf(table, true).filter(
       (fk) &#x3D;&gt;
-        !table.splitPreservesCC(
-          fd,
-          new ColumnCombination(fk.relationship.referencing)
-        )
+        !table.splitPreservesCC(fd, new ColumnCombination(fk.referencingCols))
     );
   }
 
@@ -4119,10 +4580,7 @@ export default class Schema {
   ): Array&lt;TableRelationship&gt; {
     return this.referencesOf(table, true).filter(
       (ref) &#x3D;&gt;
-        !table.splitPreservesCC(
-          fd,
-          new ColumnCombination(ref.relationship.referenced)
-        )
+        !table.splitPreservesCC(fd, new ColumnCombination(ref.referencedCols))
     );
   }
 
@@ -4154,19 +4612,26 @@ export default class Schema {
     return resultingTables;
   }
 
-  public displayedColumnsOf(table: Table): Array&lt;BasicColumn&gt; {
-    const columns &#x3D; new Array&lt;BasicColumn&gt;();
-    if (table.implementsSurrogateKey())
-      columns.push({ name: table.surrogateKey, dataTypeString: &#x27;integer&#x27; });
-    columns.push(...table.columns);
-    for (const fk of this.fksOf(table, true))
-      if (fk.referenced.implementsSurrogateKey()) {
-        columns.push({
-          name: fk.referencingName,
-          dataTypeString: &#x27;integer&#x27;,
-        });
-      }
-    return columns;
+  public displayedColumnsOf(table: BasicTable): Array&lt;BasicColumn&gt; {
+    if (table instanceof Table) {
+      const columns &#x3D; new Array&lt;BasicColumn&gt;();
+      if (table.implementsSurrogateKey())
+        columns.push(surrogateKeyColumn(table.surrogateKey));
+      columns.push(...table.columns);
+      for (const fk of this.fksOf(table, true))
+        if (fk.referencedTable.implementsSurrogateKey()) {
+          const name &#x3D;
+            fk.referencedTable.surrogateKey +
+            &#x27;_&#x27; +
+            fk.relationship.referencing.map((col) &#x3D;&gt; col.name).join(&#x27;_&#x27;);
+          columns.push(surrogateKeyColumn(name));
+        }
+      return columns;
+    } else if (table instanceof UnionedTable) {
+      return table.displayedColumns();
+    } else {
+      throw Error;
+    }
   }
 }
 </code></pre>

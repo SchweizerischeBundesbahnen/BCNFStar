@@ -26,7 +26,10 @@
     "lint": "run-s lint:*",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:prettier": "prettier --write .",
-    "postcheckout": "sh npm-install-githook.sh"
+    "postcheckout": "sh npm-install-githook.sh",
+    "docs:frontend": "cd frontend && compodoc -p tsconfig.doc.json -d ../docs/frontend/",
+    "docs:server": "cd server && npx typedoc --out ../docs/server/ --exclude \"**/node_modules/**\" --entryPointStrategy expand .",
+    "docs": "npm run docs:frontend && npm run docs:server"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.9.12",

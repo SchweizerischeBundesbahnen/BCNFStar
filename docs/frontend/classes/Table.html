@@ -67,6 +67,12 @@
 
 
 
+            <p class="comment">
+                <h3>Extends</h3>
+            </p>
+            <p class="comment">
+                        <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
+            </p>
 
 
 
@@ -89,18 +95,6 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
-                                <a href="#_filteredFks" >_filteredFks</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
-                                <a href="#_filteredReferences" >_filteredReferences</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
-                                <a href="#_fks" >_fks</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
                                 <a href="#_inds" >_inds</a>
                             </li>
                             <li>
@@ -111,10 +105,6 @@
                                     <span class="modifier">Private</span>
                                     <span class="modifier">Optional</span>
                                 <a href="#_keys" >_keys</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
-                                <a href="#_references" >_references</a>
                             </li>
                             <li>
                                     <span class="modifier">Private</span>
@@ -131,10 +121,6 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
-                                <a href="#name" >name</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
                                     <span class="modifier">Optional</span>
                                 <a href="#pk" >pk</a>
                             </li>
@@ -144,15 +130,19 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
-                                <a href="#schemaName" >schemaName</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
                                 <a href="#sources" >sources</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
                                 <a href="#surrogateKey" >surrogateKey</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#name" >name</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#schemaName" >schemaName</a>
                             </li>
                         </ul>
                     </td>
@@ -236,6 +226,10 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
+                                <a href="#minimalDeterminantsOf" >minimalDeterminantsOf</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
                                 <a href="#reducedSources" >reducedSources</a>
                             </li>
                             <li>
@@ -299,9 +293,6 @@
                         <td class="col-md-4">
                             <ul class="index-list">
                                 <li>
-                                    <a href="#fullName" >fullName</a>
-                                </li>
-                                <li>
                                     <a href="#numColumns" >numColumns</a>
                                 </li>
                                 <li>
@@ -326,7 +317,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="67" class="link-to-prism">src/model/schema/Table.ts:67</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="48" class="link-to-prism">src/model/schema/Table.ts:48</a></div>
                             </td>
                         </tr>
 
@@ -390,109 +381,10 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/model/schema/Table.ts:25</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="24" class="link-to-prism">src/model/schema/Table.ts:24</a></div>
                         </td>
                     </tr>
 
-
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="_filteredFks"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>_filteredFks</b></span>
-                        <a href="#_filteredFks"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Type : </i>    <code>Array&lt;TableRelationship&gt;</code>
-
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="35" class="link-to-prism">src/model/schema/Table.ts:35</a></div>
-                        </td>
-                    </tr>
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-description"><p>cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class</p>
-</div>
-                </td>
-            </tr>
-
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="_filteredReferences"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>_filteredReferences</b></span>
-                        <a href="#_filteredReferences"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Type : </i>    <code>Array&lt;TableRelationship&gt;</code>
-
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="43" class="link-to-prism">src/model/schema/Table.ts:43</a></div>
-                        </td>
-                    </tr>
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-description"><p>cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class</p>
-</div>
-                </td>
-            </tr>
-
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="_fks"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>_fks</b></span>
-                        <a href="#_fks"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Type : </i>    <code>Array&lt;TableRelationship&gt;</code>
-
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="39" class="link-to-prism">src/model/schema/Table.ts:39</a></div>
-                        </td>
-                    </tr>
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-description"><p>cached results of schema.fksOf(this, false). Should not be accessed from outside the schema class</p>
-</div>
-                </td>
-            </tr>
 
         </tbody>
     </table>
@@ -516,7 +408,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="51" class="link-to-prism">src/model/schema/Table.ts:51</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="32" class="link-to-prism">src/model/schema/Table.ts:32</a></div>
                         </td>
                     </tr>
 
@@ -548,7 +440,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="55" class="link-to-prism">src/model/schema/Table.ts:55</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="36" class="link-to-prism">src/model/schema/Table.ts:36</a></div>
                         </td>
                     </tr>
 
@@ -582,43 +474,10 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="24" class="link-to-prism">src/model/schema/Table.ts:24</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="23" class="link-to-prism">src/model/schema/Table.ts:23</a></div>
                         </td>
                     </tr>
 
-
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="_references"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>_references</b></span>
-                        <a href="#_references"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Type : </i>    <code>Array&lt;TableRelationship&gt;</code>
-
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="47" class="link-to-prism">src/model/schema/Table.ts:47</a></div>
-                        </td>
-                    </tr>
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-description"><p>cached results of schema.filteredksOf(this, false). Should not be accessed from outside the schema class</p>
-</div>
-                </td>
-            </tr>
 
         </tbody>
     </table>
@@ -643,7 +502,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="23" class="link-to-prism">src/model/schema/Table.ts:23</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="22" class="link-to-prism">src/model/schema/Table.ts:22</a></div>
                         </td>
                     </tr>
 
@@ -670,7 +529,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/model/schema/Table.ts:18</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/model/schema/Table.ts:17</a></div>
                         </td>
                     </tr>
 
@@ -702,39 +561,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/model/schema/Table.ts:20</a></div>
-                        </td>
-                    </tr>
-
-
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="name"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>name</b></span>
-                        <a href="#name"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Default value : </i><code>&#x27;&#x27;</code>
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/model/schema/Table.ts:16</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/model/schema/Table.ts:19</a></div>
                         </td>
                     </tr>
 
@@ -767,7 +594,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/model/schema/Table.ts:19</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/model/schema/Table.ts:18</a></div>
                         </td>
                     </tr>
 
@@ -793,39 +620,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="21" class="link-to-prism">src/model/schema/Table.ts:21</a></div>
-                        </td>
-                    </tr>
-
-
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="schemaName"></a>
-                    <span class="name">
-                            <span class="modifier">Public</span>
-                        <span ><b>schemaName</b></span>
-                        <a href="#schemaName"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <i>Default value : </i><code>&#x27;&#x27;</code>
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/model/schema/Table.ts:17</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/model/schema/Table.ts:20</a></div>
                         </td>
                     </tr>
 
@@ -851,7 +646,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="22" class="link-to-prism">src/model/schema/Table.ts:22</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="21" class="link-to-prism">src/model/schema/Table.ts:21</a></div>
                         </td>
                     </tr>
 
@@ -883,7 +678,85 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/model/schema/Table.ts:27</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/model/schema/Table.ts:25</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="name"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>name</b></span>
+                        <a href="#name"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>&#x27;&#x27;</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Inherited from         <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
+</div>
+                            </td>
+                        </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in         <code><a href="../classes/BasicTable.html#source" target="_self" >BasicTable:2</a></code>
+</div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="schemaName"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>schemaName</b></span>
+                        <a href="#schemaName"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>&#x27;&#x27;</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Inherited from         <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
+</div>
+                            </td>
+                        </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in         <code><a href="../classes/BasicTable.html#source" target="_self" >BasicTable:3</a></code>
+</div>
                         </td>
                     </tr>
 
@@ -919,8 +792,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="157"
-                            class="link-to-prism">src/model/schema/Table.ts:157</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="139"
+                            class="link-to-prism">src/model/schema/Table.ts:139</a></div>
                 </td>
             </tr>
 
@@ -990,8 +863,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="209"
-                            class="link-to-prism">src/model/schema/Table.ts:209</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="184"
+                            class="link-to-prism">src/model/schema/Table.ts:184</a></div>
                 </td>
             </tr>
 
@@ -1061,8 +934,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="183"
-                            class="link-to-prism">src/model/schema/Table.ts:183</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="165"
+                            class="link-to-prism">src/model/schema/Table.ts:165</a></div>
                 </td>
             </tr>
 
@@ -1144,8 +1017,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="234"
-                            class="link-to-prism">src/model/schema/Table.ts:234</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="209"
+                            class="link-to-prism">src/model/schema/Table.ts:209</a></div>
                 </td>
             </tr>
 
@@ -1189,8 +1062,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="278"
-                            class="link-to-prism">src/model/schema/Table.ts:278</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="253"
+                            class="link-to-prism">src/model/schema/Table.ts:253</a></div>
                 </td>
             </tr>
 
@@ -1287,8 +1160,8 @@ equivalent column from the same SourceTableInstance would have.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="125"
-                            class="link-to-prism">src/model/schema/Table.ts:125</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="107"
+                            class="link-to-prism">src/model/schema/Table.ts:107</a></div>
                 </td>
             </tr>
 
@@ -1326,8 +1199,8 @@ equivalent column from the same SourceTableInstance would have.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="119"
-                            class="link-to-prism">src/model/schema/Table.ts:119</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="101"
+                            class="link-to-prism">src/model/schema/Table.ts:101</a></div>
                 </td>
             </tr>
 
@@ -1400,8 +1273,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="95"
-                            class="link-to-prism">src/model/schema/Table.ts:95</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="77"
+                            class="link-to-prism">src/model/schema/Table.ts:77</a></div>
                 </td>
             </tr>
 
@@ -1485,8 +1358,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="73"
-                            class="link-to-prism">src/model/schema/Table.ts:73</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="55"
+                            class="link-to-prism">src/model/schema/Table.ts:55</a></div>
                 </td>
             </tr>
 
@@ -1556,8 +1429,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="217"
-                            class="link-to-prism">src/model/schema/Table.ts:217</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="192"
+                            class="link-to-prism">src/model/schema/Table.ts:192</a></div>
                 </td>
             </tr>
 
@@ -1627,8 +1500,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="435"
-                            class="link-to-prism">src/model/schema/Table.ts:435</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="434"
+                            class="link-to-prism">src/model/schema/Table.ts:434</a></div>
                 </td>
             </tr>
 
@@ -1698,8 +1571,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="28"
-                            class="link-to-prism">src/model/schema/Table.ts:28</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="26"
+                            class="link-to-prism">src/model/schema/Table.ts:26</a></div>
                 </td>
             </tr>
 
@@ -1737,8 +1610,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="371"
-                            class="link-to-prism">src/model/schema/Table.ts:371</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="370"
+                            class="link-to-prism">src/model/schema/Table.ts:370</a></div>
                 </td>
             </tr>
 
@@ -1808,8 +1681,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="359"
-                            class="link-to-prism">src/model/schema/Table.ts:359</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="358"
+                            class="link-to-prism">src/model/schema/Table.ts:358</a></div>
                 </td>
             </tr>
 
@@ -1879,8 +1752,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="353"
-                            class="link-to-prism">src/model/schema/Table.ts:353</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="328"
+                            class="link-to-prism">src/model/schema/Table.ts:328</a></div>
                 </td>
             </tr>
 
@@ -1950,8 +1823,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="265"
-                            class="link-to-prism">src/model/schema/Table.ts:265</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="240"
+                            class="link-to-prism">src/model/schema/Table.ts:240</a></div>
                 </td>
             </tr>
 
@@ -2021,8 +1894,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="377"
-                            class="link-to-prism">src/model/schema/Table.ts:377</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="376"
+                            class="link-to-prism">src/model/schema/Table.ts:376</a></div>
                 </td>
             </tr>
 
@@ -2033,6 +1906,77 @@ Returns the column itself if no equal column is found.</p>
                     <div class="io-description">
                         <b>Returns : </b>    <code>Array&lt;ColumnCombination&gt;</code>
 
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="minimalDeterminantsOf"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>minimalDeterminantsOf</b></span>
+                        <a href="#minimalDeterminantsOf"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>minimalDeterminantsOf(columns: <a href="../classes/ColumnCombination.html" target="_self">ColumnCombination</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="334"
+                            class="link-to-prism">src/model/schema/Table.ts:334</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>columns</td>
+                                    <td>
+                                                <code><a href="../classes/ColumnCombination.html" target="_self" >ColumnCombination</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Array&lt;ColumnCombination&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
@@ -2060,8 +2004,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="250"
-                            class="link-to-prism">src/model/schema/Table.ts:250</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="225"
+                            class="link-to-prism">src/model/schema/Table.ts:225</a></div>
                 </td>
             </tr>
 
@@ -2101,8 +2045,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="213"
-                            class="link-to-prism">src/model/schema/Table.ts:213</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="188"
+                            class="link-to-prism">src/model/schema/Table.ts:188</a></div>
                 </td>
             </tr>
 
@@ -2172,8 +2116,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="162"
-                            class="link-to-prism">src/model/schema/Table.ts:162</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="144"
+                            class="link-to-prism">src/model/schema/Table.ts:144</a></div>
                 </td>
             </tr>
 
@@ -2243,8 +2187,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="141"
-                            class="link-to-prism">src/model/schema/Table.ts:141</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="123"
+                            class="link-to-prism">src/model/schema/Table.ts:123</a></div>
                 </td>
             </tr>
 
@@ -2282,8 +2226,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="167"
-                            class="link-to-prism">src/model/schema/Table.ts:167</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="149"
+                            class="link-to-prism">src/model/schema/Table.ts:149</a></div>
                 </td>
             </tr>
 
@@ -2321,8 +2265,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="204"
-                            class="link-to-prism">src/model/schema/Table.ts:204</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="179"
+                            class="link-to-prism">src/model/schema/Table.ts:179</a></div>
                 </td>
             </tr>
 
@@ -2392,8 +2336,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="326"
-                            class="link-to-prism">src/model/schema/Table.ts:326</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="301"
+                            class="link-to-prism">src/model/schema/Table.ts:301</a></div>
                 </td>
             </tr>
 
@@ -2433,8 +2377,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="221"
-                            class="link-to-prism">src/model/schema/Table.ts:221</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="196"
+                            class="link-to-prism">src/model/schema/Table.ts:196</a></div>
                 </td>
             </tr>
 
@@ -2516,8 +2460,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="451"
-                            class="link-to-prism">src/model/schema/Table.ts:451</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="450"
+                            class="link-to-prism">src/model/schema/Table.ts:450</a></div>
                 </td>
             </tr>
 
@@ -2555,8 +2499,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="57"
-                            class="link-to-prism">src/model/schema/Table.ts:57</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="38"
+                            class="link-to-prism">src/model/schema/Table.ts:38</a></div>
                 </td>
             </tr>
 
@@ -2565,7 +2509,7 @@ Returns the column itself if no equal column is found.</p>
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>    <code>{ name: string; schemaName: string; columns: ColumnCombination; pk: ColumnCombination; sk: string; relationships: any; sources: any; }</code>
+                        <b>Returns : </b>    <code>{ name: any; schemaName: any; columns: ColumnCombination; pk: ColumnCombination; sk: string; relationships: any; sources: any; }</code>
 
                     </div>
                 </td>
@@ -2594,8 +2538,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="445"
-                            class="link-to-prism">src/model/schema/Table.ts:445</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="444"
+                            class="link-to-prism">src/model/schema/Table.ts:444</a></div>
                 </td>
             </tr>
 
@@ -2633,8 +2577,8 @@ Returns the column itself if no equal column is found.</p>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="388"
-                            class="link-to-prism">src/model/schema/Table.ts:388</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="387"
+                            class="link-to-prism">src/model/schema/Table.ts:387</a></div>
                 </td>
             </tr>
 
@@ -2664,39 +2608,6 @@ Returns the column itself if no equal column is found.</p>
             <tbody>
                 <tr>
                     <td class="col-md-4">
-                        <a name="fullName"></a>
-                        <span class="name"><b>fullName</b><a href="#fullName"><span class="icon ion-ios-link"></span></a></span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="col-md-4">
-                        <span class="accessor"><b>get</b><code>fullName()</code></span>
-                    </td>
-                </tr>
-                            <tr>
-                                <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="196" class="link-to-prism">src/model/schema/Table.ts:196</a></div>
-                                </td>
-                            </tr>
-                    <tr>
-                        <td class="col-md-4">
-                                <div class="io-description"><p>returns the name of the table in the format &quot;{schemaName}.{tableName}&quot;</p>
-</div>
-
-                                <div class="io-description">
-                                    <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-
-                                </div>
-                        </td>
-                    </tr>
-
-            </tbody>
-        </table>
-        <table class="table table-sm table-bordered">
-            <tbody>
-                <tr>
-                    <td class="col-md-4">
                         <a name="numColumns"></a>
                         <span class="name"><b>numColumns</b><a href="#numColumns"><span class="icon ion-ios-link"></span></a></span>
                     </td>
@@ -2709,7 +2620,7 @@ Returns the column itself if no equal column is found.</p>
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="200" class="link-to-prism">src/model/schema/Table.ts:200</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="175" class="link-to-prism">src/model/schema/Table.ts:175</a></div>
                                 </td>
                             </tr>
 
@@ -2731,7 +2642,7 @@ Returns the column itself if no equal column is found.</p>
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="409" class="link-to-prism">src/model/schema/Table.ts:409</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="408" class="link-to-prism">src/model/schema/Table.ts:408</a></div>
                                 </td>
                             </tr>
                     <tr>
@@ -2761,17 +2672,16 @@ import FunctionalDependency from &#x27;./FunctionalDependency&#x27;;
 import ITable from &#x27;@server/definitions/ITable&#x27;;
 import Relationship from &#x27;./Relationship&#x27;;
 import FdScore from &#x27;./methodObjects/FdScore&#x27;;
-import TableRelationship from &#x27;./TableRelationship&#x27;;
 import SourceTable from &#x27;./SourceTable&#x27;;
 import SourceColumn from &#x27;./SourceColumn&#x27;;
 import SourceTableInstance from &#x27;./SourceTableInstance&#x27;;
-import SourceRelationship from &#x27;./SourceRelationship&#x27;;
 import { FdCluster } from &#x27;../types/FdCluster&#x27;;
+import BasicTable from &#x27;./BasicTable&#x27;;
 import ColumnsTree from &#x27;./ColumnsTree&#x27;;
+import SourceRelationship from &#x27;./SourceRelationship&#x27;;
+import TableRelationship from &#x27;./TableRelationship&#x27;;
 
-export default class Table {
-  public name &#x3D; &#x27;&#x27;;
-  public schemaName &#x3D; &#x27;&#x27;;
+export default class Table extends BasicTable {
   public columns: ColumnCombination;
   public pk?: ColumnCombination &#x3D; undefined;
   public fds: Array&lt;FunctionalDependency&gt; &#x3D; [];
@@ -2780,28 +2690,10 @@ export default class Table {
   private _violatingFds?: Array&lt;FunctionalDependency&gt;;
   private _keys?: Array&lt;ColumnCombination&gt;;
   private _fdClusters?: Array&lt;FdCluster&gt;;
-
   public surrogateKey: string &#x3D; &#x27;&#x27;;
   public implementsSurrogateKey(): boolean {
-    return this.surrogateKey.length &gt; 1;
+    return this.surrogateKey.length &gt;&#x3D; 1;
   }
-
-  /**
-   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
-   */
-  public _filteredFks!: Array&lt;TableRelationship&gt;;
-  /**
-   * cached results of schema.fksOf(this, false). Should not be accessed from outside the schema class
-   */
-  public _fks!: Array&lt;TableRelationship&gt;;
-  /**
-   * cached results of schema.fksOf(this, true). Should not be accessed from outside the schema class
-   */
-  public _filteredReferences!: Array&lt;TableRelationship&gt;;
-  /**
-   * cached results of schema.filteredksOf(this, false). Should not be accessed from outside the schema class
-   */
-  public _references!: Array&lt;TableRelationship&gt;;
   /**
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
@@ -2824,6 +2716,7 @@ export default class Table {
   }
 
   public constructor(columns?: ColumnCombination) {
+    super();
     this.columns &#x3D; columns || new ColumnCombination();
   }
 
@@ -2947,13 +2840,6 @@ export default class Table {
     return newSource;
   }
 
-  /**
-   * returns the name of the table in the format &quot;{schemaName}.{tableName}&quot;
-   */
-  public get fullName(): string {
-    return this.schemaName + &#x27;.&#x27; + this.name;
-  }
-
   public get numColumns(): number {
     return this.columns.cardinality;
   }
@@ -2968,11 +2854,11 @@ export default class Table {
   }
 
   public remainingSchema(fd: FunctionalDependency): ColumnCombination {
-    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).deepCopy();
+    return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).copy();
   }
 
   public generatingSchema(fd: FunctionalDependency): ColumnCombination {
-    return fd.rhs.deepCopy();
+    return fd.rhs.copy();
   }
 
   public splitPreservesCC(
@@ -3111,6 +2997,30 @@ export default class Table {
     // assume fd is fully extended
     // TODO what about null values
     return fd.rhs.equals(this.columns);
+  }
+
+  public minimalDeterminantsOf(
+    columns: ColumnCombination
+  ): Array&lt;ColumnCombination&gt; {
+    const allClusters &#x3D; Array.from(this.fdClusters).sort(
+      (cluster1, cluster2) &#x3D;&gt;
+        cluster1.columns.cardinality - cluster2.columns.cardinality
+    );
+    const determinants &#x3D; new Array&lt;ColumnCombination&gt;();
+    for (const cluster of allClusters) {
+      if (!columns.isSubsetOf(cluster.columns)) continue;
+      // if (
+      //   !Array.from(relevantClusters).some((other) &#x3D;&gt;
+      //     other.columns.isSubsetOf(cluster.columns)
+      //   )
+      // )
+      for (const fd of cluster.fds) {
+        if (!determinants.some((other) &#x3D;&gt; other.isSubsetOf(fd.lhs)))
+          determinants.push(fd.lhs);
+      }
+    }
+    // determinants.slice(0, 50).forEach((det) &#x3D;&gt; console.log(det.toString()));
+    return determinants;
   }
 
   public isKey(columns: ColumnCombination): boolean {

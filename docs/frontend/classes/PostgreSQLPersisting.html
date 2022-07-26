@@ -161,6 +161,10 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
+                                <a href="#selectStatement" >selectStatement</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
                                 <a href="#sourceTableIdentifier" >sourceTableIdentifier</a>
                             </li>
                             <li>
@@ -174,10 +178,6 @@
                             <li>
                                     <span class="modifier">Public</span>
                                 <a href="#tableIdentifier" >tableIdentifier</a>
-                            </li>
-                            <li>
-                                    <span class="modifier">Public</span>
-                                <a href="#transferTargetColumns" >transferTargetColumns</a>
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
@@ -550,7 +550,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:117</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:162</a></code>
 </div>
                 </td>
             </tr>
@@ -614,7 +614,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>columnIdentifier(column: <a href="../classes/Column.html" target="_self">Column</a>)</code>
+                    <code>columnIdentifier(column: <a href="../classes/Column.html" target="_self">Column | null</a>, dataType: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                 </td>
             </tr>
 
@@ -627,7 +627,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:220</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:265</a></code>
 </div>
                 </td>
             </tr>
@@ -645,19 +645,37 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
                                     <td>Name</td>
                                     <td>Type</td>
                                     <td>Optional</td>
+                                    <td>Default value</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>column</td>
                                     <td>
-                                                <code><a href="../classes/Column.html" target="_self" >Column</a></code>
+                                                <code><a href="../classes/Column.html" target="_self" >Column | null</a></code>
                                     </td>
 
                                     <td>
                                         No
                                     </td>
 
+                                    <td>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>dataType</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>&#x27;&#x27;</code>
+                                    </td>
 
                                 </tr>
                             </tbody>
@@ -704,7 +722,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:12</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:15</a></code>
 </div>
                 </td>
             </tr>
@@ -768,7 +786,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>createTableSql(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>createTableSql(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
@@ -781,7 +799,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:32</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:35</a></code>
 </div>
                 </td>
             </tr>
@@ -805,7 +823,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -845,7 +863,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>dataTransfer(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                    <code>dataTransfer(tables: Array<BasicTable>)</code>
                 </td>
             </tr>
 
@@ -858,7 +876,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:53</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:63</a></code>
 </div>
                 </td>
             </tr>
@@ -882,7 +900,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
                                 <tr>
                                     <td>tables</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                            <code>Array&lt;BasicTable&gt;</code>
                                     </td>
 
                                     <td>
@@ -922,7 +940,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>dataTransferSql(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>dataTransferSql(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
@@ -935,7 +953,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:61</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:71</a></code>
 </div>
                 </td>
             </tr>
@@ -959,7 +977,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -1012,7 +1030,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:98</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:143</a></code>
 </div>
                 </td>
             </tr>
@@ -1089,7 +1107,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:181</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:226</a></code>
 </div>
                 </td>
             </tr>
@@ -1166,7 +1184,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:155</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:200</a></code>
 </div>
                 </td>
             </tr>
@@ -1230,7 +1248,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>generateColumnString(columns: <a href="../classes/Column.html" target="_self">Column[]</a>)</code>
+                    <code>generateColumnString(columns: <a href="../interfaces/BasicColumn.html" target="_self">BasicColumn[]</a>)</code>
                 </td>
             </tr>
 
@@ -1243,7 +1261,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:205</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:250</a></code>
 </div>
                 </td>
             </tr>
@@ -1267,7 +1285,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
                                 <tr>
                                     <td>columns</td>
                                     <td>
-                                                <code><a href="../classes/Column.html" target="_self" >Column[]</a></code>
+                                                <code><a href="../interfaces/BasicColumn.html" target="_self" >BasicColumn[]</a></code>
                                     </td>
 
                                     <td>
@@ -1320,7 +1338,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:190</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:235</a></code>
 </div>
                 </td>
             </tr>
@@ -1397,7 +1415,7 @@ In Postgres, you don&#39;t have to specify both tables but use the table you alr
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:167</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:212</a></code>
 </div>
                 </td>
             </tr>
@@ -1445,7 +1463,7 @@ Those aren&#39;t visible to the user</p>
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:228</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:277</a></code>
 </div>
                 </td>
             </tr>
@@ -1510,6 +1528,115 @@ Those aren&#39;t visible to the user</p>
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="selectStatement"></a>
+                    <span class="name">
+                        <span class="modifier">Public</span>
+                        <span ><b>selectStatement</b></span>
+                        <a href="#selectStatement"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>selectStatement(table: <a href="../classes/Table.html" target="_self">Table</a>, columns: <a href="../classes/Column.html" target="_self">Array&lt;Column | null&gt;</a>, dataTypes: string[])</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Inherited from         <code><a href="../classes/SQLPersisting.html" target="_self" >SQLPersisting</a></code>
+</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:111</a></code>
+</div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Default value</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>table</td>
+                                    <td>
+                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>columns</td>
+                                    <td>
+                                                <code><a href="../classes/Column.html" target="_self" >Array&lt;Column | null&gt;</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>dataTypes</td>
+                                    <td>
+                                            <code>string[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+                                    <td>
+                                        <code>[]</code>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="sourceTableIdentifier"></a>
                     <span class="name">
                         <span class="modifier">Public</span>
@@ -1534,7 +1661,7 @@ Those aren&#39;t visible to the user</p>
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:216</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:261</a></code>
 </div>
                 </td>
             </tr>
@@ -1611,7 +1738,7 @@ Those aren&#39;t visible to the user</p>
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:234</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:283</a></code>
 </div>
                 </td>
             </tr>
@@ -1643,7 +1770,7 @@ Those aren&#39;t visible to the user</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>tableCreation(tables: <a href="../classes/Table.html" target="_self">Array&lt;Table&gt;</a>)</code>
+                    <code>tableCreation(tables: Array<BasicTable>)</code>
                 </td>
             </tr>
 
@@ -1656,7 +1783,7 @@ Those aren&#39;t visible to the user</p>
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:24</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:27</a></code>
 </div>
                 </td>
             </tr>
@@ -1680,7 +1807,7 @@ Those aren&#39;t visible to the user</p>
                                 <tr>
                                     <td>tables</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Array&lt;Table&gt;</a></code>
+                                            <code>Array&lt;BasicTable&gt;</code>
                                     </td>
 
                                     <td>
@@ -1720,7 +1847,7 @@ Those aren&#39;t visible to the user</p>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>tableIdentifier(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
+                    <code>tableIdentifier(table: <a href="../classes/BasicTable.html" target="_self">BasicTable</a>)</code>
                 </td>
             </tr>
 
@@ -1733,7 +1860,7 @@ Those aren&#39;t visible to the user</p>
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:212</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:257</a></code>
 </div>
                 </td>
             </tr>
@@ -1760,84 +1887,7 @@ For example: If you want to update the Surrogate-Key columns, you want to refere
                                 <tr>
                                     <td>table</td>
                                     <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="transferTargetColumns"></a>
-                    <span class="name">
-                        <span class="modifier">Public</span>
-                        <span ><b>transferTargetColumns</b></span>
-                        <a href="#transferTargetColumns"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>transferTargetColumns(table: <a href="../classes/Table.html" target="_self">Table</a>)</code>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Inherited from         <code><a href="../classes/SQLPersisting.html" target="_self" >SQLPersisting</a></code>
-</div>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:94</a></code>
-</div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>table</td>
-                                    <td>
-                                                <code><a href="../classes/Table.html" target="_self" >Table</a></code>
+                                                <code><a href="../classes/BasicTable.html" target="_self" >BasicTable</a></code>
                                     </td>
 
                                     <td>
@@ -1890,7 +1940,7 @@ For example: If you want to update the Surrogate-Key columns, you want to refere
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:173</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:218</a></code>
 </div>
                 </td>
             </tr>
@@ -1969,7 +2019,7 @@ For example: If you want to update the Surrogate-Key columns, you want to refere
             </tr>
             <tr>
                 <td class="col-md-4">
-                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:128</a></code>
+                        <div class="io-line">Defined in         <code><a href="../classes/SQLPersisting.html#source" target="_self" >SQLPersisting:173</a></code>
 </div>
                 </td>
             </tr>
@@ -2051,7 +2101,7 @@ export default class PostgreSQLPersisting extends SQLPersisting {
    * In Postgres, you don&#x27;t have to specify both tables but use the table you already specified in the UPDATE-Clause.
    */
   public override updateSurrogateKeySource(fk: TableRelationship): string {
-    return this.tableIdentifier(fk.referenced);
+    return this.tableIdentifier(fk.referencedTable);
   }
 
   /** The column is only necessary for the data transfer. We don&#x27;t want to insert data later.

@@ -183,7 +183,7 @@
             <tbody>
                 <tr>
                     <td class="col-md-4">
-<code>constructor(dialogRef: <a href="../classes/Join.html" target="_self">SbbDialogRef&lt;JoinDialogComponent&gt;</a>, data: literal type)</code>
+<code>constructor(schemaService: <a href="../injectables/SchemaService.html" target="_self">SchemaService</a>, dialogRef: <a href="../classes/Join.html" target="_self">SbbDialogRef&lt;JoinDialogComponent&gt;</a>, data: literal type)</code>
                     </td>
                 </tr>
                         <tr>
@@ -205,6 +205,18 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                                <tr>
+                                                        <td>schemaService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/SchemaService.html" target="_self" >SchemaService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
                                                 <tr>
                                                         <td>dialogRef</td>
                                                   
@@ -269,8 +281,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="26"
-                            class="link-to-prism">src/app/components/operation-dialogs/join-dialog/join-dialog.component.ts:26</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="28"
+                            class="link-to-prism">src/app/components/operation-dialogs/join-dialog/join-dialog.component.ts:28</a></div>
                 </td>
             </tr>
 
@@ -312,7 +324,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/components/operation-dialogs/join-dialog/join-dialog.component.ts:18</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/app/components/operation-dialogs/join-dialog/join-dialog.component.ts:19</a></div>
                         </td>
                     </tr>
 
@@ -435,7 +447,7 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import Schema from &#x27;@/src/model/schema/Schema&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { SchemaService } from &#x27;@/src/app/schema.service&#x27;;
 import TableRelationship from &#x27;@/src/model/schema/TableRelationship&#x27;;
 import { Component, Inject } from &#x27;@angular/core&#x27;;
 import { SbbDialogRef, SBB_DIALOG_DATA } from &#x27;@sbb-esta/angular/dialog&#x27;;
@@ -452,12 +464,14 @@ export class JoinDialogComponent {
   public fk: TableRelationship;
 
   constructor(
+    private schemaService: SchemaService,
     public dialogRef: SbbDialogRef&lt;JoinDialogComponent&gt;,
-    @Inject(SBB_DIALOG_DATA) data: { fk: TableRelationship; schema: Schema }
+    @Inject(SBB_DIALOG_DATA) data: { fk: TableRelationship }
   ) {
     this.fk &#x3D; data.fk;
     this.duplicate &#x3D;
-      data.schema.referencesOf(this.fk.referenced, true).length &gt; 1;
+      this.schemaService.schema.referencesOf(this.fk.referencedTable, true)
+        .length &gt; 1;
   }
 
   public confirm() {
@@ -479,7 +493,7 @@ export class JoinDialogComponent {
     type&#x3D;&quot;text&quot;
     sbbInput
     [(ngModel)]&#x3D;&quot;newTableName&quot;
-    placeholder&#x3D;&quot;{{ fk.referencing.name }}&quot;
+    placeholder&#x3D;&quot;{{ fk.referencingTable.name }}&quot;
   /&gt;
   &lt;br /&gt;
   Column prefix in case of ambiguous column names
@@ -487,7 +501,7 @@ export class JoinDialogComponent {
   &lt;br /&gt;
   &lt;div class&#x3D;&quot;sbb-checkbox-group-vertical&quot;&gt;
     &lt;sbb-checkbox [(ngModel)]&#x3D;&quot;duplicate&quot;&gt;
-      Duplicate {{ fk.referenced.name }} before joining
+      Duplicate {{ fk.referencedTable.name }} before joining
     &lt;/sbb-checkbox&gt;
   &lt;/div&gt;
 &lt;/div&gt;
@@ -530,8 +544,8 @@ export class JoinDialogComponent {
 <script src="../js/libs/htmlparser.js"></script>
 <script src="../js/libs/deep-iterator.js"></script>
 <script>
-        var COMPONENT_TEMPLATE = '<div><div sbbDialogTitle>Join Options</div><div sbbDialogContent>  Name of new table  <input    type="text"    sbbInput    [(ngModel)]="newTableName"    placeholder="{{ fk.referencing.name }}"  />  <br />  Column prefix in case of ambiguous column names  <input type="text" sbbInput [(ngModel)]="sourceName" placeholder="" />  <br />  <div class="sbb-checkbox-group-vertical">    <sbb-checkbox [(ngModel)]="duplicate">      Duplicate {{ fk.referenced.name }} before joining    </sbb-checkbox>  </div></div><div sbbDialogActions>  <button sbb-button (click)="confirm()" cdkFocusInitial>Ok</button>  <button sbb-secondary-button sbbDialogClose>Cancel</button></div></div>'
-    var COMPONENTS = [{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'CheckIndComponent', 'selector': 'app-check-ind'},{'name': 'ContainedSubtablesComponent', 'selector': 'app-contained-subtables'},{'name': 'CustomFunctionalDependencySideBarComponent', 'selector': 'app-check-fd'},{'name': 'DatabaseTableViewerComponent', 'selector': 'app-database-table-viewer'},{'name': 'DirectDimensionDialogComponent', 'selector': 'app-direct-dimension-dialog'},{'name': 'ForeignKeysComponent', 'selector': 'app-foreign-keys'},{'name': 'GraphElementComponent', 'selector': 'app-graph-element'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JoinDialogComponent', 'selector': 'app-join-dialog'},{'name': 'KeysComponent', 'selector': 'app-keys'},{'name': 'LoadSavedSchemaComponent', 'selector': 'app-load-saved-schema'},{'name': 'MetanomeResultsViewerComponent', 'selector': 'app-metanome-results-viewer'},{'name': 'MetanomeSettingsComponent', 'selector': 'app-metanome-settings'},{'name': 'PersistSchemaComponent', 'selector': 'app-persist-schema'},{'name': 'SaveSchemaEditingComponent', 'selector': 'app-save-schema-editing'},{'name': 'SbbOptionAllComponent', 'selector': 'app-sbb-option-all'},{'name': 'SchemaEditingComponent', 'selector': 'app-schema-editing'},{'name': 'SchemaEditingSideBarComponent', 'selector': 'app-schema-editing-side-bar'},{'name': 'SchemaGraphComponent', 'selector': 'app-schema-graph'},{'name': 'SplitDialogComponent', 'selector': 'app-split-dialog'},{'name': 'TableEditingComponent', 'selector': 'app-table-editing'},{'name': 'TableSelectionComponent', 'selector': 'app-table-selection'},{'name': 'UndoRedoComponent', 'selector': 'app-undo-redo'},{'name': 'ViolatingRowsViewComponent', 'selector': 'app-violating-rows-view'},{'name': 'ViolatingRowsViewIndsComponent', 'selector': 'app-violating-rows-view-inds'}];
+        var COMPONENT_TEMPLATE = '<div><div sbbDialogTitle>Join Options</div><div sbbDialogContent>  Name of new table  <input    type="text"    sbbInput    [(ngModel)]="newTableName"    placeholder="{{ fk.referencingTable.name }}"  />  <br />  Column prefix in case of ambiguous column names  <input type="text" sbbInput [(ngModel)]="sourceName" placeholder="" />  <br />  <div class="sbb-checkbox-group-vertical">    <sbb-checkbox [(ngModel)]="duplicate">      Duplicate {{ fk.referencedTable.name }} before joining    </sbb-checkbox>  </div></div><div sbbDialogActions>  <button sbb-button (click)="confirm()" cdkFocusInitial>Ok</button>  <button sbb-secondary-button sbbDialogClose>Cancel</button></div></div>'
+    var COMPONENTS = [{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'CheckIndComponent', 'selector': 'app-check-ind'},{'name': 'ContainedSubtablesComponent', 'selector': 'app-contained-subtables'},{'name': 'CustomFunctionalDependencySideBarComponent', 'selector': 'app-check-fd'},{'name': 'DatabaseTableViewerComponent', 'selector': 'app-database-table-viewer'},{'name': 'DeleteTableDialogComponent', 'selector': 'app-delete-table-dialog'},{'name': 'DirectDimensionDialogComponent', 'selector': 'app-direct-dimension-dialog'},{'name': 'ForeignKeysComponent', 'selector': 'app-foreign-keys'},{'name': 'GraphElementComponent', 'selector': 'app-graph-element'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JoinDialogComponent', 'selector': 'app-join-dialog'},{'name': 'KeysComponent', 'selector': 'app-keys'},{'name': 'LoadSavedSchemaComponent', 'selector': 'app-load-saved-schema'},{'name': 'MetanomeResultsViewerComponent', 'selector': 'app-metanome-results-viewer'},{'name': 'MetanomeSettingsComponent', 'selector': 'app-metanome-settings'},{'name': 'PersistSchemaComponent', 'selector': 'app-persist-schema'},{'name': 'SaveSchemaEditingComponent', 'selector': 'app-save-schema-editing'},{'name': 'SbbOptionAllComponent', 'selector': 'app-sbb-option-all'},{'name': 'SchemaEditingComponent', 'selector': 'app-schema-editing'},{'name': 'SchemaEditingSideBarComponent', 'selector': 'app-schema-editing-side-bar'},{'name': 'SchemaGraphComponent', 'selector': 'app-schema-graph'},{'name': 'SplitDialogComponent', 'selector': 'app-split-dialog'},{'name': 'TableEditingComponent', 'selector': 'app-table-editing'},{'name': 'TableSelectionComponent', 'selector': 'app-table-selection'},{'name': 'UndoRedoComponent', 'selector': 'app-undo-redo'},{'name': 'UnionDialogComponent', 'selector': 'app-union-dialog'},{'name': 'UnionSidebarComponent', 'selector': 'app-union-sidebar'},{'name': 'ViolatingRowsViewComponent', 'selector': 'app-violating-rows-view'},{'name': 'ViolatingRowsViewIndsComponent', 'selector': 'app-violating-rows-view-inds'}];
     var DIRECTIVES = [];
     var ACTUAL_COMPONENT = {'name': 'JoinDialogComponent'};
 </script>

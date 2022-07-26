@@ -150,7 +150,7 @@
             <tbody>
                 <tr>
                     <td class="col-md-4">
-<code>constructor(dataService: <a href="../injectables/DatabaseService.html" target="_self">DatabaseService</a>, router: <a href="https://angular.io/api/router/Router" target="_blank">Router</a>)</code>
+<code>constructor(schemaService: <a href="../injectables/SchemaService.html" target="_self">SchemaService</a>, router: <a href="https://angular.io/api/router/Router" target="_blank">Router</a>)</code>
                     </td>
                 </tr>
                         <tr>
@@ -173,10 +173,10 @@
                                         </thead>
                                         <tbody>
                                                 <tr>
-                                                        <td>dataService</td>
+                                                        <td>schemaService</td>
                                                   
                                                         <td>
-                                                                        <code><a href="../injectables/DatabaseService.html" target="_self" >DatabaseService</a></code>
+                                                                        <code><a href="../injectables/SchemaService.html" target="_self" >SchemaService</a></code>
                                                         </td>
                                                   
                                                     <td>
@@ -294,7 +294,7 @@
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import Schema from &#x27;@/src/model/schema/Schema&#x27;;
 import { Component } from &#x27;@angular/core&#x27;;
 import { Router } from &#x27;@angular/router&#x27;;
-import { DatabaseService } from &#x27;../../database.service&#x27;;
+import { SchemaService } from &#x27;../../schema.service&#x27;;
 
 @Component({
   selector: &#x27;app-home&#x27;,
@@ -302,10 +302,10 @@ import { DatabaseService } from &#x27;../../database.service&#x27;;
   styleUrls: [&#x27;./home.component.css&#x27;],
 })
 export class HomeComponent {
-  constructor(private dataService: DatabaseService, private router: Router) {}
+  constructor(private schemaService: SchemaService, private router: Router) {}
 
   public setSchemaAndGo(schema: Schema) {
-    this.dataService.schema &#x3D; schema;
+    this.schemaService.setSchema(schema);
     this.router.navigate([&#x27;/edit-schema&#x27;]);
   }
 }
@@ -353,7 +353,7 @@ export class HomeComponent {
 <script src="../js/libs/deep-iterator.js"></script>
 <script>
         var COMPONENT_TEMPLATE = '<div><app-table-selection  [withContentPreview]="true"  (schema)="setSchemaAndGo($event)"></app-table-selection></div>'
-    var COMPONENTS = [{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'CheckIndComponent', 'selector': 'app-check-ind'},{'name': 'ContainedSubtablesComponent', 'selector': 'app-contained-subtables'},{'name': 'CustomFunctionalDependencySideBarComponent', 'selector': 'app-check-fd'},{'name': 'DatabaseTableViewerComponent', 'selector': 'app-database-table-viewer'},{'name': 'DirectDimensionDialogComponent', 'selector': 'app-direct-dimension-dialog'},{'name': 'ForeignKeysComponent', 'selector': 'app-foreign-keys'},{'name': 'GraphElementComponent', 'selector': 'app-graph-element'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JoinDialogComponent', 'selector': 'app-join-dialog'},{'name': 'KeysComponent', 'selector': 'app-keys'},{'name': 'LoadSavedSchemaComponent', 'selector': 'app-load-saved-schema'},{'name': 'MetanomeResultsViewerComponent', 'selector': 'app-metanome-results-viewer'},{'name': 'MetanomeSettingsComponent', 'selector': 'app-metanome-settings'},{'name': 'PersistSchemaComponent', 'selector': 'app-persist-schema'},{'name': 'SaveSchemaEditingComponent', 'selector': 'app-save-schema-editing'},{'name': 'SbbOptionAllComponent', 'selector': 'app-sbb-option-all'},{'name': 'SchemaEditingComponent', 'selector': 'app-schema-editing'},{'name': 'SchemaEditingSideBarComponent', 'selector': 'app-schema-editing-side-bar'},{'name': 'SchemaGraphComponent', 'selector': 'app-schema-graph'},{'name': 'SplitDialogComponent', 'selector': 'app-split-dialog'},{'name': 'TableEditingComponent', 'selector': 'app-table-editing'},{'name': 'TableSelectionComponent', 'selector': 'app-table-selection'},{'name': 'UndoRedoComponent', 'selector': 'app-undo-redo'},{'name': 'ViolatingRowsViewComponent', 'selector': 'app-violating-rows-view'},{'name': 'ViolatingRowsViewIndsComponent', 'selector': 'app-violating-rows-view-inds'}];
+    var COMPONENTS = [{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'CheckIndComponent', 'selector': 'app-check-ind'},{'name': 'ContainedSubtablesComponent', 'selector': 'app-contained-subtables'},{'name': 'CustomFunctionalDependencySideBarComponent', 'selector': 'app-check-fd'},{'name': 'DatabaseTableViewerComponent', 'selector': 'app-database-table-viewer'},{'name': 'DeleteTableDialogComponent', 'selector': 'app-delete-table-dialog'},{'name': 'DirectDimensionDialogComponent', 'selector': 'app-direct-dimension-dialog'},{'name': 'ForeignKeysComponent', 'selector': 'app-foreign-keys'},{'name': 'GraphElementComponent', 'selector': 'app-graph-element'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JoinDialogComponent', 'selector': 'app-join-dialog'},{'name': 'KeysComponent', 'selector': 'app-keys'},{'name': 'LoadSavedSchemaComponent', 'selector': 'app-load-saved-schema'},{'name': 'MetanomeResultsViewerComponent', 'selector': 'app-metanome-results-viewer'},{'name': 'MetanomeSettingsComponent', 'selector': 'app-metanome-settings'},{'name': 'PersistSchemaComponent', 'selector': 'app-persist-schema'},{'name': 'SaveSchemaEditingComponent', 'selector': 'app-save-schema-editing'},{'name': 'SbbOptionAllComponent', 'selector': 'app-sbb-option-all'},{'name': 'SchemaEditingComponent', 'selector': 'app-schema-editing'},{'name': 'SchemaEditingSideBarComponent', 'selector': 'app-schema-editing-side-bar'},{'name': 'SchemaGraphComponent', 'selector': 'app-schema-graph'},{'name': 'SplitDialogComponent', 'selector': 'app-split-dialog'},{'name': 'TableEditingComponent', 'selector': 'app-table-editing'},{'name': 'TableSelectionComponent', 'selector': 'app-table-selection'},{'name': 'UndoRedoComponent', 'selector': 'app-undo-redo'},{'name': 'UnionDialogComponent', 'selector': 'app-union-dialog'},{'name': 'UnionSidebarComponent', 'selector': 'app-union-sidebar'},{'name': 'ViolatingRowsViewComponent', 'selector': 'app-violating-rows-view'},{'name': 'ViolatingRowsViewIndsComponent', 'selector': 'app-violating-rows-view-inds'}];
     var DIRECTIVES = [];
     var ACTUAL_COMPONENT = {'name': 'HomeComponent'};
 </script>

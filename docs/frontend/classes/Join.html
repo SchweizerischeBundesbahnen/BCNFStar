@@ -470,8 +470,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="115"
-                            class="link-to-prism">src/model/schema/methodObjects/Join.ts:115</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="117"
+                            class="link-to-prism">src/model/schema/methodObjects/Join.ts:117</a></div>
                 </td>
             </tr>
 
@@ -592,8 +592,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="130"
-                            class="link-to-prism">src/model/schema/methodObjects/Join.ts:130</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="132"
+                            class="link-to-prism">src/model/schema/methodObjects/Join.ts:132</a></div>
                 </td>
             </tr>
 
@@ -750,8 +750,8 @@ export default class Join {
   public sourceMapping &#x3D; new Map&lt;SourceTableInstance, SourceTableInstance&gt;();
 
   public constructor(fk: TableRelationship, private name?: string) {
-    this.referencing &#x3D; fk.referencing;
-    this.referenced &#x3D; fk.referenced;
+    this.referencing &#x3D; fk.referencingTable;
+    this.referenced &#x3D; fk.referencedTable;
     this.relationship &#x3D; fk.relationship;
 
     this.join();
@@ -799,7 +799,6 @@ export default class Join {
     // name, pk, sk
     this.newTable.schemaName &#x3D; this.referencing.schemaName;
     this.newTable.name &#x3D; this.referencing.name;
-    this.newTable.pk &#x3D; this.referencing.pk?.deepCopy();
     this.newTable.surrogateKey &#x3D; this.referencing.surrogateKey;
 
     // inherit sources, relationships and columns from referencing table
@@ -816,6 +815,9 @@ export default class Join {
     );
     this.newTable.addColumns(
       ...this.referencing.columns.applySourceMapping(this.sourceMapping)
+    );
+    this.newTable.pk &#x3D; this.referencing.pk?.applySourceMapping(
+      this.sourceMapping
     );
 
     // sources and relationships from referenced table
