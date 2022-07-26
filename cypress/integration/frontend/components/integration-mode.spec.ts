@@ -14,6 +14,7 @@ describe("The integration start page", () => {
     cy.contains("Use no Metanome result").click();
     cy.contains("Use no Metanome result").click();
     cy.contains("Ok").click();
+    cy.wait(100);
     cy.contains("Start integration").click();
 
     // cy.loadMetanomeConfigAndOk();
