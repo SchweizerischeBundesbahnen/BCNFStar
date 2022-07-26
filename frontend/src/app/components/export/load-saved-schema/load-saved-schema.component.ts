@@ -3,7 +3,7 @@ import Schema from '@/src/model/schema/Schema';
 import { Router } from '@angular/router';
 import { parse } from 'zipson';
 import * as JSZip from 'jszip';
-import SaveSchemaState from '@/src/model/schema/methodObjects/saveIntermediateState';
+import SaveSchemaState from '@/src/model/schema/methodObjects/SaveSchemaState';
 import { SchemaService } from '@/src/app/schema.service';
 
 @Component({

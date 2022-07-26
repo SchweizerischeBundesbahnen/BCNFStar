@@ -108,7 +108,7 @@ export class SchemaService {
       this.selectedTable = command.newTable;
     };
     command.onUndo = () => {
-      this.selectedTable = fk.referencing;
+      this.selectedTable = fk.referencingTable;
     };
 
     this.commandProcessor.do(command);

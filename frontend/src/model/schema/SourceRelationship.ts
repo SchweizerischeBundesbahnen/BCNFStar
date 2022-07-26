@@ -6,52 +6,74 @@ export default class SourceRelationship {
    * corresponding column in referenced
    */
   public constructor(
-    public referencing = new Array<SourceColumn>(),
-    public referenced = new Array<SourceColumn>()
+    private _referencingCols = new Array<SourceColumn>(),
+    private _referencedCols = new Array<SourceColumn>()
   ) {}
 
   public equals(other: SourceRelationship): boolean {
     if (this == other) return true;
-    if (!this.referencing[0].table.equals(other.referencing[0].table))
+    if (!this.referencingCols[0].table.equals(other.referencingCols[0].table))
       return false;
-    if (!this.referenced[0].table.equals(other.referenced[0].table))
+    if (!this.referencedCols[0].table.equals(other.referencedCols[0].table))
       return false;
-    if (this.referencing.length != other.referencing.length) return false;
+    if (this.referencingCols.length != other.referencingCols.length)
+      return false;
 
-    const pairs = this.referencing
-      .map((column, index) => `${column.name}.${this.referenced[index].name}`)
+    const pairs = this.referencingCols
+      .map(
+        (column, index) => `${column.name}.${this.referencedCols[index].name}`
+      )
       .sort();
-    const otherPairs = other.referencing
-      .map((column, index) => `${column.name}.${other.referenced[index].name}`)
+    const otherPairs = other.referencingCols
+      .map(
+        (column, index) => `${column.name}.${other.referencedCols[index].name}`
+      )
       .sort();
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
-  public sourceColumnsMapped(
+  public mapsColumns(
     referencingCol: SourceColumn,
     referencedCol: SourceColumn
   ): boolean {
-    const i = this.referencing.findIndex((otherReferencingCol) =>
+    const i = this.referencingCols.findIndex((otherReferencingCol) =>
       otherReferencingCol.equals(referencingCol)
     );
     if (i == -1) return false;
-    return this.referenced[i].equals(referencedCol);
+    return this.referencedCols[i].equals(referencedCol);
   }
 
   public get isTrivial(): boolean {
-    for (const i in this.referencing) {
-      if (!this.referencing[i].equals(this.referenced[i])) return false;
+    for (const i in this.referencingCols) {
+      if (!this.referencingCols[i].equals(this.referencedCols[i])) return false;
     }
     return true;
   }
 
   public toString(): string {
-    const lhsString = this.referencing.map((col) => col.name).join(', ');
-    const rhsString = this.referenced.map((col) => col.name).join(', ');
+    const lhsString = this.referencingCols.map((col) => col.name).join(', ');
+    const rhsString = this.referencedCols.map((col) => col.name).join(', ');
 
-    const lhsSourceTable = this.referencing[0].table.fullName;
-    const rhsSourceTable = this.referenced[0].table.fullName;
+    const lhsSourceTable = this.referencingCols[0].table.fullName;
+    const rhsSourceTable = this.referencedCols[0].table.fullName;
 
     return `(${lhsSourceTable}) ${lhsString} -> (${rhsSourceTable}) ${rhsString}`;
+  }
+
+  /**
+   * whether @other can be transitively extended by composing this relationship with @other
+   */
+  public isConnected(other: SourceRelationship): boolean {
+    return other.referencingCols.every((otherCol) =>
+      this.referencedCols.some((col) => col.equals(otherCol))
+    );
+  }
+
+  public get referencingCols(): Array<SourceColumn> {
+    return this._referencingCols;
+  }
+
+  public get referencedCols(): Array<SourceColumn> {
+    return this._referencedCols;
   }
 }
