@@ -1,4 +1,6 @@
 {
+  "table1Sql": "SELECT * FROM public.nation_region_denormalized",
+  "table2Sql": "SELECT * FROM public.nation_region_denormalized",
   "key1": {
     "table_schema": "public",
     "table_name": "nation_region_denormalized",

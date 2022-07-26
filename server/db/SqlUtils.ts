@@ -111,38 +111,27 @@ export default abstract class SqlUtils {
    * The SQL calculates the number of rows of the unioned tables and the number of rows of the unioned key-columns and takes the difference
    * difference > 0 means, that the key is invalid as the unioned table contains different rows with the same key. (SQL-UNION is implemented as a SET-Operation)
    */
-  public testKeyUnionabilitySql(uk: IRequestBodyUnionedKeys): string {
-    const table1Identifier: string = `${this.escape(
-      uk.key1.table_schema
-    )}.${this.escape(uk.key1.table_name)}`;
-    const table2Identifier: string = `${this.escape(
-      uk.key2.table_schema
-    )}.${this.escape(uk.key2.table_name)}`;
-
+  public testKeyUnionabilitySql(
+    uk: IRequestBodyUnionedKeys,
+    table1: string,
+    table2: string
+  ): string {
     return `
   SELECT 
     (SELECT COUNT(*) as unionedCount
     FROM
     (
-    SELECT ${this.generateColumnString(
-      uk.unionedColumns[0]
-    )} FROM ${table1Identifier} 
+    SELECT ${this.generateColumnString(uk.unionedColumns[0])} FROM ${table1} 
     UNION
-    SELECT ${this.generateColumnString(
-      uk.unionedColumns[1]
-    )} FROM ${table2Identifier} 
+    SELECT ${this.generateColumnString(uk.unionedColumns[1])} FROM ${table2} 
     ) as unionedCount)
   -
     (SELECT COUNT(*) as unionedCountKey
     FROM
     (
-      SELECT ${this.generateColumnString(
-        uk.key1.attributes
-      )} FROM ${table1Identifier}
+      SELECT ${this.generateColumnString(uk.key1.attributes)} FROM ${table1}
       UNION
-      SELECT ${this.generateColumnString(
-        uk.key2.attributes
-      )} FROM ${table2Identifier}
+      SELECT ${this.generateColumnString(uk.key2.attributes)} FROM ${table2}
     ) as unionedcount) as count
 `;
   }
