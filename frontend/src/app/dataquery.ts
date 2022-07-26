@@ -127,14 +127,14 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
   private body(offset = 0, limit = 0): IRequestBodyINDViolatingRows {
     const data: IRequestBodyINDViolatingRows = {
       referencingTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referencing,
-        this.tableRelationship.relationship.referencing,
+        this.tableRelationship.referencingTable,
+        this.tableRelationship.referencingCols,
         [],
         true
       ),
       referencedTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referenced,
-        this.tableRelationship.relationship.referenced,
+        this.tableRelationship.referencedTable,
+        this.tableRelationship.referencedCols,
         [],
         true
       ),
