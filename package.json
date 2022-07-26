@@ -31,7 +31,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "^3.9.12",
     "cross-env": "^7.0.3",
-    "cypress": "^9.1.0",
+    "cypress": "^10.1.0",
     "cypress-dotenv": "^2.0.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-postgres": "^1.1.1",
