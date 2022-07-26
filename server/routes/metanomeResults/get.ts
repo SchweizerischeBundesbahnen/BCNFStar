@@ -16,9 +16,12 @@ export async function getMetanomeResults(req: Request, res: Response) {
   } catch (e) {
     console.error(e);
     if (!res.headersSent) {
-      res
-        .status(502)
-        .end("An error ocurred while getting info about metanome results");
+      if (e.toString().includes("ENOENT"))
+        res.status(404).end("File not found");
+      else
+        res
+          .status(502)
+          .end("An error ocurred while getting info about metanome results");
     }
   }
 }
