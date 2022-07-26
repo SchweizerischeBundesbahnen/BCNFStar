@@ -27,6 +27,8 @@ export default class Delete {
 
     this.newTable.schemaName = this.table.schemaName;
     this.newTable.name = this.table.name;
+    this.newTable.isSuggestedFact = this.table.isSuggestedFact;
+    this.newTable.isRejectedFact = this.table.isRejectedFact;
   }
 
   /**

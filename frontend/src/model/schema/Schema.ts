@@ -26,8 +26,6 @@ import PotentialFacts from './methodObjects/PotentialFacts';
 export default class Schema {
   public readonly tables = new Set<BasicTable>();
   private potentialFacts = new Set<BasicTable>();
-  private suggestedFacts = new Set<BasicTable>();
-  private rejectedFacts = new Set<BasicTable>();
   public name?: string;
   /**
    * all fks from the actual database and inds that the user validated
@@ -104,22 +102,22 @@ export default class Schema {
   }
 
   public suggestFact(table: BasicTable) {
-    this.suggestedFacts.add(table);
+    table.isSuggestedFact = true;
     this.relationshipsValid = false;
   }
 
   public unsuggestFact(table: BasicTable) {
-    this.suggestedFacts.delete(table);
+    table.isSuggestedFact = false;
     this.relationshipsValid = false;
   }
 
   public rejectFact(table: BasicTable) {
-    this.rejectedFacts.add(table);
+    table.isRejectedFact = true;
     this.relationshipsValid = false;
   }
 
   public unrejectFact(table: BasicTable) {
-    this.rejectedFacts.delete(table);
+    table.isRejectedFact = false;
     this.relationshipsValid = false;
   }
 
@@ -209,12 +207,12 @@ export default class Schema {
   public isFact(table: BasicTable, onlyDisplayed: boolean): boolean {
     return (
       this.referencesOf(table, onlyDisplayed).length == 0 ||
-      this.suggestedFacts.has(table)
+      table.isSuggestedFact
     );
   }
 
   public isPotentialFact(table: BasicTable): boolean {
-    if (this.rejectedFacts.has(table)) return false;
+    if (table.isRejectedFact) return false;
     if (!this._tableFksValid) this.updateFks();
     return this.potentialFacts.has(table);
   }
