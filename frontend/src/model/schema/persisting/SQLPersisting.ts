@@ -69,11 +69,6 @@ export default abstract class SQLPersisting {
       columnString += 'NULL';
       columnStrings.push(columnString);
     }
-    for (const fk of schema.fksOf(table, true)) {
-      if (fk.referencedTable.implementsSurrogateKey()) {
-        columnStrings.push(`${fk.referencingName} INT NOT NULL`);
-      }
-    }
     const tableName = keepSchema
       ? this.escape(table.fullName)
       : this.tableIdentifier(table);
