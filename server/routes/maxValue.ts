@@ -11,7 +11,7 @@ export default async function getMaxValue(
       parameter.tableName,
       parameter.columnName
     );
-    res.json(query_result.map((row: any) => +row.max)[0]);
+    res.json(+query_result);
   } catch (error) {
     console.error(error);
     res.status(502).json({ error: "Could not get ranking redundances" });

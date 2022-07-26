@@ -15,7 +15,7 @@ import Table from '../Table';
   position: 0,
   redundanceTeam: 0,
   redundanceWeiLink: 0,
-  redundanceMetanome: 1,
+  redundanceMetanome: 0,
   similarity: 0,
 };
 

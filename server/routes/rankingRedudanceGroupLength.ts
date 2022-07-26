@@ -11,7 +11,7 @@ export default async function getRankingRedudanceGroupLength(
       parameter.tableName,
       JSON.parse(parameter.fdColumns)
     );
-    res.json(query_result.map((row: any) => +row.count)[0]);
+    res.json(+query_result);
   } catch (error) {
     console.error(error);
     res.status(502).json({ error: "Could not get ranking redundances" });

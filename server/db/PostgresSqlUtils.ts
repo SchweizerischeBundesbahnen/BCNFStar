@@ -269,8 +269,7 @@ from
       FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
       WHERE redundance != 1`
     );
-
-    return query_result.rows;
+    return query_result.rows[0]["sum"];
   }
 
   public async getRedundantGroupLengthByColumns(
@@ -278,12 +277,6 @@ from
     columns: Array<string>
   ): Promise<any> {
     const stringColumns = columns.map((col) => '"' + col + '"').join(",");
-    console.log(`SELECT COUNT(*)
-    FROM (
-      COUNT(*) as redundance 
-      FROM (${table}) as temp_table 
-      GROUP BY ${stringColumns})
-    as temp_table_2`);
     const query_result = await this.pool.query<SchemaQueryRow>(
       `SELECT COUNT(*)
       FROM (
@@ -292,7 +285,7 @@ from
         GROUP BY ${stringColumns})
       as temp_table_2`
     );
-    return query_result.rows;
+    return query_result.rows[0]["count"];
   }
 
   public async getMaxValueByColumn(
@@ -302,7 +295,7 @@ from
     const query_result = await this.pool.query<SchemaQueryRow>(
       `SELECT MAX(LENGTH(${column}::text)) from ${table}`
     );
-    return query_result.rows;
+    return query_result.rows[0]["max"];
   }
 
   public async getColumnSample(table: string, column: string): Promise<any> {

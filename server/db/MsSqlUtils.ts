@@ -254,10 +254,11 @@ export default class MsSqlUtils extends SqlUtils {
     const stringColumns = columns.map((col) => '"' + col + '"').join(",");
     const query_result = await sql.query<SchemaQueryRow>(
       `SELECT SUM(redundance)
-      FROM (COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
+      FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
       WHERE redundance != 1`
     );
-    return query_result;
+
+    return query_result.recordset[0][""];
   }
 
   public async getRedundantGroupLengthByColumns(
@@ -267,9 +268,9 @@ export default class MsSqlUtils extends SqlUtils {
     const stringColumns = columns.map((col) => '"' + col + '"').join(",");
     const query_result = await sql.query<SchemaQueryRow>(
       `SELECT COUNT(*)
-      FROM (SELECT ${stringColumns}, COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2`
+      FROM (SELECT ${stringColumns}, COUNT(*) as redundance FROM (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2`
     );
-    return query_result;
+    return query_result.recordset[0][""];
   }
 
   public async getMaxValueByColumn(
@@ -277,16 +278,16 @@ export default class MsSqlUtils extends SqlUtils {
     column: string
   ): Promise<any> {
     const query_result = await sql.query<SchemaQueryRow>(
-      `SELECT MAX(LENGTH(${column}::text)) from ${table}`
+      `SELECT MAX(LEN(${column})) FROM ${table}`
     );
-    return query_result;
+    return query_result.recordset[0][""];
   }
 
   public async getColumnSample(table: string, column: string): Promise<any> {
     const query_result = await sql.query<SchemaQueryRow>(
-      `SELECT ${column} from ${table} LIMIT 5s000000`
+      `SELECT TOP 5000000 ${column} FROM ${table}`
     );
-    return query_result;
+    return query_result.recordset;
   }
 
   public override async getViolatingRowsForFD(
