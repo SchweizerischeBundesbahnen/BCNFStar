@@ -205,8 +205,6 @@ export default abstract class SqlUtils {
     `;
   }
 
-  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
-   */
   public abstract tempTableName(name: string): string;
 
   /**

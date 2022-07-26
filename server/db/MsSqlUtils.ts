@@ -57,7 +57,7 @@ export default class MsSqlUtils extends SqlUtils {
     return "varchar(max)";
   }
 
-  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
+  /** The #{name} is syntax-sugar in mssql to create a temp table. It is dropped after the session ends by the dbms.
    */
   public override tempTableName(name: string): string {
     return `#${name}`;
