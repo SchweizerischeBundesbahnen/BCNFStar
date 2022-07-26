@@ -7,7 +7,7 @@ describe("The integration start page", () => {
     cy.selectTablesAndGo();
     cy.contains("Ok").click();
     cy.get(".sbb-dialog-container").should("not.exist");
-    cy.contains("public").click();
+    cy.get("sbb-expansion-panel").contains("public").click();
     cy.contains("denormalized_data").click();
     cy.contains("Go").click();
 
@@ -24,6 +24,7 @@ describe("The integration start page", () => {
     //   .click({ force: true });
   });
   it("renders both table editing pages", () => {
+    cy.contains("Edit left schema").click();
     cy.get(".table-head-title")
       .contains("public.nation_region_denormalized")
       .click();

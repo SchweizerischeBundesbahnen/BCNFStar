@@ -16,6 +16,8 @@ export class DatabaseTableViewerComponent implements OnInit, OnChanges {
   public _dataSource = new SbbTableDataSource<Record<string, any>>([]);
   public tableColumns: Array<string> = [];
   public isLoading = false;
+  // <columnName,<cssAttributeName, cssAttributeValue>>
+  public cellStyle: Record<string, Record<string, any>> = {};
 
   @ViewChild(SbbTable) sbbtable?: SbbTable<ITablePage>;
 
@@ -60,6 +62,7 @@ export class DatabaseTableViewerComponent implements OnInit, OnChanges {
     if (!result) return;
     this.tableColumns = result.attributes;
     this._dataSource.data = result.rows;
+    this.cellStyle = this.dataService.cellStyle;
     this.sbbtable!.renderRows();
   }
 }
