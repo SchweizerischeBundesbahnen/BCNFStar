@@ -208,7 +208,7 @@ Cypress.Commands.add(
   }
 );
 Cypress.Commands.add("executeSql", (Sql) => {
-  return cy.task("dbQuery", { query: Sql });
+  return cy.task("dbQuery", Sql);
 });
 
 Cypress.Commands.add("createSchema", (schemaName) => {
