@@ -23,11 +23,27 @@ export async function getMetanomeResults(req: Request, res: Response) {
   }
 }
 
+/**
+ * Sends content of a metanome results file as a stream to prevent issues with
+ * maximum file length in node
+ * @param res Express response object
+ * @param fileName of file in jsonlines format
+ */
 export async function sendMetanomeResult(res: Response, fileName: string) {
+  let headersSent = false;
+  function assureHeadersAreSent() {
+    if (headersSent || res.headersSent) return;
+    headersSent = true;
+    res.setHeader("Content-Type", "application/json");
+    res.write("[");
+  }
+
   const path = join(MetanomeAlgorithm.resultsFolder, fileName);
   const fileStream = createReadStream(path, { encoding: "utf-8" });
-  fileStream.on("error", () => {
-    res.status(404).json({ message: "File not found!" });
+  fileStream.on("error", (err) => {
+    console.error(err);
+    if (!res.header && !headersSent)
+      res.status(404).json({ message: "File not found!" });
   });
   const lines = readline.createInterface({
     input: fileStream,
@@ -36,12 +52,17 @@ export async function sendMetanomeResult(res: Response, fileName: string) {
 
   let firstLine = true;
   res.statusCode = 200;
-  res.setHeader("Content-Type", "application/json");
-  res.write("[");
+
   for await (const line of lines) {
-    if (!firstLine) res.write(",");
-    firstLine = false;
+    if (!firstLine) {
+      res.write(",");
+    } else {
+      firstLine = false;
+      assureHeadersAreSent();
+    }
+
     res.write(line);
   }
+  assureHeadersAreSent();
   res.end("]");
 }
