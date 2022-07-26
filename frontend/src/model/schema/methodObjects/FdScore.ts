@@ -6,15 +6,16 @@ import Table from '../Table';
   COSTUMIZE YOUR RANKING:
   uses only keyValue ranking by default
   every attrubute should be >= 0 and smaller <= 1
-  in sum all attributes should be 1
+  in sum all attributes should be 1,
+  be carful with using redundance rankings, these are needing lots of database requests witch could result in long waiting times
 */
 (window as any).DEFAULT_RANKING_WEIGHTS = {
   length: 0,
-  keyValue: 0.25,
+  keyValue: 1,
   position: 0,
-  redundanceTeam: 0.25,
-  redundanceWeiLink: 0.25,
-  redundanceMetanome: 0.25,
+  redundanceTeam: 0,
+  redundanceWeiLink: 0,
+  redundanceMetanome: 1,
   similarity: 0,
 };
 
@@ -132,9 +133,9 @@ export default class FdScore {
 
   private fdRedundanceScoreTeam(): number {
     // get all redundant tuples and normalize by row count
-    return (
-      (this.table.rowCount - this.fd._uniqueTuplesLhs) / this.table.rowCount
-    );
+    return this.table.rowCount == 0
+      ? 0
+      : (this.table.rowCount - this.fd._uniqueTuplesLhs) / this.table.rowCount;
   }
 
   private fdRedundanceScoreMetanome(): number {
@@ -153,7 +154,9 @@ export default class FdScore {
   }
 
   private fdRedundanceScoreWeiLink(): number {
-    return this.fd._redundantTuples / this.table.rowCount;
+    return this.table.rowCount == 0
+      ? 0
+      : this.fd._redundantTuples / this.table.rowCount;
   }
 
   private fdSimilarityScore(): number {

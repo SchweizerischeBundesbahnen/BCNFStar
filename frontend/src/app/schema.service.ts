@@ -158,8 +158,9 @@ export class SchemaService {
     command.onUndo = () => (this.selectedTable = command.table);
 
     this.commandProcessor.do(command);
-    if (command.children?.length != 0)
+    if (command.children?.length != 0) {
       await this.resetDataForRedundanceRanking(command.children!);
+    }
     this.notifyAboutSchemaChanges();
   }
 
@@ -317,27 +318,31 @@ export class SchemaService {
         });
       });
 
-      if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam) {
+      if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam > 0) {
         let resultUniqueTuplesLhs = await Promise.all(
           fdUniqueTuplesLhsPromises
         );
+        let num = 0;
         tables.forEach((table) => {
           table.fdClusters().forEach((cluster, index) =>
             cluster.fds.forEach((fd) => {
-              fd._uniqueTuplesLhs = resultUniqueTuplesLhs[index];
+              fd._uniqueTuplesLhs = resultUniqueTuplesLhs[index + num];
             })
           );
+          num += table.fdClusters().length;
         });
       }
 
       if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink > 0) {
         let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
+        let num = 0;
         tables.forEach((table) => {
           table.fdClusters().forEach((cluster, index) =>
             cluster.fds.forEach((fd) => {
-              fd._redundantTuples = resultRedundantTuples[index];
+              fd._redundantTuples = resultRedundantTuples[index + num];
             })
           );
+          num += table.fdClusters().length;
         });
       }
     }

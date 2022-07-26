@@ -228,8 +228,8 @@ export class SchemaCreationService {
         );
     }
 
-    this.getMaxValueOf(tables);
-    this.getColumnSamples(tables);
+    await this.getMaxValueOf(tables);
+    await this.getColumnSamples(tables);
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);
