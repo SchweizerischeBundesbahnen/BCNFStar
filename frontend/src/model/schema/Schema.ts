@@ -704,20 +704,14 @@ export default class Schema {
   }
 
   public isFkColumn(table: BasicTable, column: BasicColumn): boolean {
-    if (table instanceof Table) {
-      if (!(column instanceof Column))
-        return (
-          !table.implementsSurrogateKey() || column.name != table.surrogateKey
-        );
-      for (const fk of this.fksOf(table, true))
-        if (fk.relationship.referencing.includes(column)) return true;
-      return false;
-    } else {
-      if (!(column instanceof Column)) return true; //assuming UnionTables has no surrogate key
-      for (const fk of this.fksOf(table, true))
-        if (fk.relationship.referencing.includes(column)) return true;
-      return false;
-    }
+    if (!(table instanceof Table)) return false; //not supported yet
+    if (!(column instanceof Column))
+      return (
+        !table.implementsSurrogateKey() || column.name != table.surrogateKey
+      );
+    for (const fk of this.fksOf(table, true))
+      if (fk.referencingCols.includes(column)) return true;
+    return false;
   }
 
   public displayedColumnsOf(table: BasicTable): Array<BasicColumn> {
@@ -731,7 +725,7 @@ export default class Schema {
           const name =
             fk.referencedTable.surrogateKey +
             '_' +
-            fk.relationship.referencing.map((col) => col.name).join('_');
+            fk.referencingCols.map((col) => col.name).join('_');
           columns.push(surrogateKeyColumn(name));
         }
       return columns;
