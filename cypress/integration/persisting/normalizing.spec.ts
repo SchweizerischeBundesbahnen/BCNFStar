@@ -92,8 +92,8 @@ describe("The persist-button should create executable SQL", () => {
 
   // TODO maybe we should think about transactions?
   after("database cleanup", () => {
-    // cy.executeSql(`DROP SCHEMA IF EXISTS ${normalizedSchema} CASCADE`);
-    // cy.executeSql(`DROP SCHEMA IF EXISTS ${denormalizedSchema} CASCADE`);
-    // cy.executeSql(`DROP SCHEMA IF EXISTS ${surrogateKeysSchema} CASCADE`);
+    cy.executeSql(`DROP SCHEMA IF EXISTS ${normalizedSchema} CASCADE`);
+    cy.executeSql(`DROP SCHEMA IF EXISTS ${denormalizedSchema} CASCADE`);
+    cy.executeSql(`DROP SCHEMA IF EXISTS ${surrogateKeysSchema} CASCADE`);
   });
 });
