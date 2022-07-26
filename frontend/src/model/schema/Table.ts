@@ -51,7 +51,7 @@ export default class Table extends BasicTable {
       relationships: this.relationships,
       sources: this.sources,
       rowCount: this.rowCount,
-      // fds: this.fds
+      fds: this.fds,
     };
   }
 

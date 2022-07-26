@@ -10,9 +10,9 @@ import Table from '../Table';
 */
 (window as any).DEFAULT_RANKING_WEIGHTS = {
   length: 0,
-  keyValue: 0,
+  keyValue: 0.25,
   position: 0,
-  redundanceTeam: 0.5,
+  redundanceTeam: 0.25,
   redundanceWeiLink: 0.25,
   redundanceMetanome: 0.25,
   similarity: 0,
