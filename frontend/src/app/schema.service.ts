@@ -128,13 +128,11 @@ export class SchemaService {
   }
 
   public async deleteTable() {
+    if (!this.selectedTable) return;
     const dialogRef = this.dialog.open(DeleteTableDialogComponent);
     const value = await firstValueFrom(dialogRef.afterClosed());
     if (!value) return;
-    const command = new DeleteTableCommand(
-      this.schema,
-      this._selectedTable! as Table
-    );
+    const command = new DeleteTableCommand(this.schema, this.selectedTable);
     command.onDo = () => {
       this.selectedTable = undefined;
     };
