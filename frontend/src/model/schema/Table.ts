@@ -39,6 +39,8 @@ export default class Table extends BasicTable {
     return {
       name: this.name,
       schemaName: this.schemaName,
+      isSuggestedFact: this.isSuggestedFact,
+      isRejectedFact: this.isRejectedFact,
       columns: this.columns,
       pk: this.pk,
       sk: this.surrogateKey,
