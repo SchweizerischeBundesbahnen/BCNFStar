@@ -26,13 +26,13 @@ export default class JoinCommand extends Command {
 
   protected override _undo(): void {
     this.schema.deleteTables(this.newTable!);
-    this.schema.addTables(this.fk.referencing);
-    if (!this.duplicate) this.schema.addTables(this.fk.referenced);
+    this.schema.addTables(this.fk.referencingTable);
+    if (!this.duplicate) this.schema.addTables(this.fk.referencedTable);
   }
 
   protected override _redo(): void {
-    this.schema.deleteTables(this.fk.referencing);
-    if (!this.duplicate) this.schema.deleteTables(this.fk.referenced);
+    this.schema.deleteTables(this.fk.referencingTable);
+    if (!this.duplicate) this.schema.deleteTables(this.fk.referencedTable);
     this.schema.addTables(this.newTable!);
   }
 }

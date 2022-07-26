@@ -14,26 +14,29 @@ import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
 
 export default class Table extends BasicTable {
+  // defining properties
+
   public columns: ColumnCombination;
   public pk?: ColumnCombination = undefined;
-  public fds: Array<FunctionalDependency> = [];
-  public relationships = new Array<Relationship>();
   public sources = new Array<SourceTableInstance>();
+  public relationships = new Array<Relationship>();
+  public surrogateKey: string = '';
+
+  // cached results
+
+  public fds: Array<FunctionalDependency> = [];
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
-  public surrogateKey: string = '';
-  public implementsSurrogateKey(): boolean {
-    return this.surrogateKey.length >= 1;
-  }
-  /**
-   * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
-   */
+  /** cached results of schema.indsOf(this). Should not be accessed from outside the schema class */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
-  /**
-   * This variable tracks if the cached inds are still valid
-   */
+  /** This variable tracks if the cached inds are still valid */
   public _indsValid = false;
+
+  public constructor(columns?: ColumnCombination) {
+    super();
+    this.columns = columns || new ColumnCombination();
+  }
 
   public toJSON() {
     return {
@@ -45,11 +48,6 @@ export default class Table extends BasicTable {
       relationships: this.relationships,
       sources: this.sources,
     };
-  }
-
-  public constructor(columns?: ColumnCombination) {
-    super();
-    this.columns = columns || new ColumnCombination();
   }
 
   public static fromITable(iTable: ITable): Table {
@@ -92,6 +90,10 @@ export default class Table extends BasicTable {
     table.name = tableName;
     table.schemaName = '';
     return table;
+  }
+
+  public implementsSurrogateKey(): boolean {
+    return this.surrogateKey.length >= 1;
   }
 
   /**
