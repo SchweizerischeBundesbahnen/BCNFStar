@@ -261,7 +261,7 @@ export default class Schema {
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
-    if (result.length == 0 || this.suggestedFacts.has(table))
+    if (result.length == 0 || this.isFact(table, onlyDisplayedFks))
       result.push(new Array<TableRelationship>());
     return result;
   }
