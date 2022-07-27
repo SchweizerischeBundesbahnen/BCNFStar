@@ -45,12 +45,12 @@ export class DatabaseService {
       this.http.get<Array<ITable>>(this.baseUrl + '/tables')
     );
     const rowCounts = await this.loadTableRowCounts();
-    const tables = iTables.map((iTable) =>
-      Table.fromITable(
+    const tables = iTables.map((iTable) => {
+      return Table.fromITable(
         iTable,
-        rowCounts[iTable.schemaName + '.' + iTable.name].entries
-      )
-    );
+        rowCounts[iTable.schemaName + '.' + iTable.name]?.entries ?? 0
+      );
+    });
     return tables;
   }
 

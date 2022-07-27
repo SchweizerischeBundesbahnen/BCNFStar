@@ -81,12 +81,11 @@ export default class Table extends BasicTable {
     const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
-    iTable.attributes.forEach((iAttribute, index) => {
+    iTable.attributes.forEach((iAttribute) => {
       const sourceColumn = new SourceColumn(
         iAttribute.name,
         sourceTable,
         iAttribute.dataType,
-        index,
         iAttribute.nullable
       );
       table.addColumns(new Column(sourceTableInstance, sourceColumn));
@@ -110,12 +109,11 @@ export default class Table extends BasicTable {
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
 
-    columnNames.forEach((name, index) => {
+    columnNames.forEach((name) => {
       const sourceColumn = new SourceColumn(
         name,
         sourceTable,
         'unknown data type',
-        index,
         false
       );
       table.addColumns(new Column(sourceTableInstance, sourceColumn));

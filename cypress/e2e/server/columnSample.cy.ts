@@ -1,24 +1,24 @@
 import { isIForeignKey } from "../../../server/definitions/IForeignKey.guard";
 
-describe("The /maxValue route", () => {
+describe("The /samples route", () => {
   it("returns JSON", () => {
     cy.request(
       "get",
       Cypress.env("BACKEND_BASEURL") +
-        "/maxValue/column?tableName=nation_region_denormalized&=&columnName=n_name"
+        "/samples?tableName=public.nation_region_denormalized&=&columnName=n_name"
     )
       .its("headers")
       .its("content-type")
       .should("include", "application/json");
   });
 
-  it("returns max value", () => {
+  it("returns column sample", () => {
     cy.request(
       "get",
       Cypress.env("BACKEND_BASEURL") +
-        "/maxValue/column?tableName=nation_region_denormalized&=&columnName=n_name"
+        "/samples?tableName=public.nation_region_denormalized&=&columnName=n_name"
     ).should((result) => {
-      expect(result.body).to.be.equals(14);
+      expect(result.body.length).to.be.equals(25);
     });
   });
 });
