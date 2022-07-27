@@ -28,6 +28,7 @@ import { unionSpec } from './components/union/union-sidebar/union-sidebar.compon
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
+import Command from '../model/commands/Command';
 
 @Injectable({
   providedIn: 'root',
@@ -269,6 +270,21 @@ export class SchemaService {
     if (!(this.selectedTable instanceof Table))
       throw Error('surrogate keys not implemented for unioned tables');
     this.selectedTable!.surrogateKey = key;
+    this.notifyAboutSchemaChanges();
+  }
+
+  /**
+   * Submits a command to the command processor that does nothing except
+   * calling the onDo and onUndo callbacks when appropriate
+   * Currently used to change from and to schema changing mode
+   * @param onDo
+   * @param onUndo
+   */
+  public doPlainCommand(onDo: () => void, onUndo: () => void) {
+    const command = new Command();
+    command.onDo = onDo;
+    command.onUndo = onUndo;
+    this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }
 

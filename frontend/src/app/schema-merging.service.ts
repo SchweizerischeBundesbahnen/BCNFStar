@@ -73,14 +73,23 @@ export class SchemaMergingService {
   }
 
   private combinedSchema?: Schema;
-  private oldSchemas?: [Schema, Schema];
-  startMerging(schemas?: [Schema, Schema]) {
-    if (schemas) this.oldSchemas = schemas;
-    else this.oldSchemas = this.intService.schemas!;
-    this.schemaService.notifyAboutSchemaChanges();
-    this.intService.stopIntegration();
-    this.combinedSchema = this.oldSchemas[0].merge(this.oldSchemas[1]);
-    this.schemaService.schema = this.combinedSchema;
+  startMerging() {
+    const combinedSchema = this.intService.schemas![0].merge(
+      this.intService.schemas![1]
+    );
+    this.schemaService.doPlainCommand(
+      () => {
+        this.intService.stopIntegration();
+        this.schemaService.schema = this.combinedSchema = combinedSchema;
+      },
+      () => {
+        this.intService.startIntegration(
+          this.intService.schemas![0],
+          this.intService.schemas![1]
+        );
+        delete this.combinedSchema;
+      }
+    );
   }
 
   public async union(tables: [Table, Table]) {
@@ -102,18 +111,37 @@ export class SchemaMergingService {
   public availableTablesFor(table?: BasicTable): Array<Table> {
     if (!table || !(table instanceof Table)) return [];
     return (
-      this.oldSchemas?.find((s) => !s.tables.has(table))?.regularTables ?? []
+      this.intService.schemas?.find((s) => !s.tables.has(table))
+        ?.regularTables ?? []
     );
   }
 
   public cancel() {
-    this.intService.startIntegration(this.oldSchemas![0], this.oldSchemas![1]);
-    this.complete();
+    const combinedSchema = this.combinedSchema;
+    this.schemaService.doPlainCommand(
+      () => {
+        this.intService.startIntegration(
+          this.intService.schemas![0],
+          this.intService.schemas![1]
+        );
+        delete this.combinedSchema;
+      },
+      () => {
+        this.intService.stopIntegration();
+        this.combinedSchema = combinedSchema;
+      }
+    );
   }
 
   public complete() {
-    delete this.combinedSchema;
-    delete this.oldSchemas;
-    this.schemaService.notifyAboutSchemaChanges();
+    const combinedSchema = this.combinedSchema;
+    this.schemaService.doPlainCommand(
+      () => {
+        delete this.combinedSchema;
+      },
+      () => {
+        this.combinedSchema = combinedSchema;
+      }
+    );
   }
 }

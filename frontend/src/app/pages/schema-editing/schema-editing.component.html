@@ -1,27 +1,33 @@
 <div class="grid-container">
   <div class="grid-container-graphmenu">
     <button sbb-button id="reset-btn" class="me-1">Reset view</button>
-    <button
-      type="button"
-      sbb-button
-      *ngIf="!mergeService.isMerging"
-      (click)="schemaService.autoNormalize()"
-      class="me-1"
-    >
-      Auto-normalize all tables
-    </button>
-    <app-integration-bar *ngIf="intService.isIntegrating"></app-integration-bar>
-    <sbb-toggle
-      [(ngModel)]="schemaService.starMode"
-      *ngIf="!intService.isIntegrating && !mergeService.isMerging"
-      class="me-1"
-      [disabled]="intService.isIntegrating || mergeService.isMerging"
-    >
-      <sbb-toggle-option label="Normal Mode" [value]="false">
-      </sbb-toggle-option>
-      <sbb-toggle-option label="Star Schema Mode" [value]="true">
-      </sbb-toggle-option>
-    </sbb-toggle>
+    <div>
+      <button
+        type="button"
+        sbb-button
+        *ngIf="!mergeService.isMerging"
+        (click)="schemaService.autoNormalize()"
+        class="me-1"
+      >
+        Auto-normalize all tables
+      </button>
+    </div>
+    <div>
+      <app-integration-bar
+        *ngIf="intService.isIntegrating"
+      ></app-integration-bar>
+      <sbb-toggle
+        [(ngModel)]="schemaService.starMode"
+        *ngIf="!intService.isIntegrating && !mergeService.isMerging"
+        class="me-1"
+        [disabled]="intService.isIntegrating || mergeService.isMerging"
+      >
+        <sbb-toggle-option label="Normal Mode" [value]="false">
+        </sbb-toggle-option>
+        <sbb-toggle-option label="Star Schema Mode" [value]="true">
+        </sbb-toggle-option>
+      </sbb-toggle>
+    </div>
     <app-undo-redo class="undo-redo"></app-undo-redo>
   </div>
   <app-schema-graph [tables]="tables" [links]="links"></app-schema-graph>
