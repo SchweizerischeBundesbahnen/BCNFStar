@@ -20,7 +20,15 @@ export enum Side {
   left,
   right,
 }
-
+/**
+ * This service is used to coordinate the schema integration mode, where two
+ * database schemas are algined and then merged. For the merging phase, there is a
+ * different service (schema-merging.service.ts). The integration service interacts with
+ * the schema service, and the merging service interacts with both others.
+ *
+ * It manages which schema is currently edited in the schemaService, and generates tables
+ *  and their connections (links) for the schema editing graph while in the aligning phase
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -28,6 +36,7 @@ export class IntegrationService {
   private baseUrl: string;
 
   private _isComparing = true;
+  /** Whether or not the user is viewing the Compare schemas tab */
   get isComparing() {
     return this._isIntegrating && this._isComparing;
   }
@@ -36,7 +45,12 @@ export class IntegrationService {
     this.schemaService.notifyAboutSchemaChanges();
   }
 
+  /**
+   * The schemas which are being edited. In this phase they are completely seperate.
+   * The first one is regarded left schema, the other one the right
+   */
   private _schemas?: [Schema, Schema];
+  /** Which of the two schemas is being edited. Only relevant when not in comparing mode*/
   private _currentlyEditedSide: Side = Side.left;
 
   private thesaurus?: string = '';
@@ -64,13 +78,15 @@ export class IntegrationService {
   }
 
   private _isIntegrating = false;
+  /** true if in the alignment phase of the integration mode. If false, the integration service is inactive */
   get isIntegrating() {
-    return !!this._isIntegrating;
+    return this._isIntegrating;
   }
 
-  /** <schema.table.column of left schema, schema.table.column of right schema*/
+  /** Which columns of the two schemas are considered equivalent by the schema matcher */
   private matchings?: Map<SourceColumn, SourceColumn>;
 
+  /** All tables from both schemas that are currently being integrated */
   public get tables() {
     if (!this.schemas) return [];
     return [...this.schemas[Side.left].tables].concat([
@@ -159,8 +175,8 @@ export class IntegrationService {
   ) {
     const result = await this.getSchemaMatching(
       srcSchema,
-      src,
       targetSchema,
+      src,
       target
     );
     const matchings: Map<SourceColumn, SourceColumn> = new Map();
@@ -178,35 +194,20 @@ export class IntegrationService {
     return matchings;
   }
 
-  public async getTableMatching(
-    srcSchema: Schema,
-    src: Iterable<Table>,
-    targetSchema: Schema,
-    target: Iterable<Table>
-  ) {
-    const result = await this.getSchemaMatching(
-      srcSchema,
-      src,
-      targetSchema,
-      target
-    );
-    const matchings: Map<Table, Table> = new Map();
-    const findTable = (tables: Iterable<Table>, identifier: string) =>
-      [...tables].find((t) => t.fullName === identifier);
-    for (const entry of result) {
-      const leftTable = findTable(src, entry.source);
-      const rightTable = findTable(target, entry.target);
-      if (leftTable && rightTable) matchings.set(leftTable, rightTable);
-    }
-    return matchings;
-  }
-
+  /**
+   * Calls the backend route which executes the COMA schema matcher on the specified tables
+   * @param srcSchema left schema, considered source by coma
+   * @param targetSchema right schema, considered target by coma
+   * @param src the subset of the schema's tables that shall be matched (if omitted: all)
+   * @param target the subset of the schema's tables that shall be matched (if omitted: all
+   * @returns return value of the backend route, see type definition for more
+   */
   private async getSchemaMatching(
     srcSchema: Schema,
-    src: Iterable<Table>,
     targetSchema: Schema,
-    target: Iterable<Table>
-  ) {
+    src: Iterable<Table> = srcSchema.regularTables,
+    target: Iterable<Table> = targetSchema.regularTables
+  ): Promise<Array<ISchemaMatchingResponse>> {
     const srcPersister = new MsSqlPersisting('__schema_matching_temp_src');
     const targetPersister = new MsSqlPersisting(
       '__schema_matching_temp_target'

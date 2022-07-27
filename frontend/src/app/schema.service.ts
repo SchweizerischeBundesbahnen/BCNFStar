@@ -24,12 +24,20 @@ import Table from '../model/schema/Table';
 import TableRelationship from '../model/schema/TableRelationship';
 import { DirectDimensionDialogComponent } from './components/operation-dialogs/direct-dimension-dialog/direct-dimension-dialog.component';
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
-import { unionSpec } from './components/union/union-sidebar/union-sidebar.component';
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 import Command from '../model/commands/Command';
+import { UnionDialogComponent } from './components/union/union-dialog/union-dialog.component';
 
+/**
+ * This service is the core of BCNFStar's schema editing (=normal) mode.
+ * It manages the working schema. It supplies the schema and the selected table.
+ * All changes to the schema should happen through this service, as it informs
+ * components like the graph about these changes. To listen for schema changes,
+ * subscribe to schemaChanged.
+ * It also manages the command processor, which is used to undo and redo schema operations.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -73,9 +81,14 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  /** This command processor is used to enable undo/redo functionality for schema changes.
+   * For more information on this pattern, see {@link https://refactoring.guru/design-patterns/command}.
+   * A subset of its functionality is exposed through {@link undo}, {@link redo}, {@link canUndo} and {@link canRedo}
+   */
   private commandProcessor = new CommandProcessor();
 
   private _schemaChanged = new EventEmitter<void>();
+  /** Always emits an event after the schema has been replaced or modified */
   get schemaChanged() {
     return this._schemaChanged.asObservable();
   }
@@ -85,6 +98,11 @@ export class SchemaService {
     private notification: SbbNotificationToast
   ) {}
 
+  /**
+   * Shows the join dialog to users for join options, and
+   * executes the join if the user confirms the join in that dialog
+   * @param fk TableRelationship to be joined
+   */
   public async join(fk: TableRelationship) {
     const dialogRef = this.dialog.open(JoinDialogComponent, {
       data: { fk: fk },
@@ -115,23 +133,30 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  /** Hides a foreign key that the user doesn't want to be displayed and persisted */
   public dismiss(fk: TableRelationship) {
     let command = new DismissFkCommand(this.schema, fk);
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }
 
+  /** Displays a foreign key that was either blacklisted or filtered. This will cause it
+   * to be created when persisting the schema. When a foreign key was on the blacklist, it
+   * just gets removed from there and does not get put on the whitelist, so it may be filtered later.
+   */
   public show(fk: TableRelationship) {
     let command = new ShowFkCommand(this.schema, fk);
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }
 
-  public async deleteTable() {
+  /** Shows a warning and deletes a table from the schema. If no table is given, deletes the selectedTable */
+  public async deleteTable(table: BasicTable | undefined = this.selectedTable) {
+    if (!table) return;
     const dialogRef = this.dialog.open(DeleteTableDialogComponent);
     const value = await firstValueFrom(dialogRef.afterClosed());
     if (!value) return;
-    const command = new DeleteTableCommand(this.schema, this._selectedTable!);
+    const command = new DeleteTableCommand(this.schema, table);
     command.onDo = () => {
       this.selectedTable = undefined;
     };
@@ -142,6 +167,13 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  /**
+   * Splits the  {@link selectedTable} according to the given {@link FunctionalDependency}.
+   * Normally, the split fd dialog should be shown before this operation for the user to customise
+   * the FD to be split
+   * @param fd FunctionalDependency used to split the table
+   * @param name Name of the resulting table. By default: column names of the FD's left hand side.
+   */
   public split(fd: FunctionalDependency, name?: string) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');
@@ -154,13 +186,17 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public indToFk(event: SourceRelationship) {
-    let command = new IndToFkCommand(this._schema, event);
+  /**
+   * Creates a foreign key based on an inclusion dependency
+   */
+  public indToFk(ind: SourceRelationship) {
+    let command = new IndToFkCommand(this._schema, ind);
 
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
   }
 
+  /** Deletes the specified column from the {@link selectedTable} */
   public deleteColumn(column: Column) {
     if (!(this.selectedTable instanceof Table))
       throw Error('deleteColumn not implemented for unioned tables');
@@ -176,6 +212,12 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  /**
+   * @param selectedTables Tables for the algorithm to be executed on
+   * Applies the BCNF algorithm to each of these tables:
+   * As long as there are BCNF-violating {@link FunctionalDependency FunctionalDependencies}
+   * for this table, split on the highest-rated of these FDs and do the same for the generated tables
+   */
   public autoNormalize(
     selectedTables: Iterable<Table> = this._schema.regularTables
   ): void {
@@ -192,12 +234,27 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public union(spec: unionSpec) {
+  /**
+   * Opens the union dialog and executes the selected union
+   * @param tables the pair of tables to be unioned
+   */
+  public async union(tables: [Table, Table]) {
+    const dialogRef = this.dialog.open(UnionDialogComponent, {
+      data: {
+        tables,
+      },
+    });
+    const dialogResult: {
+      columns: Array<Array<Column | null>>;
+      newTableName: string;
+    } = await firstValueFrom(dialogRef.afterClosed());
+
+    if (!dialogResult) return;
     const command = new UnionCommand(
       this.schema,
-      spec.tables,
-      spec.columns,
-      spec.newTableName
+      tables,
+      dialogResult.columns,
+      dialogResult.newTableName
     );
     command.onDo = () => (this.selectedTable = command.newTable);
     command.onUndo = () => (this.selectedTable = command.tables[0]);
@@ -205,6 +262,13 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
+  /**
+   * To be used while in Star Schema mode. Displays the DirectDimension dialog, and applies
+   * the user's choice there.
+   * DirectDimension can be applied to dimension tables which do not have a foreign key directly
+   * linking them to the fact table. It adds the refencing columns of their foreign key to the fact
+   * table to create a direct foreign key between the fact table and {@link table}
+   */
   public async makeDirectDimension(table: BasicTable): Promise<void> {
     if (!(table instanceof Table))
       throw Error('directDimension not implemented for unioned tables');
@@ -276,9 +340,9 @@ export class SchemaService {
   /**
    * Submits a command to the command processor that does nothing except
    * calling the onDo and onUndo callbacks when appropriate
-   * Currently used to change from and to schema changing mode
-   * @param onDo
-   * @param onUndo
+   * Currently used to change from and to different integration modes
+   * @param onDo executed once immediately, and every time the user redos this action
+   * @param onUndo executed every time the user undos this action
    */
   public doPlainCommand(onDo: () => void, onUndo: () => void) {
     const command = new Command();

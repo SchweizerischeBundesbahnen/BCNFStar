@@ -1,6 +1,14 @@
 export default class Command {
-  public onDo: Function = function () {};
-  public onUndo: Function = function () {};
+  /**
+   * Custom callback that is executed after the command
+   * is executed or re-executed via the redo button
+   */
+  public onDo: () => void = function () {};
+  /**
+   * Custom callback that is executed after the user
+   * undos this command.
+   */
+  public onUndo: () => void = function () {};
 
   protected _do(): void {}
   protected _undo(): void {}

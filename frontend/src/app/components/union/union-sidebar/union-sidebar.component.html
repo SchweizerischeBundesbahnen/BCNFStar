@@ -11,7 +11,11 @@
       table.fullName
     }}</sbb-option>
   </sbb-select>
-  <button sbb-button [disabled]="!otherTable" (click)="openDialog()">
+  <button
+    sbb-button
+    [disabled]="!otherTable"
+    (click)="schemaService.union([table, otherTable!])"
+  >
     Match Columns
   </button>
 </div>
