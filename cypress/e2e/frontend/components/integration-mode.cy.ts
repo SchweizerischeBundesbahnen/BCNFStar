@@ -11,8 +11,9 @@ describe("The integration start page", () => {
     cy.contains("denormalized_data").click();
     cy.contains("Go").click();
 
-    cy.contains("Use no Metanome result").click();
-    cy.contains("Use no Metanome result").click();
+    cy.get("sbb-toggle-option:not(.sbb-toggle-option-selected").click({
+      multiple: true,
+    });
     cy.contains("Ok").click();
     cy.wait(100);
     cy.contains("Start integration").click();

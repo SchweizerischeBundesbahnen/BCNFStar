@@ -53,8 +53,8 @@ describe("The persist-button should create executable SQL", () => {
       ","
     )} FROM ${denormalizedSchema}.nation_region_denormalized) AS x`;
 
-    cy.executeSql(Sql).then((response: any) =>
-      expect(response[0].count).to.equal("0")
+    cy.executeSql(Sql).then((response) =>
+      expect(response.rows[0].count).to.equal("0")
     );
   });
 
@@ -85,7 +85,7 @@ describe("The persist-button should create executable SQL", () => {
 
     cy.executeSql(queryWithoutSurrkey).then((resultWithout) => {
       cy.executeSql(queryWithSurrkey).then((resultWith) => {
-        expect(resultWithout).to.deep.equal(resultWith);
+        expect(resultWithout.rows).to.deep.equal(resultWith.rows);
       });
     });
   });
