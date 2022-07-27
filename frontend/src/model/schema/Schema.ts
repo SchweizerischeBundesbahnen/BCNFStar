@@ -21,9 +21,11 @@ import {
 import UnionedTable from './UnionedTable';
 import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
+import PotentialFacts from './methodObjects/PotentialFacts';
 
 export default class Schema {
   public readonly tables = new Set<BasicTable>();
+  private potentialFacts = new Set<BasicTable>();
   public name?: string;
   /**
    * all fks from the actual database and inds that the user validated
@@ -99,6 +101,26 @@ export default class Schema {
     return this._unionedTables;
   }
 
+  public suggestFact(table: BasicTable) {
+    table.isSuggestedFact = true;
+    this.relationshipsValid = false;
+  }
+
+  public unsuggestFact(table: BasicTable) {
+    table.isSuggestedFact = false;
+    this.relationshipsValid = false;
+  }
+
+  public rejectFact(table: BasicTable) {
+    table.isRejectedFact = true;
+    this.relationshipsValid = false;
+  }
+
+  public unrejectFact(table: BasicTable) {
+    table.isRejectedFact = false;
+    this.relationshipsValid = false;
+  }
+
   public addFks(...fks: SourceRelationship[]) {
     this._baseFks.push(...fks);
     this.deriveFks(fks);
@@ -165,6 +187,7 @@ export default class Schema {
     this._starMode = value;
     for (const [fk, displayOptions] of this._tableFks.entries())
       displayOptions.filtered = this.shouldBeFiltered(fk);
+    if (value) this.updatePotentialFacts();
   }
 
   private set relationshipsValid(valid: boolean) {
@@ -182,11 +205,20 @@ export default class Schema {
    * @param onlyDisplayed whether to use only the displayed fks or all fks as a basis for calculation
    */
   public isFact(table: BasicTable, onlyDisplayed: boolean): boolean {
-    return this.referencesOf(table, onlyDisplayed).length == 0;
+    return (
+      this.referencesOf(table, onlyDisplayed).length == 0 ||
+      table.isSuggestedFact
+    );
+  }
+
+  public isPotentialFact(table: BasicTable): boolean {
+    if (table.isRejectedFact) return false;
+    if (!this._tableFksValid) this.updateFks();
+    return this.potentialFacts.has(table);
   }
 
   public isDirectDimension(table: BasicTable): boolean {
-    return this.referencesOf(table, true).some((reference) =>
+    return this.referencesOf(table, true).every((reference) =>
       this.isFact(reference.referencingTable, true)
     );
   }
@@ -227,7 +259,8 @@ export default class Schema {
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
-    if (result.length == 0) result.push(new Array<TableRelationship>());
+    if (result.length == 0 || this.isFact(table, onlyDisplayedFks))
+      result.push(new Array<TableRelationship>());
     return result;
   }
 
@@ -297,6 +330,7 @@ export default class Schema {
     this.calculateTrivialFks();
     this._tableFksValid = true;
     this.calculateFkDisplayOptions(oldFks);
+    if (this.starMode) this.updatePotentialFacts();
   }
 
   private calculateFkDisplayOptions(
@@ -423,10 +457,15 @@ export default class Schema {
   }
 
   private isStarViolatingFk(fk: TableRelationship) {
+    if (this.isFact(fk.referencedTable, false)) return true;
     if (this.isFact(fk.referencingTable, false)) return false;
     return !this.directDimensionableRoutes(fk.referencedTable, false).some(
       (route) => route[route.length - 1] == fk
     );
+  }
+
+  private updatePotentialFacts() {
+    this.potentialFacts = new PotentialFacts(this).potentialFacts;
   }
 
   private addTableFk(fk: TableRelationship) {
@@ -662,6 +701,17 @@ export default class Schema {
     return resultingTables;
   }
 
+  public isFkColumn(table: BasicTable, column: BasicColumn): boolean {
+    if (!(table instanceof Table)) return false; //not supported yet
+    if (!(column instanceof Column))
+      return (
+        !table.implementsSurrogateKey() || column.name != table.surrogateKey
+      );
+    for (const fk of this.fksOf(table, true))
+      if (fk.referencingCols.includes(column)) return true;
+    return false;
+  }
+
   public displayedColumnsOf(table: BasicTable): Array<BasicColumn> {
     if (table instanceof Table) {
       const columns = new Array<BasicColumn>();
@@ -673,7 +723,7 @@ export default class Schema {
           const name =
             fk.referencedTable.surrogateKey +
             '_' +
-            fk.relationship.referencing.map((col) => col.name).join('_');
+            fk.referencingCols.map((col) => col.name).join('_');
           columns.push(surrogateKeyColumn(name));
         }
       return columns;

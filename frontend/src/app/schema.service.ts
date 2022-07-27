@@ -28,6 +28,8 @@ import { unionSpec } from './components/union/union-sidebar/union-sidebar.compon
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
+import SuggestFactCommand from '../model/commands/SuggestFactCommand';
+import RejectFactCommand from '../model/commands/RejectFactCommand';
 
 @Injectable({
   providedIn: 'root',
@@ -137,6 +139,20 @@ export class SchemaService {
     };
     command.onUndo = () => {
       this.selectedTable = command.table;
+    };
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public suggestOrRejectFact(table: BasicTable, suggest: boolean) {
+    const command = suggest
+      ? new SuggestFactCommand(this.schema, table)
+      : new RejectFactCommand(this.schema, table);
+    command.onDo = () => {
+      this.selectedTable = table;
+    };
+    command.onUndo = () => {
+      this.selectedTable = table;
     };
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();

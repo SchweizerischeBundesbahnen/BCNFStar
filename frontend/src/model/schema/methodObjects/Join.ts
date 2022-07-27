@@ -60,10 +60,12 @@ export default class Join {
   }
 
   private join() {
-    // name, pk, sk
+    // name, pk, sk, isSuggested/RejectedFact
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
     this.newTable.surrogateKey = this.referencing.surrogateKey;
+    this.newTable.isSuggestedFact = this.referencing.isSuggestedFact;
+    this.newTable.isRejectedFact = this.referencing.isRejectedFact;
 
     // inherit sources, relationships and columns from referencing table
     this.referencing.sources.forEach((source) => {
