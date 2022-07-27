@@ -32,6 +32,8 @@ export default class Split {
     generating.name =
       this.generatingName ||
       this.fd.lhs.columnNames().join('_').substring(0, 50);
+    generating.isSuggestedFact = false;
+    generating.isRejectedFact = false;
 
     this.substitute(generating, this.fd.lhs);
 
