@@ -40,6 +40,8 @@ interface JSONTableRelationship {
 interface JSONTable {
   name: string;
   schemaName: string;
+  isSuggestedFact: boolean;
+  isRejectedFact: boolean;
   columns: JSONColumnCombination;
   pk?: JSONColumnCombination;
   sk: string;
@@ -59,6 +61,8 @@ interface JSONFunctionalDependencies {
 interface JSONUnionedTable {
   name: string;
   schemaName: string;
+  isSuggestedFact: boolean;
+  isRejectedFact: boolean;
   tables: [JSONTable, JSONTable];
   columns: [Array<JSONColumn | null>, Array<JSONColumn | null>];
   rPriority: Array<boolean>;
@@ -235,6 +239,8 @@ export default class SaveSchemaState {
     );
     newTable.schemaName = table.schemaName;
     newTable.name = table.name;
+    newTable.isSuggestedFact = table.isSuggestedFact;
+    newTable.isRejectedFact = table.isRejectedFact;
     newTable.rPriority = table.rPriority;
     return newTable;
   }
@@ -245,6 +251,9 @@ export default class SaveSchemaState {
 
     table.name = jsonTable.name;
     table.schemaName = jsonTable.schemaName;
+
+    table.isSuggestedFact = jsonTable.isSuggestedFact;
+    table.isRejectedFact = jsonTable.isRejectedFact;
 
     table.sources = jsonTable.sources.map((source) =>
       this.parseSourceTableInstance(source)

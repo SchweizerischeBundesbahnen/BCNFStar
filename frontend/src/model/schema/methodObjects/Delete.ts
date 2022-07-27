@@ -29,6 +29,8 @@ export default class Delete {
     this.newTable.name = this.table.name;
 
     this.newTable.calculateColumnMatching();
+    this.newTable.isSuggestedFact = this.table.isSuggestedFact;
+    this.newTable.isRejectedFact = this.table.isRejectedFact;
   }
 
   /**

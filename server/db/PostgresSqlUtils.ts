@@ -78,7 +78,8 @@ export default class PostgresSqlUtils extends SqlUtils {
     return `__${name}__`;
   }
 
-  public tempTableScripts(Sql: string, name: string): ITemptableScript {
+  public tempTableScripts(Sql: string): ITemptableScript {
+    const name: string = this.randomName();
     const ITemptableScript: ITemptableScript = {
       name: this.tempTableName(name),
       createScript: `
@@ -90,13 +91,14 @@ export default class PostgresSqlUtils extends SqlUtils {
     return ITemptableScript;
   }
 
-  public override async createTempTable(
-    _sql: string,
-    name: string
-  ): Promise<string> {
-    const x: ITemptableScript = this.tempTableScripts(_sql, name);
+  public override async createTempTable(_sql: string): Promise<string> {
+    const x: ITemptableScript = this.tempTableScripts(_sql);
     await this.pool.query(x.createScript);
     return x.name;
+  }
+
+  public override async dropTempTable(name: string): Promise<void> {
+    await this.pool.query(this.dropTable_SQL(name));
   }
 
   public async tableExistsInSchema(
@@ -245,7 +247,7 @@ from
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const tableName: string = await this.createTempTable(_sql, "X");
+    const tableName: string = await this.createTempTable(_sql);
     const query_result = await this.pool.query(
       this.violatingRowsForFD_SQL(tableName, lhs, rhs) +
         `ORDER BY ${lhs.join(",")}
@@ -253,6 +255,7 @@ from
         OFFSET ${offset}
         `
     );
+    await this.dropTempTable(tableName);
     return {
       rows: query_result.rows,
       attributes: query_result.fields.map((v) => v.name),
@@ -310,10 +313,11 @@ from
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<{ entries: number; groups: number }> {
-    const tempTable: string = await this.createTempTable(sql, "X");
+    const tempTable: string = await this.createTempTable(sql);
     const result = await this.pool.query<{ entries: number; groups: number }>(
       this.getViolatingRowsForFDCount_Sql(tempTable, lhs, rhs)
     );
+    await this.dropTempTable(tempTable);
     return result.rows[0];
   }
 
@@ -325,12 +329,10 @@ from
     limit: number
   ): Promise<ITablePage> {
     const referencingTempTable: string = await this.createTempTable(
-      referencingTableSql,
-      "X"
+      referencingTableSql
     );
     const referencedTempTable: string = await this.createTempTable(
-      referencedTableSql,
-      "Y"
+      referencedTableSql
     );
 
     const query_result = await this.pool.query(
@@ -347,6 +349,9 @@ from
         OFFSET ${offset}
         `
     );
+    this.dropTempTable(referencingTempTable);
+    this.dropTempTable(referencedTempTable);
+
     return {
       rows: query_result.rows,
       attributes: query_result.fields.map((v) => v.name),
@@ -359,12 +364,10 @@ from
     columnRelationships: IColumnRelationship[]
   ): Promise<IRowCounts> {
     const referencingTable: string = await this.createTempTable(
-      referencingTableSql,
-      "X"
+      referencingTableSql
     );
     const referencedTable: string = await this.createTempTable(
-      referencedTableSql,
-      "Y"
+      referencedTableSql
     );
 
     const count = await this.pool.query<IRowCounts>(
@@ -374,6 +377,8 @@ from
         columnRelationships
       )
     );
+    await this.dropTempTable(referencingTable);
+    await this.dropTempTable(referencedTable);
     return count.rows[0];
   }
 

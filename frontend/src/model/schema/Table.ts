@@ -15,19 +15,22 @@ import TableRelationship from './TableRelationship';
 import JaroWinklerDistance from './methodObjects/JaroWinklerDistance';
 
 export default class Table extends BasicTable {
+  // defining properties
+
   public columns: ColumnCombination;
   public pk?: ColumnCombination = undefined;
-  public fds: Array<FunctionalDependency> = [];
-  public relationships = new Array<Relationship>();
   public sources = new Array<SourceTableInstance>();
+  public relationships = new Array<Relationship>();
+  public surrogateKey: string = '';
+
+  // cached results
+
+  public fds: Array<FunctionalDependency> = [];
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
-  public surrogateKey: string = '';
+
   public rowCount: number = 0;
-  public implementsSurrogateKey(): boolean {
-    return this.surrogateKey.length >= 1;
-  }
   public columnNameMatchings: Map<
     { col: SourceColumn; otherCol: SourceColumn },
     number
@@ -36,15 +39,20 @@ export default class Table extends BasicTable {
    * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
    */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
-  /**
-   * This variable tracks if the cached inds are still valid
-   */
+  /** This variable tracks if the cached inds are still valid */
   public _indsValid = false;
+
+  public constructor(columns?: ColumnCombination) {
+    super();
+    this.columns = columns || new ColumnCombination();
+  }
 
   public toJSON() {
     return {
       name: this.name,
       schemaName: this.schemaName,
+      isSuggestedFact: this.isSuggestedFact,
+      isRejectedFact: this.isRejectedFact,
       columns: this.columns,
       pk: this.pk,
       sk: this.surrogateKey,
@@ -53,11 +61,6 @@ export default class Table extends BasicTable {
       rowCount: this.rowCount,
       fds: this.fds,
     };
-  }
-
-  public constructor(columns?: ColumnCombination) {
-    super();
-    this.columns = columns || new ColumnCombination();
   }
 
   public calculateColumnMatching() {
@@ -78,11 +81,12 @@ export default class Table extends BasicTable {
     const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
-    iTable.attributes.forEach((iAttribute) => {
+    iTable.attributes.forEach((iAttribute, index) => {
       const sourceColumn = new SourceColumn(
         iAttribute.name,
         sourceTable,
         iAttribute.dataType,
+        index,
         iAttribute.nullable
       );
       table.addColumns(new Column(sourceTableInstance, sourceColumn));
@@ -106,11 +110,12 @@ export default class Table extends BasicTable {
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
 
-    columnNames.forEach((name) => {
+    columnNames.forEach((name, index) => {
       const sourceColumn = new SourceColumn(
         name,
         sourceTable,
         'unknown data type',
+        index,
         false
       );
       table.addColumns(new Column(sourceTableInstance, sourceColumn));
@@ -121,6 +126,10 @@ export default class Table extends BasicTable {
     table.calculateColumnMatching();
 
     return table;
+  }
+
+  public implementsSurrogateKey(): boolean {
+    return this.surrogateKey.length >= 1;
   }
 
   /**

@@ -108,6 +108,10 @@ export default abstract class SqlUtils {
     return columns.map((c) => this.escape(c)).join(", ");
   }
 
+  public dropTable_SQL(tableName: string): string {
+    return `DROP TABLE IF EXISTS ${tableName};`;
+  }
+
   public testTypeCastingSql(tc: IRequestBodyTypeCasting): string {
     const tableString = `${this.escape(tc.schema)}.${this.escape(tc.table)}`;
     // Casting twice in the second part of the SQL is necessary to recognize informationloss (float -> int)
@@ -218,11 +222,7 @@ export default abstract class SqlUtils {
     `;
   }
 
-  /** The #{name} is syntax-sugar in mssql to craete a temp table. It is dropped after the session ends by the dbms.
-   */
-  public tempTableName(name: string): string {
-    return `#${name}`;
-  }
+  public abstract tempTableName(name: string): string;
 
   /**
    * @param Sql The Sql that queries the information the temp-table should contain
@@ -234,7 +234,13 @@ export default abstract class SqlUtils {
    * @param sql The Sql that queries the information the temp-table should contain
    * @param name The name of the temp-table. Relevant for multiple temp-table in one query
    */
-  public abstract createTempTable(sql: string, name: string): Promise<string>;
+  public abstract createTempTable(sql: string): Promise<string>;
+
+  public abstract dropTempTable(name: string): Promise<void>;
+
+  protected randomName(): string {
+    return (Math.random() + 1).toString(36).substring(7);
+  }
 
   protected violatingRowsForFD_SQL(
     tableName: string,

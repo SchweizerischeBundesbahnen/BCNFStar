@@ -122,56 +122,22 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     return indRowDataQuery;
   }
 
-  protected tableRelationship: TableRelationship;
-  private constructor(relationship: TableRelationship) {
+  private constructor(protected tableRelationship: TableRelationship) {
     super();
-    this.tableRelationship = relationship;
   }
 
   public override async loadTablePage(
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const data: IRequestBodyINDViolatingRows = {
-      referencingTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referencingTable,
-        this.tableRelationship.relationship.referencing,
-        [],
-        true
-      ),
-      referencedTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referencedTable,
-        this.tableRelationship.relationship.referenced,
-        [],
-        true
-      ),
-      relationship: this.tableRelationship.relationship.toIRelationship(),
-      offset: offset,
-      limit: limit,
-    };
+    const data = this.body(offset, limit);
     return firstValueFrom(
       this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/ind`, data)
     );
   }
 
   public override async loadRowCount(): Promise<IRowCounts> {
-    const data: IRequestBodyINDViolatingRows = {
-      referencingTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referencingTable,
-        this.tableRelationship.relationship.referencing,
-        [],
-        true
-      ),
-      referencedTableSql: this.SqlGeneration!.selectStatement(
-        this.tableRelationship.referencedTable,
-        this.tableRelationship.relationship.referenced,
-        [],
-        true
-      ),
-      relationship: this.tableRelationship.relationship.toIRelationship(),
-      offset: 0,
-      limit: 0,
-    };
+    const data = this.body();
     return firstValueFrom(
       this.http.post<IRowCounts>(
         `${this.baseUrl}/violatingRows/rowcount/ind`,
@@ -179,28 +145,47 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
       )
     );
   }
+
+  private body(offset = 0, limit = 0): IRequestBodyINDViolatingRows {
+    const data: IRequestBodyINDViolatingRows = {
+      referencingTableSql: this.SqlGeneration!.selectStatement(
+        this.tableRelationship.referencingTable,
+        this.tableRelationship.referencingCols,
+        [],
+        true
+      ),
+      referencedTableSql: this.SqlGeneration!.selectStatement(
+        this.tableRelationship.referencedTable,
+        this.tableRelationship.referencedCols,
+        [],
+        true
+      ),
+      relationship: this.tableRelationship.relationship.toIRelationship(),
+      offset: offset,
+      limit: limit,
+    };
+
+    return data;
+  }
 }
 
 export class ViolatingFDRowsDataQuery extends DataQuery {
-  protected table: Table;
-  protected lhs: Array<Column>;
-  protected rhs: Array<Column>;
-
   public static async Create(
     table: Table,
     lhs: Array<Column>,
     rhs: Array<Column>
   ): Promise<ViolatingFDRowsDataQuery> {
-    const indRowDataQuery = new ViolatingFDRowsDataQuery(table, lhs, rhs);
-    await indRowDataQuery.initPersisting();
-    return indRowDataQuery;
+    const fdRowDataQuery = new ViolatingFDRowsDataQuery(table, lhs, rhs);
+    await fdRowDataQuery.initPersisting();
+    return fdRowDataQuery;
   }
 
-  private constructor(table: Table, lhs: Array<Column>, rhs: Array<Column>) {
+  private constructor(
+    protected table: Table,
+    protected lhs: Array<Column>,
+    protected rhs: Array<Column>
+  ) {
     super();
-    this.table = table;
-    this.lhs = lhs;
-    this.rhs = rhs;
   }
 
   public override async loadTablePage(
@@ -209,19 +194,7 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     withSeparators = true
   ): Promise<ITablePage> {
     const lhsNames = this.lhs.map((c) => c.name);
-    const rhsNames = this.rhs.map((c) => c.name);
-    const data: IRequestBodyFDViolatingRows = {
-      sql: this.SqlGeneration!.selectStatement(
-        this.table,
-        this.table.columns.asArray(),
-        [],
-        true
-      ),
-      lhs: lhsNames,
-      rhs: rhsNames,
-      offset: offset,
-      limit: limit,
-    };
+    const data = this.body(offset, limit);
     const result = await firstValueFrom(
       this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
     );
@@ -252,6 +225,16 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
   }
 
   public override async loadRowCount(): Promise<IRowCounts> {
+    const data = this.body();
+    return firstValueFrom(
+      this.http.post<IRowCounts>(
+        `${this.baseUrl}/violatingRows/rowcount/fd`,
+        data
+      )
+    );
+  }
+
+  private body(offset = 0, limit = 0): IRequestBodyFDViolatingRows {
     const data: IRequestBodyFDViolatingRows = {
       sql: this.SqlGeneration!.selectStatement(
         this.table,
@@ -261,14 +244,9 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
       ),
       lhs: this.lhs.map((c) => c.name),
       rhs: this.rhs.map((c) => c.name),
-      offset: 0,
-      limit: 0,
+      offset: offset,
+      limit: limit,
     };
-    return firstValueFrom(
-      this.http.post<IRowCounts>(
-        `${this.baseUrl}/violatingRows/rowcount/fd`,
-        data
-      )
-    );
+    return data;
   }
 }

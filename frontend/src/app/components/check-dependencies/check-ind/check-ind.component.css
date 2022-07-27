@@ -12,6 +12,10 @@
     width: 20%;
 }
 
+#removeColumnRelationButton {
+    width: 20%;
+}
+
 #columnMatch {
     padding-top: 10px;
 }

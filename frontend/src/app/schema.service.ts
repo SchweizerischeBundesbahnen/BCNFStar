@@ -29,6 +29,8 @@ import { unionSpec } from './components/union/union-sidebar/union-sidebar.compon
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DatabaseService } from './database.service';
+import SuggestFactCommand from '../model/commands/SuggestFactCommand';
+import RejectFactCommand from '../model/commands/RejectFactCommand';
 
 @Injectable({
   providedIn: 'root',
@@ -132,18 +134,30 @@ export class SchemaService {
   }
 
   public async deleteTable() {
+    if (!this.selectedTable) return;
     const dialogRef = this.dialog.open(DeleteTableDialogComponent);
     const value = await firstValueFrom(dialogRef.afterClosed());
     if (!value) return;
-    const command = new DeleteTableCommand(
-      this.schema,
-      this._selectedTable! as Table
-    );
+    const command = new DeleteTableCommand(this.schema, this.selectedTable);
     command.onDo = () => {
       this.selectedTable = undefined;
     };
     command.onUndo = () => {
       this.selectedTable = command.table;
+    };
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
+  public suggestOrRejectFact(table: BasicTable, suggest: boolean) {
+    const command = suggest
+      ? new SuggestFactCommand(this.schema, table)
+      : new RejectFactCommand(this.schema, table);
+    command.onDo = () => {
+      this.selectedTable = table;
+    };
+    command.onUndo = () => {
+      this.selectedTable = table;
     };
     this.commandProcessor.do(command);
     this.notifyAboutSchemaChanges();
@@ -368,6 +382,5 @@ export class SchemaService {
 
   private notifyAboutSchemaChanges() {
     this._schemaChanged.next();
-    console.log('schema: ', this.schema);
   }
 }

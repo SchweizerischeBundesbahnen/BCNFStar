@@ -33,6 +33,7 @@ declare namespace Cypress {
 
     /**
      * Executes the given query on the test database.
+     * Returns a pg response https://node-postgres.com/api/result
      */
     executeSql(query: string): any;
 
@@ -57,6 +58,16 @@ declare namespace Cypress {
     visitCheckContainedSubtableTab(): void;
 
     visitPossibleForeignKeysTab(): void;
+
+    visitCheckContainedSubtableTab(): void;
+
+    checkFD(lhs: Array<string>, rhs: Array<string>);
+
+    visitSuggestForeignKeyTab(): void;
+
+    checkIND(referencedTable: string, columnRelationship: Array<Array<string>>);
+
+    joinTablesByFirstIND(referencingTable: string, referencedTable: string);
 
     createForeignKey(): void;
 
