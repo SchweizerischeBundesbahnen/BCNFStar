@@ -39,7 +39,7 @@ export class IntegrationService {
   private _schemas?: [Schema, Schema];
   private _currentlyEditedSide: Side = Side.left;
 
-  private thesaurus?: string;
+  private thesaurus?: string = '';
   set currentlyEditedSide(side: Side) {
     this._currentlyEditedSide = side;
     this.schemaService.schema = this._schemas![this._currentlyEditedSide];

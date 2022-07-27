@@ -15,8 +15,8 @@ export class IntegrationStartComponent {
   private thesaurus?: string;
   constructor(private intService: IntegrationService, private router: Router) {}
 
-  async onThesaurusChanged(evt: Array<File>) {
-    if (evt.length) this.thesaurus = await evt[0].text();
+  async onThesaurusChanged(files: Array<File>) {
+    if (files.length) this.thesaurus = await files[0].text();
     else this.thesaurus = undefined;
   }
 
