@@ -44,7 +44,7 @@ describe("The integration start page", () => {
   });
 
   it("shows correspondences in the compare window", () => {
-    cy.contains("Compare schemas and integrate").click();
+    cy.contains("Compare").click();
     cy.get(".joint-link").should("have.length", 26);
     cy.get(".table-head-title").contains("public.denormalized_data");
     cy.get(".table-head-title").contains("public.nation_region_denormalized");
