@@ -30,6 +30,11 @@ Alternatively, you can use `npm run dev` if you don't want tests to be run
 
 To run the tests as they are being executed in the CI, run `npm run test:prod`.
 
+### Testing SaveSchemaState
+
+If you change the persisting of the model in [SaveSchemaState.ts](/frontend/src/model/schema/methodObjects/SaveSchemaState.ts) and other schema files you always have to update the zip files savedExampleSchema.zip and savedSchema.zip in cypress forlder [Fixtures](/cypress/fixtures) for tests [load-saved-schema.cy.ts](/cypress/e2e/frontend/components/load-saved-schema.cy.ts) and [tables-selection.cy.ts](/cypress/e2e/frontend/pages/tables-selection.cy.ts).
+The schema savedSchema.zip includes the two testing tables "nation_region_denormalized" and "part_partsupp_supplier_denormalized" without schema transformations. The schema of savedExampleSchema.zip should be include a schema with lots of the possible schema transformations (like one split, join, union).
+
 ### Troubleshooting
 
 Something doesn't work? Always try to run `npm install && npm run build` first. This may be required after changes to files in the `server/definitions` folder or to any dependency.
