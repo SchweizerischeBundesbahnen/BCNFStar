@@ -28,7 +28,7 @@ describe("The foreign keys tab", () => {
 
   it("hides created fk and displays it unter Dismissed Foreign Keys", () => {
     cy.createForeignKey();
-    cy.get('[joint-selector="delete-fk-button"]').click();
+    cy.get('[joint-selector="delete-fk-button"]').click({ force: true });
     cy.contains(
       "(public.part_partsupp_supplier_denormalized) s_nationkey -> (public.nation_region_denormalized) n_nationkey"
     );
@@ -37,7 +37,7 @@ describe("The foreign keys tab", () => {
 
   it("displays foreign key after hide it", () => {
     cy.createForeignKey();
-    cy.get('[joint-selector="delete-fk-button"]').click();
+    cy.get('[joint-selector="delete-fk-button"]').click({ force: true });
     cy.contains(
       "(public.part_partsupp_supplier_denormalized) s_nationkey -> (public.nation_region_denormalized) n_nationkey"
     );

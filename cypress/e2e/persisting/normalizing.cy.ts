@@ -42,7 +42,7 @@ describe("The persist-button should create executable SQL", () => {
   });
 
   it("denormalized table contains same data as initial table", () => {
-    cy.get('[joint-selector="join-button"]').click();
+    cy.get('[joint-selector="join-button"]').click({ force: true });
     cy.contains("Ok").click();
 
     cy.createSchema(denormalizedSchema);

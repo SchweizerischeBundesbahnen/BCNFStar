@@ -38,6 +38,7 @@ import getRedundanceSum from "./routes/rankingRedundanceSum";
 import getRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
 import getMaxValue from "./routes/maxValue";
 import getColumnSample from "./routes/columnSample";
+import getSchemaMatching from "./routes/schemaMatching";
 
 const app = express();
 
@@ -112,6 +113,8 @@ app.delete(
   deleteMetanomeResults
 );
 app.post("/metanomeResults", runMetanome);
+
+app.post("/schemaMatching", getSchemaMatching);
 
 app.get("/persist/dbmsname", getDbmsName);
 

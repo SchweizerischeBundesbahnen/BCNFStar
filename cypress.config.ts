@@ -7,5 +7,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       return require("./cypress/plugins/index.js")(on, config);
     },
+    viewportWidth: 1000 * 1.2,
+    viewportHeight: 660 * 1.2,
   },
 });

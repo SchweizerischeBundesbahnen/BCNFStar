@@ -1,5 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 
+
+.integration-left {
+  background-color: rgb(245, 255, 255) !important;
+}
+
+.integration-right {
+  background-color: rgb(250, 255, 245) !important;
+}
+
 .sbb-select{
   width: 100%;
 }
@@ -18,6 +27,7 @@ body {
 
 .sbb-tab-body-wrapper {
   height: 100%;
+  background: transparent !important
 }
 
 .sbb-toggle-option-button {
@@ -26,6 +36,11 @@ body {
 
 .sbb-panel {
   max-height: 40vh;
+}
+
+/* shows cursor as clickable when hovering over join/union buttons */
+text {
+  cursor: pointer;
 }
 
 .d-flex {

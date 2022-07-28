@@ -35,16 +35,24 @@ export function splitlines(content: string): Array<string> {
 }
 
 /**
+ * Creates dir if it doesn't exist. Works for nested, non-existing dirs
+ * @param dir
+ */
+export async function ensureDirExists(dir: string) {
+  try {
+    await access(dir);
+  } catch (e) {
+    await mkdir(dir, { recursive: true });
+  }
+}
+
+/**
  * Creates a file and the containing folders if they don't exist
  * @param path path of the file
  * @param content content that should be written to the file if it didn't exist
  */
 export async function initFile(path: string, content: string = "") {
-  try {
-    await access(dirname(path));
-  } catch (e) {
-    await mkdir(dirname(path), { recursive: true });
-  }
+  ensureDirExists(dirname(path));
   try {
     await access(path);
   } catch (e) {
