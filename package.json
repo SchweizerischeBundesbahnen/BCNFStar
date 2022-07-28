@@ -37,7 +37,6 @@
     "cypress": "^10.1.0",
     "cypress-dotenv": "^2.0.0",
     "cypress-file-upload": "^5.0.8",
-    "cypress-postgres": "^1.1.1",
     "dotenv": "^16.0.1",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",

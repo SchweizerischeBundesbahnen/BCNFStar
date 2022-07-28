@@ -41,3 +41,5 @@ coverage
 
 /docs/frontend
 /docs/server
+server/coma/results
+server/coma/schemas

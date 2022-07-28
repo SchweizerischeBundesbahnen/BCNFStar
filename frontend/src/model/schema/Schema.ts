@@ -62,7 +62,14 @@ export default class Schema {
     };
   }
 
-  public constructor(...tables: Array<Table>) {
+  public merge(other: Schema) {
+    const result = new Schema(...this.tables, ...other.tables);
+    result._baseFks = this._baseFks.concat(other._baseFks);
+    result._inds = this._inds.concat(other._inds);
+    return result;
+  }
+
+  public constructor(...tables: Array<BasicTable>) {
     this.addTables(...tables);
   }
 
@@ -179,11 +186,14 @@ export default class Schema {
     displayOptions.whitelisted = whitelisted;
   }
 
-  public get starMode(): boolean {
+  public get __starMode(): boolean {
     return this._starMode;
   }
 
-  public set starMode(value: boolean) {
+  /**
+   * Do not call directly, instead set and get schemaService.starMode
+   */
+  public set __starMode(value: boolean) {
     this._starMode = value;
     for (const [fk, displayOptions] of this._tableFks.entries())
       displayOptions.filtered = this.shouldBeFiltered(fk);
@@ -330,7 +340,7 @@ export default class Schema {
     this.calculateTrivialFks();
     this._tableFksValid = true;
     this.calculateFkDisplayOptions(oldFks);
-    if (this.starMode) this.updatePotentialFacts();
+    if (this.__starMode) this.updatePotentialFacts();
   }
 
   private calculateFkDisplayOptions(
@@ -417,7 +427,7 @@ export default class Schema {
   }
 
   private shouldBeFiltered(fk: TableRelationship) {
-    if (this.starMode) return this.isStarViolatingFk(fk);
+    if (this.__starMode) return this.isStarViolatingFk(fk);
     else return this.isTransitiveFk(fk);
   }
 
@@ -713,6 +723,7 @@ export default class Schema {
   }
 
   public displayedColumnsOf(table: BasicTable): Array<BasicColumn> {
+    if (!this.tables.has(table)) return (table as Table).columns.asArray();
     if (table instanceof Table) {
       const columns = new Array<BasicColumn>();
       if (table.implementsSurrogateKey())
