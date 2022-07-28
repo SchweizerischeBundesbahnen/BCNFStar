@@ -1,5 +1,14 @@
 <div class="grid">
-  <div class="start-btn">
+  <div
+    sbbTooltip="File that contains lines of comma-separated word pairs that have the same meaning. Used as a hint for the schema matcher"
+  >
+    Thesaurus file
+    <sbb-file-selector
+      class="upload-btn"
+      (fileChanged)="onThesaurusChanged($event)"
+    ></sbb-file-selector>
+  </div>
+  <div>
     <button
       sbb-button
       (click)="startIntegration()"

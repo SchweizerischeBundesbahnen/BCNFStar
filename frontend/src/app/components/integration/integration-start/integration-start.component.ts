@@ -11,11 +11,22 @@ import { IntegrationService } from '../../../integration.service';
 export class IntegrationStartComponent {
   public leftSchema?: Schema;
   public rightSchema?: Schema;
+
+  private thesaurus?: string;
   constructor(private intService: IntegrationService, private router: Router) {}
+
+  async onThesaurusChanged(files: Array<File>) {
+    if (files.length) this.thesaurus = await files[0].text();
+    else this.thesaurus = undefined;
+  }
 
   startIntegration() {
     if (!this.leftSchema || !this.rightSchema) return;
-    this.intService.startIntegration(this.leftSchema, this.rightSchema);
+    this.intService.startIntegration(
+      this.leftSchema,
+      this.rightSchema,
+      this.thesaurus
+    );
     this.router.navigate(['/edit-schema']);
   }
 }
