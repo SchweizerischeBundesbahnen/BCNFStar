@@ -159,7 +159,7 @@ export class SchemaCreationService {
     return result;
   }
 
-  private async getMaxValueOf(tables: Array<Table>) {
+  private async determineMaxColumnValueOf(tables: Array<Table>) {
     if ((window as any).DEFAULT_RANKING_WEIGHTS.keyValue > 0) {
       let maxValuePromises = new Map<Column, Promise<number>>();
       for (const table of tables) {
@@ -182,7 +182,7 @@ export class SchemaCreationService {
     }
   }
 
-  private async getColumnSamples(tables: Array<Table>) {
+  private async determineBloomfilters(tables: Array<Table>) {
     if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome > 0) {
       let samplePromises = new Map<Column, Promise<Array<string>>>();
       tables.forEach((table) => {
@@ -228,8 +228,8 @@ export class SchemaCreationService {
         );
     }
 
-    await this.getMaxValueOf(tables);
-    await this.getColumnSamples(tables);
+    await this.determineMaxColumnValueOf(tables);
+    await this.determineBloomfilters(tables);
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);
@@ -246,9 +246,7 @@ export class SchemaCreationService {
     for (const table of schema.regularTables) schema.calculateFdsOf(table);
 
     await this.schemaService.resetDataForRedundanceRanking(
-      Array.from(schema.tables).filter(
-        (table) => table instanceof Table
-      ) as Array<Table>
+      Array.from(schema.regularTables)
     );
     return schema;
   }

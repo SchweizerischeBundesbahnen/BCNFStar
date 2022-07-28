@@ -80,7 +80,7 @@ export class DatabaseService {
     return await firstValueFrom(
       this.http.get<number>(
         this.baseUrl +
-          `/redundances?tableName=${tableSql}&&fdColumns=[${columns}]`
+          `/redundances?tableSql=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }
@@ -97,7 +97,7 @@ export class DatabaseService {
     return await firstValueFrom(
       this.http.get<number>(
         this.baseUrl +
-          `/redundances/length?tableName=${tableSql}&&fdColumns=[${columns}]`
+          `/redundances/length?tableSql=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }

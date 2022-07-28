@@ -428,13 +428,13 @@ export default class Table extends BasicTable {
   }
 
   /**
-   * @param withPaulFd returns cluster with or without PaulFd, not needed when calculating data for redundance ranking
+   * @param withPkFd returns cluster with or without pkFd, not needed when calculating data for redundance ranking
    * @returns FdClusters, which group functional dependencies that have the same right hand side
    * Used in UI to make functional dependencies easier to discover
    */
-  public fdClusters(withPaulFd: boolean = false): Array<FdCluster> {
+  public fdClusters(withPkFd: boolean = false): Array<FdCluster> {
     let allFds: Array<FunctionalDependency> = [...this.violatingFds()];
-    if (withPaulFd && this.pk) {
+    if (withPkFd && this.pk) {
       let newFd = new FunctionalDependency(
         this.pk!.copy(),
         this.columns.copy()

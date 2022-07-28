@@ -34,8 +34,8 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
-import getRankingRedundanceSum from "./routes/rankingRedundanceSum";
-import getRankingRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
+import getRedundanceSum from "./routes/rankingRedundanceSum";
+import getRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
 import getMaxValue from "./routes/maxValue";
 import getColumnSample from "./routes/columnSample";
 
@@ -80,12 +80,12 @@ app.get("/pks", getPksFunction);
 app.get(
   "/redundances",
   [check("tableName").isString(), check("columns").isString()],
-  getRankingRedundanceSum
+  getRedundanceSum
 );
 app.get(
   "/redundances/length",
   [check("tableName").isString(), check("columns").isString()],
-  getRankingRedudanceGroupLength
+  getRedudanceGroupLength
 );
 app.get(
   "/maxValue/column",
