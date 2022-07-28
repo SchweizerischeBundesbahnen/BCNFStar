@@ -1,3 +1,136 @@
-test
-<a href="/BCNFStar/frontend">frontend</a>
-<a href="/BCNFStar/server">server</a>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>BCNFStar Docs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+
+    <style>
+      body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #000000;
+        background-color: #fff;
+        overflow: hidden;
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-rows: 8% 1fr 9%;
+        grid-template-columns: 1fr;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      .header {
+        padding: 0px 20px 0px 20px;
+      }
+
+      .content {
+        overflow-y: scroll;
+        padding: 0px 20px 0px 20px;
+      }
+
+      a {
+        color: #dc4801;
+        text-decoration: none;
+        text-align: center;
+      }
+
+      a:hover {
+        color: #dc4801;
+      }
+
+      img {
+        display: block;
+        margin: auto;
+      }
+
+      .icon {
+        height: 3rem
+      }
+
+      p {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: #000000;
+      }
+
+      .mt {
+        margin-top: 0.5rem;
+      }
+
+      .text-center {
+        text-align: center !important;
+      }
+
+      .bcnf {
+        color: #dc4801 !important;
+      }
+
+      .wrapper {
+        display: block;
+      }
+
+      .wrapper-item {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+      }
+      .separator {
+        border-bottom: 1px solid #dc4801;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-container">
+      <div class="separator header">
+        <h1>
+          <div class="wrapper">
+            <div class="wrapper-item">Documentation of BCNFStar</div>
+            <img class="icon wrapper-item" src="assets/BCNF4.png" />
+          </div>
+        </h1>
+      </div>
+      <div class="separator content">
+        <h2>Architecture</h2>
+        <p>BCNFStar consists of four components: an <a href="https://angular.io/expre">Angular</a> frontend, an <a href="https://expressjs.com/">Express</a> server, a database and <a href="https://hpi.de/naumann/projects/data-profiling-and-analytics/metanome-data-profiling.html">Metanome</a>. The frontend allows a user to load a schema via a data connection (postgres, mssql and sqledge possible). Functional dependencies and inclusion dependencies are calculated for the tables of the schema. Using this relationship, BCNFStar makes suggestions about schema transformations that a user can select in a graphical user interface. The application communicates with the database and Metanome to load schema information, functional dependencies and inclusion dependencies. This communication is handled by the server using API requests. The calculation of functional dependencies and inclusion dependencies is performed by Metanome, a Java program that combines numerous power-efficient and well-scalable algorithms for data profiling on large datasets.</p>
+        <img src="assets/Architektur_BCNF*.png" style="width: 30vw">
+
+        <h2>Model</h2>
+        <p>After a schema is loaded into BCNFStar, it is represented using a model. The model has classes for all needed entities, such as schema, table and column. All the performed schema transformations are executed on it. A partially simplified class diagram can be found bellow:</p>
+        <img src="assets/model.png" style="width: 50vw">
+
+        <h2>Development Documentation</h2>
+        <div>
+          You can find the development documentation for our frontend <a href="/BCNFStar/frontend">here</a>
+        </div>
+        <div>
+          You can find the development documentation for our server  <a href="/BCNFStar/server">here</a>
+        </div>
+
+        <h2>User documentation</h2>
+        <div>
+          You can find the user documentation  <a href="user">here</a>
+        </div>
+        
+      </div>
+      <div class="mt text-center">
+        <div> 
+          <span style="font-weight: bold;">BCNFStar-Team:</span> <br> Janina Adamcic, Marie Fischer, Christop Kirchherr, Paul Rößler, Paul Sieben, Tobias Sträubig
+        </div>
+        <div>
+          <a href="https://github.com/SchweizerischeBundesbahnen/BCNFStar">View our project on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
