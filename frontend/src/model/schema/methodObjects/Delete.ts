@@ -2,6 +2,9 @@ import ColumnCombination from '../ColumnCombination';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
+/**
+ * Method object for the deletion of columns from a table.
+ */
 export default class Delete {
   public newTable!: Table;
 
