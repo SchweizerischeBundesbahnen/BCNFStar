@@ -26,7 +26,7 @@ describe("The integration start page", () => {
     //   .click({ force: true });
   });
   it("renders both table editing pages", () => {
-    cy.contains("Edit left schema").click();
+    cy.contains("Edit left schema").click({ force: true });
     cy.get(".table-head-title")
       .contains("public.nation_region_denormalized")
       .click();
@@ -35,7 +35,7 @@ describe("The integration start page", () => {
       "public.denormalized_data"
     );
 
-    cy.contains("Edit right schema").click();
+    cy.contains("Edit right schema").click({ force: true });
     cy.get(".table-head-title").contains("public.denormalized_data").click();
     cy.get(".table-head-title").should(
       "not.contain.text",
@@ -44,7 +44,7 @@ describe("The integration start page", () => {
   });
 
   it("shows correspondences in the compare window", () => {
-    cy.contains("Compare").click();
+    cy.contains("Compare").click({ force: true });
     cy.get(".joint-link").should("have.length", 26);
     cy.get(".table-head-title").contains("public.denormalized_data");
     cy.get(".table-head-title").contains("public.nation_region_denormalized");
