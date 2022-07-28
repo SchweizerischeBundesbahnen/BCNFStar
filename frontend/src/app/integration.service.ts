@@ -56,7 +56,7 @@ export class IntegrationService {
     return this._schemas;
   }
 
-  /** schema that is currently not edited (the other ome is schemaService.schema)*/
+  /** schema that is currently not edited (the other one is schemaService.schema)*/
   get inactiveSchema() {
     return this._schemas![this.currentlyEditedSide];
   }
