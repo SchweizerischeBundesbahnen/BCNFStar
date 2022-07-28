@@ -177,7 +177,6 @@ export class SchemaService {
    * @param fd FunctionalDependency used to split the table
    * @param name Name of the resulting table. By default: column names of the FD's left hand side.
    */
-=======
   public suggestOrRejectFact(table: BasicTable, suggest: boolean) {
     const command = suggest
       ? new SuggestFactCommand(this.schema, table)

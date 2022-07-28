@@ -340,7 +340,7 @@ export default class Schema {
     this.calculateTrivialFks();
     this._tableFksValid = true;
     this.calculateFkDisplayOptions(oldFks);
-    if (this.starMode) this.updatePotentialFacts();
+    if (this.__starMode) this.updatePotentialFacts();
   }
 
   private calculateFkDisplayOptions(
