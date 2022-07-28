@@ -38,3 +38,6 @@ cypress/downloads
 # Code coverage reports
 .nyc_output
 coverage
+
+/docs/frontend
+/docs/server
