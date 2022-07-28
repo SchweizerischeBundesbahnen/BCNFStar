@@ -1,6 +1,5 @@
-import Schema from '@/src/model/schema/Schema';
+import { Component } from '@angular/core';
 import Table from 'src/model/schema/Table';
-import { Component, Input } from '@angular/core';
 import { SchemaService } from '../../schema.service';
 
 @Component({
@@ -9,10 +8,7 @@ import { SchemaService } from '../../schema.service';
   styleUrls: ['./schema-editing-side-bar.component.css'],
 })
 export class SchemaEditingSideBarComponent {
-  @Input() public schema!: Schema;
-
   constructor(public schemaService: SchemaService) {}
-
   get table() {
     return this.schemaService.selectedTable! as Table;
   }

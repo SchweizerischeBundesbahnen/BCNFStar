@@ -4,6 +4,7 @@ import Column from '@/src/model/schema/Column';
 import BasicColumn from '@/src/model/types/BasicColumn';
 import { Component, Input, OnInit } from '@angular/core';
 import Table from 'src/model/schema/Table';
+import { IntegrationService } from '@/src/app/integration.service';
 
 @Component({
   selector: 'app-graph-element',
@@ -19,7 +20,10 @@ export class GraphElementComponent implements OnInit {
   public isIndirectDimension: boolean = false;
   public isPotentialFact: boolean = false;
 
-  constructor(public schemaService: SchemaService) {}
+  constructor(
+    public schemaService: SchemaService,
+    public intService: IntegrationService
+  ) {}
 
   ngOnInit(): void {
     if (!this.schemaService.starMode) return;
@@ -36,6 +40,13 @@ export class GraphElementComponent implements OnInit {
   }
 
   public select() {
+    if (
+      !this.schemaService.schema.tables.has(this.table) &&
+      this.intService.isIntegrating
+    ) {
+      this.intService.currentlyEditedSide =
+        1 - this.intService.currentlyEditedSide;
+    }
     this.schemaService.selectedTable = this.table;
   }
 

@@ -1,10 +1,18 @@
-export default abstract class Command {
-  public onDo: Function = function () {};
-  public onUndo: Function = function () {};
+export default class Command {
+  /**
+   * Custom callback that is executed after the command
+   * is executed or re-executed via the redo button
+   */
+  public onDo: () => void = function () {};
+  /**
+   * Custom callback that is executed after the user
+   * undos this command.
+   */
+  public onUndo: () => void = function () {};
 
-  protected abstract _do(): void;
-  protected abstract _undo(): void;
-  protected abstract _redo(): void;
+  protected _do(): void {}
+  protected _undo(): void {}
+  protected _redo(): void {}
 
   public do(): void {
     this._do();
