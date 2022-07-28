@@ -74,7 +74,7 @@ export default class Delete {
       if (fd.lhs.isSubsetOf(this.newTable.columns)) {
         const newFd = fd.copy();
         newFd.rhs.intersect(this.newTable.columns);
-        if (!newFd.isFullyTrivial()) {
+        if (!newFd.isTrivial()) {
           this.newTable.fds.push(newFd);
         }
       }

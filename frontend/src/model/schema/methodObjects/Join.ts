@@ -91,6 +91,7 @@ export default class Join {
       .sourcesTopological()
       .reverse()[0];
     if (this.relationship.sourceRelationship().isTrivial) {
+      // This is the case for the tableRelationships between the remaining and the generating table of any split.
       this.sourceMapping.set(
         referencedRootSource,
         this.sourceMapping.get(
