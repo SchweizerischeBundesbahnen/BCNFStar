@@ -5,6 +5,7 @@ import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import IInclusionDependency from '@server/definitions/IInclusionDependency';
 import IPrimaryKey from '@server/definitions/IPrimaryKey';
 import { firstValueFrom } from 'rxjs';
+import Column from '../model/schema/Column';
 import ColumnCombination from '../model/schema/ColumnCombination';
 import Schema from '../model/schema/Schema';
 import SourceColumn from '../model/schema/SourceColumn';
@@ -12,12 +13,17 @@ import SourceFunctionalDependency from '../model/schema/SourceFunctionalDependen
 import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import { DatabaseService } from './database.service';
+import { SchemaService } from './schema.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SchemaCreationService {
-  constructor(private http: HttpClient, private dataService: DatabaseService) {}
+  constructor(
+    private http: HttpClient,
+    private dataService: DatabaseService,
+    private schemaService: SchemaService
+  ) {}
 
   private getMetanomeResult<T>(fileName: string): Promise<T> {
     return firstValueFrom(
@@ -153,6 +159,51 @@ export class SchemaCreationService {
     return result;
   }
 
+  private async determineMaxColumnValueOf(tables: Array<Table>) {
+    if ((window as any).DEFAULT_RANKING_WEIGHTS.keyValue > 0) {
+      let maxValuePromises = new Map<Column, Promise<number>>();
+      for (const table of tables) {
+        table.columns.asArray().forEach((col) => {
+          maxValuePromises.set(
+            col,
+            firstValueFrom(
+              this.http.get<number>(
+                this.dataService.baseUrl +
+                  `/maxValue/column?tableName=${table.fullName}&&columnName=${col.name}`
+              )
+            )
+          );
+        });
+      }
+
+      for (const [col, promise] of maxValuePromises.entries()) {
+        col.maxValue = await promise;
+      }
+    }
+  }
+
+  private async determineBloomfilters(tables: Array<Table>) {
+    if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome > 0) {
+      let samplePromises = new Map<Column, Promise<Array<string>>>();
+      tables.forEach((table) => {
+        Array.from(table.columns).forEach((col) => {
+          samplePromises.set(
+            col,
+            firstValueFrom(
+              this.http.get<Array<string>>(
+                this.dataService.baseUrl +
+                  `/samples?tableName=${table.fullName}&&columnName=${col.name}`
+              )
+            )
+          );
+        });
+      });
+      for (const [col, promise] of samplePromises.entries()) {
+        col.setBloomFilterFpp(await promise);
+      }
+    }
+  }
+
   /**
    * Creates InputSchema for use on edit-schema page with the supplied tables
    * @param tables used on edit-schema page
@@ -176,6 +227,9 @@ export class SchemaCreationService {
           column.sourceColumn
         );
     }
+
+    await this.determineMaxColumnValueOf(tables);
+    await this.determineBloomfilters(tables);
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);
@@ -190,6 +244,10 @@ export class SchemaCreationService {
     for (const [table, pk] of (await pkPromise).entries()) table.pk = pk;
 
     for (const table of schema.regularTables) schema.calculateFdsOf(table);
+
+    await this.schemaService.resetDataForRedundanceRanking(
+      Array.from(schema.regularTables)
+    );
     return schema;
   }
 }

@@ -262,6 +262,52 @@ from
     };
   }
 
+  public async getRedundantValuesByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any> {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT SUM(redundance)
+      FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
+      WHERE redundance != 1`
+    );
+    return query_result.rows[0]["sum"];
+  }
+
+  public async getRedundantGroupLengthByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any> {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT COUNT(*)
+      FROM (
+        SELECT COUNT(*) as redundance 
+        FROM (${table}) as temp_table 
+        GROUP BY ${stringColumns})
+      as temp_table_2`
+    );
+    return query_result.rows[0]["count"];
+  }
+
+  public async getMaxValueByColumn(
+    table: string,
+    column: string
+  ): Promise<any> {
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT MAX(LENGTH(${column}::text)) from ${table}`
+    );
+    return query_result.rows[0]["max"];
+  }
+
+  public async getColumnSample(table: string, column: string): Promise<any> {
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT ${column} from ${table} LIMIT 5000000`
+    );
+    return query_result.rows;
+  }
+
   public override async getViolatingRowsForFDCount(
     sql: string,
     lhs: Array<string>,

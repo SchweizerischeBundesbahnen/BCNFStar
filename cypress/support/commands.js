@@ -234,6 +234,7 @@ Cypress.Commands.add("deleteAllMetanomeResults", () => {
 Cypress.Commands.add("clickOnTable", (tablename) => {
   cy.get(`.table-head-title:contains("${tablename}")`).click({ force: true });
 });
+
 Cypress.Commands.add("createForeignKey", () => {
   cy.visitPossibleForeignKeysTab();
   cy.contains("public.part_partsupp_supplier_denormalized").click();

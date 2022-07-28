@@ -2,6 +2,7 @@
 
 describe("The check-ind component should display violating rows for custom inds", () => {
   beforeEach(() => {
+    //cy.wait(5000)
     cy.visitFrontend();
     cy.selectSpecificTablesAndGo("public", [
       "nation_region_denormalized",

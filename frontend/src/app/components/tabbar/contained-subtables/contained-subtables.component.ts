@@ -28,6 +28,7 @@ export class ContainedSubtablesComponent {
   public _fdClusterFilter = new Array<Column>();
   public page: number = 0;
   public pageSize = 5;
+  public fdCluster: Array<FdCluster> = [];
 
   public lhsSelection = new Array<Column>();
 
@@ -57,7 +58,8 @@ export class ContainedSubtablesComponent {
 
   public fdClusters(): Array<FdCluster> {
     const cc = this.fdClusterFilter;
-    const cluster = this.table.fdClusters
+    const cluster = this.table
+      .rankedFdClusters()
       .filter((cluster) => cc.isSubsetOf(cluster.columns))
       .map((value, index) => [value, index] as [FdCluster, number]);
     if (cc.asArray().length > 0) {

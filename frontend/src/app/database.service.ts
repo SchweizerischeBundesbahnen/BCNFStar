@@ -6,6 +6,8 @@ import { firstValueFrom } from 'rxjs';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 import IRowCounts from '@server/definitions/IRowCounts';
+import Column from '../model/schema/Column';
+import { TableQuery } from './dataquery';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +44,13 @@ export class DatabaseService {
     const iTables = await firstValueFrom(
       this.http.get<Array<ITable>>(this.baseUrl + '/tables')
     );
-    const tables = iTables.map((iTable) => Table.fromITable(iTable));
+    const rowCounts = await this.loadTableRowCounts();
+    const tables = iTables.map((iTable) => {
+      return Table.fromITable(
+        iTable,
+        rowCounts[iTable.schemaName + '.' + iTable.name]?.entries ?? 0
+      );
+    });
     return tables;
   }
 
@@ -56,6 +64,40 @@ export class DatabaseService {
       this.http.post<{ message: string; fileName: string }>(
         `${this.baseUrl}/metanomeResults/`,
         job
+      )
+    );
+  }
+
+  public async getRedundanceByValueCombinations(
+    table: Table,
+    lhs: Array<Column>
+  ): Promise<number> {
+    let columns: Array<string> = [];
+    lhs.forEach((col) => columns.push('"' + col.name + '"'));
+
+    const tableSql = await new TableQuery(table).getTableSQL();
+
+    return await firstValueFrom(
+      this.http.get<number>(
+        this.baseUrl +
+          `/redundances?tableSql=${tableSql}&&fdColumns=[${columns}]`
+      )
+    );
+  }
+
+  public async getUniqueTuplesOfValueCombinations(
+    table: Table,
+    lhs: Array<Column>
+  ): Promise<number> {
+    let columns: Array<string> = [];
+    lhs.forEach((col) => columns.push('"' + col.name + '"'));
+
+    const tableSql = await new TableQuery(table).getTableSQL();
+
+    return await firstValueFrom(
+      this.http.get<number>(
+        this.baseUrl +
+          `/redundances/length?tableSql=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }

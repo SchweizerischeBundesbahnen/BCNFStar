@@ -12,15 +12,15 @@ describe("ColumnCombination", () => {
   const source = new SourceTableInstance(sourceTable);
   let columnA = new Column(
     source,
-    new SourceColumn("A", sourceTable, "int", 1, false)
+    new SourceColumn("A", sourceTable, "int", false)
   );
   let columnB = new Column(
     source,
-    new SourceColumn("B", sourceTable, "int", 1, false)
+    new SourceColumn("B", sourceTable, "int", false)
   );
   let columnC = new Column(
     source,
-    new SourceColumn("C", sourceTable, "int", 1, false)
+    new SourceColumn("C", sourceTable, "int", false)
   );
 
   beforeEach(() => {

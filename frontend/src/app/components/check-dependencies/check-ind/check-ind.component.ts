@@ -6,8 +6,8 @@ import Relationship from '@/src/model/schema/Relationship';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
 import { ViolatingRowsViewIndsComponent } from '../../operation-dialogs/violating-rows-view-inds/violating-rows-view-inds.component';
 import { ViolatingINDRowsDataQuery } from '../../../dataquery';
-import TableRelationship from '@/src/model/schema/TableRelationship';
 import { SchemaService } from '@/src/app/schema.service';
+import TableRelationship from '@/src/model/schema/TableRelationship';
 import IRowCounts from '@server/definitions/IRowCounts';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
 

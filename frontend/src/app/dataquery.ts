@@ -58,6 +58,28 @@ export abstract class DataQuery {
   }
 }
 
+export class TableQuery extends DataQuery {
+  constructor(private table: Table) {
+    super();
+  }
+
+  public override async loadTablePage(): Promise<ITablePage> {
+    return new Promise<ITablePage>(() => {});
+  }
+
+  public override async loadRowCount(): Promise<IRowCounts> {
+    return new Promise<IRowCounts>(() => {});
+  }
+
+  public async getTableSQL() {
+    await this.initPersisting();
+    return this.SqlGeneration!.selectStatement(
+      this.table,
+      this.table.columns.asArray()
+    );
+  }
+}
+
 export class TablePreviewDataQuery extends DataQuery {
   constructor(protected table: Table) {
     super();

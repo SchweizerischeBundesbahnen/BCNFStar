@@ -34,6 +34,10 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
+import getRedundanceSum from "./routes/rankingRedundanceSum";
+import getRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
+import getMaxValue from "./routes/maxValue";
+import getColumnSample from "./routes/columnSample";
 import getSchemaMatching from "./routes/schemaMatching";
 
 const app = express();
@@ -73,6 +77,28 @@ app.get(
 
 app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
+
+app.get(
+  "/redundances",
+  [check("tableName").isString(), check("columns").isString()],
+  getRedundanceSum
+);
+app.get(
+  "/redundances/length",
+  [check("tableName").isString(), check("columns").isString()],
+  getRedudanceGroupLength
+);
+app.get(
+  "/maxValue/column",
+  [check("tableName").isString(), check("columnName").isString()],
+  getMaxValue
+);
+
+app.get(
+  "/samples",
+  [check("tableName").isString(), check("columnName").isString()],
+  getColumnSample
+);
 
 // Metanome
 app.get("/metanomeResults", getMetanomeIndex);

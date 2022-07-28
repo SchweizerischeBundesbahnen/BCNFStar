@@ -26,6 +26,7 @@ import { DirectDimensionDialogComponent } from './components/operation-dialogs/d
 import { JoinDialogComponent } from './components/operation-dialogs/join-dialog/join-dialog.component';
 import { ViolatingRowsViewComponent } from './components/operation-dialogs/violating-rows-view/violating-rows-view.component';
 import { ViolatingFDRowsDataQuery } from './dataquery';
+import { DatabaseService } from './database.service';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 import Command from '../model/commands/Command';
 import SuggestFactCommand from '../model/commands/SuggestFactCommand';
@@ -98,7 +99,8 @@ export class SchemaService {
 
   constructor(
     private dialog: SbbDialog,
-    private notification: SbbNotificationToast
+    private notification: SbbNotificationToast,
+    private dataService: DatabaseService
   ) {}
 
   /**
@@ -133,6 +135,8 @@ export class SchemaService {
     };
 
     this.commandProcessor.do(command);
+    if (command.newTable)
+      await this.resetDataForRedundanceRanking([command.newTable!]);
     this.notifyAboutSchemaChanges();
   }
 
@@ -191,7 +195,7 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public split(fd: FunctionalDependency, name?: string) {
+  public async split(fd: FunctionalDependency, name?: string) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');
     let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
@@ -200,6 +204,9 @@ export class SchemaService {
     command.onUndo = () => (this.selectedTable = command.table);
 
     this.commandProcessor.do(command);
+    if (command.children?.length != 0) {
+      await this.resetDataForRedundanceRanking(command.children!);
+    }
     this.notifyAboutSchemaChanges();
   }
 
@@ -353,6 +360,69 @@ export class SchemaService {
       throw Error('surrogate keys not implemented for unioned tables');
     this.selectedTable!.surrogateKey = key;
     this.notifyAboutSchemaChanges();
+  }
+
+  public async resetDataForRedundanceRanking(tables: Array<Table>) {
+    let fdRedundantTuplePromises: Array<Promise<number>> = new Array<
+      Promise<number>
+    >();
+    let fdUniqueTuplesLhsPromises: Array<Promise<number>> = new Array<
+      Promise<number>
+    >();
+
+    if (
+      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam > 0 ||
+      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink > 0
+    ) {
+      tables.forEach((table) => {
+        table.fdClusters().forEach((cluster) => {
+          if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam > 0) {
+            fdUniqueTuplesLhsPromises.push(
+              this.dataService.getUniqueTuplesOfValueCombinations(
+                table,
+                cluster.fds[0].lhs.asArray()
+              )
+            );
+          }
+          if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink > 0) {
+            fdRedundantTuplePromises.push(
+              this.dataService.getRedundanceByValueCombinations(
+                table,
+                cluster.fds[0].lhs.asArray()
+              )
+            );
+          }
+        });
+      });
+
+      if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam > 0) {
+        let resultUniqueTuplesLhs = await Promise.all(
+          fdUniqueTuplesLhsPromises
+        );
+        let num = 0;
+        tables.forEach((table) => {
+          table.fdClusters().forEach((cluster, index) =>
+            cluster.fds.forEach((fd) => {
+              fd._uniqueTuplesLhs = resultUniqueTuplesLhs[index + num];
+            })
+          );
+          num += table.fdClusters().length;
+        });
+      }
+
+      if ((window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink > 0) {
+        let resultRedundantTuples = await Promise.all(fdRedundantTuplePromises);
+        let num = 0;
+        tables.forEach((table) => {
+          table.fdClusters().forEach((cluster, index) =>
+            cluster.fds.forEach((fd) => {
+              fd._redundantTuples = resultRedundantTuples[index + num];
+            })
+          );
+          num += table.fdClusters().length;
+        });
+      }
+    }
   }
 
   /**

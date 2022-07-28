@@ -5,7 +5,11 @@ import Table from "../../../frontend/src/model/schema/Table";
 
 describe("ColumnsTree", () => {
   let columnsTree = new ColumnsTree<string>();
-  let [a, b, c, d] = Table.fromColumnNames(["a", "b", "c", "d"], "t").columns;
+  let [a, b, c, d] = Table.fromColumnNames(
+    ["a", "b", "c", "d"],
+    "t",
+    0
+  ).columns;
 
   getPossibleSubsets([a, b, c, d])
     .map(toCC)

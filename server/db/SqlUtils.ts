@@ -81,6 +81,23 @@ export default abstract class SqlUtils {
 
   public abstract getDatatypes(): Promise<string[]>;
 
+  public abstract getRedundantValuesByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any>;
+
+  public abstract getRedundantGroupLengthByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any>;
+
+  public abstract getMaxValueByColumn(
+    table: string,
+    column: string
+  ): Promise<any>;
+
+  public abstract getColumnSample(table: string, column: string): Promise<any>;
+
   public abstract testKeyUnionability(
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability>;

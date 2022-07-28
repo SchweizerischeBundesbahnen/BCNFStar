@@ -1,7 +1,7 @@
 import { exampleSchemaToJSON, exampleSchema } from "../../utils/exampleTables";
 import SaveSchemaState from "../../../frontend/src/model/schema/methodObjects/SaveSchemaState";
 
-describe("SaveIntermediateState", () => {
+describe("SaveSchemaState", () => {
   it("parses an JSON Schema", () => {
     expect(
       exampleSchema() ==

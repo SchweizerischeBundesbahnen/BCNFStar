@@ -55,6 +55,8 @@ declare namespace Cypress {
 
     visitContainedSubtableTab(): void;
 
+    visitCheckContainedSubtableTab(): void;
+
     visitPossibleForeignKeysTab(): void;
 
     visitCheckContainedSubtableTab(): void;
@@ -86,5 +88,8 @@ declare namespace Cypress {
       table2: string,
       columnMapping: Array<[string, string]>
     );
+
+    checkFD(lhs: any, rhs: any): void;
+    joinTablesByFirstIND(table1: any, table2: any): void;
   }
 }

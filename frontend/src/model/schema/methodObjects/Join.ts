@@ -64,6 +64,9 @@ export default class Join {
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
     this.newTable.surrogateKey = this.referencing.surrogateKey;
+    // update rowCount for redundance ranking
+    this.newTable.rowCount = this.referencing.rowCount;
+
     this.newTable.isSuggestedFact = this.referencing.isSuggestedFact;
     this.newTable.isRejectedFact = this.referencing.isRejectedFact;
 
@@ -114,6 +117,39 @@ export default class Join {
         )
       );
     }
+
+    // set maxValues, bloomfilters after joining
+    this.referenced.columns.asArray().forEach((col) => {
+      let testCol = this.newTable.columns
+        .asArray()
+        .find((newCol) => newCol.equals(col));
+      if (testCol) {
+        testCol.maxValue = col.maxValue;
+        testCol.bloomFilterExpectedFpp = col.bloomFilterExpectedFpp;
+      }
+    });
+    this.referencing.columns.asArray().forEach((col) => {
+      let testCol = this.newTable.columns
+        .asArray()
+        .find((newCol) => newCol.equals(col));
+      if (testCol) {
+        testCol.maxValue = col.maxValue;
+        let fkColumn = this.relationship.referencing.find((relCol) =>
+          relCol.equals(testCol!)
+        );
+        if (fkColumn) {
+          const index = this.relationship.referencing.indexOf(fkColumn);
+          testCol.bloomFilterExpectedFpp =
+            (this.relationship.referenced[index].bloomFilterExpectedFpp +
+              this.relationship.referencing[index].bloomFilterExpectedFpp) /
+            2;
+        } else {
+          testCol.bloomFilterExpectedFpp = col.bloomFilterExpectedFpp;
+        }
+      }
+    });
+
+    this.newTable.calculateColumnMatching();
   }
 
   private findEquivalentSource(

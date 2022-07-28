@@ -1,10 +1,11 @@
-import IFunctionalDependency from '@server/definitions/IFunctionalDependency';
 import ColumnCombination from './ColumnCombination';
-import Table from './Table';
 
 export default class FunctionalDependency {
-  lhs: ColumnCombination;
-  rhs: ColumnCombination;
+  public lhs: ColumnCombination;
+  public rhs: ColumnCombination;
+  public _redundantTuples: number = 0;
+  public _uniqueTuplesLhs: number = 0;
+
   /**
    * cached result of the score calculation. Should not be accessed directly
    */
@@ -16,21 +17,12 @@ export default class FunctionalDependency {
     this.extend();
   }
 
-  public static fromIFunctionalDependency(
-    table: Table,
-    iFd: IFunctionalDependency
-  ): FunctionalDependency {
-    const lhs = table.columns.columnsFromNames(...iFd.lhsColumns);
-    const rhs = table.columns.columnsFromNames(...iFd.rhsColumns);
-
-    return new FunctionalDependency(
-      new ColumnCombination(lhs),
-      new ColumnCombination(rhs)
-    );
-  }
-
   public copy(): FunctionalDependency {
-    return new FunctionalDependency(this.lhs.copy(), this.rhs.copy());
+    let newFd = new FunctionalDependency(this.lhs.copy(), this.rhs.copy());
+    newFd._redundantTuples = this._redundantTuples;
+    newFd._uniqueTuplesLhs = this._uniqueTuplesLhs;
+
+    return newFd;
   }
 
   private extend(): void {

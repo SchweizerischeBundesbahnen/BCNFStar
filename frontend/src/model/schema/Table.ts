@@ -12,6 +12,7 @@ import BasicTable from './BasicTable';
 import ColumnsTree from './ColumnsTree';
 import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
+import JaroWinklerDistance from './methodObjects/JaroWinklerDistance';
 
 export default class Table extends BasicTable {
   // defining properties
@@ -28,7 +29,15 @@ export default class Table extends BasicTable {
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
-  /** cached results of schema.indsOf(this). Should not be accessed from outside the schema class */
+
+  public rowCount: number = 0;
+  public columnNameMatchings: Map<
+    { col: SourceColumn; otherCol: SourceColumn },
+    number
+  > = new Map<{ col: SourceColumn; otherCol: SourceColumn }, number>();
+  /**
+   * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
+   */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
   /** This variable tracks if the cached inds are still valid */
   public _indsValid = false;
@@ -49,48 +58,71 @@ export default class Table extends BasicTable {
       sk: this.surrogateKey,
       relationships: this.relationships,
       sources: this.sources,
+      rowCount: this.rowCount,
+      fds: this.fds,
     };
   }
 
-  public static fromITable(iTable: ITable): Table {
+  public calculateColumnMatching() {
+    for (let column of this.columns) {
+      for (let otherColumn of this.columns) {
+        this.columnNameMatchings.set(
+          { col: column.sourceColumn, otherCol: otherColumn.sourceColumn },
+          new JaroWinklerDistance(
+            column.sourceColumn.name,
+            otherColumn.sourceColumn.name
+          ).get()
+        );
+      }
+    }
+  }
+
+  public static fromITable(iTable: ITable, rowCount: number): Table {
     const sourceTable = new SourceTable(iTable.name, iTable.schemaName);
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
-    iTable.attributes.forEach((iAttribute, index) => {
+    iTable.attributes.forEach((iAttribute) => {
       const sourceColumn = new SourceColumn(
         iAttribute.name,
         sourceTable,
         iAttribute.dataType,
-        index,
         iAttribute.nullable
       );
       table.addColumns(new Column(sourceTableInstance, sourceColumn));
     });
     table.name = sourceTable.name;
     table.schemaName = sourceTable.schemaName;
+    table.rowCount = rowCount;
+    table.calculateColumnMatching();
     return table;
   }
 
   /**
    * This way of creating Table objects should not be used in production as important information (datatype and nullable) are missing
    */
-  public static fromColumnNames(columnNames: Array<string>, tableName: string) {
+  public static fromColumnNames(
+    columnNames: Array<string>,
+    tableName: string,
+    rowCount: number
+  ) {
     const sourceTable = new SourceTable(tableName, '');
     const table = new Table();
     const sourceTableInstance = table.addSource(sourceTable);
 
-    columnNames.forEach((name, i) => {
+    columnNames.forEach((name) => {
       const sourceColumn = new SourceColumn(
         name,
         sourceTable,
         'unknown data type',
-        i,
         false
       );
       table.addColumns(new Column(sourceTableInstance, sourceColumn));
     });
     table.name = tableName;
     table.schemaName = '';
+    table.rowCount = rowCount;
+    table.calculateColumnMatching();
+
     return table;
   }
 
@@ -338,7 +370,7 @@ export default class Table extends BasicTable {
   public minimalDeterminantsOf(
     columns: ColumnCombination
   ): Array<ColumnCombination> {
-    const allClusters = Array.from(this.fdClusters).sort(
+    const allClusters = Array.from(this.fdClusters(true)).sort(
       (cluster1, cluster2) =>
         cluster1.columns.cardinality - cluster2.columns.cardinality
     );
@@ -390,49 +422,74 @@ export default class Table extends BasicTable {
 
   public violatingFds(): Array<FunctionalDependency> {
     if (!this._violatingFds) {
-      this._violatingFds = this.fds
-        .filter((fd) => this.isBCNFViolating(fd))
-        .sort((fd1, fd2) => {
-          let score1 = new FdScore(this, fd1).get();
-          let score2 = new FdScore(this, fd2).get();
-          if (score1 !== score2) return score2 - score1;
-          const [fd1String, fd2String] = [fd1.toString(), fd2.toString()];
-          if (fd1String < fd2String) return 1;
-          if (fd2String < fd1String) return -1;
-          return 0;
-        });
+      this._violatingFds = this.fds.filter((fd) => this.isBCNFViolating(fd));
     }
     return this._violatingFds;
   }
 
   /**
+   * @param withPkFd returns cluster with or without pkFd, not needed when calculating data for redundance ranking
    * @returns FdClusters, which group functional dependencies that have the same right hand side
    * Used in UI to make functional dependencies easier to discover
    */
-  public get fdClusters(): Array<FdCluster> {
-    if (!this._fdClusters) {
-      const fdClusterTree = new ColumnsTree<FdCluster>();
-      if (this.pk)
-        fdClusterTree.add(
-          {
-            columns: this.columns.copy(),
-            fds: new Array(
-              new FunctionalDependency(this.pk!.copy(), this.columns.copy())
-            ),
-          },
-          this.columns.copy()
-        );
-      for (let fd of this.violatingFds()) {
-        let cluster = fdClusterTree.get(fd.rhs);
-        if (!cluster) {
-          cluster = { columns: fd.rhs.copy(), fds: new Array() };
-          fdClusterTree.add(cluster, cluster.columns);
-        }
-        cluster.fds.push(fd);
+  public fdClusters(withPkFd: boolean = false): Array<FdCluster> {
+    let allFds: Array<FunctionalDependency> = [...this.violatingFds()];
+    if (withPkFd && this.pk) {
+      let newFd = new FunctionalDependency(
+        this.pk!.copy(),
+        this.columns.copy()
+      );
+      // because lhs is primary key there are so much groups like tuples in table
+      newFd._uniqueTuplesLhs = this.rowCount;
+      // because lhs is primary key there are no redundant data
+      newFd._redundantTuples = 0;
+      allFds.push(newFd);
+    }
+
+    const fdClusterTree = new ColumnsTree<FdCluster>();
+    for (let fd of allFds) {
+      let cluster = fdClusterTree.get(fd.rhs);
+      if (!cluster) {
+        cluster = { columns: fd.rhs.copy(), fds: new Array() };
+        fdClusterTree.add(cluster, cluster.columns);
       }
-      this._fdClusters = fdClusterTree.getAll();
+      cluster.fds.push(fd);
+    }
+    return fdClusterTree.getAll();
+  }
+
+  public rankedFdClusters(): Array<FdCluster> {
+    if (!this._fdClusters) {
+      this._fdClusters = this.scoreFdInFdClusters(this.fdClusters(true));
+
+      // sort clusters by best ranked fd per cluster
+      this._fdClusters.sort((cluster1, cluster2) => {
+        const bestFdScore1 = Math.max(
+          ...cluster1.fds.map((fd) => fd._score || 0)
+        );
+        const bestFdScore2 = Math.max(
+          ...cluster2.fds.map((fd) => fd._score || 0)
+        );
+        if (bestFdScore1 < bestFdScore2) return 1;
+        if (bestFdScore1 > bestFdScore2) return -1;
+        return 0;
+      });
+
+      // sort fds in cluster descending
+      this._fdClusters.forEach((cluster) =>
+        cluster.fds.sort((fd1, fd2) => (fd2._score || 0) - (fd1._score || 0))
+      );
     }
     return this._fdClusters;
+  }
+
+  private scoreFdInFdClusters(fdClusters: Array<FdCluster>): Array<FdCluster> {
+    fdClusters.forEach((cluster) =>
+      cluster.fds.forEach((fd) => {
+        new FdScore(this, fd).get();
+      })
+    );
+    return fdClusters;
   }
 
   public hull(columns: ColumnCombination): ColumnCombination {

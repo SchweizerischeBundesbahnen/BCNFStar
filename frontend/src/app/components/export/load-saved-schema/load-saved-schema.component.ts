@@ -14,6 +14,7 @@ import { SchemaService } from '@/src/app/schema.service';
 export class LoadSavedSchemaComponent {
   public newSchema = new Schema();
   public file: File = new File([], '');
+  public isLoading = false;
 
   constructor(public schemaService: SchemaService, public router: Router) {}
 
@@ -24,6 +25,7 @@ export class LoadSavedSchemaComponent {
   }
 
   public async onLoad() {
+    this.isLoading = true;
     let newZip = new JSZip();
     const zipResult = await newZip.loadAsync(this.file);
     for (let file in zipResult.files) {
@@ -36,6 +38,7 @@ export class LoadSavedSchemaComponent {
           this.router.navigate(['/edit-schema']);
         });
     }
+    this.isLoading = false;
   }
 
   public getSchema(savedZipedSchemaEntry: string) {
