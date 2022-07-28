@@ -28,6 +28,9 @@ import { ViolatingRowsViewComponent } from './components/operation-dialogs/viola
 import { ViolatingFDRowsDataQuery } from './dataquery';
 import { DeleteTableDialogComponent } from './components/operation-dialogs/delete-table-dialog/delete-table-dialog.component';
 import Command from '../model/commands/Command';
+import SuggestFactCommand from '../model/commands/SuggestFactCommand';
+import RejectFactCommand from '../model/commands/RejectFactCommand';
+
 import { UnionDialogComponent } from './components/union/union-dialog/union-dialog.component';
 
 /**
@@ -174,6 +177,21 @@ export class SchemaService {
    * @param fd FunctionalDependency used to split the table
    * @param name Name of the resulting table. By default: column names of the FD's left hand side.
    */
+=======
+  public suggestOrRejectFact(table: BasicTable, suggest: boolean) {
+    const command = suggest
+      ? new SuggestFactCommand(this.schema, table)
+      : new RejectFactCommand(this.schema, table);
+    command.onDo = () => {
+      this.selectedTable = table;
+    };
+    command.onUndo = () => {
+      this.selectedTable = table;
+    };
+    this.commandProcessor.do(command);
+    this.notifyAboutSchemaChanges();
+  }
+
   public split(fd: FunctionalDependency, name?: string) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');

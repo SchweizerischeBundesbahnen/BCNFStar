@@ -18,6 +18,7 @@ export class GraphElementComponent implements OnInit {
   public isFact: boolean = false;
   public isDirectDimension: boolean = false;
   public isIndirectDimension: boolean = false;
+  public isPotentialFact: boolean = false;
 
   constructor(
     public schemaService: SchemaService,
@@ -31,10 +32,11 @@ export class GraphElementComponent implements OnInit {
       this.schemaService.schema.directDimensionableRoutes(this.table, true)
         .length > 0;
     this.isFact = this.schemaService.schema.isFact(this.table, true);
-    this.isDirectDimension = this.schemaService.schema.isDirectDimension(
-      this.table
-    );
+    this.isDirectDimension =
+      !this.isFact && this.schemaService.schema.isDirectDimension(this.table);
     this.isIndirectDimension = !this.isFact && !this.isDirectDimension;
+    this.isPotentialFact =
+      !this.isFact && this.schemaService.schema.isPotentialFact(this.table);
   }
 
   public select() {
@@ -57,6 +59,10 @@ export class GraphElementComponent implements OnInit {
       !!this.table.pk &&
       this.table.pk.includes(column as Column)
     );
+  }
+
+  public isFkColumn(column: BasicColumn): boolean {
+    return this.schemaService.schema.isFkColumn(this.table, column);
   }
 
   public isHighlightedColumn(column: BasicColumn): boolean {
