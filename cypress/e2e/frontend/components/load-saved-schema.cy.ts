@@ -18,7 +18,7 @@ describe("The load saved schema editing", () => {
   it("renders schema after selecting a file and click the load button", () => {
     cy.contains("Upload file").click();
     cy.get('input[type="file"]').attachFile("savedSchema.zip");
-    cy.get(".sbb-button").eq(0).click();
+    cy.get(".sbb-button").contains("Load").click();
     cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
   });
 });

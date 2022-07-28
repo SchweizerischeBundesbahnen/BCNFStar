@@ -73,7 +73,6 @@ export class TableEditingComponent {
     if (this.editingColumn!.userAlias == this.editingColumn!.sourceColumn.name)
       this.editingColumn!.userAlias = undefined;
     this.table.resolveColumnNameDuplicates();
-    console.log('new alias is ', this.editingColumn!.userAlias);
     this.resetColumnEdit();
   }
 
@@ -92,7 +91,6 @@ export class TableEditingComponent {
   public changeSourceName() {
     this.editingSource!.setUserAlias(this.sourceNameEditString);
     this.table.resolveSourceNameDuplicates();
-    console.log('new alias is ', this.editingSource!.userAlias);
     this.resetSourceEdit();
   }
 }

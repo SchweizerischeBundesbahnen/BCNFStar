@@ -1,31 +1,43 @@
 <div class="grid-container">
   <div class="grid-container-graphmenu">
-    <button sbb-button (click)="graph.resetView()" id="reset-btn" class="me-1">
-      Reset view
-    </button>
-    <button
-      type="button"
-      sbb-button
-      (click)="schemaService.autoNormalize()"
-      class="me-1"
-    >
-      {{ "Auto-normalize all tables" }}
-    </button>
-    <sbb-toggle [(ngModel)]="schemaService.starMode" class="me-1">
-      <sbb-toggle-option label="Normal Mode" [value]="false">
-      </sbb-toggle-option>
-      <sbb-toggle-option label="Star Schema Mode" [value]="true">
-      </sbb-toggle-option>
-    </sbb-toggle>
+    <button sbb-button id="reset-btn" class="me-1">Reset view</button>
+    <div>
+      <button
+        type="button"
+        sbb-button
+        *ngIf="!mergeService.isMerging"
+        (click)="schemaService.autoNormalize()"
+        class="me-1"
+      >
+        Auto-normalize all tables
+      </button>
+    </div>
+    <div>
+      <app-integration-bar
+        *ngIf="intService.isIntegrating"
+      ></app-integration-bar>
+      <sbb-toggle
+        [(ngModel)]="schemaService.starMode"
+        *ngIf="!intService.isIntegrating && !mergeService.isMerging"
+        class="me-1"
+        [disabled]="intService.isIntegrating || mergeService.isMerging"
+      >
+        <sbb-toggle-option label="Normal Mode" [value]="false">
+        </sbb-toggle-option>
+        <sbb-toggle-option label="Star Schema Mode" [value]="true">
+        </sbb-toggle-option>
+      </sbb-toggle>
+    </div>
     <app-undo-redo class="undo-redo"></app-undo-redo>
   </div>
-  <div>
-    <app-schema-graph></app-schema-graph>
-  </div>
+  <app-schema-graph [tables]="tables" [links]="links"></app-schema-graph>
 
-  <div class="item-sidebar">
-    <div class="grid-container-sidebar">
-      <div>
+  <div class="item-sidebar" [ngClass]="intService.getIntegrationClass()">
+    <div
+      class="grid-container-sidebar"
+      *ngIf="!mergeService.isMerging; else merging"
+    >
+      <div *ngIf="!intService.isIntegrating; else integrationSidebar">
         <h2>Schema export</h2>
         <div class="mb-1">
           <app-persist-schema></app-persist-schema>
@@ -34,13 +46,51 @@
           <app-save-schema-editing> </app-save-schema-editing>
         </div>
       </div>
+      <ng-template #integrationSidebar>
+        <div class="a">
+          <h2>
+            Edit the two schemas so that their tables align in the graph on the
+            left side. After that you can
+          </h2>
+          <button class="" sbb-button (click)="mergeService.startMerging()">
+            Merge schemas
+          </button>
+        </div>
+      </ng-template>
       <app-schema-editing-side-bar
         class="schema-editing-side-bar"
         *ngIf="schemaService.hasSelectedRegularTable()"
       ></app-schema-editing-side-bar>
-      <h2 *ngIf="!schemaService.selectedTable" class="table-not-selected">
+      <h2
+        *ngIf="!schemaService.hasSelectedRegularTable()"
+        class="table-not-selected"
+      >
         Select a table in the graph to start editing
       </h2>
     </div>
   </div>
+
+  <ng-template #merging>
+    <h2>
+      Now that the two schemas are aligned, you can union all their equivalent
+      tables.
+    </h2>
+    <div style="display: flex; justify-content: space-around">
+      <button sbb-button (click)="mergeService.cancel()">Go back</button>
+      <button sbb-button (click)="mergeService.complete()">Done</button>
+    </div>
+    <h2
+      *ngIf="!schemaService.hasSelectedRegularTable(); else mergeWithSelected"
+    >
+      Click the U buttons in the graph to union tables, or select one to see
+      further options here.
+    </h2>
+    <ng-template #mergeWithSelected>
+      <app-union-sidebar
+        [availableTables]="
+          mergeService.availableTablesFor(schemaService.selectedTable)
+        "
+      ></app-union-sidebar>
+    </ng-template>
+  </ng-template>
 </div>
