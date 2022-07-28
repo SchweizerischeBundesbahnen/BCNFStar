@@ -33,6 +33,7 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
+import getSchemaMatching from "./routes/schemaMatching";
 
 const app = express();
 
@@ -85,6 +86,8 @@ app.delete(
   deleteMetanomeResults
 );
 app.post("/metanomeResults", runMetanome);
+
+app.post("/schemaMatching", getSchemaMatching);
 
 app.get("/persist/dbmsname", getDbmsName);
 

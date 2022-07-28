@@ -3,6 +3,10 @@ element::-webkit-scrollbar {
   /* for Chrome, Safari, and Opera */
 }
 
+app-union-sidebar {
+  margin: 1rem;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: calc(66.66% - 2px) calc(33.33% - 2px);
@@ -30,7 +34,7 @@ element::-webkit-scrollbar {
   grid-template-rows: auto;
 }
 
-.grid-container > div {
+.grid-container > * {
   background-color: rgba(255, 255, 255, 1);
 }
 
@@ -39,10 +43,8 @@ h2 {
 }
 
 .item-sidebar {
-  grid-row-start: 1;
-  grid-row-end: 3;
-  grid-column-start: 1;
-  grid-column-start: 2;
+  grid-row: 1/span 2;
+  grid-column: 2;
 }
 
 sbb-toggle {
@@ -61,6 +63,10 @@ sbb-toggle-option {
 
 .table-not-selected {
   align-self: center
+}
+
+.a {
+  padding: 1rem;
 }
 
 .undo-redo {

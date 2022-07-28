@@ -38,3 +38,6 @@ cypress/downloads
 # Code coverage reports
 .nyc_output
 coverage
+
+server/coma/results
+server/coma/schemas
