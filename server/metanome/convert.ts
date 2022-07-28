@@ -10,6 +10,7 @@
 // If it runs through successfully, you may delete the metanome/temp
 // and metanome/results folders
 
+import { isIMetanomeConfig } from "@/definitions/IMetanomeConfig.guard";
 import { readdirSync } from "fs";
 import { access, mkdir, rename } from "fs/promises";
 import BINDER from "./BINDER";
@@ -52,7 +53,7 @@ import HyFD from "./HyFD";
     await algo.processFiles();
   }
   for (let i = 0; i < indNames.length; i++) {
-    const binder = new BINDER(indNames[i]);
+    const binder = new BINDER(indNames[i], {memory: undefined});
     await binder.addToIndexFile();
     await rename("metanome/results/" + indFiles[i], await binder.resultPath());
     await binder.processFiles();
