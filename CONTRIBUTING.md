@@ -30,6 +30,23 @@ Alternatively, you can use `npm run dev` if you don't want tests to be run
 
 To run the tests as they are being executed in the CI, run `npm run test:prod`.
 
+### Testing SaveSchemaState
+
+There is a feature called _save intermediate state_ in BCNFStar which allows users to download and restore working copies of schemas containing all transformations they already did. If you change any fields in the data model, you will likely need to edit this feature as well.
+If you change the persisting of the model in [SaveSchemaState.ts](/frontend/src/model/schema/methodObjects/SaveSchemaState.ts) and other schema files you always have to update the zip files [savedExampleSchema.zip](/cypress/fixtures/savedExampleSchema.zip) and [savedSchema.zip](/cypress/fixtures/savedSchema.zip) in cypress forlder [Fixtures](/cypress/fixtures) for tests [load-saved-schema.cy.ts](/cypress/e2e/frontend/components/load-saved-schema.cy.ts) and [tables-selection.cy.ts](/cypress/e2e/frontend/pages/tables-selection.cy.ts).
+
+How to generate these files
+
+1. If not already done for testing, load the test database from `cypress/mssql_1MB_testdata_denormalized.sql` or `cypress/mssql_1MB_testdata_denormalized.sql`
+1. Make sure to update the database connection details (see Database section of the README)
+1. Start BCNFStar with `npm run dev` and visit `http://localhost:4200`
+1. Select the tables `public.nation_region_denormalized` and `public.part_partsupp_supplier_denormalized`
+1. Select metanome results and go
+1. Type `savedSchema` in the textbox labelled `file name`, download the file and store it under `cypress/fixtures`
+1. Do some arbitrary schema operations. Which ones you do does not matter, but they should ideally cover a range of BCNFStar's features, and especially the ones you just edited. While testing, we check if loading and saving this file again yields the same result.
+1. Save this schema as `savedExampleSchema` and also store it in `cypress/fixtures`
+1. Run `npm run test:dev` and make sure the tests [load-saved-schema.cy.ts](/cypress/e2e/frontend/components/load-saved-schema.cy.ts) and [tables-selection.cy.ts](/cypress/e2e/frontend/pages/tables-selection.cy.ts) run through```
+
 ### Troubleshooting
 
 Something doesn't work? Always try to run `npm install && npm run build` first. This may be required after changes to files in the `server/definitions` folder or to any dependency.
