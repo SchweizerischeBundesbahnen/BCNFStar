@@ -1,5 +1,9 @@
 import ColumnCombination from './ColumnCombination';
 
+/**
+ * This class represents a functional dependency inside a table.
+ * The left hand side is always included in the right hand side.
+ */
 export default class FunctionalDependency {
   public lhs: ColumnCombination;
   public rhs: ColumnCombination;
@@ -14,7 +18,7 @@ export default class FunctionalDependency {
   public constructor(lhs: ColumnCombination, rhs: ColumnCombination) {
     this.lhs = lhs;
     this.rhs = rhs;
-    this.extend();
+    this.rhs.union(this.lhs);
   }
 
   public copy(): FunctionalDependency {
@@ -25,12 +29,11 @@ export default class FunctionalDependency {
     return newFd;
   }
 
-  private extend(): void {
-    this.rhs.union(this.lhs);
-    // TODO: Inter-FD-extension (maybe)
-  }
-
-  public isFullyTrivial(): boolean {
+  /**
+   * Returns whether the rhs is a subset of the lhs.
+   * Such a functional dependency is always valid and is therefore called "trivial".
+   */
+  public isTrivial(): boolean {
     return this.lhs.cardinality >= this.rhs.cardinality;
   }
 

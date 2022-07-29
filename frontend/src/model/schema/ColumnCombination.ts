@@ -2,6 +2,9 @@ import Column from './Column';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 
+/**
+ * A collection of columns. It offers set operations and other methods for convenience.
+ */
 export default class ColumnCombination {
   private _columns: Array<Column> = [];
 
@@ -21,22 +24,25 @@ export default class ColumnCombination {
     return new ColumnCombination(new Array(...this._columns));
   }
 
-  public columnsFromNames(...names: Array<string>) {
-    return names.map((name) => this.columnFromName(name));
+  public columnsByNames(...names: Array<string>): Array<Column> {
+    return names.map((name) => this.columnByName(name));
   }
 
-  public columnFromName(name: string): Column {
+  public columnByName(name: string): Column {
     const result = this.asArray().find((column) => name.includes(column.name));
     if (!result) console.error('column with name ' + name + ' not found');
     return result!;
   }
 
-  public columnsFromIds(...numbers: Array<number>) {
+  public columnsByIds(...numbers: Array<number>): ColumnCombination {
     return new ColumnCombination(
       this.asArray().filter((col, i) => numbers.includes(i))
     );
   }
 
+  /**
+   * Should only be called on collections of columns with the same sourceTableInstance. It returns this sourceTableInstance.
+   */
   public sourceTableInstance(): SourceTableInstance {
     let sources = this.sourceTableInstances();
     if (sources.length > 1)
@@ -47,6 +53,9 @@ export default class ColumnCombination {
     return sources[0];
   }
 
+  /**
+   * Returns all sourceTableInstances of the contained columns.
+   */
   public sourceTableInstances(): Array<SourceTableInstance> {
     let sources = new Array<SourceTableInstance>();
     this._columns.forEach((column) => {
@@ -56,6 +65,10 @@ export default class ColumnCombination {
     return sources;
   }
 
+  /**
+   * Tries to find columns whose sourceColumns are the equal to the given ones. Returns the ones that are found.
+   * If findAll is set to true, all sourceColumns must be found or the return value is null.
+   */
   public columnsEquivalentTo(
     sourceColumns: Array<SourceColumn>,
     findAll: boolean
@@ -128,6 +141,9 @@ export default class ColumnCombination {
     return this.columnNames().join(', ');
   }
 
+  /**
+   * Returns a copy of this columnCombination where all sourceTableInstances of the contained columns are replaced according to the mapping.
+   */
   public applySourceMapping(
     mapping: Map<SourceTableInstance, SourceTableInstance>
   ): ColumnCombination {
@@ -136,6 +152,9 @@ export default class ColumnCombination {
     );
   }
 
+  /**
+   * Replaces columns within the collection according to the mapping.
+   */
   public columnSubstitution(mapping: Map<Column, Column>) {
     this._columns = this._columns.map(
       (column) => mapping.get(column) || column

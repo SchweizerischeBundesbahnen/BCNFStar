@@ -6,7 +6,7 @@ import BloomFilter from './methodObjects/BloomFilter';
 
 /**
  * These objects uniquely identify a column within a table.
- * Be careful when using them outside the context of a table
+ * Be careful when using them outside the context of a table.
  */
 export default class Column implements BasicColumn {
   public includeSourceName = false;
@@ -88,6 +88,9 @@ export default class Column implements BasicColumn {
     );
   }
 
+  /**
+   * Returns a new column whose sourceTableInstance is replaced according to the mapping.
+   */
   public applySourceMapping(
     mapping: Map<SourceTableInstance, SourceTableInstance>
   ): Column {

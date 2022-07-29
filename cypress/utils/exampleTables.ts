@@ -15,14 +15,14 @@ export function sportartVereinTable(): Table {
   );
   table.addFd(
     new FunctionalDependency(
-      new ColumnCombination(table.columns.columnsFromNames("Name", "Sportart")),
-      new ColumnCombination(table.columns.columnsFromNames("Verein"))
+      new ColumnCombination(table.columns.columnsByNames("Name", "Sportart")),
+      new ColumnCombination(table.columns.columnsByNames("Verein"))
     )
   );
   table.addFd(
     new FunctionalDependency(
-      new ColumnCombination(table.columns.columnsFromNames("Verein")),
-      new ColumnCombination(table.columns.columnsFromNames("Sportart"))
+      new ColumnCombination(table.columns.columnsByNames("Verein")),
+      new ColumnCombination(table.columns.columnsByNames("Sportart"))
     )
   );
   return table;
@@ -49,25 +49,20 @@ export function CDSchema(): Schema {
   schema.addTables(cdTracksTable, interpretTable);
   const fk = new SourceRelationship();
   fk.referencingCols.push(
-    cdTracksTable.columns.columnFromName("Interpret").sourceColumn
+    cdTracksTable.columns.columnByName("Interpret").sourceColumn
   );
   fk.referencedCols.push(
-    interpretTable.columns.columnFromName("Interpret").sourceColumn
+    interpretTable.columns.columnByName("Interpret").sourceColumn
   );
   schema.addFks(fk);
 
   schema.addFd(
     new SourceFunctionalDependency(
       cdTracksTable.columns
-        .columnsFromNames("CD_ID", "Tracknr")
+        .columnsByNames("CD_ID", "Tracknr")
         .map((col) => col.sourceColumn),
       cdTracksTable.columns
-        .columnsFromNames(
-          "Albumtitel",
-          "Interpret",
-          "Erscheinungsjahr",
-          "Titel"
-        )
+        .columnsByNames("Albumtitel", "Interpret", "Erscheinungsjahr", "Titel")
         .map((col) => col.sourceColumn)
     )
   );
@@ -75,10 +70,10 @@ export function CDSchema(): Schema {
   schema.addFd(
     new SourceFunctionalDependency(
       cdTracksTable.columns
-        .columnsFromNames("CD_ID")
+        .columnsByNames("CD_ID")
         .map((col) => col.sourceColumn),
       cdTracksTable.columns
-        .columnsFromNames("Albumtitel", "Interpret", "Erscheinungsjahr")
+        .columnsByNames("Albumtitel", "Interpret", "Erscheinungsjahr")
         .map((col) => col.sourceColumn)
     )
   );
@@ -86,10 +81,10 @@ export function CDSchema(): Schema {
   schema.addFd(
     new SourceFunctionalDependency(
       interpretTable.columns
-        .columnsFromNames("Interpret")
+        .columnsByNames("Interpret")
         .map((col) => col.sourceColumn),
       cdTracksTable.columns
-        .columnsFromNames("Gründungsjahr")
+        .columnsByNames("Gründungsjahr")
         .map((col) => col.sourceColumn)
     )
   );
@@ -109,7 +104,7 @@ export function exampleSchema(): Schema {
 
   schema.addTables(tableA, tableB, tableC);
 
-  let [a1, a2, a3, a4, a5, a6] = tableA.columns.columnsFromNames(
+  let [a1, a2, a3, a4, a5, a6] = tableA.columns.columnsByNames(
     "A1",
     "A2",
     "A3",
@@ -117,8 +112,8 @@ export function exampleSchema(): Schema {
     "A5",
     "A6"
   );
-  let [b1, b2, b3] = tableB.columns.columnsFromNames("B1", "B2", "B3");
-  let [c1, c2] = tableC.columns.columnsFromNames("C1", "C2");
+  let [b1, b2, b3] = tableB.columns.columnsByNames("B1", "B2", "B3");
+  let [c1, c2] = tableC.columns.columnsByNames("C1", "C2");
 
   tableA.pk = new ColumnCombination([a1]);
   tableB.pk = new ColumnCombination([b1, b2]);
@@ -188,21 +183,21 @@ export function multiFkSchema(): Schema {
   const tableB = Table.fromColumnNames(["b_b1", "b_b2", "b_b3"], "TableB");
   tableB.addFd(
     new FunctionalDependency(
-      new ColumnCombination(tableB.columns.columnsFromNames("b_b1", "b_b2")),
+      new ColumnCombination(tableB.columns.columnsByNames("b_b1", "b_b2")),
       tableB.columns.copy()
     )
   );
   tableA.addFd(
     new FunctionalDependency(
-      new ColumnCombination(tableA.columns.columnsFromNames("a_a1", "a_a2")),
+      new ColumnCombination(tableA.columns.columnsByNames("a_a1", "a_a2")),
       tableA.columns.copy()
     )
   );
   tableA.addFd(
     new FunctionalDependency(
-      new ColumnCombination(tableA.columns.columnsFromNames("a_a3")),
+      new ColumnCombination(tableA.columns.columnsByNames("a_a3")),
       new ColumnCombination(
-        tableA.columns.columnsFromNames("a_a2", "a_b1", "a_b2", "a_a3")
+        tableA.columns.columnsByNames("a_a2", "a_b1", "a_b2", "a_a3")
       )
     )
   );
@@ -210,18 +205,18 @@ export function multiFkSchema(): Schema {
   schema.addFks(
     new SourceRelationship(
       tableC.columns
-        .columnsFromNames("c_a1", "c_a2")
+        .columnsByNames("c_a1", "c_a2")
         .map((col) => col.sourceColumn),
       tableA.columns
-        .columnsFromNames("a_a1", "a_a2")
+        .columnsByNames("a_a1", "a_a2")
         .map((col) => col.sourceColumn)
     ),
     new SourceRelationship(
       tableA.columns
-        .columnsFromNames("a_b1", "a_b2")
+        .columnsByNames("a_b1", "a_b2")
         .map((col) => col.sourceColumn),
       tableB.columns
-        .columnsFromNames("b_b1", "b_b2")
+        .columnsByNames("b_b1", "b_b2")
         .map((col) => col.sourceColumn)
     )
   );

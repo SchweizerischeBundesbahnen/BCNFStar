@@ -3,15 +3,15 @@ import Column from './Column';
 import SourceRelationship from './SourceRelationship';
 import SourceTableInstance from './SourceTableInstance';
 
+/**
+ * This class is used for the representation of foreign keys that are used inside a table to join two sourceTableInstances.
+ * The arrays referencing and referenced are linked in a way so that the columns with the same index are corresponding.
+ */
 export default class Relationship {
-  // these arrays are linked, the column in _referencing has the same index as the
-  // corresponding column in _referenced
   private _referencing: Array<Column>;
   private _referenced: Array<Column>;
 
-  /**
-   * cached result of the score calculation. Should not be accessed directly
-   */
+  /** cached result of the score calculation. Should not be accessed directly */
   public _score?: number;
 
   public constructor(referencing: Array<Column>, referenced: Array<Column>) {
@@ -45,6 +45,9 @@ export default class Relationship {
     this._referenced.splice(index, 1);
   }
 
+  /**
+   * Returns the sourceRelationship which this relationship originated from.
+   */
   public sourceRelationship(): SourceRelationship {
     const sourceRel = new SourceRelationship();
     for (const i in this._referencing) {
@@ -54,6 +57,9 @@ export default class Relationship {
     return sourceRel;
   }
 
+  /**
+   * Returns a copy of this relationship where all sourceTableInstances of the columns in this relationship are replaced according to the mapping.
+   */
   public applySourceMapping(
     mapping: Map<SourceTableInstance, SourceTableInstance>
   ): Relationship {
@@ -63,6 +69,9 @@ export default class Relationship {
     );
   }
 
+  /**
+   * Returns the columns that are referenced in this relationship by the passed columns (referencing).
+   */
   public columnsReferencedBy(
     referencing: Array<Column>
   ): Array<Column | undefined> {
@@ -127,6 +136,9 @@ export default class Relationship {
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
+  /**
+   * Returns whether the column referencingCol is referencing the column referencedCol in this relationship.
+   */
   public mapsColumns(referencingCol: Column, referencedCol: Column): boolean {
     const i = this.referencing.findIndex((otherReferencingCol) =>
       otherReferencingCol.equals(referencingCol)

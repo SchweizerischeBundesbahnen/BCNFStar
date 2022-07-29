@@ -1,5 +1,8 @@
 import SourceTable from './SourceTable';
 
+/**
+ * Represents a column that exists in the database.
+ */
 export default class SourceColumn {
   public constructor(
     public name: string,

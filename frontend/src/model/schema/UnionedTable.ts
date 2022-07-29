@@ -3,10 +3,17 @@ import BasicTable from './BasicTable';
 import Column from './Column';
 import Table from './Table';
 
+/**
+ * A table which is the result of a UNION operation. It contains the two tables which are unioned and the matching of the columns.
+ */
 export default class UnionedTable extends BasicTable {
   public tables: [Table, Table];
+  /**
+   * Columns[i] contains the selected columns of tables[i].
+   * The arrays are linked in a way so that the columns with the same index are unioned.
+   */
   public columns: [Array<Column | null>, Array<Column | null>];
-  /** states for each column whether columns from table1 (false) or table2 (true) should be prioritized. */
+  /** States for each column whether columns from table1 (false) or table2 (true) should be prioritized. */
   public rPriority = new Array<boolean>();
 
   public constructor(

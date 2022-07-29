@@ -1,3 +1,6 @@
+/**
+ * Containes the necessary information to display an object as a column in the schema graph
+ */
 export default interface BasicColumn {
   name: string;
   dataType: string;

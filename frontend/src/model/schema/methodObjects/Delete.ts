@@ -2,6 +2,9 @@ import ColumnCombination from '../ColumnCombination';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
+/**
+ * Method object for the deletion of columns from a table.
+ */
 export default class Delete {
   public newTable!: Table;
 
@@ -76,7 +79,7 @@ export default class Delete {
       if (fd.lhs.isSubsetOf(this.newTable.columns)) {
         const newFd = fd.copy();
         newFd.rhs.intersect(this.newTable.columns);
-        if (!newFd.isFullyTrivial()) {
+        if (!newFd.isTrivial()) {
           this.newTable.fds.push(newFd);
         }
       }

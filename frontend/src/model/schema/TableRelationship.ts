@@ -4,7 +4,7 @@ import Relationship from './Relationship';
 import Table from './Table';
 
 /**
- * These objects describe a relationship between two different tables.
+ * These objects describe a foreign key relationship or inclusiondependency between two different tables.
  * It contains all information to uniquely identify all columns involved in the relationship across the schema.
  */
 export default class TableRelationship {
@@ -54,7 +54,7 @@ export default class TableRelationship {
 
   /**
     If this relationship is affected by a surrogate key,
-    this is the name of the according surrogate column.
+    this is the name of the according surrogate foreign key column.
     This is also the name of the jointjs port to
     attach to for any foreign key.
     */
@@ -86,7 +86,7 @@ export default class TableRelationship {
     return this.relationship.referenced;
   }
 
-  mapsColumns(col1: Column, col2: Column): boolean {
+  public mapsColumns(col1: Column, col2: Column): boolean {
     return this.relationship.mapsColumns(col1, col2);
   }
 }

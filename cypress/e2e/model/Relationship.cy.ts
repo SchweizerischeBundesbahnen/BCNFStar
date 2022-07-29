@@ -10,8 +10,8 @@ describe("Relationship", () => {
     table1 = Table.fromColumnNames(["A", "B1", "C1"], "table1", 0);
     table2 = Table.fromColumnNames(["B2", "C2", "D"], "table2", 0);
     relationship = new Relationship(
-      table1.columns.columnsFromNames("B1", "C1"),
-      table2.columns.columnsFromNames("B2", "C2")
+      table1.columns.columnsByNames("B1", "C1"),
+      table2.columns.columnsByNames("B2", "C2")
     );
   });
 
@@ -19,8 +19,8 @@ describe("Relationship", () => {
     const otherTable1 = Table.fromColumnNames(["A", "B1", "C1"], "table1", 0);
     const otherTable2 = Table.fromColumnNames(["B2", "C2", "D"], "table2", 0);
     const otherRelationship = new Relationship(
-      otherTable1.columns.columnsFromNames("B1", "C1"),
-      otherTable2.columns.columnsFromNames("B2", "C2")
+      otherTable1.columns.columnsByNames("B1", "C1"),
+      otherTable2.columns.columnsByNames("B2", "C2")
     );
     expect(relationship.equals(otherRelationship)).to.equal(true);
   });

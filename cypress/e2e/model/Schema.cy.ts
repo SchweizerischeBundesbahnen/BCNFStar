@@ -205,9 +205,7 @@ describe("Schema", () => {
       0
     );
 
-    fd.rhs.delete(
-      ...(tableA as Table).columns.columnsFromNames("a_a2", "a_b1")
-    );
+    fd.rhs.delete(...(tableA as Table).columns.columnsByNames("a_a2", "a_b1"));
 
     expect(
       schema.fdSplitReferenceViolationsOf(fd, tableA as Table).length
