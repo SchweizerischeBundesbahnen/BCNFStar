@@ -48,26 +48,36 @@ export default class UnionedTable extends BasicTable {
     );
   }
 
+  /**
+   * Returns the column which is unioned with the given column.
+   * The passed column must come from tables[0].
+   */
   public matchedColumn(column: Column) {
     const i = this.columns[0].indexOf(column);
     return this.columns[1][i];
   }
 
+  /**
+   * Returns a basicTableRelationship which applies to the unioned table
+   * and corresponds to fk1 and fk2.
+   * If fk1 and fk2 do not correspond with each other null is returned.
+   * @param fk1 A tableRelationship which applies to tables[0]
+   * @param fk2 A tableRelationship which applies to tables[1]
+   */
   public equivalentFk(
     fk1: TableRelationship,
     fk2: TableRelationship
-  ): BasicTableRelationship | undefined {
-    if (fk1.referencedTable != fk2.referencedTable) return undefined;
-    if (fk1.referencingCols.length != fk2.referencingCols.length)
-      return undefined;
+  ): BasicTableRelationship | null {
+    if (fk1.referencedTable != fk2.referencedTable) return null;
+    if (fk1.referencingCols.length != fk2.referencingCols.length) return null;
     for (const i in fk1.referencingCols) {
       const referencingCol2 = this.matchedColumn(fk1.referencingCols[i]);
-      if (!referencingCol2) return undefined;
+      if (!referencingCol2) return null;
       const referencedCol2 = fk2.relationship.columnsReferencedBy([
         referencingCol2,
       ])[0];
-      if (!referencedCol2) return undefined;
-      if (fk1.referencedCols[i] != referencedCol2) return undefined;
+      if (!referencedCol2) return null;
+      if (fk1.referencedCols[i] != referencedCol2) return null;
     }
     const newReferencingCols = fk1.referencingCols.map((col) =>
       this.displayedColumnAt(this.columns[0].indexOf(col))
