@@ -23,16 +23,16 @@ describe("FdScore", () => {
       5
     );
     let fd1 = new FunctionalDependency(
-      new ColumnCombination(table.columns.columnsFromNames("p_A")),
-      new ColumnCombination(table.columns.columnsFromNames("p_B", "c_C"))
+      new ColumnCombination(table.columns.columnsByNames("p_A")),
+      new ColumnCombination(table.columns.columnsByNames("p_B", "c_C"))
     );
     fd1._uniqueTuplesLhs = 3;
     fd1._redundantTuples = 4;
     table.addFd(fd1);
 
     let fd2 = new FunctionalDependency(
-      new ColumnCombination(table.columns.columnsFromNames("p_B", "c_C")),
-      new ColumnCombination(table.columns.columnsFromNames("p_A", "c_D", "c_E"))
+      new ColumnCombination(table.columns.columnsByNames("p_B", "c_C")),
+      new ColumnCombination(table.columns.columnsByNames("p_A", "c_D", "c_E"))
     );
     fd2._uniqueTuplesLhs = 5;
     fd2._redundantTuples = 0;
