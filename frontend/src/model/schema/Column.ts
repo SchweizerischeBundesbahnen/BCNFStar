@@ -27,6 +27,10 @@ export default class Column implements BasicColumn {
     this._bloomFilterExpectedFpp = num;
   }
 
+  /**
+   * creates bloomfilters to estimate unique values of the column
+   * @param sample first 5.000.000 values of a columns
+   */
   public setBloomFilterFpp(sample: Array<string>) {
     let bf = new BloomFilter(sample.length, 0.5);
     sample.forEach((e) => bf.add(e ? e.toString() : 'null'));

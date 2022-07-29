@@ -447,6 +447,11 @@ export default class Table extends BasicTable {
     return fdClusterTree.getAll();
   }
 
+  /**
+   * sort clusters by best ranked fd per cluster
+   * sort fds in cluster descending
+   * @returns fd clusters sorted by ranking score
+   */
   public rankedFdClusters(): Array<FdCluster> {
     if (!this._fdClusters) {
       this._fdClusters = this.scoreFdInFdClusters(this.fdClusters(true));
@@ -472,6 +477,11 @@ export default class Table extends BasicTable {
     return this._fdClusters;
   }
 
+  /**
+   * calculates for every fd in the clusters a ranking score
+   * @param fdClusters 
+   * @returns fdc lusters with fds with ranking scores
+   */
   private scoreFdInFdClusters(fdClusters: Array<FdCluster>): Array<FdCluster> {
     fdClusters.forEach((cluster) =>
       cluster.fds.forEach((fd) => {

@@ -2,13 +2,13 @@ import ColumnCombination from '../ColumnCombination';
 import FunctionalDependency from '../FunctionalDependency';
 import Table from '../Table';
 
-/* 
-  COSTUMIZE YOUR RANKING:
+/**
+ * COSTUMIZE YOUR RANKING:
   uses only keyValue ranking by default
   every attrubute should be >= 0 and smaller <= 1
   in sum all attributes should be 1,
   be carful with using redundance rankings, these are needing lots of database requests witch could result in long waiting times
-*/
+ */
 (window as any).DEFAULT_RANKING_WEIGHTS = {
   length: 0,
   keyValue: 1,
@@ -28,6 +28,10 @@ export default class FdScore {
     this.fd = fd;
   }
 
+  /**
+   * calculate the ranking score
+   * @returns a ranking score that indicates how useful the fd is
+   */
   public get(): number {
     if (!this.fd._score) {
       this.fd._score = this.calculate();
@@ -37,7 +41,7 @@ export default class FdScore {
 
   /**
    * should be only used for testing
-   * @returns all single scores and the combination of it
+   * @returns all single scores
    */
   public testingScore() {
     return {
@@ -51,6 +55,10 @@ export default class FdScore {
     };
   }
 
+  /**
+   * with window.DEFAULT_RANKING_WEIGHTS you can change the impact of each ranking
+   * @returns a ranking score used different ranking approaches 
+   */
   private calculate(): number {
     return (
       (window as any).DEFAULT_RANKING_WEIGHTS.length * this.fdLengthScore() +
@@ -69,25 +77,36 @@ export default class FdScore {
     );
   }
 
+  /**
+   * 
+   * @returns length score of lhs of the fd
+   */
   private lhsLengthScore(): number {
     return this.fd.lhs.cardinality > 0 ? 1 / this.fd.lhs.cardinality : 0;
   }
 
+  /**
+   * -2 because the rhs can be at most (number columns of a table - 2) colums long
+   * @returns length score of rhs of the fd
+   */
   private rhsLengthScore(): number {
-    //TODO: Find out the reason for the magic number 2
     return this.table.numColumns > 2
       ? this.fd.rhs.copy().setMinus(this.fd.lhs).cardinality /
           (this.table.numColumns - 2)
       : 0;
   }
 
+  /**
+   * 
+   * @returns length score of fd
+   */
   private fdLengthScore(): number {
     return (this.lhsLengthScore() + this.rhsLengthScore()) / 2;
   }
 
   /**
    * 1 for keys where all key columns have values of length at most 1, less if values can be longer
-   * @returns score between 0 and 1
+   * @returns key value score
    */
   private fdKeyValueScore(): number {
     let maxKeyLength = 0;
@@ -95,6 +114,10 @@ export default class FdScore {
     return maxKeyLength == 0 ? 0 : 1 / Math.max(1, maxKeyLength - 7);
   }
 
+  /**
+   * 
+   * @returns position score
+   */
   private fdPositionScore(): number {
     return (this.lhsPositionScore() + this.rhsPositionScore()) / 2;
   }
@@ -111,10 +134,13 @@ export default class FdScore {
     return 1 / (this.numAttributesBetween(columns) + 1);
   }
 
-  /* looks how much columns are between the columns of a column combination
-  example: sorted ordinal positions of columns 1 3 4 7
-  3 columns between this column combination
-  because one column bewteen 1 and 3, two columns between 4 and 7 */
+  /**
+   * example: sorted ordinal positions of columns 1 3 4 7
+   * 3 columns between this column combination
+   * because one column bewteen 1 and 3, two columns between 4 and 7 
+   * @param columns 
+   * @returns how much columns are between the columns of a column combination
+   */
   private numAttributesBetween(columns: ColumnCombination): number {
     const colArray = this.table.columns.asArray();
     const columnsOrderByOrdinalPosition = columns
@@ -131,13 +157,20 @@ export default class FdScore {
     return range - columns.cardinality;
   }
 
+  /**
+   * use the unique values of the emerging table after splitting to calculate the redundance
+   * @returns redundance score
+   */
   private fdRedundanceScoreTeam(): number {
-    // get all redundant tuples and normalize by row count
     return this.table.rowCount == 0
       ? 0
       : (this.table.rowCount - this.fd._uniqueTuplesLhs) / this.table.rowCount;
   }
 
+  /**
+   * use bloomfilters to estimate the unique values of columns and calculates with it the redundance score
+   * @returns redundance score
+   */
   private fdRedundanceScoreMetanome(): number {
     return (
       (this.densityScore(this.fd.lhs) +
@@ -153,12 +186,20 @@ export default class FdScore {
     return 1 - densityScore / fdSideArray.length;
   }
 
+  /**
+   * use sum of all redundant values of the emerging table after splitting to calculate redundance ranking
+   * @returns redundance score
+   */
   private fdRedundanceScoreWeiLink(): number {
     return this.table.rowCount == 0
       ? 0
       : this.fd._redundantTuples / this.table.rowCount;
   }
 
+  /**
+   * uses the similarity of all combinations of columns of lhs and rhs to calculate similarity ranking
+   * @returns similarity score
+   */
   private fdSimilarityScore(): number {
     const simLhs = this.averageSimilarityForCC(this.fd.lhs);
     const simRhs = this.averageSimilarityForCC(
@@ -167,6 +208,11 @@ export default class FdScore {
     return (simLhs + simRhs) / 2;
   }
 
+  /**
+   * 
+   * @param fdSide lhs or rhs, column combination
+   * @returns average similarity of one column combination
+   */
   private averageSimilarityForCC(fdSide: ColumnCombination): number {
     const fdSideArray = Array.from(fdSide);
 

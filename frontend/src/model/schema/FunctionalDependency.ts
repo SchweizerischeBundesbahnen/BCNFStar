@@ -3,6 +3,8 @@ import ColumnCombination from './ColumnCombination';
 /**
  * This class represents a functional dependency inside a table.
  * The left hand side is always included in the right hand side.
+ * _redundantTuples is the sum of all tuples which are redundant in the emerging table after splitting grouped by lhs
+ * _uniqueTuplesLhs are the unique values of the emerging table after splitting grouped by lhs
  */
 export default class FunctionalDependency {
   public lhs: ColumnCombination;
