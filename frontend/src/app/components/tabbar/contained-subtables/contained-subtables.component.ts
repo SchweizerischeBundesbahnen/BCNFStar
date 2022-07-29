@@ -56,6 +56,10 @@ export class ContainedSubtablesComponent {
     return new ColumnCombination(this._fdClusterFilter);
   }
 
+  /**
+   * 
+   * @returns fd clusters (further infos in Table.ts) eventually filterd by columns from user input
+   */
   public fdClusters(): Array<FdCluster> {
     const cc = this.fdClusterFilter;
     const cluster = this.table
