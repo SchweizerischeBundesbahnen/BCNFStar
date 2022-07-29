@@ -70,13 +70,7 @@ First set up your personal DB configuration in [](docker-compose.yml). By defaul
 - DB_PASSWORD=
 ```
 
-To build your docker container run
-
-```bash
-docker build . -t bcnfstar
-```
-
-to create bcnfstar docker image and run
+After that, you can use the following command to launch the app
 
 ```bash
 docker-compose up

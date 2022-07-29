@@ -2,7 +2,7 @@ version: '2'
 
 services:
   new_bcnfstar:
-    image: bcnfstar
+    image: pvii/bcnfstar:latest
     ports:
     - 80:80
     environment:
