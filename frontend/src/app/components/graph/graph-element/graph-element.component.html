@@ -1,11 +1,26 @@
-<div class="container px-0" [ngStyle]="bbox">
+<div
+  class="container px-0"
+  [ngClass]="intService.getIntegrationClass(table)"
+  [ngStyle]="bbox"
+>
   <div
     *ngIf="showMakeDirectDimension"
     class="extra-button"
+    id="makeDirectDimension"
     type="button"
     (click)="schemaService.makeDirectDimension(table)"
   >
     D
+  </div>
+  <div
+    *ngIf="isPotentialFact"
+    class="extra-button"
+    id="potentialFact"
+    type="button"
+    [sbbTooltip]="factTooltip"
+    [sbbTooltipTrigger]="'click'"
+  >
+    F
   </div>
   <div
     class="table-head ellipsis"
@@ -29,6 +44,7 @@
       [sbbTooltip]="column.name"
       [ngClass]="{
         pk: isPkColumn(column),
+        fk: isFkColumn(column),
         highlighted: isHighlightedColumn(column)
       }"
       class="ellipsis"
@@ -51,3 +67,21 @@
     ></sbb-icon>
   </div>
 </div>
+
+<ng-template #factTooltip>
+  <div>Is {{ table.name }} a fact table?</div>
+  <div id="potentialFactTooltip">
+    <button
+      sbb-icon-button
+      (click)="schemaService.suggestOrRejectFact(table, true)"
+    >
+      <sbb-icon svgIcon="kom:tick-medium"></sbb-icon>
+    </button>
+    <button
+      sbb-icon-button
+      (click)="schemaService.suggestOrRejectFact(table, false)"
+    >
+      <sbb-icon svgIcon="kom:cross-medium"></sbb-icon>
+    </button>
+  </div>
+</ng-template>

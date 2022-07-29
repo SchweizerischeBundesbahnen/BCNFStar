@@ -16,7 +16,7 @@ interface IRel<RelType, ColType> {
 }
 
 /**
- * uses existingRels to calculate all valid relationships by transitively extending them
+ * Uses existingRels to calculate all valid relationships by transitively extending them.
  */
 export abstract class FkDerivation<
   RelType extends IRel<RelType, ColType>,
@@ -67,7 +67,6 @@ export abstract class FkDerivation<
   ): RelType;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class SourceFkDerivation extends FkDerivation<
   SourceRelationship,
   SourceColumn
@@ -84,7 +83,6 @@ export class SourceFkDerivation extends FkDerivation<
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class TableFkDerivation extends FkDerivation<TableRelationship, Column> {
   override constructFk(
     fkToReferencing: TableRelationship,

@@ -1,4 +1,7 @@
-<div>
+<div
+  *ngIf="!intService.isIntegrating; else intModeMessage"
+  class="union-sidebar-grid"
+>
   <sbb-select
     id="unionTableSelection"
     placeholder="Select table to union with"
@@ -8,9 +11,18 @@
       table.fullName
     }}</sbb-option>
   </sbb-select>
-</div>
-<div>
-  <button sbb-button [disabled]="!otherTable" (click)="openDialog()">
+  <button
+    sbb-button
+    [disabled]="!otherTable"
+    (click)="schemaService.union([table, otherTable!])"
+  >
     Match Columns
   </button>
 </div>
+
+<ng-template #intModeMessage>
+  <h2>
+    Union is disabled because nested unions are not supported and one union
+    operation is already required to merge the schemas
+  </h2>
+</ng-template>

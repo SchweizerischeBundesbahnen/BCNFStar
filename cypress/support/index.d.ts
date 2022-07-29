@@ -33,6 +33,7 @@ declare namespace Cypress {
 
     /**
      * Executes the given query on the test database.
+     * Returns a pg response https://node-postgres.com/api/result
      */
     executeSql(query: string): any;
 

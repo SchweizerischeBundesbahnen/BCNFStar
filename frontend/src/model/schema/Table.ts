@@ -13,43 +13,44 @@ import ColumnsTree from './ColumnsTree';
 import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
 
+/** A working table that is the result of any number of split and join operations. */
 export default class Table extends BasicTable {
+  // defining properties
+
   public columns: ColumnCombination;
   public pk?: ColumnCombination = undefined;
-  public fds: Array<FunctionalDependency> = [];
-  public relationships = new Array<Relationship>();
   public sources = new Array<SourceTableInstance>();
+  public relationships = new Array<Relationship>();
+  public surrogateKey: string = '';
+
+  // cached results
+
+  public fds: Array<FunctionalDependency> = [];
   private _violatingFds?: Array<FunctionalDependency>;
   private _keys?: Array<ColumnCombination>;
   private _fdClusters?: Array<FdCluster>;
-  public surrogateKey: string = '';
-  public implementsSurrogateKey(): boolean {
-    return this.surrogateKey.length >= 1;
-  }
-  /**
-   * cached results of schema.indsOf(this). Should not be accessed from outside the schema class
-   */
+  /** cached results of schema.indsOf(this). Should not be accessed from outside the schema class */
   public _inds!: Map<SourceRelationship, Array<TableRelationship>>;
-  /**
-   * This variable tracks if the cached inds are still valid
-   */
+  /** This variable tracks if the cached inds are still valid */
   public _indsValid = false;
+
+  public constructor(columns?: ColumnCombination) {
+    super();
+    this.columns = columns || new ColumnCombination();
+  }
 
   public toJSON() {
     return {
       name: this.name,
       schemaName: this.schemaName,
+      isSuggestedFact: this.isSuggestedFact,
+      isRejectedFact: this.isRejectedFact,
       columns: this.columns,
       pk: this.pk,
       sk: this.surrogateKey,
       relationships: this.relationships,
       sources: this.sources,
     };
-  }
-
-  public constructor(columns?: ColumnCombination) {
-    super();
-    this.columns = columns || new ColumnCombination();
   }
 
   public static fromITable(iTable: ITable): Table {
@@ -94,8 +95,12 @@ export default class Table extends BasicTable {
     return table;
   }
 
+  public implementsSurrogateKey(): boolean {
+    return this.surrogateKey.length >= 1;
+  }
+
   /**
-   * finds a column in the tables columns which is equal to the given column.
+   * Finds a column in the tables columns which is equal to the given column.
    * Returns the column itself if no equal column is found.
    */
   public findEqualSelectedColumn(column: Column): Column {
@@ -104,6 +109,10 @@ export default class Table extends BasicTable {
     );
   }
 
+  /**
+   * Makes sure that columns that are equal to each other are replaced to be an identical object.
+   * This improves the performance of comparisons and allows the usage of e.g. Array.includes().
+   */
   public establishIdentities() {
     if (this.pk) {
       this.pk = new ColumnCombination(
@@ -120,6 +129,7 @@ export default class Table extends BasicTable {
     });
   }
 
+  /** If multiple columns are given the same name, this method includes their sources in their names. */
   public resolveColumnNameDuplicates() {
     const checked = new Set<Column>();
     for (const column of this.columns) {
@@ -146,6 +156,7 @@ export default class Table extends BasicTable {
     this.resolveColumnNameDuplicates();
   }
 
+  /** If multiple sources are given the same name, this method adds numbers to their names. */
   public resolveSourceNameDuplicates() {
     const checked = new Set<SourceTableInstance>();
     for (const source of this.sources) {
@@ -176,36 +187,35 @@ export default class Table extends BasicTable {
     return this.columns.cardinality;
   }
 
-  public setFds(fds: Array<FunctionalDependency>) {
-    this.fds = fds;
-    this.fds = fds.filter((fd) => !fd.isFullyTrivial()); // needed?
-  }
-
   public addFd(fd: FunctionalDependency) {
     this.fds.push(fd);
   }
 
-  public remainingSchema(fd: FunctionalDependency): ColumnCombination {
+  /** The columns that the remaining table of a split with the fd would have. */
+  public remainingTableSchema(fd: FunctionalDependency): ColumnCombination {
     return this.columns.copy().setMinus(fd.rhs).union(fd.lhs).copy();
   }
 
-  public generatingSchema(fd: FunctionalDependency): ColumnCombination {
+  /** The columns that the generating table of a split with the fd would have. */
+  public generatingTableSchema(fd: FunctionalDependency): ColumnCombination {
     return fd.rhs.copy();
   }
 
+  /**
+   * Returns whether the given columnCombination is fully contained
+   * in at least one of the tables resulting from a split with the fd.
+   */
   public splitPreservesCC(
     fd: FunctionalDependency,
     cc: ColumnCombination
   ): boolean {
     return (
-      cc.isSubsetOf(this.remainingSchema(fd)) ||
-      cc.isSubsetOf(this.generatingSchema(fd))
+      cc.isSubsetOf(this.remainingTableSchema(fd)) ||
+      cc.isSubsetOf(this.generatingTableSchema(fd))
     );
   }
 
-  /**
-   * @returns the selected columns of each source (SourceTableInstance) of this table
-   */
+  /** Returns the selected columns of each source of this table. */
   public columnsBySource(): Map<SourceTableInstance, ColumnCombination> {
     const result = new Map<SourceTableInstance, ColumnCombination>();
 
@@ -219,9 +229,7 @@ export default class Table extends BasicTable {
     return result;
   }
 
-  /**
-   * Returns the sources of which not all rows of the original source table are found in this table
-   */
+  /** Returns the sources of which not all rows of the original source table are found in this table. */
   public reducedSources(): Array<SourceTableInstance> {
     const result = new Array<SourceTableInstance>();
     for (const rel of this.relationships) {
@@ -237,17 +245,11 @@ export default class Table extends BasicTable {
     return result;
   }
 
-  public isRoot(source: SourceTableInstance) {
-    return !this.relationships.some(
-      (rel) => rel.referenced[0].sourceTableInstance == source
-    );
-  }
-
   /**
-   * @returns all sets of columns - each set coming mostly from the same SourceTableInstance - which match the sourceColumns.
-   * Columns from other SourceTableInstances can be included in one match, if the columns have the same values as the
-   * equivalent column from the same SourceTableInstance would have.
-   * @param sourceColumns columns to be matched. Must come from the same SourceTable
+   * @returns all sets of columns - each set coming from the same sourceTableInstance - which match the sourceColumns.
+   * columns from other sourceTableInstances can be included in one match, if the columns have the same values as the
+   * equivalent column from the same sourceTableInstance would have.
+   * @param sourceColumns columns to be matched. Must come from the same sourceTable
    * @param allowReduced do we want matches which come from reduced sources (see reducedSources)
    */
   public columnsEquivalentTo(
@@ -295,9 +297,7 @@ export default class Table extends BasicTable {
     return result;
   }
 
-  /**
-   * returns all sources in an order so that every referenced table comes before their referencing table.
-   */
+  /** Returns all sources in an order, so that every referenced table comes before their referencing table. */
   public sourcesTopological(): Array<SourceTableInstance> {
     const result = new Array<SourceTableInstance>();
     const numReferenced = new Map<SourceTableInstance, number>();
@@ -326,11 +326,10 @@ export default class Table extends BasicTable {
   }
 
   public isKeyFd(fd: FunctionalDependency): boolean {
-    // assume fd is fully extended
-    // TODO what about null values
     return fd.rhs.equals(this.columns);
   }
 
+  /** Returns the minimal columnCombinations which determine the given columns. */
   public minimalDeterminantsOf(
     columns: ColumnCombination
   ): Array<ColumnCombination> {
@@ -341,17 +340,11 @@ export default class Table extends BasicTable {
     const determinants = new Array<ColumnCombination>();
     for (const cluster of allClusters) {
       if (!columns.isSubsetOf(cluster.columns)) continue;
-      // if (
-      //   !Array.from(relevantClusters).some((other) =>
-      //     other.columns.isSubsetOf(cluster.columns)
-      //   )
-      // )
       for (const fd of cluster.fds) {
         if (!determinants.some((other) => other.isSubsetOf(fd.lhs)))
           determinants.push(fd.lhs);
       }
     }
-    // determinants.slice(0, 50).forEach((det) => console.log(det.toString()));
     return determinants;
   }
 
@@ -402,8 +395,8 @@ export default class Table extends BasicTable {
   }
 
   /**
-   * @returns FdClusters, which group functional dependencies that have the same right hand side
-   * Used in UI to make functional dependencies easier to discover
+   * @returns FdClusters, which group functional dependencies that have the same right hand side.
+   * Used in UI to make functional dependencies easier to discover.
    */
   public get fdClusters(): Array<FdCluster> {
     if (!this._fdClusters) {
@@ -431,6 +424,7 @@ export default class Table extends BasicTable {
     return this._fdClusters;
   }
 
+  /** Returns all columns that are functionally determined by the passed columns. */
   public hull(columns: ColumnCombination): ColumnCombination {
     const rhs = columns.copy();
     for (const fd of this.fds) {
@@ -439,19 +433,5 @@ export default class Table extends BasicTable {
       }
     }
     return rhs;
-  }
-
-  public toTestString(): string {
-    let str = `${this.name}(${this.columns.toString()})\n`;
-    str += this.fds.map((fd) => fd.toString()).join('\n');
-    return str;
-  }
-
-  public toITable(): ITable {
-    return {
-      name: this.name,
-      schemaName: this.schemaName,
-      attributes: this.columns.asArray().map((attr) => attr.toIAttribute()),
-    };
   }
 }

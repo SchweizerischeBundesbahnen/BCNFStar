@@ -12,7 +12,7 @@ export class KeysComponent {
   public editMode = true;
 
   constructor(public schemaService: SchemaService) {
-    this.schemaService.selectedTableChanged.subscribe(() => this.reset);
+    this.schemaService.selectedTableChanged.subscribe(() => this.reset());
   }
 
   public get table() {
@@ -20,8 +20,10 @@ export class KeysComponent {
   }
 
   public reset() {
-    this.surrogateKey = this.table.surrogateKey ?? '';
-    this.editMode = !this.surrogateKey;
+    if (this.table) {
+      this.surrogateKey = this.table.surrogateKey ?? '';
+      this.editMode = !this.surrogateKey;
+    }
   }
 
   public emitSurrogateKey() {
