@@ -36,8 +36,9 @@ export default class PotentialFacts {
     if (visitedTables.includes(table)) return 0;
     if (!this.connectionTopologyValues.has(table)) {
       let ctv =
-        PotentialFacts.weightDirect * this.schema.fksOf(table, true).length;
-      for (const fk of this.schema.fksOf(table, true))
+        PotentialFacts.weightDirect *
+        this.schema.basicFksOf(table, true).length;
+      for (const fk of this.schema.basicFksOf(table, true))
         ctv +=
           PotentialFacts.weightIndirect *
           this.calculateCTVOf(fk.referencedTable, [...visitedTables, table]);

@@ -167,13 +167,12 @@ ${columnStrings.join(',\n')});\n`;
     for (const referencingTable of schema.tables) {
       for (const fk of schema.basicFksOf(referencingTable, true)) {
         if (
-          fk.referencingTable instanceof Table &&
-          fk.referencedTable instanceof Table &&
+          fk instanceof TableRelationship &&
           fk.referencedTable.implementsSurrogateKey()
         ) {
-          Sql += this.addSkColumnToReferencingSql(fk as TableRelationship);
-          Sql += this.updateSurrogateKeySql(fk as TableRelationship);
-          Sql += this.foreignSurrogateKeySql(fk as TableRelationship);
+          Sql += this.addSkColumnToReferencingSql(fk);
+          Sql += this.updateSurrogateKeySql(fk);
+          Sql += this.foreignSurrogateKeySql(fk);
         } else {
           Sql += this.uniqueConstraint(fk);
           Sql += this.foreignKeySql(fk);
