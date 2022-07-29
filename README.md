@@ -57,7 +57,7 @@ npm run start
 
 ### Docker
 
-If want to use a docker container for deployment you can skip the steps above. Just follow the next commands.
+If you want to use a docker container for deployment you can skip the steps above. Just follow the next commands.
 
 First set up your personal DB configuration in [](docker-compose.yml). By default we use a standard postgres database configuration.
 
