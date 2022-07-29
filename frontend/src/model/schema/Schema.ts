@@ -21,6 +21,7 @@ import {
 import UnionedTable from './UnionedTable';
 import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
+import BasicTableRelationship from './BasicTableRelationship';
 import PotentialFacts from './methodObjects/PotentialFacts';
 
 /**
@@ -104,6 +105,14 @@ export default class Schema {
       ) as Array<Table>;
     }
     return this._regularTables;
+  }
+
+  public get decomposedTables(): Array<Table> {
+    return [...this.tables].flatMap((table) => {
+      if (table instanceof Table) return [table];
+      if (table instanceof UnionedTable) return table.tables;
+      throw new Error('unsupported Table type');
+    });
   }
 
   public get unionedTables(): Array<UnionedTable> {
@@ -301,22 +310,48 @@ export default class Schema {
       (fk) => fk.referencedTable == table
     );
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
+    result = result.filter((fk) => this.tables.has(fk.referencingTable));
     return result;
   }
 
   /**
+   * Returns foreign key relationships, where the given table (only of type Table) is referencing another.
    * @param onlyDisplayed whether to use only the displayed fks or all fks
    */
-  public fksOf(
-    table: BasicTable,
-    onlyDisplayed: boolean
-  ): Array<TableRelationship> {
-    if (!(table instanceof Table)) return [];
+  public fksOf(table: Table, onlyDisplayed: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
       (fk) => fk.referencingTable == table
     );
+    result = result.filter((fk) => this.tables.has(fk.referencedTable));
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
+    return result;
+  }
+
+  /**
+   * Returns foreign key relationships, where the given table (of type Table or UnionedTable) is referencing another.
+   * @param onlyDisplayed whether to use only the displayed fks or all fks
+   */
+  public basicFksOf(
+    table: BasicTable,
+    onlyDisplayed: boolean
+  ): Array<BasicTableRelationship> {
+    let result = new Array<BasicTableRelationship>();
+    if (table instanceof Table) {
+      result.push(...this.fksOf(table, onlyDisplayed));
+      // for (let otherTable of this.unionedTables) {
+      //   let fks1 = this.fksBetween(table, otherTable.tables[0]);
+      //   let fks2 = this.fksBetween(table, otherTable.tables[1]);
+      // }
+    }
+    if (table instanceof UnionedTable) {
+      for (const fk1 of this.fksOf(table.tables[0], onlyDisplayed)) {
+        for (const fk2 of this.fksOf(table.tables[1], onlyDisplayed)) {
+          const newFk = table.equivalentFk(fk1, fk2);
+          if (newFk) result.push(newFk);
+        }
+      }
+    }
     return result;
   }
 
@@ -382,14 +417,14 @@ export default class Schema {
   private calculateFks(): void {
     for (const rel of this._fks) {
       const referencings = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.regularTables) {
+      for (const table of this.decomposedTables) {
         const columns = table.columnsEquivalentTo(rel.referencingCols, true);
         if (columns.length > 0) referencings.set(table, columns);
       }
       if ([...referencings.keys()].length == 0) continue;
 
       const referenceds = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.regularTables) {
+      for (const table of this.decomposedTables) {
         const columns = table
           .columnsEquivalentTo(rel.referencedCols, false)
           .filter((possibleColumns) =>
@@ -422,8 +457,8 @@ export default class Schema {
    * returns a sourceRelationship with equal referencing and referenced columns.
    */
   private calculateTrivialFks(): void {
-    for (const referencingTable of this.regularTables) {
-      for (const referencedTable of this.regularTables) {
+    for (const referencingTable of this.decomposedTables) {
+      for (const referencedTable of this.decomposedTables) {
         if (referencedTable == referencingTable || !referencedTable.pk)
           continue;
         const pk = referencedTable.pk!.asArray();

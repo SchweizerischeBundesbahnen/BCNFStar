@@ -12,7 +12,7 @@ import { SchemaMergingService } from '@/src/app/schema-merging.service';
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
   style: Record<string, any>;
-  links: Map<Table, joint.dia.Link>;
+  links: Map<BasicTable, joint.dia.Link>;
 };
 
 export enum PortSide {

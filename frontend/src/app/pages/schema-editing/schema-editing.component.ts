@@ -83,9 +83,12 @@ export class SchemaEditingComponent {
     if (this.intService.isComparing) return this.intService.links;
     const newLinks: Array<LinkDefinition> = [];
     for (const table of this.schemaService.schema.tables)
-      for (const fk of this.schemaService.schema.fksOf(table, true))
+      for (const fk of this.schemaService.schema.basicFksOf(table, true))
         newLinks.push({
-          tool: this.generateJoinButton(fk),
+          tool:
+            fk instanceof TableRelationship
+              ? this.generateJoinButton(fk)
+              : undefined,
           source: {
             table,
             columnName: fk.referencingName,
