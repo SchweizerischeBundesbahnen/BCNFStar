@@ -10,14 +10,14 @@ describe("FunctionalDependency", () => {
     table = Table.fromColumnNames(["A", "B", "C", "D"], "table1");
     table.addFd(
       new FunctionalDependency(
-        new ColumnCombination(table.columns.columnsFromNames("A")),
-        new ColumnCombination(table.columns.columnsFromNames("B", "C"))
+        new ColumnCombination(table.columns.columnsByNames("A")),
+        new ColumnCombination(table.columns.columnsByNames("B", "C"))
       )
     );
     table.addFd(
       new FunctionalDependency(
-        new ColumnCombination(table.columns.columnsFromNames("A")),
-        new ColumnCombination(table.columns.columnsFromNames("A"))
+        new ColumnCombination(table.columns.columnsByNames("A")),
+        new ColumnCombination(table.columns.columnsByNames("A"))
       )
     );
   });
@@ -25,13 +25,13 @@ describe("FunctionalDependency", () => {
   it("extends correctly", () => {
     expect(
       table.fds[0].rhs.equals(
-        new ColumnCombination(table.columns.columnsFromNames("A", "B", "C"))
+        new ColumnCombination(table.columns.columnsByNames("A", "B", "C"))
       )
     ).to.equal(true);
   });
 
   it("checks full triviality correctly", () => {
-    expect(table.fds[0].isFullyTrivial()).to.equal(false);
-    expect(table.fds[1].isFullyTrivial()).to.equal(true);
+    expect(table.fds[0].isTrivial()).to.equal(false);
+    expect(table.fds[1].isTrivial()).to.equal(true);
   });
 });

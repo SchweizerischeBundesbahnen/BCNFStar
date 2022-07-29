@@ -4,6 +4,7 @@ import Relationship from '../Relationship';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
+/** Method object for performing a JOIN operation between two tables. */
 export default class Join {
   public newTable = new Table();
 
@@ -21,6 +22,10 @@ export default class Join {
     this.join();
   }
 
+  /**
+   * Assure that all sources referenced by the given source are correctly added to the new table.
+   * @param definitelyNew Whether it is known for sure that no source equal to the given source is already contained in the new table.
+   */
   private resolveChildSources(
     source: SourceTableInstance,
     definitelyNew: boolean
@@ -36,6 +41,11 @@ export default class Join {
       );
   }
 
+  /**
+   * Assure that source and all its referenced sources including the relationships between them are correctly added to the new table.
+   * @param relToSource The referencing relationship to source.
+   * @param definitelyNew Whether it is known for sure that no source equal to the given source is already contained in the new table.
+   */
   private addSourcesAndRels(
     source: SourceTableInstance,
     relToSource: Relationship,
@@ -91,6 +101,7 @@ export default class Join {
       .sourcesTopological()
       .reverse()[0];
     if (this.relationship.sourceRelationship().isTrivial) {
+      // This is the case for the tableRelationships between the remaining and the generating table of any split.
       this.sourceMapping.set(
         referencedRootSource,
         this.sourceMapping.get(
@@ -116,6 +127,7 @@ export default class Join {
     }
   }
 
+  /** Finds a source in the new table which can be used to select the columns that were selected from the given source. */
   private findEquivalentSource(
     source: SourceTableInstance,
     relToSource: Relationship

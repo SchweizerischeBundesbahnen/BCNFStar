@@ -1,6 +1,11 @@
 import BasicTable from '../BasicTable';
 import Schema from '../Schema';
 
+/**
+ * Calculates the potential of tables to be fact tables.
+ * Method taken from
+ * Il Yeol Song, Ritu Khare, and Bing Dai. 2007. SAMSTAR: a semi-automated lexical method for generating star schemas from an entity-relationship diagram. In Proceedings of the ACM tenth international workshop on Data warehousing and OLAP (DOLAP '07). Association for Computing Machinery, New York, NY, USA, 9–16. https://doi.org/10.1145/1317331.1317334
+ */
 export default class PotentialFacts {
   public potentialFacts = new Set<BasicTable>();
 

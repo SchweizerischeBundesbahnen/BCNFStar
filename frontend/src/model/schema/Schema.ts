@@ -23,30 +23,40 @@ import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
 import PotentialFacts from './methodObjects/PotentialFacts';
 
+/**
+ * Manages working set of tables, provides table operations and stores information about relationships and fds.
+ */
 export default class Schema {
+  // defining properies
+
   public readonly tables = new Set<BasicTable>();
-  private potentialFacts = new Set<BasicTable>();
   public name?: string;
-  /**
-   * all fks from the actual database and inds that the user validated
-   */
+  private _starMode = false;
+  /** All fks from the actual database and inds that the user validated */
   private _baseFks = new Array<SourceRelationship>();
-  /**
-   * all fks that can be derived from _baseFks
-   */
+  private _inds = new Array<SourceRelationship>();
+  private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
+
+  // derived/cached results
+
+  /** Only relevant for star schema creation. Set of tables that have potential to be a fact table. */
+  private potentialFacts = new Set<BasicTable>();
+
+  /** All fks from _baseFks and the fks that can be constructed by transitive extension of these. */
   private _fks = new Array<SourceRelationship>();
   /**
-   * all fks in the form of TableRelationship that are valid among the current tables
+   * All fks in the form of TableRelationship that are valid among the current tables
    * mapped to filtered, blacklisted, whitelisted
    */
   private _tableFks = new Map<TableRelationship, FkDisplayOptions>();
-  private _inds = new Array<SourceRelationship>();
-  private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
-  private _starMode = false;
 
   private _regularTables?: Array<Table>;
   private _unionedTables?: Array<UnionedTable>;
+
+  public constructor(...tables: Array<BasicTable>) {
+    this.addTables(...tables);
+  }
 
   public toJSON() {
     return {
@@ -69,10 +79,6 @@ export default class Schema {
     return result;
   }
 
-  public constructor(...tables: Array<BasicTable>) {
-    this.addTables(...tables);
-  }
-
   public addTables(...tables: Array<BasicTable>) {
     tables.forEach((table) => {
       this.tables.add(table);
@@ -88,6 +94,7 @@ export default class Schema {
     });
     this.relationshipsValid = false;
     this._regularTables = undefined;
+    this._unionedTables = undefined;
   }
 
   public get regularTables(): Array<Table> {
@@ -108,21 +115,25 @@ export default class Schema {
     return this._unionedTables;
   }
 
+  /** Declare the passed table to be a fact table. */
   public suggestFact(table: BasicTable) {
     table.isSuggestedFact = true;
     this.relationshipsValid = false;
   }
 
+  /** Withdraw the delaration of the passed table as a fact table. */
   public unsuggestFact(table: BasicTable) {
     table.isSuggestedFact = false;
     this.relationshipsValid = false;
   }
 
+  /** Disclaim that the passed table is a fact table. */
   public rejectFact(table: BasicTable) {
     table.isRejectedFact = true;
     this.relationshipsValid = false;
   }
 
+  /** Withdraw the rejection of the passed table as a fact table. */
   public unrejectFact(table: BasicTable) {
     table.isRejectedFact = false;
     this.relationshipsValid = false;
@@ -141,6 +152,7 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
+  /** Add the sourceFks to the array _fks ensuring that _fks is closed under transitive extension of fks. */
   private deriveFks(fks: SourceRelationship[]) {
     for (const fk of fks) {
       for (const actualFk of new SourceFkDerivation(this._fks, fk).result) {
@@ -163,6 +175,7 @@ export default class Schema {
     this._fds.get(fd.rhs[0].table)!.push(fd);
   }
 
+  /** Returns an item of _tableFks that is equal to the passed fk. */
   private findEquivalentFk(fk: TableRelationship) {
     if (this._tableFks.has(fk)) return fk;
     return Array.from(this._tableFks.keys()).find((otherFk) =>
@@ -234,8 +247,9 @@ export default class Schema {
   }
 
   /**
-   * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
-   * or routes that would add no extra information to the fact table when joined completely
+   * Returns the result of routesFromFactTo(table, onlydisplayedFks).
+   * Filters out routes that consist of less than 2 TableRelationships
+   * or routes that would add no extra information to the fact table when joined completely.
    * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public directDimensionableRoutes(
@@ -250,7 +264,7 @@ export default class Schema {
   }
 
   /**
-   * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
+   * Returns all routes (in the form of an array of TableRelationships) from a fact table to this table.
    * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public routesFromFactTo(
@@ -290,6 +304,9 @@ export default class Schema {
     return result;
   }
 
+  /**
+   * @param onlyDisplayed whether to use only the displayed fks or all fks
+   */
   public fksOf(
     table: BasicTable,
     onlyDisplayed: boolean
@@ -303,6 +320,7 @@ export default class Schema {
     return result;
   }
 
+  /** Returns all foreign keys of the passed table that are not displayed. */
   public hiddenFksOf(table: Table): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     return Array.from(this._tableFks.keys()).filter(
@@ -319,7 +337,7 @@ export default class Schema {
 
   /**
    * Returns the inds from the given table to other tables. The inds are contained inside a map
-   * to keep the information which source-ind caused which concrete inds to appear in the current
+   * to keep the information which source ind caused which concrete inds to appear in the current
    * state of the schema.
    */
   public indsOf(
@@ -334,6 +352,7 @@ export default class Schema {
     table._indsValid = true;
   }
 
+  /** Recalculates _tableFks and potentialFacts. */
   public updateFks(oldFks = this._tableFks): void {
     this._tableFks = new Map<TableRelationship, FkDisplayOptions>();
     this.calculateFks();
@@ -397,8 +416,10 @@ export default class Schema {
   }
 
   /**
-   * A table which has the same columns as another tables pk has a relationship with this table.
-   * This method adds these relationships to the tables.
+   * A table has a relationship with another table if it contains columns equivalent to the other table's pk.
+   * This occurs whenever a table is split. This method adds these so called trivial relationships.
+   * Calling the sourceRelationship method on one of these relationships
+   * returns a sourceRelationship with equal referencing and referenced columns.
    */
   private calculateTrivialFks(): void {
     for (const referencingTable of this.regularTables) {
@@ -493,6 +514,7 @@ export default class Schema {
     }
   }
 
+  /** Returns whether a join on the basis of this relationship adds information to the referencing table. */
   public isRelationshipValid(relationship: TableRelationship): boolean {
     const newTable = new Join(relationship).newTable;
     return (
@@ -524,9 +546,6 @@ export default class Schema {
   /**
    * Finds all valid relationships in the current state of the schema in which the parameter table
    * is referencing some other table. Uses a list of relationships that apply to the datasource
-   * @param table
-   * @param relationships
-   * @returns
    */
   private matchSourceRelationships(
     table: Table,
@@ -596,7 +615,7 @@ export default class Schema {
           new ColumnCombination(lhs),
           new ColumnCombination(rhs)
         );
-        if (fd.isFullyTrivial()) continue;
+        if (fd.isTrivial()) continue;
         const existingFd = fds.get(source)!.get(fd.lhs);
         if (existingFd) existingFd.rhs.union(fd.rhs);
         else fds.get(source)!.add(fd, fd.lhs);
@@ -641,7 +660,7 @@ export default class Schema {
                 referencedColumns.includes(column)
             )
         );
-        if (fd.isFullyTrivial()) continue;
+        if (fd.isTrivial()) continue;
         if (
           fd.rhs.asArray().every((column) => table.columns.includes(column))
         ) {
@@ -659,10 +678,12 @@ export default class Schema {
     return table.violatingFds().filter((fd) => this.isFdSplittable(fd, table));
   }
 
+  /** Returns whether the primary key (if existing) would be destroyed when performing a split based on this fd. */
   public fdSplitPKViolationOf(fd: FunctionalDependency, table: Table): boolean {
     return !!table.pk && !table.splitPreservesCC(fd, table.pk);
   }
 
+  /** Returns an array of foreign keys of the table, that would be destroyed when performing a split based on this fd. */
   public fdSplitFKViolationsOf(
     fd: FunctionalDependency,
     table: Table
@@ -673,6 +694,7 @@ export default class Schema {
     );
   }
 
+  /** Returns an array of referenced keys of the table, that would be destroyed when performing a split based on this fd. */
   public fdSplitReferenceViolationsOf(
     fd: FunctionalDependency,
     table: Table
@@ -683,6 +705,10 @@ export default class Schema {
     );
   }
 
+  /**
+   * Returns true if no primary key, foreign key or referenced key of the table
+   * would be destroyed when performing a split based on this fd.
+   */
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
     return (
       this.fdSplitFKViolationsOf(fd, table).length == 0 &&
