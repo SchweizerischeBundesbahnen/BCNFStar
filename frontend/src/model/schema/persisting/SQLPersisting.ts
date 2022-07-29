@@ -131,11 +131,18 @@ ${columnStrings.join(',\n')});\n`;
   public selectStatement(
     table: Table,
     columns: Array<Column | null>,
-    dataTypes: string[] = []
+    dataTypes: string[] = [],
+    includeAliases: boolean = false
   ) {
     let Sql = '';
     Sql += `SELECT DISTINCT ${columns
-      .map((col, index) => `${this.columnIdentifier(col, dataTypes[index])}`)
+      .map((col, index) => {
+        let colString = this.columnIdentifier(col, dataTypes[index]);
+        if (col && col.sourceColumn.name != col.name && includeAliases) {
+          colString += ' AS ' + col.name;
+        }
+        return colString;
+      })
       .join(', ')} FROM ${table.sources
       .map((source) => {
         let sourceString = this.sourceTableIdentifier(source.table);

@@ -2,6 +2,7 @@ import IAttribute from '@server/definitions/IAttribute';
 import BasicColumn from '../types/BasicColumn';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
+import BloomFilter from './methodObjects/BloomFilter';
 
 /**
  * These objects uniquely identify a column within a table.
@@ -9,12 +10,37 @@ import SourceTableInstance from './SourceTableInstance';
  */
 export default class Column implements BasicColumn {
   public includeSourceName = false;
+  private _maxValue = 0;
+  private _bloomFilterExpectedFpp: number = 0;
 
   public constructor(
     public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
     public userAlias?: string
   ) {}
+
+  public get bloomFilterExpectedFpp() {
+    return this._bloomFilterExpectedFpp;
+  }
+
+  public set bloomFilterExpectedFpp(num: number) {
+    this._bloomFilterExpectedFpp = num;
+  }
+
+  public setBloomFilterFpp(sample: Array<string>) {
+    let bf = new BloomFilter(sample.length, 0.5);
+    sample.forEach((e) => bf.add(e ? e.toString() : 'null'));
+
+    this._bloomFilterExpectedFpp = bf.expectedFpp();
+  }
+
+  public get maxValue() {
+    return this._maxValue;
+  }
+
+  public set maxValue(num: number) {
+    this._maxValue = num;
+  }
 
   public get name() {
     let name = '';
@@ -32,11 +58,14 @@ export default class Column implements BasicColumn {
   }
 
   public copy(): Column {
-    return new Column(
+    let col = new Column(
       this.sourceTableInstance,
       this.sourceColumn,
       this.userAlias
     );
+    // for value ranking, sufficient to update maxValues after splitting
+    col.maxValue = this._maxValue;
+    return col;
   }
 
   public get dataType() {
@@ -45,10 +74,6 @@ export default class Column implements BasicColumn {
 
   public get nullable() {
     return this.sourceColumn.nullable;
-  }
-
-  public get ordinalPosition() {
-    return this.sourceColumn.ordinalPosition;
   }
 
   public get dataTypeString() {

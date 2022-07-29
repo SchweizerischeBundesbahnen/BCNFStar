@@ -36,8 +36,11 @@ export default class Split {
     generating.isSuggestedFact = false;
     generating.isRejectedFact = false;
 
-    this.substitute(generating, this.fd.lhs);
+    // update rowCount for redundance ranking
+    remaining.rowCount = this.table.rowCount;
+    generating.rowCount = this.fd._uniqueTuplesLhs;
 
+    this.substitute(generating, this.fd.lhs);
     this.newTables = [remaining, generating];
   }
 

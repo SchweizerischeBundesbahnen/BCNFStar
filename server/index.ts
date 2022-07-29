@@ -16,6 +16,7 @@ import { check, body } from "express-validator";
 import {
   isValidFileName,
   isValidDatatype,
+  isValidSql,
 } from "./validation/parameterValidation";
 
 import { getDbmsName } from "./routes/dbserver";
@@ -33,6 +34,10 @@ import {
   getMetanomeResults,
 } from "./routes/metanomeResults/";
 import { runMetanome } from "./routes/metanomeResults/run";
+import getRedundanceSum from "./routes/rankingRedundanceSum";
+import getRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
+import getMaxValue from "./routes/maxValue";
+import getColumnSample from "./routes/columnSample";
 import getSchemaMatching from "./routes/schemaMatching";
 
 const app = express();
@@ -73,6 +78,28 @@ app.get(
 app.get("/fks", getFksFunction);
 app.get("/pks", getPksFunction);
 
+app.get(
+  "/redundances",
+  [check("tableName").isString(), check("columns").isString()],
+  getRedundanceSum
+);
+app.get(
+  "/redundances/length",
+  [check("tableName").isString(), check("columns").isString()],
+  getRedudanceGroupLength
+);
+app.get(
+  "/maxValue/column",
+  [check("tableName").isString(), check("columnName").isString()],
+  getMaxValue
+);
+
+app.get(
+  "/samples",
+  [check("tableName").isString(), check("columnName").isString()],
+  getColumnSample
+);
+
 // Metanome
 app.get("/metanomeResults", getMetanomeIndex);
 app.get(
@@ -102,11 +129,33 @@ app.post(
 
 app.post("/unionedkeys", checkUnionedKeys);
 
-app.post("/violatingRows/fd", getViolatingRowsForFD);
-app.post("/violatingRows/rowcount/fd", getViolatingRowsForFDCount);
+app.post(
+  "/violatingRows/fd",
+  [body("sql").trim().custom(isValidSql())],
+  getViolatingRowsForFD
+);
+app.post(
+  "/violatingRows/rowcount/fd",
+  [body("sql").trim().custom(isValidSql())],
+  getViolatingRowsForFDCount
+);
 
-app.post("/violatingRows/rowcount/ind", getViolatingRowsForSuggestedINDCount);
-app.post("/violatingRows/ind", getViolatingRowsForSuggestedIND);
+app.post(
+  "/violatingRows/rowcount/ind",
+  [
+    body("referencingTableSql").trim().custom(isValidSql()),
+    body("referencedTableSql").trim().custom(isValidSql()),
+  ],
+  getViolatingRowsForSuggestedINDCount
+);
+app.post(
+  "/violatingRows/ind",
+  [
+    body("referencingTableSql").trim().custom(isValidSql()),
+    body("referencedTableSql").trim().custom(isValidSql()),
+  ],
+  getViolatingRowsForSuggestedIND
+);
 
 app.use(expressStaticGzip(getStaticDir(), { serveStatic: {} }));
 

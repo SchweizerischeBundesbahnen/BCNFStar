@@ -55,7 +55,26 @@ declare namespace Cypress {
 
     visitContainedSubtableTab(): void;
 
+    visitCheckContainedSubtableTab(): void;
+
     visitPossibleForeignKeysTab(): void;
+
+    visitCheckContainedSubtableTab(): void;
+
+    visitForeignKeyTab(): void;
+
+    visitUnionTab(): void;
+
+    checkFD(lhs: Array<string>, rhs: Array<string>): void;
+
+    visitSuggestForeignKeyTab(): void;
+
+    checkIND(
+      referencedTable: string,
+      columnRelationship: Array<Array<string>>
+    ): void;
+
+    joinTablesByFirstIND(referencingTable: string, referencedTable: string);
 
     createForeignKey(): void;
 
@@ -76,5 +95,15 @@ declare namespace Cypress {
       table2: string,
       columnMapping: Array<[string, string]>
     );
+
+    joinTablesByFirstIND(table1: any, table2: any): void;
+
+    selectColumns(
+      columnList: Array<string>,
+      site: string,
+      multiselection: boolean
+    ): void;
+
+    createForeignKeyByFirstIND(table1: any, table2: any): void;
   }
 }

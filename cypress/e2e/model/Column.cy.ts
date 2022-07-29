@@ -10,7 +10,7 @@ describe("Column", () => {
     const sourceTable = new SourceTable("table", "schema");
     columnA = new Column(
       new SourceTableInstance(sourceTable),
-      new SourceColumn("A", sourceTable, "int", 1, false)
+      new SourceColumn("A", sourceTable, "int", false)
     );
   });
 

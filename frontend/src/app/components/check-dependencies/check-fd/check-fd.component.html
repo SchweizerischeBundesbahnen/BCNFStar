@@ -1,5 +1,10 @@
 <div>
-  <sbb-select [(ngModel)]="_lhs" multiple placeholder="Key Columns">
+  <sbb-select
+    id="lhsSelection"
+    [(ngModel)]="_lhs"
+    multiple
+    placeholder="Key Columns"
+  >
     <app-sbb-option-all
       [(current)]="_lhs"
       [available]="table.columns.asArray()"
@@ -8,12 +13,17 @@
       *ngFor="let column of table.columns"
       [value]="column"
       [sbbTooltip]="column.name"
-      >{{ column.sourceColumn.name }}
+      >{{ column.name }}
     </sbb-option>
   </sbb-select>
 </div>
 <div>
-  <sbb-select [(ngModel)]="rhs" multiple placeholder="Other Columns">
+  <sbb-select
+    id="rhsSelection"
+    [(ngModel)]="rhs"
+    multiple
+    placeholder="Other Columns"
+  >
     <app-sbb-option-all
       [(current)]="_rhs"
       [available]="table.columns.asArray()"

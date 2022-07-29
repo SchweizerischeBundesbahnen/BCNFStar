@@ -98,8 +98,8 @@ export default class Relationship {
       },
       columnRelationships: this._referencing.map((referencingCol, index) => {
         return {
-          referencingColumn: referencingCol.sourceColumn.name,
-          referencedColumn: this._referenced[index].sourceColumn.name,
+          referencingColumn: referencingCol.name,
+          referencedColumn: this._referenced[index].name,
         };
       }),
     };

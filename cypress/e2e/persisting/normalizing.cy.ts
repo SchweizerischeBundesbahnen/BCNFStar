@@ -4,7 +4,7 @@ describe("The persist-button should create executable SQL", () => {
   const normalizedSchema = "test_schema_normalized";
   const denormalizedSchema = "test_schema_denormalized";
   const surrogateKeysSchema = "test_schema_surrogate_keys";
-  const normalizedTables = ["nation_region_denormalized", "r_regionkey"];
+  const normalizedTables = ["nation_region_denormalized", "n_regionkey"];
 
   let columns: Array<string> = [];
 
@@ -36,7 +36,7 @@ describe("The persist-button should create executable SQL", () => {
     );
     cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
       "contain",
-      "r_regionkey"
+      "n_regionkey"
     );
     cy.get(".joint-tool").should("have.length", 2);
   });
@@ -63,7 +63,7 @@ describe("The persist-button should create executable SQL", () => {
     cy.selectSpecificTablesAndGo(normalizedSchema, normalizedTables);
     cy.loadMetanomeConfigAndOk();
     cy.get(".table-head")
-      .contains(normalizedSchema + ".r_regionkey")
+      .contains(normalizedSchema + ".n_regionkey")
       .click();
     const surrkeyName = "surrkey";
     cy.get("#surrogate-key-input").type(surrkeyName);
@@ -71,17 +71,17 @@ describe("The persist-button should create executable SQL", () => {
     cy.createSchema(surrogateKeysSchema);
 
     const queryWithoutSurrkey = `
-    SELECT n.n_nationkey, r.r_regionkey FROM
+    SELECT n.n_nationkey, r.n_regionkey FROM
       ${normalizedSchema}.nation_region_denormalized n 
-        JOIN ${normalizedSchema}.r_regionkey r
-        ON n.r_regionkey = r.r_regionkey
-      ORDER BY n.n_nationkey, r.r_regionkey;`;
+        JOIN ${normalizedSchema}.n_regionkey r
+        ON n.n_regionkey = r.n_regionkey
+      ORDER BY n.n_nationkey, r.n_regionkey;`;
     const queryWithSurrkey = `
-    SELECT n.n_nationkey, r.r_regionkey FROM
+    SELECT n.n_nationkey, r.n_regionkey FROM
       ${surrogateKeysSchema}.nation_region_denormalized n 
-        JOIN ${surrogateKeysSchema}.r_regionkey r
-        ON n.${surrkeyName}_r_regionkey = r.${surrkeyName}
-      ORDER BY n.n_nationkey, r.r_regionkey;`;
+        JOIN ${surrogateKeysSchema}.n_regionkey r
+        ON n.${surrkeyName}_n_regionkey = r.${surrkeyName}
+      ORDER BY n.n_nationkey, r.n_regionkey;`;
 
     cy.executeSql(queryWithoutSurrkey).then((resultWithout) => {
       cy.executeSql(queryWithSurrkey).then((resultWith) => {

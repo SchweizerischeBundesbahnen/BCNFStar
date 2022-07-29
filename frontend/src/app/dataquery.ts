@@ -6,13 +6,37 @@ import IRowCounts from '@server/definitions/IRowCounts';
 import ITablePage from '@server/definitions/ITablePage';
 import { firstValueFrom } from 'rxjs';
 import Column from '../model/schema/Column';
-import Relationship from '../model/schema/Relationship';
+import MsSqlPersisting from '../model/schema/persisting/MsSqlPersisting';
+import PostgreSQLPersisting from '../model/schema/persisting/PostgreSQLPersisting';
+import SQLPersisting from '../model/schema/persisting/SQLPersisting';
+import TableRelationship from '../model/schema/TableRelationship';
 import Table from '../model/schema/Table';
 import { InjectorInstance } from './app.module';
 
 export abstract class DataQuery {
   protected baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   protected http: HttpClient;
+
+  protected SqlGeneration?: SQLPersisting;
+
+  public async getDmbsName(): Promise<string> {
+    return firstValueFrom(
+      this.http.get<string>(`${this.baseUrl}/persist/dbmsname`)
+    );
+  }
+
+  public async initPersisting(): Promise<void> {
+    const dbmsName: string = await this.getDmbsName();
+
+    if (dbmsName == 'postgres') {
+      this.SqlGeneration = new PostgreSQLPersisting('XXXXXXXXXXXX');
+    } else if (dbmsName == 'mssql') {
+      this.SqlGeneration = new MsSqlPersisting('XXXXXXXXXXXX');
+    } else {
+      throw Error('Unknown Dbms-Server');
+    }
+  }
+
   constructor() {
     this.http = InjectorInstance.get<HttpClient>(HttpClient);
   }
@@ -31,6 +55,28 @@ export abstract class DataQuery {
    */
   public get cellStyle(): Record<string, Record<string, any>> {
     return {};
+  }
+}
+
+export class TableQuery extends DataQuery {
+  constructor(private table: Table) {
+    super();
+  }
+
+  public override async loadTablePage(): Promise<ITablePage> {
+    return new Promise<ITablePage>(() => {});
+  }
+
+  public override async loadRowCount(): Promise<IRowCounts> {
+    return new Promise<IRowCounts>(() => {});
+  }
+
+  public async getTableSQL() {
+    await this.initPersisting();
+    return this.SqlGeneration!.selectStatement(
+      this.table,
+      this.table.columns.asArray()
+    );
   }
 }
 
@@ -68,7 +114,15 @@ export class TablePreviewDataQuery extends DataQuery {
 }
 
 export class ViolatingINDRowsDataQuery extends DataQuery {
-  constructor(protected relationship: Relationship) {
+  public static async Create(
+    relationship: TableRelationship
+  ): Promise<ViolatingINDRowsDataQuery> {
+    const indRowDataQuery = new ViolatingINDRowsDataQuery(relationship);
+    await indRowDataQuery.initPersisting();
+    return indRowDataQuery;
+  }
+
+  private constructor(protected tableRelationship: TableRelationship) {
     super();
   }
 
@@ -76,22 +130,14 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const data: IRequestBodyINDViolatingRows = {
-      relationship: this.relationship.toIRelationship(),
-      offset: offset,
-      limit: limit,
-    };
+    const data = this.body(offset, limit);
     return firstValueFrom(
       this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/ind`, data)
     );
   }
 
   public override async loadRowCount(): Promise<IRowCounts> {
-    const data: IRequestBodyINDViolatingRows = {
-      relationship: this.relationship.toIRelationship(),
-      offset: 0,
-      limit: 0,
-    };
+    const data = this.body();
     return firstValueFrom(
       this.http.post<IRowCounts>(
         `${this.baseUrl}/violatingRows/rowcount/ind`,
@@ -99,17 +145,47 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
       )
     );
   }
+
+  private body(offset = 0, limit = 0): IRequestBodyINDViolatingRows {
+    const data: IRequestBodyINDViolatingRows = {
+      referencingTableSql: this.SqlGeneration!.selectStatement(
+        this.tableRelationship.referencingTable,
+        this.tableRelationship.referencingCols,
+        [],
+        true
+      ),
+      referencedTableSql: this.SqlGeneration!.selectStatement(
+        this.tableRelationship.referencedTable,
+        this.tableRelationship.referencedCols,
+        [],
+        true
+      ),
+      relationship: this.tableRelationship.relationship.toIRelationship(),
+      offset: offset,
+      limit: limit,
+    };
+
+    return data;
+  }
 }
 
 export class ViolatingFDRowsDataQuery extends DataQuery {
-  protected table: Table;
-  protected lhs: Array<Column>;
-  protected rhs: Array<Column>;
-  constructor(table: Table, lhs: Array<Column>, rhs: Array<Column>) {
+  public static async Create(
+    table: Table,
+    lhs: Array<Column>,
+    rhs: Array<Column>
+  ): Promise<ViolatingFDRowsDataQuery> {
+    const fdRowDataQuery = new ViolatingFDRowsDataQuery(table, lhs, rhs);
+    await fdRowDataQuery.initPersisting();
+    return fdRowDataQuery;
+  }
+
+  private constructor(
+    protected table: Table,
+    protected lhs: Array<Column>,
+    protected rhs: Array<Column>
+  ) {
     super();
-    this.table = table;
-    this.lhs = lhs;
-    this.rhs = rhs;
   }
 
   public override async loadTablePage(
@@ -117,19 +193,8 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     limit: number,
     withSeparators = true
   ): Promise<ITablePage> {
-    // currently supports only check on "sourceTables".
-    if (this.table.sources.length != 1)
-      throw Error('Not Implemented Exception');
-
-    const lhsNames = this.lhs.map((c) => c.sourceColumn.name);
-    const data: IRequestBodyFDViolatingRows = {
-      schema: this.table.sources[0].table.schemaName,
-      table: this.table.sources[0].table.name,
-      lhs: lhsNames,
-      rhs: this.rhs.map((c) => c.sourceColumn.name),
-      offset: offset,
-      limit: limit,
-    };
+    const lhsNames = this.lhs.map((c) => c.name);
+    const data = this.body(offset, limit);
     const result = await firstValueFrom(
       this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
     );
@@ -160,22 +225,28 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
   }
 
   public override async loadRowCount(): Promise<IRowCounts> {
-    // currently supports only check on "sourceTables".
-    if (this.table.sources.length != 1)
-      throw Error('Not Implemented Exception');
-    const data: IRequestBodyFDViolatingRows = {
-      schema: this.table.sources[0].table.schemaName,
-      table: this.table.sources[0].table.name,
-      lhs: this.lhs.map((c) => c.sourceColumn.name),
-      rhs: this.rhs.map((c) => c.sourceColumn.name),
-      offset: 0,
-      limit: 0,
-    };
+    const data = this.body();
     return firstValueFrom(
       this.http.post<IRowCounts>(
         `${this.baseUrl}/violatingRows/rowcount/fd`,
         data
       )
     );
+  }
+
+  private body(offset = 0, limit = 0): IRequestBodyFDViolatingRows {
+    const data: IRequestBodyFDViolatingRows = {
+      sql: this.SqlGeneration!.selectStatement(
+        this.table,
+        this.table.columns.asArray(),
+        [],
+        true
+      ),
+      lhs: this.lhs.map((c) => c.name),
+      rhs: this.rhs.map((c) => c.name),
+      offset: offset,
+      limit: limit,
+    };
+    return data;
   }
 }

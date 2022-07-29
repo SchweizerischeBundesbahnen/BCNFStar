@@ -1,4 +1,7 @@
 <div>
+  <div class="loading" *ngIf="this.isLoading">
+    <sbb-loading mode="fullbox"></sbb-loading>
+  </div>
   <sbb-file-selector
     (fileChanged)="onChange($event)"
     accept=".zip"

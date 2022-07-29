@@ -5,6 +5,7 @@ import SqlUtils, {
   SchemaQueryRow,
 } from "./SqlUtils";
 import { Pool, QueryConfig, PoolConfig } from "pg";
+import ITemptableScript from "@/definitions/ITemptableScripts";
 
 import ITablePage from "@/definitions/ITablePage";
 import ITable from "@/definitions/ITable";
@@ -71,6 +72,33 @@ export default class PostgresSqlUtils extends SqlUtils {
 
   public UNIVERSAL_DATATYPE(): string {
     return "text";
+  }
+
+  public override tempTableName(name: string): string {
+    return `__${name}__`;
+  }
+
+  public tempTableScripts(Sql: string): ITemptableScript {
+    const name: string = this.randomName();
+    const ITemptableScript: ITemptableScript = {
+      name: this.tempTableName(name),
+      createScript: `
+      DROP TABLE IF EXISTS ${this.tempTableName(name)}; 
+      CREATE TEMP TABLE ${this.tempTableName(name)} AS
+      ${Sql};
+      `,
+    };
+    return ITemptableScript;
+  }
+
+  public override async createTempTable(_sql: string): Promise<string> {
+    const x: ITemptableScript = this.tempTableScripts(_sql);
+    await this.pool.query(x.createScript);
+    return x.name;
+  }
+
+  public override async dropTempTable(name: string): Promise<void> {
+    await this.pool.query(this.dropTable_SQL(name));
   }
 
   public async tableExistsInSchema(
@@ -213,78 +241,104 @@ from
   }
 
   public override async getViolatingRowsForFD(
-    schema: string,
-    table: string,
+    _sql: string,
     lhs: Array<string>,
     rhs: Array<string>,
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
-      throw Error("Columns don't exist in table.");
-    }
-
+    const tableName: string = await this.createTempTable(_sql);
     const query_result = await this.pool.query(
-      this.violatingRowsForFD_SQL(schema, table, lhs, rhs) +
+      this.violatingRowsForFD_SQL(tableName, lhs, rhs) +
         `ORDER BY ${lhs.join(",")}
         LIMIT ${limit} 
         OFFSET ${offset}
         `
     );
+    await this.dropTempTable(tableName);
     return {
       rows: query_result.rows,
       attributes: query_result.fields.map((v) => v.name),
     };
   }
 
-  public override async getViolatingRowsForFDCount(
-    schema: string,
+  public async getRedundantValuesByColumns(
     table: string,
+    columns: Array<string>
+  ): Promise<any> {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT SUM(redundance)
+      FROM (SELECT COUNT(*) as redundance from (${table}) as temp_table GROUP BY ${stringColumns}) as temp_table_2
+      WHERE redundance != 1`
+    );
+    return query_result.rows[0]["sum"];
+  }
+
+  public async getRedundantGroupLengthByColumns(
+    table: string,
+    columns: Array<string>
+  ): Promise<any> {
+    const stringColumns = columns.map((col) => '"' + col + '"').join(",");
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT COUNT(*)
+      FROM (
+        SELECT COUNT(*) as redundance 
+        FROM (${table}) as temp_table 
+        GROUP BY ${stringColumns})
+      as temp_table_2`
+    );
+    return query_result.rows[0]["count"];
+  }
+
+  public async getMaxValueByColumn(
+    table: string,
+    column: string
+  ): Promise<any> {
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT MAX(LENGTH(${column}::text)) from ${table}`
+    );
+    return query_result.rows[0]["max"];
+  }
+
+  public async getColumnSample(table: string, column: string): Promise<any> {
+    const query_result = await this.pool.query<SchemaQueryRow>(
+      `SELECT ${column} from ${table} LIMIT 5000000`
+    );
+    return query_result.rows;
+  }
+
+  public override async getViolatingRowsForFDCount(
+    sql: string,
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<{ entries: number; groups: number }> {
-    if (!this.columnsExistInTable(schema, table, lhs.concat(rhs))) {
-      throw Error("Columns don't exist in table.");
-    }
-
+    const tempTable: string = await this.createTempTable(sql);
     const result = await this.pool.query<{ entries: number; groups: number }>(
-      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups FROM 
-      (${this.violatingRowsForFD_SQL(schema, table, lhs, rhs)} 
-      ) AS X
-      `
+      this.getViolatingRowsForFDCount_Sql(tempTable, lhs, rhs)
     );
+    await this.dropTempTable(tempTable);
     return result.rows[0];
   }
 
   public async getViolatingRowsForSuggestedIND(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[],
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    if (
-      !this.columnsExistInTable(
-        referencingTable.schemaName,
-        referencingTable.name,
-        columnRelationships.map((c) => c.referencingColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referencing.");
-    }
-    if (
-      !this.columnsExistInTable(
-        referencedTable.schemaName,
-        referencedTable.name,
-        columnRelationships.map((c) => c.referencedColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referenced.");
-    }
+    const referencingTempTable: string = await this.createTempTable(
+      referencingTableSql
+    );
+    const referencedTempTable: string = await this.createTempTable(
+      referencedTableSql
+    );
+
     const query_result = await this.pool.query(
       `${this.violatingRowsForSuggestedIND_SQL(
-        referencingTable,
-        referencedTable,
+        referencingTempTable,
+        referencedTempTable,
         columnRelationships
       )}` +
         `
@@ -295,6 +349,9 @@ from
         OFFSET ${offset}
         `
     );
+    this.dropTempTable(referencingTempTable);
+    this.dropTempTable(referencedTempTable);
+
     return {
       rows: query_result.rows,
       attributes: query_result.fields.map((v) => v.name),
@@ -302,38 +359,26 @@ from
   }
 
   public async getViolatingRowsForSuggestedINDCount(
-    referencingTable: ITable,
-    referencedTable: ITable,
+    referencingTableSql: string,
+    referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
   ): Promise<IRowCounts> {
-    if (
-      !this.columnsExistInTable(
-        referencingTable.schemaName,
-        referencingTable.name,
-        columnRelationships.map((c) => c.referencingColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referencing.");
-    }
-    if (
-      !this.columnsExistInTable(
-        referencedTable.schemaName,
-        referencedTable.name,
-        columnRelationships.map((c) => c.referencedColumn)
-      )
-    ) {
-      throw Error("Columns don't exist in referenced.");
-    }
+    const referencingTable: string = await this.createTempTable(
+      referencingTableSql
+    );
+    const referencedTable: string = await this.createTempTable(
+      referencedTableSql
+    );
 
     const count = await this.pool.query<IRowCounts>(
-      `SELECT COALESCE(SUM(Count), 0) as entries, COALESCE(COUNT(*),0) as groups 
-      FROM ( ${this.violatingRowsForSuggestedIND_SQL(
+      this.getViolatingRowsForINDCount_Sql(
         referencingTable,
         referencedTable,
         columnRelationships
-      )}
-      ) AS X`
+      )
     );
+    await this.dropTempTable(referencingTable);
+    await this.dropTempTable(referencedTable);
     return count.rows[0];
   }
 

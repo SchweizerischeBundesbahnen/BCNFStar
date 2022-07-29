@@ -47,6 +47,15 @@ interface JSONTable {
   sk: string;
   relationships: Array<JSONRelationship>;
   sources: Array<JSONSourceTableInstance>;
+  rowCount: number;
+  fds: Array<JSONFunctionalDependencies>;
+}
+
+interface JSONFunctionalDependencies {
+  lhs: JSONColumnCombination;
+  rhs: JSONColumnCombination;
+  _redundantTuples: number;
+  _uniqueTuplesLhs: number;
 }
 
 interface JSONUnionedTable {
@@ -74,6 +83,8 @@ interface JSONColumn {
   sourceColumn: JSONSourceColumn;
   userAlias?: string;
   includeSourceName: boolean;
+  _maxValue: number;
+  _bloomFilterExpectedFpp: number;
 }
 
 interface JSONSourceTableInstance {
@@ -87,13 +98,13 @@ interface JSONSourceColumn {
   name: string;
   table: JSONSourceTable;
   dataType: string;
-  ordinalPosition: number;
   nullable: boolean;
 }
 
 interface JSONSourceTable {
   name: string;
   schemaName: string;
+  rowCount: number;
 }
 
 export default class SaveSchemaState {
@@ -115,6 +126,9 @@ export default class SaveSchemaState {
     this.newSchema.regularTables.forEach((table) => {
       this.newSchema.calculateFdsOf(table);
     });
+    schema.regularTables.forEach((table) => {
+      this.parseFdsRankingAttributes(table);
+    });
     this.newSchema.updateFks(
       this.parseTableFks(
         schema._tableFks,
@@ -122,6 +136,52 @@ export default class SaveSchemaState {
       )
     );
     return this.newSchema;
+  }
+
+  private parseFdsRankingAttributes(table: JSONTable) {
+    const parsedTable = this.parseTable(table);
+    let existingTable = this.newSchema.regularTables.find(
+      (t) =>
+        t.schemaName == parsedTable.schemaName &&
+        t.name == parsedTable.name &&
+        parsedTable.sources.every((source) =>
+          t.sources.find((other) => other.equals(source))
+        ) &&
+        t.columns.equals(parsedTable.columns) &&
+        (!t.pk && !parsedTable.pk ? true : t.pk!.equals(parsedTable.pk!)) &&
+        t.surrogateKey == parsedTable.surrogateKey &&
+        t.rowCount == parsedTable.rowCount &&
+        parsedTable.relationships.every((rel) =>
+          t.relationships.find((other) => other.equals(rel))
+        )
+    );
+    if (existingTable) {
+      table.fds.forEach((fd) => {
+        let existingFd = existingTable!.fds.find(
+          (f) =>
+            f.lhs.equals(this.parseColumnCombination(fd.lhs, existingTable!)) &&
+            f.rhs.equals(this.parseColumnCombination(fd.rhs, existingTable!))
+        );
+        if (existingFd) {
+          existingFd._redundantTuples = fd._redundantTuples;
+          existingFd._uniqueTuplesLhs = fd._uniqueTuplesLhs;
+        } else {
+          console.log(
+            'no fd found, ranking attributes could not be parsed',
+            'JSONTable: ' + table,
+            'parsedTable: ' + parsedTable,
+            'tables of new schema: ' + this.newSchema.regularTables
+          );
+        }
+      });
+    } else {
+      console.log(
+        'no table ranking attributes could not be parsed',
+        table,
+        parsedTable,
+        this.newSchema.regularTables
+      );
+    }
   }
 
   private parseTableFks(
@@ -211,6 +271,8 @@ export default class SaveSchemaState {
       newRelationships.push(this.parseRelationship(relationship, table, table));
     });
     table.relationships = newRelationships;
+    table.rowCount = jsonTable.rowCount;
+    table.calculateColumnMatching();
 
     return table;
   }
@@ -227,6 +289,8 @@ export default class SaveSchemaState {
       col.userAlias
     );
     column.includeSourceName = col.includeSourceName;
+    column.bloomFilterExpectedFpp = col._bloomFilterExpectedFpp;
+    column.maxValue = col._maxValue;
     let existing = this.existingColumnsForTable
       .get(table)!
       .find((other) => other.equals(column));
@@ -285,7 +349,6 @@ export default class SaveSchemaState {
       sc.name,
       newSourceTable,
       sc.dataType,
-      sc.ordinalPosition,
       sc.nullable
     );
 
