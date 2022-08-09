@@ -100,10 +100,7 @@ app.post(
 
 app.post(
   "/unionedkeys",
-  [
-    body("table1Sql").trim().custom(isValidSql()),
-    body("table2Sql").trim().custom(isValidSql()),
-  ],
+  [body("tableSql").trim().custom(isValidSql())],
   checkUnionedKeys
 );
 
