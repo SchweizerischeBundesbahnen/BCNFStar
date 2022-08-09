@@ -1,18 +1,8 @@
 {
-  "table1Sql": "SELECT * FROM public.nation_region_denormalized",
-  "table2Sql": "SELECT * FROM public.nation_region_denormalized",
-  "key1": {
+  "tableSql": "SELECT n_nationkey, n_name FROM public.nation_region_denormalized UNION SELECT n_nationkey, r_name FROM public.nation_region_denormalized",
+  "expectedKey": {
     "table_schema": "public",
     "table_name": "nation_region_denormalized",
     "attributes": ["n_nationkey", "n_name"]
-  },
-  "key2": {
-    "table_schema": "public",
-    "table_name": "nation_region_denormalized",
-    "attributes": ["n_nationkey", "r_name"]
-  },
-  "unionedColumns": [
-    ["n_nationkey", "n_name"],
-    ["n_nationkey", "r_name"]
-  ]
+  }
 }
