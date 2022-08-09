@@ -107,32 +107,20 @@ export default abstract class SqlUtils {
     `;
   }
 
-  /** Expects to get two keys respectively. Otherwise, this Sql won't work correctly, i.e. return wrong results
-   * The SQL calculates the number of rows of the unioned tables and the number of rows of the unioned key-columns and takes the difference
-   * difference > 0 means, that the key is invalid as the unioned table contains different rows with the same key. (SQL-UNION is implemented as a SET-Operation)
+  /**
+   * A key is invalid when the unioned table contains different rows with the same key. (SQL-UNION is implemented as a SET-Operation)
    */
-  public testKeyUnionabilitySql(
-    uk: IRequestBodyUnionedKeys,
-    table1: string,
-    table2: string
-  ): string {
+  public testKeyUnionabilitySql(uk: IRequestBodyUnionedKeys): string {
     return `
-  SELECT 
-    (SELECT COUNT(*) as unionedCount
-    FROM
-    (
-    SELECT ${this.generateColumnString(uk.unionedColumns[0])} FROM ${table1} 
-    UNION
-    SELECT ${this.generateColumnString(uk.unionedColumns[1])} FROM ${table2} 
-    ) as unionedCount)
-  -
-    (SELECT COUNT(*) as unionedCountKey
-    FROM
-    (
-      SELECT ${this.generateColumnString(uk.key1.attributes)} FROM ${table1}
-      UNION
-      SELECT ${this.generateColumnString(uk.key2.attributes)} FROM ${table2}
-    ) as unionedcount) as count
+  SELECT COUNT(*) 
+  FROM (
+    SELECT ${this.generateColumnString(uk.expectedKey.attributes)} FROM (
+    ${uk.tableSql}
+    ) AS x
+    GROUP BY ${this.generateColumnString(
+      uk.expectedKey.attributes
+    )} HAVING COUNT (*) > 1
+  ) as y
 `;
   }
 
