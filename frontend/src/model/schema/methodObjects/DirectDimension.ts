@@ -3,11 +3,16 @@ import Table from '../Table';
 import TableRelationship from '../TableRelationship';
 import Join from './Join';
 
+/** Adds references to indirect dimension tables in a fact table. */
 export default class DirectDimension {
+  /** The new fact table, which includes references to the desired dimension tables */
   public newTable!: Table;
   public oldTable: Table;
   private join!: Join;
 
+  /**
+   * @param routes All routes from a fact table to dimension tables, based on which references should be added in the fact table.
+   */
   public constructor(private routes: Array<Array<TableRelationship>>) {
     this.oldTable = routes[0][0].referencingTable;
     for (const i in this.routes) {

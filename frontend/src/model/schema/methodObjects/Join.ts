@@ -4,6 +4,7 @@ import Relationship from '../Relationship';
 import SourceTableInstance from '../SourceTableInstance';
 import Table from '../Table';
 
+/** Method object for performing a JOIN operation between two tables. */
 export default class Join {
   public newTable = new Table();
 
@@ -21,6 +22,10 @@ export default class Join {
     this.join();
   }
 
+  /**
+   * Assure that all sources referenced by the given source are correctly added to the new table.
+   * @param definitelyNew Whether it is known for sure that no source equal to the given source is already contained in the new table.
+   */
   private resolveChildSources(
     source: SourceTableInstance,
     definitelyNew: boolean
@@ -36,6 +41,11 @@ export default class Join {
       );
   }
 
+  /**
+   * Assure that source and all its referenced sources including the relationships between them are correctly added to the new table.
+   * @param relToSource The referencing relationship to source.
+   * @param definitelyNew Whether it is known for sure that no source equal to the given source is already contained in the new table.
+   */
   private addSourcesAndRels(
     source: SourceTableInstance,
     relToSource: Relationship,
@@ -60,10 +70,15 @@ export default class Join {
   }
 
   private join() {
-    // name, pk, sk
+    // name, pk, sk, isSuggested/RejectedFact
     this.newTable.schemaName = this.referencing.schemaName;
     this.newTable.name = this.referencing.name;
     this.newTable.surrogateKey = this.referencing.surrogateKey;
+    // update rowCount for redundance ranking
+    this.newTable.rowCount = this.referencing.rowCount;
+
+    this.newTable.isSuggestedFact = this.referencing.isSuggestedFact;
+    this.newTable.isRejectedFact = this.referencing.isRejectedFact;
 
     // inherit sources, relationships and columns from referencing table
     this.referencing.sources.forEach((source) => {
@@ -89,6 +104,7 @@ export default class Join {
       .sourcesTopological()
       .reverse()[0];
     if (this.relationship.sourceRelationship().isTrivial) {
+      // This is the case for the tableRelationships between the remaining and the generating table of any split.
       this.sourceMapping.set(
         referencedRootSource,
         this.sourceMapping.get(
@@ -112,8 +128,42 @@ export default class Join {
         )
       );
     }
+
+    // set maxValues, bloomfilters after joining
+    this.referenced.columns.asArray().forEach((col) => {
+      let testCol = this.newTable.columns
+        .asArray()
+        .find((newCol) => newCol.equals(col));
+      if (testCol) {
+        testCol.maxValue = col.maxValue;
+        testCol.bloomFilterExpectedFpp = col.bloomFilterExpectedFpp;
+      }
+    });
+    this.referencing.columns.asArray().forEach((col) => {
+      let testCol = this.newTable.columns
+        .asArray()
+        .find((newCol) => newCol.equals(col));
+      if (testCol) {
+        testCol.maxValue = col.maxValue;
+        let fkColumn = this.relationship.referencing.find((relCol) =>
+          relCol.equals(testCol!)
+        );
+        if (fkColumn) {
+          const index = this.relationship.referencing.indexOf(fkColumn);
+          testCol.bloomFilterExpectedFpp =
+            (this.relationship.referenced[index].bloomFilterExpectedFpp +
+              this.relationship.referencing[index].bloomFilterExpectedFpp) /
+            2;
+        } else {
+          testCol.bloomFilterExpectedFpp = col.bloomFilterExpectedFpp;
+        }
+      }
+    });
+
+    this.newTable.calculateColumnMatching();
   }
 
+  /** Finds a source in the new table which can be used to select the columns that were selected from the given source. */
   private findEquivalentSource(
     source: SourceTableInstance,
     relToSource: Relationship

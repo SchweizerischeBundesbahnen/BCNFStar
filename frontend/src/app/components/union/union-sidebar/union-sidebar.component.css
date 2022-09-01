@@ -1,0 +1,10 @@
+.union-sidebar-grid {
+    display: grid;
+    grid-template-columns: auto;
+    justify-items: center;
+    gap: 1rem;
+}
+
+sbb-select {
+    width: 90%;
+}

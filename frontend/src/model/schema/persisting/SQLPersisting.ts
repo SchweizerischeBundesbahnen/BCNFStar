@@ -6,6 +6,7 @@ import Table from '../Table';
 import BasicTable from '../BasicTable';
 import UnionedTable from '../UnionedTable';
 import BasicColumn from '../../types/BasicColumn';
+import BasicTableRelationship from '../BasicTableRelationship';
 
 export default abstract class SQLPersisting {
   public constructor(protected schemaName: string) {}
@@ -15,7 +16,7 @@ export default abstract class SQLPersisting {
   public createSQL(schema: Schema): string {
     let SQL = '';
     SQL += this.schemaPreparation(schema);
-    SQL += this.tableCreation([...schema.tables]);
+    SQL += this.tableCreation(schema);
     SQL += this.dataTransfer([...schema.tables]);
     SQL += this.primaryKeys([...schema.regularTables]);
     SQL += this.foreignKeys(schema);
@@ -24,15 +25,30 @@ export default abstract class SQLPersisting {
 
   public abstract schemaPreparation(schema: Schema): string;
 
-  public tableCreation(tables: Array<BasicTable>): string {
+  /**
+   * @param keepSchema whether the original schema name of the table should be kept.
+   *  Only set to true if you want to generate SQL for schema matching
+   */
+  public tableCreation(
+    schema: Schema,
+    tables: Iterable<BasicTable> = schema.tables,
+    keepSchema = false
+  ): string {
     let Sql: string = '';
     for (const table of tables) {
-      Sql += this.createTableSql(table) + '\n';
+      Sql += this.createTableSql(schema, table, keepSchema) + '\n';
     }
     return Sql;
   }
 
-  public createTableSql(table: BasicTable): string {
+  /**
+   * @returns a CREATE TABLE statement containing all final columns, but no keys for the given `table`
+   */
+  public createTableSql(
+    schema: Schema,
+    table: BasicTable,
+    keepSchema = false
+  ): string {
     let columnStrings: string[] = [];
 
     let columns: Array<BasicColumn> = [];
@@ -54,10 +70,11 @@ export default abstract class SQLPersisting {
       columnString += 'NULL';
       columnStrings.push(columnString);
     }
-
-    return `CREATE TABLE ${this.tableIdentifier(table)} (${columnStrings.join(
-      ', '
-    )});`;
+    const tableName = keepSchema
+      ? this.escape(table.fullName)
+      : this.tableIdentifier(table);
+    return `CREATE TABLE ${tableName} (
+${columnStrings.join(',\n')});\n`;
   }
 
   public dataTransfer(tables: Array<BasicTable>): string {
@@ -76,6 +93,8 @@ export default abstract class SQLPersisting {
       columns = table.displayedColumns();
     } else if (table instanceof Table) {
       columns = table.columns.asArray();
+    } else {
+      throw Error('Not implemented for tables other than unioned and regular');
     }
 
     Sql = `INSERT INTO ${this.tableIdentifier(
@@ -102,6 +121,8 @@ export default abstract class SQLPersisting {
         table.columns.asArray(),
         table.columns.asArray().map((c) => c.dataType)
       );
+    } else {
+      throw Error('Not implemented for tables other than unioned and regular');
     }
 
     Sql += ';';
@@ -151,8 +172,11 @@ export default abstract class SQLPersisting {
     let Sql: string = '';
 
     for (const referencingTable of schema.tables) {
-      for (const fk of schema.fksOf(referencingTable, true)) {
-        if (fk.referencedTable.implementsSurrogateKey()) {
+      for (const fk of schema.basicFksOf(referencingTable, true)) {
+        if (
+          fk instanceof TableRelationship &&
+          fk.referencedTable.implementsSurrogateKey()
+        ) {
           Sql += this.addSkColumnToReferencingSql(fk);
           Sql += this.updateSurrogateKeySql(fk);
           Sql += this.foreignSurrogateKeySql(fk);
@@ -222,7 +246,7 @@ export default abstract class SQLPersisting {
 
   /** Relevant if you want to reference columns, which aren't the primary key.
    */
-  public uniqueConstraint(fk: TableRelationship): string {
+  public uniqueConstraint(fk: BasicTableRelationship): string {
     return `
 ALTER TABLE ${this.tableIdentifier(
       fk.referencedTable
@@ -230,7 +254,7 @@ ALTER TABLE ${this.tableIdentifier(
 `;
   }
 
-  public foreignKeySql(fk: TableRelationship): string {
+  public foreignKeySql(fk: BasicTableRelationship): string {
     return `ALTER TABLE ${this.tableIdentifier(fk.referencingTable)}
       ADD CONSTRAINT ${this.randomFkName()}
       FOREIGN KEY (${this.generateColumnString(fk.referencingCols)})

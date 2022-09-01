@@ -1,0 +1,5 @@
+von,startort
+nach,zielort
+umsatz,preis
+datum,tag
+id,nr

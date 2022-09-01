@@ -5,6 +5,7 @@ import Relationship from '../Relationship';
 import Table from '../Table';
 import Delete from './Delete';
 
+/** Method object for performing a split operation on a table with a functional dependency. */
 export default class Split {
   public newTables!: [Table, Table];
 
@@ -32,15 +33,18 @@ export default class Split {
     generating.name =
       this.generatingName ||
       this.fd.lhs.columnNames().join('_').substring(0, 50);
+    generating.isSuggestedFact = false;
+    generating.isRejectedFact = false;
+
+    // update rowCount for redundance ranking
+    remaining.rowCount = this.table.rowCount;
+    generating.rowCount = this.fd._uniqueTuplesLhs;
 
     this.substitute(generating, this.fd.lhs);
-
     this.newTables = [remaining, generating];
   }
 
-  /**
-   * Ersetzt jede column aus columns in table durch eine kopie
-   */
+  /** Substitute each of the given columns of the table with a copy. */
   private substitute(table: Table, columns: ColumnCombination) {
     const mapping = new Map<Column, Column>();
     for (const column of columns) {
@@ -61,9 +65,7 @@ export default class Split {
     });
   }
 
-  /**
-   * puts pk columns first
-   */
+  /** Puts primary key columns first. */
   private reorderColumnsOf(table: Table) {
     if (!table.pk) return;
     const columns = table.columns;

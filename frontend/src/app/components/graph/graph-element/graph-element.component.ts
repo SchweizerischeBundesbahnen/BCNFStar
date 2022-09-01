@@ -4,6 +4,7 @@ import Column from '@/src/model/schema/Column';
 import BasicColumn from '@/src/model/types/BasicColumn';
 import { Component, Input, OnInit } from '@angular/core';
 import Table from 'src/model/schema/Table';
+import { IntegrationService } from '@/src/app/integration.service';
 
 @Component({
   selector: 'app-graph-element',
@@ -17,8 +18,12 @@ export class GraphElementComponent implements OnInit {
   public isFact: boolean = false;
   public isDirectDimension: boolean = false;
   public isIndirectDimension: boolean = false;
+  public isPotentialFact: boolean = false;
 
-  constructor(public schemaService: SchemaService) {}
+  constructor(
+    public schemaService: SchemaService,
+    public intService: IntegrationService
+  ) {}
 
   ngOnInit(): void {
     if (!this.schemaService.starMode) return;
@@ -27,13 +32,21 @@ export class GraphElementComponent implements OnInit {
       this.schemaService.schema.directDimensionableRoutes(this.table, true)
         .length > 0;
     this.isFact = this.schemaService.schema.isFact(this.table, true);
-    this.isDirectDimension = this.schemaService.schema.isDirectDimension(
-      this.table
-    );
+    this.isDirectDimension =
+      !this.isFact && this.schemaService.schema.isDirectDimension(this.table);
     this.isIndirectDimension = !this.isFact && !this.isDirectDimension;
+    this.isPotentialFact =
+      !this.isFact && this.schemaService.schema.isPotentialFact(this.table);
   }
 
   public select() {
+    if (
+      !this.schemaService.schema.tables.has(this.table) &&
+      this.intService.isIntegrating
+    ) {
+      this.intService.currentlyEditedSide =
+        1 - this.intService.currentlyEditedSide;
+    }
     this.schemaService.selectedTable = this.table;
   }
 
@@ -46,6 +59,10 @@ export class GraphElementComponent implements OnInit {
       !!this.table.pk &&
       this.table.pk.includes(column as Column)
     );
+  }
+
+  public isFkColumn(column: BasicColumn): boolean {
+    return this.schemaService.schema.isFkColumn(this.table, column);
   }
 
   public isHighlightedColumn(column: BasicColumn): boolean {

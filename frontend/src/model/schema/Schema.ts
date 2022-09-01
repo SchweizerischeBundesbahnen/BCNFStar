@@ -21,30 +21,43 @@ import {
 import UnionedTable from './UnionedTable';
 import BasicTable from './BasicTable';
 import { FkDisplayOptions } from '../types/FkDisplayOptions';
+import BasicTableRelationship from './BasicTableRelationship';
+import PotentialFacts from './methodObjects/PotentialFacts';
 
+/**
+ * Manages working set of tables, provides table operations and stores information about relationships and fds.
+ */
 export default class Schema {
+  // defining properies
+
   public readonly tables = new Set<BasicTable>();
   public name?: string;
-  /**
-   * all fks from the actual database and inds that the user validated
-   */
+  private _starMode = false;
+  /** All fks from the actual database and inds that the user validated */
   private _baseFks = new Array<SourceRelationship>();
-  /**
-   * all fks that can be derived from _baseFks
-   */
+  private _inds = new Array<SourceRelationship>();
+  private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
+
+  // derived/cached results
+
+  /** Only relevant for star schema creation. Set of tables that have potential to be a fact table. */
+  private potentialFacts = new Set<BasicTable>();
+
+  /** All fks from _baseFks and the fks that can be constructed by transitive extension of these. */
   private _fks = new Array<SourceRelationship>();
   /**
-   * all fks in the form of TableRelationship that are valid among the current tables
+   * All fks in the form of TableRelationship that are valid among the current tables
    * mapped to filtered, blacklisted, whitelisted
    */
   private _tableFks = new Map<TableRelationship, FkDisplayOptions>();
-  private _inds = new Array<SourceRelationship>();
-  private _fds = new Map<SourceTable, Array<SourceFunctionalDependency>>();
   private _tableFksValid = false;
-  private _starMode = false;
 
   private _regularTables?: Array<Table>;
   private _unionedTables?: Array<UnionedTable>;
+
+  public constructor(...tables: Array<BasicTable>) {
+    this.addTables(...tables);
+  }
 
   public toJSON() {
     return {
@@ -60,8 +73,11 @@ export default class Schema {
     };
   }
 
-  public constructor(...tables: Array<Table>) {
-    this.addTables(...tables);
+  public merge(other: Schema) {
+    const result = new Schema(...this.tables, ...other.tables);
+    result._baseFks = this._baseFks.concat(other._baseFks);
+    result._inds = this._inds.concat(other._inds);
+    return result;
   }
 
   public addTables(...tables: Array<BasicTable>) {
@@ -79,6 +95,7 @@ export default class Schema {
     });
     this.relationshipsValid = false;
     this._regularTables = undefined;
+    this._unionedTables = undefined;
   }
 
   public get regularTables(): Array<Table> {
@@ -90,6 +107,14 @@ export default class Schema {
     return this._regularTables;
   }
 
+  public get decomposedTables(): Array<Table> {
+    return [...this.tables].flatMap((table) => {
+      if (table instanceof Table) return [table];
+      if (table instanceof UnionedTable) return table.tables;
+      throw new Error('unsupported Table type');
+    });
+  }
+
   public get unionedTables(): Array<UnionedTable> {
     if (this._unionedTables === undefined) {
       this._unionedTables = [...this.tables].filter(
@@ -97,6 +122,30 @@ export default class Schema {
       ) as Array<UnionedTable>;
     }
     return this._unionedTables;
+  }
+
+  /** Declare the passed table to be a fact table. */
+  public suggestFact(table: BasicTable) {
+    table.isSuggestedFact = true;
+    this.relationshipsValid = false;
+  }
+
+  /** Withdraw the delaration of the passed table as a fact table. */
+  public unsuggestFact(table: BasicTable) {
+    table.isSuggestedFact = false;
+    this.relationshipsValid = false;
+  }
+
+  /** Disclaim that the passed table is a fact table. */
+  public rejectFact(table: BasicTable) {
+    table.isRejectedFact = true;
+    this.relationshipsValid = false;
+  }
+
+  /** Withdraw the rejection of the passed table as a fact table. */
+  public unrejectFact(table: BasicTable) {
+    table.isRejectedFact = false;
+    this.relationshipsValid = false;
   }
 
   public addFks(...fks: SourceRelationship[]) {
@@ -112,6 +161,7 @@ export default class Schema {
     this.relationshipsValid = false;
   }
 
+  /** Add the sourceFks to the array _fks ensuring that _fks is closed under transitive extension of fks. */
   private deriveFks(fks: SourceRelationship[]) {
     for (const fk of fks) {
       for (const actualFk of new SourceFkDerivation(this._fks, fk).result) {
@@ -134,6 +184,7 @@ export default class Schema {
     this._fds.get(fd.rhs[0].table)!.push(fd);
   }
 
+  /** Returns an item of _tableFks that is equal to the passed fk. */
   private findEquivalentFk(fk: TableRelationship) {
     if (this._tableFks.has(fk)) return fk;
     return Array.from(this._tableFks.keys()).find((otherFk) =>
@@ -157,14 +208,18 @@ export default class Schema {
     displayOptions.whitelisted = whitelisted;
   }
 
-  public get starMode(): boolean {
+  public get __starMode(): boolean {
     return this._starMode;
   }
 
-  public set starMode(value: boolean) {
+  /**
+   * Do not call directly, instead set and get schemaService.starMode
+   */
+  public set __starMode(value: boolean) {
     this._starMode = value;
     for (const [fk, displayOptions] of this._tableFks.entries())
       displayOptions.filtered = this.shouldBeFiltered(fk);
+    if (value) this.updatePotentialFacts();
   }
 
   private set relationshipsValid(valid: boolean) {
@@ -182,18 +237,28 @@ export default class Schema {
    * @param onlyDisplayed whether to use only the displayed fks or all fks as a basis for calculation
    */
   public isFact(table: BasicTable, onlyDisplayed: boolean): boolean {
-    return this.referencesOf(table, onlyDisplayed).length == 0;
+    return (
+      this.referencesOf(table, onlyDisplayed).length == 0 ||
+      table.isSuggestedFact
+    );
+  }
+
+  public isPotentialFact(table: BasicTable): boolean {
+    if (table.isRejectedFact) return false;
+    if (!this._tableFksValid) this.updateFks();
+    return this.potentialFacts.has(table);
   }
 
   public isDirectDimension(table: BasicTable): boolean {
-    return this.referencesOf(table, true).some((reference) =>
+    return this.referencesOf(table, true).every((reference) =>
       this.isFact(reference.referencingTable, true)
     );
   }
 
   /**
-   * filters out routes from routesFromFactTo(table) that consist of less than 2 TableRelationships
-   * or routes that would add no extra information to the fact table when joined completely
+   * Returns the result of routesFromFactTo(table, onlydisplayedFks).
+   * Filters out routes that consist of less than 2 TableRelationships
+   * or routes that would add no extra information to the fact table when joined completely.
    * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public directDimensionableRoutes(
@@ -208,7 +273,7 @@ export default class Schema {
   }
 
   /**
-   * @returns all routes (in the form of an array of TableRelationships) from a fact table to this table
+   * Returns all routes (in the form of an array of TableRelationships) from a fact table to this table.
    * @param onlyDisplayedFks whether to use only the displayed fks or all fks as a basis for route calculation
    */
   public routesFromFactTo(
@@ -227,7 +292,8 @@ export default class Schema {
       routes.forEach((route) => route.push(rel));
       result.push(...routes);
     }
-    if (result.length == 0) result.push(new Array<TableRelationship>());
+    if (result.length == 0 || this.isFact(table, onlyDisplayedFks))
+      result.push(new Array<TableRelationship>());
     return result;
   }
 
@@ -244,25 +310,52 @@ export default class Schema {
       (fk) => fk.referencedTable == table
     );
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
+    result = result.filter((fk) => this.tables.has(fk.referencingTable));
     return result;
   }
 
   /**
+   * Returns foreign key relationships, where the given table (only of type Table) is referencing another.
    * @param onlyDisplayed whether to use only the displayed fks or all fks
    */
-  public fksOf(
-    table: BasicTable,
-    onlyDisplayed: boolean
-  ): Array<TableRelationship> {
-    if (!(table instanceof Table)) return [];
+  public fksOf(table: Table, onlyDisplayed: boolean): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     let result = Array.from(this._tableFks.keys()).filter(
       (fk) => fk.referencingTable == table
     );
+    result = result.filter((fk) => this.tables.has(fk.referencedTable));
     if (onlyDisplayed) result = result.filter((fk) => this.isFkDisplayed(fk));
     return result;
   }
 
+  /**
+   * Returns foreign key relationships, where the given table (of type Table or UnionedTable) is referencing another.
+   * @param onlyDisplayed whether to use only the displayed fks or all fks
+   */
+  public basicFksOf(
+    table: BasicTable,
+    onlyDisplayed: boolean
+  ): Array<BasicTableRelationship> {
+    let result = new Array<BasicTableRelationship>();
+    if (table instanceof Table) {
+      result.push(...this.fksOf(table, onlyDisplayed));
+      // for (let otherTable of this.unionedTables) {
+      //   let fks1 = this.fksBetween(table, otherTable.tables[0]);
+      //   let fks2 = this.fksBetween(table, otherTable.tables[1]);
+      // }
+    }
+    if (table instanceof UnionedTable) {
+      for (const fk1 of this.fksOf(table.tables[0], onlyDisplayed)) {
+        for (const fk2 of this.fksOf(table.tables[1], onlyDisplayed)) {
+          const newFk = table.equivalentFk(fk1, fk2);
+          if (newFk) result.push(newFk);
+        }
+      }
+    }
+    return result;
+  }
+
+  /** Returns all foreign keys of the passed table that are not displayed. */
   public hiddenFksOf(table: Table): Array<TableRelationship> {
     if (!this._tableFksValid) this.updateFks();
     return Array.from(this._tableFks.keys()).filter(
@@ -279,7 +372,7 @@ export default class Schema {
 
   /**
    * Returns the inds from the given table to other tables. The inds are contained inside a map
-   * to keep the information which source-ind caused which concrete inds to appear in the current
+   * to keep the information which source ind caused which concrete inds to appear in the current
    * state of the schema.
    */
   public indsOf(
@@ -294,12 +387,14 @@ export default class Schema {
     table._indsValid = true;
   }
 
+  /** Recalculates _tableFks and potentialFacts. */
   public updateFks(oldFks = this._tableFks): void {
     this._tableFks = new Map<TableRelationship, FkDisplayOptions>();
     this.calculateFks();
     this.calculateTrivialFks();
     this._tableFksValid = true;
     this.calculateFkDisplayOptions(oldFks);
+    if (this.__starMode) this.updatePotentialFacts();
   }
 
   private calculateFkDisplayOptions(
@@ -322,14 +417,14 @@ export default class Schema {
   private calculateFks(): void {
     for (const rel of this._fks) {
       const referencings = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.regularTables) {
+      for (const table of this.decomposedTables) {
         const columns = table.columnsEquivalentTo(rel.referencingCols, true);
         if (columns.length > 0) referencings.set(table, columns);
       }
       if ([...referencings.keys()].length == 0) continue;
 
       const referenceds = new Map<Table, Array<Array<Column>>>();
-      for (const table of this.regularTables) {
+      for (const table of this.decomposedTables) {
         const columns = table
           .columnsEquivalentTo(rel.referencedCols, false)
           .filter((possibleColumns) =>
@@ -356,12 +451,14 @@ export default class Schema {
   }
 
   /**
-   * A table which has the same columns as another tables pk has a relationship with this table.
-   * This method adds these relationships to the tables.
+   * A table has a relationship with another table if it contains columns equivalent to the other table's pk.
+   * This occurs whenever a table is split. This method adds these so called trivial relationships.
+   * Calling the sourceRelationship method on one of these relationships
+   * returns a sourceRelationship with equal referencing and referenced columns.
    */
   private calculateTrivialFks(): void {
-    for (const referencingTable of this.regularTables) {
-      for (const referencedTable of this.regularTables) {
+    for (const referencingTable of this.decomposedTables) {
+      for (const referencedTable of this.decomposedTables) {
         if (referencedTable == referencingTable || !referencedTable.pk)
           continue;
         const pk = referencedTable.pk!.asArray();
@@ -386,7 +483,7 @@ export default class Schema {
   }
 
   private shouldBeFiltered(fk: TableRelationship) {
-    if (this.starMode) return this.isStarViolatingFk(fk);
+    if (this.__starMode) return this.isStarViolatingFk(fk);
     else return this.isTransitiveFk(fk);
   }
 
@@ -426,10 +523,15 @@ export default class Schema {
   }
 
   private isStarViolatingFk(fk: TableRelationship) {
+    if (this.isFact(fk.referencedTable, false)) return true;
     if (this.isFact(fk.referencingTable, false)) return false;
     return !this.directDimensionableRoutes(fk.referencedTable, false).some(
       (route) => route[route.length - 1] == fk
     );
+  }
+
+  private updatePotentialFacts() {
+    this.potentialFacts = new PotentialFacts(this).potentialFacts;
   }
 
   private addTableFk(fk: TableRelationship) {
@@ -447,6 +549,7 @@ export default class Schema {
     }
   }
 
+  /** Returns whether a join on the basis of this relationship adds information to the referencing table. */
   public isRelationshipValid(relationship: TableRelationship): boolean {
     const newTable = new Join(relationship).newTable;
     return (
@@ -478,9 +581,6 @@ export default class Schema {
   /**
    * Finds all valid relationships in the current state of the schema in which the parameter table
    * is referencing some other table. Uses a list of relationships that apply to the datasource
-   * @param table
-   * @param relationships
-   * @returns
    */
   private matchSourceRelationships(
     table: Table,
@@ -550,7 +650,7 @@ export default class Schema {
           new ColumnCombination(lhs),
           new ColumnCombination(rhs)
         );
-        if (fd.isFullyTrivial()) continue;
+        if (fd.isTrivial()) continue;
         const existingFd = fds.get(source)!.get(fd.lhs);
         if (existingFd) existingFd.rhs.union(fd.rhs);
         else fds.get(source)!.add(fd, fd.lhs);
@@ -595,7 +695,7 @@ export default class Schema {
                 referencedColumns.includes(column)
             )
         );
-        if (fd.isFullyTrivial()) continue;
+        if (fd.isTrivial()) continue;
         if (
           fd.rhs.asArray().every((column) => table.columns.includes(column))
         ) {
@@ -613,10 +713,12 @@ export default class Schema {
     return table.violatingFds().filter((fd) => this.isFdSplittable(fd, table));
   }
 
+  /** Returns whether the primary key (if existing) would be destroyed when performing a split based on this fd. */
   public fdSplitPKViolationOf(fd: FunctionalDependency, table: Table): boolean {
     return !!table.pk && !table.splitPreservesCC(fd, table.pk);
   }
 
+  /** Returns an array of foreign keys of the table, that would be destroyed when performing a split based on this fd. */
   public fdSplitFKViolationsOf(
     fd: FunctionalDependency,
     table: Table
@@ -627,6 +729,7 @@ export default class Schema {
     );
   }
 
+  /** Returns an array of referenced keys of the table, that would be destroyed when performing a split based on this fd. */
   public fdSplitReferenceViolationsOf(
     fd: FunctionalDependency,
     table: Table
@@ -637,6 +740,10 @@ export default class Schema {
     );
   }
 
+  /**
+   * Returns true if no primary key, foreign key or referenced key of the table
+   * would be destroyed when performing a split based on this fd.
+   */
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
     return (
       this.fdSplitFKViolationsOf(fd, table).length == 0 &&
@@ -665,7 +772,19 @@ export default class Schema {
     return resultingTables;
   }
 
+  public isFkColumn(table: BasicTable, column: BasicColumn): boolean {
+    if (!(table instanceof Table)) return false; //not supported yet
+    if (!(column instanceof Column))
+      return (
+        !table.implementsSurrogateKey() || column.name != table.surrogateKey
+      );
+    for (const fk of this.fksOf(table, true))
+      if (fk.referencingCols.includes(column)) return true;
+    return false;
+  }
+
   public displayedColumnsOf(table: BasicTable): Array<BasicColumn> {
+    if (!this.tables.has(table)) return (table as Table).columns.asArray();
     if (table instanceof Table) {
       const columns = new Array<BasicColumn>();
       if (table.implementsSurrogateKey())
@@ -676,7 +795,7 @@ export default class Schema {
           const name =
             fk.referencedTable.surrogateKey +
             '_' +
-            fk.relationship.referencing.map((col) => col.name).join('_');
+            fk.referencingCols.map((col) => col.name).join('_');
           columns.push(surrogateKeyColumn(name));
         }
       return columns;

@@ -1,10 +1,10 @@
 import SourceColumn from './SourceColumn';
 
+/**
+ * Represents a foreign key relationship or inclusion dependency inside the database.
+ * The arrays referencingCols and referencedCols are linked in a way so that the columns with the same index are corresponding.
+ */
 export default class SourceRelationship {
-  /**
-   * these arrays are linked, the column in referencing has the same index as the
-   * corresponding column in referenced
-   */
   public constructor(
     private _referencingCols = new Array<SourceColumn>(),
     private _referencedCols = new Array<SourceColumn>()
@@ -32,6 +32,9 @@ export default class SourceRelationship {
     return pairs.every((pair, index) => pair == otherPairs[index]);
   }
 
+  /**
+   * Returns whether the column referencingCol is referencing the column referencedCol in this relationship.
+   */
   public mapsColumns(
     referencingCol: SourceColumn,
     referencedCol: SourceColumn
@@ -61,7 +64,7 @@ export default class SourceRelationship {
   }
 
   /**
-   * whether @other can be transitively extended by composing this relationship with @other
+   * Returns whether @other can be transitively extended by composing this relationship with @other
    */
   public isConnected(other: SourceRelationship): boolean {
     return other.referencingCols.every((otherCol) =>

@@ -84,8 +84,8 @@ export class SplitDialogComponent {
     return !this.minimalDeterminants.some((det) => det.equals(this.fd.lhs));
   }
 
-  public updateViolations() {
-    this.minimalDeterminants = this.table.minimalDeterminantsOf(
+  public async updateViolations() {
+    this.minimalDeterminants = await this.table.minimalDeterminantsOf(
       this.selectedColumnsCC()
     );
     this.pkViolation = this.schemaService.schema.fdSplitPKViolationOf(

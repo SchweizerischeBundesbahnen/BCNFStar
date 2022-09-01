@@ -39,7 +39,7 @@ DB_PASSFILE="~/.pgpass"
 
 ### Redis
 
-Since metanome jobs might take a lot of time and resources, we queue them. This requires running a [Redis](https://redis.io/) instance for storing the queue through server restarts, which can be obtained from many standard pacakge managers on Unix or from a [tarball](https://redis.io/download). On Windows, you can use [this download](https://github.com/zkteco-home/redis-windows). If you host Redis on a different machine or change its config, you may pass REDIS_HOST and REDIS_PORT env variables.
+Since metanome jobs might take a lot of time and resources, we queue them. This requires running a [Redis](https://redis.io/) instance for storing the queue through server restarts, which can be obtained from many standard package managers on Unix or from a [tarball](https://redis.io/download). On Windows, you can use [this download](https://github.com/zkteco-home/redis-windows). If you host Redis on a different machine or change its config, you may pass REDIS_HOST and REDIS_PORT env variables.
 
 ## Deploying
 
@@ -57,7 +57,7 @@ npm run start
 
 ### Docker
 
-If want to use a docker container for deployment you can skip the steps above. Just follow the next commands.
+If you want to use a docker container for deployment you can skip the steps above. Just follow the next commands.
 
 First set up your personal DB configuration in [](docker-compose.yml). By default we use a standard postgres database configuration.
 
@@ -70,13 +70,7 @@ First set up your personal DB configuration in [](docker-compose.yml). By defaul
 - DB_PASSWORD=
 ```
 
-To build your docker container run
-
-```bash
-docker build . -t bcnfstar
-```
-
-to create bcnfstar docker image and run
+After that, you can use the following command to launch the app
 
 ```bash
 docker-compose up
@@ -86,6 +80,17 @@ to create docker containers for redis and BCNFStar.
 
 You can open BCNFStar on `http://localhost/#/`.
 
+### Configure FD-Ranking
+
+To better assess the subject-specific correctness of functional dependencies, the functional dependencies can be evaluated using various ranking approaches. The defaultRankingWeights constant in the [FdScore.ts](frontend/src/model/schema/methodObjects/FdScore.ts) file can be used to specify whether and to what extent a ranking approach is included in the overall ranking calculation. By default, only the keyValue ranking is used. The attributes of defaultRankingWeights may only have values between 0 and 1 and the sum of all attributes must be 1.
+
 ### Troubleshooting
 
 Something doesn't work? Always try to run `npm install && npm run build` first.
+
+### Documentation
+
+There are two types of documentation for this project.  
+
+1. A documentation close to the source code that is auto-generated for the [frontend](frontend/documentation/) and the [backend](server/documentation/) respectively.
+2. A documentation for all the features the tool implements. This can be found [here](documentation/index.md).

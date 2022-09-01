@@ -20,8 +20,10 @@ export class KeysComponent {
   }
 
   public reset() {
-    this.surrogateKey = this.table.surrogateKey ?? '';
-    this.editMode = !this.surrogateKey;
+    if (this.table) {
+      this.surrogateKey = this.table.surrogateKey ?? '';
+      this.editMode = !this.surrogateKey;
+    }
   }
 
   public emitSurrogateKey() {

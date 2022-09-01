@@ -11,12 +11,11 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  font-size: 14.5px;
 }
 
 .extra-button {
   position: absolute;
-  left: 10px;
-  top: 3px;
   pointer-events: auto !important;
   height: 22px;
   width: 22px;
@@ -24,9 +23,26 @@
   text-align: center;
   vertical-align: middle;
   display: inline-block;
-  background-color: #ffde15;
   font-weight: bold;
   color: white;
+  line-height: unset;
+}
+
+#makeDirectDimension {
+  left: 10px;
+  top: 3px;
+  background-color: green;
+}
+
+#potentialFact {
+  left: 35px;
+  top: 3px;
+  background-color: blue;
+}
+
+#potentialFactTooltip {
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .fact {

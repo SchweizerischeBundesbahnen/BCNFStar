@@ -58,6 +58,28 @@ export abstract class DataQuery {
   }
 }
 
+export class TableQuery extends DataQuery {
+  constructor(private table: Table) {
+    super();
+  }
+
+  public override async loadTablePage(): Promise<ITablePage> {
+    return new Promise<ITablePage>(() => {});
+  }
+
+  public override async loadRowCount(): Promise<IRowCounts> {
+    return new Promise<IRowCounts>(() => {});
+  }
+
+  public async getTableSQL() {
+    await this.initPersisting();
+    return this.SqlGeneration!.selectStatement(
+      this.table,
+      this.table.columns.asArray()
+    );
+  }
+}
+
 export class TablePreviewDataQuery extends DataQuery {
   constructor(protected table: Table) {
     super();
@@ -128,13 +150,13 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     const data: IRequestBodyINDViolatingRows = {
       referencingTableSql: this.SqlGeneration!.selectStatement(
         this.tableRelationship.referencingTable,
-        this.tableRelationship.relationship.referencing,
+        this.tableRelationship.referencingCols,
         [],
         true
       ),
       referencedTableSql: this.SqlGeneration!.selectStatement(
         this.tableRelationship.referencedTable,
-        this.tableRelationship.relationship.referenced,
+        this.tableRelationship.referencedCols,
         [],
         true
       ),
