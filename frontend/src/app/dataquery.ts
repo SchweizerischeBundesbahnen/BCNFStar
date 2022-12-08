@@ -9,6 +9,8 @@ import Column from '../model/schema/Column';
 import MsSqlPersisting from '../model/schema/persisting/MsSqlPersisting';
 import PostgreSQLPersisting from '../model/schema/persisting/PostgreSQLPersisting';
 import SQLPersisting from '../model/schema/persisting/SQLPersisting';
+import SynapseSqlPersisting from '../model/schema/persisting/SynapseSqlPersisting';
+import SparkSqlPersisting from '../model/schema/persisting/SparkSqlPersisting';
 import TableRelationship from '../model/schema/TableRelationship';
 import Table from '../model/schema/Table';
 import { InjectorInstance } from './app.module';
@@ -27,11 +29,14 @@ export abstract class DataQuery {
 
   public async initPersisting(): Promise<void> {
     const dbmsName: string = await this.getDmbsName();
-
     if (dbmsName == 'postgres') {
       this.SqlGeneration = new PostgreSQLPersisting('XXXXXXXXXXXX');
     } else if (dbmsName == 'mssql') {
       this.SqlGeneration = new MsSqlPersisting('XXXXXXXXXXXX');
+    } else if (dbmsName == 'synapse') {
+      this.SqlGeneration = new SynapseSqlPersisting('XXXXXXXXXXXX');
+    } else if (dbmsName == 'hive2') {
+      this.SqlGeneration = new SparkSqlPersisting('XXXXXXXXXXXX');
     } else {
       throw Error('Unknown Dbms-Server');
     }

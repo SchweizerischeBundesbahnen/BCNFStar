@@ -1,8 +1,10 @@
 import { SchemaService } from '@/src/app/schema.service';
+import { Component } from '@angular/core';
 import PostgreSQLPersisting from '@/src/model/schema/persisting/PostgreSQLPersisting';
 import SQLPersisting from '@/src/model/schema/persisting/SQLPersisting';
-import { Component } from '@angular/core';
 import MsSqlPersisting from '@/src/model/schema/persisting/MsSqlPersisting';
+import SynapseSqlPersisting from '@/src/model/schema/persisting/SynapseSqlPersisting';
+import SparkSqlPersisting from '@/src/model/schema/persisting/SparkSqlPersisting';
 import * as saveAs from 'file-saver';
 import { DatabaseService } from '../../../database.service';
 
@@ -21,11 +23,14 @@ export class PersistSchemaComponent {
 
   public async initPersisting(): Promise<SQLPersisting> {
     const dbmsName: string = await this.dataService.getDmbsName();
-
     if (dbmsName == 'postgres') {
       return new PostgreSQLPersisting(this.schemaName);
     } else if (dbmsName == 'mssql') {
       return new MsSqlPersisting(this.schemaName);
+    } else if (dbmsName == 'synapse') {
+      return new SynapseSqlPersisting(this.schemaName);
+    }else if (dbmsName == 'hive2') {
+      return new SparkSqlPersisting(this.schemaName);
     }
     throw Error('Unknown Dbms-Server');
   }

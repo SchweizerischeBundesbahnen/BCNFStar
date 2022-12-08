@@ -5,6 +5,7 @@ import SqlUtils, {
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
+  SchemaRowsQueryRow,
 } from "./SqlUtils";
 import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
@@ -187,6 +188,24 @@ export default class MsSqlUtils extends SqlUtils {
         error: "Table or schema does not exist in database",
       };
     }
+  }
+
+
+  public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
+    const result = await sql.query(`SELECT 
+    SCHEMA_NAME(schema_id) table_schema,
+    name table_name,
+    SUM(sPTN.Rows) AS count 
+      FROM sys.objects AS sOBJ
+      INNER JOIN sys.partitions AS sPTN ON sOBJ.object_id = sPTN.object_id
+      WHERE
+        sOBJ.type = 'U'
+        AND sOBJ.is_ms_shipped = 0x0
+        AND index_id < 2
+    GROUP BY schema_id, name`);
+
+    return result.recordset;
+  
   }
 
   /**
@@ -424,6 +443,7 @@ INNER JOIN sys.columns col2
   public getJdbcPath(): string {
     return "mssql-jdbc-9.4.1.jre8.jar";
   }
+  
   public getDbmsName(): DbmsType {
     return DbmsType.mssql;
   }

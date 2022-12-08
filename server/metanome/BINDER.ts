@@ -73,9 +73,9 @@ function splitTableIdentifier(
   tablesWithSchema: string[]
 ) {
   // Depending on the database type, tableIdentifier might contain both schema-
-  // amd table name, or just the table name
+  // and table name, or just the table name
   let tableWithSchema: string;
-  if (sqlUtils.getDbmsName() == DbmsType.mssql)
+  if ([DbmsType.mssql, DbmsType.synapse, DbmsType.spark].includes(sqlUtils.getDbmsName()))
     tableWithSchema = cId.tableIdentifier;
   else if (sqlUtils.getDbmsName() == DbmsType.postgres)
     tableWithSchema = tablesWithSchema.find((entry) => {

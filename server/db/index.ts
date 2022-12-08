@@ -4,7 +4,9 @@ import { join } from "path";
 import { absoluteServerDir, splitlines } from "@/utils/files";
 import MsSqlUtils from "./MsSqlUtils";
 import PostgresSqlUtils from "./PostgresSqlUtils";
+import SynapseSqlUtils from "./SynapseSqlUtils";
 import SqlUtils from "./SqlUtils";
+import SparkSqlUtils from "./SparkSqlUtils";
 
 /**
  * Reads the config files and sets environment variables accordingly
@@ -71,9 +73,25 @@ function createDbUtils(): SqlUtils {
       process.env.DB_PASSWORD,
       +process.env.DB_PORT
     );
-  } else {
+  } else if (process.env.DB_TYPE == "synapse") {
+    return new SynapseSqlUtils(
+      process.env.DB_HOST,
+      process.env.DB_DATABASE,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD,
+      +process.env.DB_PORT
+    );
+  } else if (process.env.DB_TYPE == "hive2"  || process.env.DB_TYPE == "spark") {
+    return new SparkSqlUtils(
+      process.env.DB_HOST,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD,
+      +process.env.DB_PORT
+    );
+  }
+  else {
     throw Error(`Error: Unknown value for environment variable DB_TYPE: ${process.env.DB_TYPE}
-Valid values are 'mssql', 'sqlserver', 'postgres'`);
+Valid values are 'mssql', 'sqlserver', 'postgres', 'synapse', 'hive2' and 'spark'`);
   }
 }
 

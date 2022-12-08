@@ -3,6 +3,7 @@ import SqlUtils, {
   ForeignKeyResult,
   PrimaryKeyResult,
   SchemaQueryRow,
+  SchemaRowsQueryRow,
 } from "./SqlUtils";
 import { Pool, QueryConfig, PoolConfig } from "pg";
 import ITemptableScript from "@/definitions/ITemptableScripts";
@@ -201,6 +202,11 @@ export default class PostgresSqlUtils extends SqlUtils {
       };
     }
   }
+
+  public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
+    return null;
+  }
+
 
   public async getForeignKeys(): Promise<ForeignKeyResult[]> {
     const result = await this.pool.query<ForeignKeyResult>(`select 

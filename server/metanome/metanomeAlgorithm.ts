@@ -12,7 +12,8 @@ import {
 } from "@/definitions/IIndexFileEntry";
 import { IMetanomeConfig } from "@/definitions/IMetanomeConfig";
 
-export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
+//export const METANOME_CLI_JAR_PATH = "metanome-cli-1.1.0.jar";
+export const METANOME_CLI_JAR_PATH = sqlUtils.getDbmsName()=="hive2" ? "metanome-cli-1.2-SNAPSHOT.jar" : "metanome-cli-1.1.0.jar";
 
 export default abstract class MetanomeAlgorithm {
   public static resultsFolder = join(
@@ -63,7 +64,8 @@ export default abstract class MetanomeAlgorithm {
    */
   public command(): string {
     return `java -Xmx${this.memory()} -cp "${this.classpath()}" de.metanome.cli.App --algorithm "${this.algoClass()}" --db-connection "${this.dbPassPath()}" --db-type "${
-      process.env.DB_TYPE
+      sqlUtils.getDbmsName()
+      
     }" --table-key "${this.tableKey()}"  --tables "${this.schemaAndTables.join(
       ","
     )}" --output "file:${this.outputFileName()}" ${this.configString()}`.replace(
