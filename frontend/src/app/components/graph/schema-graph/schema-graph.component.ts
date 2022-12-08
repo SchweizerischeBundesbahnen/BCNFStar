@@ -42,6 +42,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Input() public links: Iterable<LinkDefinition> = [];
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
+  // if you change this, also change graph-element.component.css > .column-name > height
   protected columnHeight = 23;
 
   public graphStorage = new Map<BasicTable, GraphStorageItem>();
@@ -237,7 +238,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
           r: this.columnHeight / 2,
           cx,
           fill,
-          cy:
+           cy:
             this.graphElementHeaderHeight + this.columnHeight * (counter + 0.5),
         },
       },

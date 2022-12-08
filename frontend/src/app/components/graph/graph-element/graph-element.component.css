@@ -14,6 +14,11 @@
   font-size: 14.5px;
 }
 
+.column-name {
+  /* if you change this, also change columnHeight in schema-graph.component.ts */
+  height: 23px
+}
+
 .extra-button {
   position: absolute;
   pointer-events: auto !important;
