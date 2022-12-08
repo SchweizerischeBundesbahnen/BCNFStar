@@ -141,6 +141,7 @@ export default class MsSqlUtils extends SqlUtils {
   ): Promise<KeyUnionability> {
     const _sql: string = this.testKeyUnionabilitySql(t);
     const result: sql.IResult<any> = await sql.query(_sql);
+
     if (result.recordset[0].count == 0) return KeyUnionability.allowed;
     return KeyUnionability.forbidden;
   }

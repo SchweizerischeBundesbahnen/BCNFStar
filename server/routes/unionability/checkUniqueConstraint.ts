@@ -27,6 +27,6 @@ export default async function checkUnionedKeys(
       );
   } catch (error) {
     console.error(error);
-    res.status(502).json({ error: "Error while trying to test type casting." });
+    res.status(502).json({ error: "Error while trying to test unioned keys." });
   }
 }
