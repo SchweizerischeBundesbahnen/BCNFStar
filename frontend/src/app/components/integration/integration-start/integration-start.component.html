@@ -24,6 +24,7 @@
     *ngIf="!leftSchema"
     [withContentPreview]="false"
     (schema)="leftSchema = $event"
+    class="left"
   ></app-table-selection>
   <h2 *ngIf="leftSchema" class="centered">
     Selected the following tables for the left schema:
@@ -39,6 +40,7 @@
     *ngIf="!rightSchema"
     [withContentPreview]="false"
     (schema)="rightSchema = $event"
+    class="right"
   ></app-table-selection>
   <h2 *ngIf="rightSchema" class="centered">
     Selected the following tables for the right schema:
