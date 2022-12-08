@@ -22,6 +22,12 @@ export type SchemaQueryRow = {
   table_schema: string;
 };
 
+export type SchemaRowsQueryRow = {
+  table_schema: string;
+  table_name: string;
+  count: number;
+};
+
 export type ForeignKeyResult = {
   fk_name: string;
   table_schema: string;
@@ -41,17 +47,21 @@ export type PrimaryKeyResult = {
 export enum DbmsType {
   mssql = "mssql",
   postgres = "postgres",
+  synapse = "mssql",  //Use the same connector
+  spark = "hive2"
 }
 
 export default abstract class SqlUtils {
   abstract init(): void;
   public abstract getSchema(): Promise<Array<SchemaQueryRow>>;
+  public abstract getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>>;
   public abstract getTablePage(
     tablename: string,
     schemaname: string,
     offset: number,
     limit: number
   ): Promise<ITablePage>;
+
   public abstract getTableRowCount(
     table: string,
     schema: string

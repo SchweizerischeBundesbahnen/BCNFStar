@@ -34,7 +34,7 @@ export default class HyFDExtended extends FunctionalDependencyAlgorithm {
     const [, table] = splitTableString(this.schemaAndTable);
     return join(
       OUTPUT_DIR,
-      (sqlUtils.getDbmsName() == DbmsType.mssql ? this.schemaAndTable : table) +
+      ([DbmsType.mssql,DbmsType.synapse,DbmsType.spark].includes(sqlUtils.getDbmsName()) ? this.schemaAndTable : table) +
         "-hyfd_extended.txt"
     );
   }
