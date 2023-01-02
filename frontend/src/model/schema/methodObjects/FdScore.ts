@@ -44,14 +44,20 @@ export default class FdScore {
    * @returns all single scores
    */
   public testingScore() {
+    return Object.fromEntries(Object.entries(this.allScores()).map(
+      ([type, scoreFunction]) => [type, scoreFunction.bind(this)()]
+    ))
+  }
+
+  private allScores(): Record<string, () => number> {
     return {
-      length: this.fdLengthScore(),
-      keyValue: this.fdKeyValueScore(),
-      position: this.fdPositionScore(),
-      redundanceTeam: this.fdRedundanceScoreTeam(),
-      redundanceWeiLink: this.fdRedundanceScoreWeiLink(),
-      redundanceMetanome: this.fdRedundanceScoreMetanome(),
-      similarity: this.fdSimilarityScore(),
+      length: this.fdLengthScore,
+      keyValue: this.fdKeyValueScore,
+      position: this.fdPositionScore,
+      redundanceTeam: this.fdRedundanceScoreTeam,
+      redundanceWeiLink: this.fdRedundanceScoreWeiLink,
+      redundanceMetanome: this.fdRedundanceScoreMetanome,
+      similarity: this.fdSimilarityScore
     };
   }
 
@@ -60,37 +66,12 @@ export default class FdScore {
    * @returns a ranking score used different ranking approaches 
    */
   private calculate(): number {
-    let lengthScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.length != 0 
-      ? (window as any).DEFAULT_RANKING_WEIGHTS.length * this.fdLengthScore()
-      : 0;
-    let keyValueScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.keyValue != 0 
-      ? (window as any).DEFAULT_RANKING_WEIGHTS.keyValue * this.fdKeyValueScore()
-      : 0;
-    let positionScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.position != 0 
-      ? (window as any).DEFAULT_RANKING_WEIGHTS.position * this.fdPositionScore()
-      : 0;
-    let redundanceTeamScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam != 0 
-      ? (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam * this.fdRedundanceScoreTeam()
-      : 0;
-    let redundanceWeiLinkScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink != 0 
-      ? (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink * this.fdRedundanceScoreWeiLink()
-      : 0;
-    let redundanceMetanomeScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome != 0 
-      ? (window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome * this.fdRedundanceScoreMetanome()
-      : 0;
-    let similarityScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.similarity != 0 
-      ? (window as any).DEFAULT_RANKING_WEIGHTS.similarity * this.fdSimilarityScore()
-      : 0;
-
-    return (
-      lengthScore +
-      keyValueScore +
-      positionScore +
-      redundanceTeamScore +
-      redundanceWeiLinkScore +
-      redundanceMetanomeScore +
-      similarityScore
-    );
+    let score = 0
+    for (const [weightName, scoreFunction] of Object.entries(this.allScores())) {
+      const weight: number = (window as any).DEFAULT_RANKING_WEIGHTS[weightName] ?? 0
+      if (weight !== 0) score += weight * scoreFunction.bind(this)()
+    }
+    return score
   }
 
   /**

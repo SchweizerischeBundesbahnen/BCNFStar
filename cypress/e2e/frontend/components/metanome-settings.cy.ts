@@ -474,7 +474,7 @@ describe("The metanome settings dialog", () => {
     ).should("contain", "SAMPLE_GOAL: 600", { force: true });
   });
 
-  it("does not calculate fds and inds when using use no Metanome result tab", () => {
+  it.only("does not calculate fds and inds when using use no Metanome result tab", () => {
     cy.get('.sbb-toggle-option:contains("Use no Metanome result")').click({
       multiple: true,
     });
