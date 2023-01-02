@@ -60,20 +60,36 @@ export default class FdScore {
    * @returns a ranking score used different ranking approaches 
    */
   private calculate(): number {
+    let lengthScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.length != 0 
+      ? (window as any).DEFAULT_RANKING_WEIGHTS.length * this.fdLengthScore()
+      : 0;
+    let keyValueScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.keyValue != 0 
+      ? (window as any).DEFAULT_RANKING_WEIGHTS.keyValue * this.fdKeyValueScore()
+      : 0;
+    let positionScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.position != 0 
+      ? (window as any).DEFAULT_RANKING_WEIGHTS.position * this.fdPositionScore()
+      : 0;
+    let redundanceTeamScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam != 0 
+      ? (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam * this.fdRedundanceScoreTeam()
+      : 0;
+    let redundanceWeiLinkScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink != 0 
+      ? (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink * this.fdRedundanceScoreWeiLink()
+      : 0;
+    let redundanceMetanomeScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome != 0 
+      ? (window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome * this.fdRedundanceScoreMetanome()
+      : 0;
+    let similarityScore: number = (window as any).DEFAULT_RANKING_WEIGHTS.similarity != 0 
+      ? (window as any).DEFAULT_RANKING_WEIGHTS.similarity * this.fdSimilarityScore()
+      : 0;
+
     return (
-      (window as any).DEFAULT_RANKING_WEIGHTS.length * this.fdLengthScore() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.keyValue *
-        this.fdKeyValueScore() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.position *
-        this.fdPositionScore() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam *
-        this.fdRedundanceScoreTeam() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink *
-        this.fdRedundanceScoreWeiLink() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome *
-        this.fdRedundanceScoreMetanome() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.similarity *
-        this.fdSimilarityScore()
+      lengthScore +
+      keyValueScore +
+      positionScore +
+      redundanceTeamScore +
+      redundanceWeiLinkScore +
+      redundanceMetanomeScore +
+      similarityScore
     );
   }
 
