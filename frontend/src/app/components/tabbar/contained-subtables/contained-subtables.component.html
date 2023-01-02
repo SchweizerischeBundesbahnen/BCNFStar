@@ -7,6 +7,7 @@
       multiple
       placeholder="Filter columns"
       [(ngModel)]="_fdClusterFilter"
+      (selectionChange)="selectionChanged()"
     >
       <app-sbb-option-all
         [(current)]="_fdClusterFilter"
@@ -20,16 +21,16 @@
       >
     </sbb-select>
     <br />
-    <sbb-accordion *ngIf="fdClusters().length > 0; else noClusters">
+    <sbb-accordion *ngIf="cachedClusters.length > 0; else noClusters">
       <sbb-paginator
         (page)="changePage($event)"
         [pageSize]="pageSize"
-        [length]="fdClusters().length"
+        [length]="cachedClusters.length"
       >
       </sbb-paginator>
       <sbb-expansion-panel
         *ngFor="
-          let cluster of fdClusters().slice(
+          let cluster of cachedClusters.slice(
             page * pageSize,
             (page + 1) * pageSize
           )

@@ -56,25 +56,36 @@ export class ContainedSubtablesComponent {
     return new ColumnCombination(this._fdClusterFilter);
   }
 
+  public cachedClusters = this.table.rankedFdClusters();
+
+  public selectionChanged() {
+    this.updateFdClusters();
+  }
+
+  
   /**
    * 
    * @returns fd clusters (further infos in Table.ts) eventually filterd by columns from user input
    */
-  public fdClusters(): Array<FdCluster> {
+  public updateFdClusters(): void {
     const cc = this.fdClusterFilter;
-    const cluster = this.table
-      .rankedFdClusters()
-      .filter((cluster) => cc.isSubsetOf(cluster.columns))
-      .map((value, index) => [value, index] as [FdCluster, number]);
-    if (cc.asArray().length > 0) {
-      cluster.sort(([cluster1, index1], [cluster2, index2]) => {
-        const count1 = cluster1.columns.copy().setMinus(cc).asArray().length;
-        const count2 = cluster2.columns.copy().setMinus(cc).asArray().length;
-        // if count is the same, use original order (stable sort)
-        return count1 - count2 || index1 - index2;
-      });
+    const clusters = this.table.rankedFdClusters();
+
+    if (cc.cardinality == 0) {
+      this.cachedClusters = clusters
+    } else {
+      let filteredCluster = clusters
+        .filter((cluster) => cc.isSubsetOf(cluster.columns))
+        .map((value, index) => [value, index] as [FdCluster, number]);
+
+        filteredCluster.sort(([cluster1, index1], [cluster2, index2]) => {
+          const count1 = cluster1.columns.copy().setMinus(cc).asArray().length;
+          const count2 = cluster2.columns.copy().setMinus(cc).asArray().length;
+          // if count is the same, use original order (stable sort)
+          return count1 - count2 || index1 - index2;
+        });
+      this.cachedClusters = filteredCluster.map(([value]) => value);
     }
-    return cluster.map(([value]) => value);
   }
 
   public fdFromLhs(): FunctionalDependency {
