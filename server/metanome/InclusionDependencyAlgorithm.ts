@@ -10,7 +10,7 @@ export default abstract class InclusionDependencyAlgorithm extends MetanomeAlgor
   }
 
   protected resultType(): MetanomeResultType {
-    return MetanomeResultType.ind;
+    return 'InclusionDependency';
   }
 
   public async moveFiles(): Promise<void> {

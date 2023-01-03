@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import Table from '../model/schema/Table';
 import { firstValueFrom } from 'rxjs';
-import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 import IRowCounts from '@server/definitions/IRowCounts';
 import Column from '../model/schema/Column';
@@ -54,11 +53,11 @@ export class DatabaseService {
     return tables;
   }
 
-  public async runMetanome(entry: IIndexFileEntry) {
+  public async runMetanome(entry: IMetanomeJob) {
     const job: IMetanomeJob = {
-      algoClass: entry.algorithm,
+      algoClass: entry.algoClass,
       config: entry.config,
-      schemaAndTables: entry.tables,
+      schemaAndTables: entry.schemaAndTables,
     };
     return await firstValueFrom(
       this.http.post<{ message: string; fileName: string }>(

@@ -68,7 +68,7 @@
 
     <ul>
       <li *ngFor="let item of loadingStatus | keyvalue">
-        {{ item.key.algorithm }} with {{ item.key.tables }}
+        {{ item.key.algoClass }} with {{ item.key.schemaAndTables }}
         <sbb-loading
           mode="inline"
           aria-valuetext="Loading, please wait"

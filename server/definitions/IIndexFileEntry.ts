@@ -1,17 +1,15 @@
 import { IMetanomeConfig } from "./IMetanomeConfig";
+import { IMetanomeJob   } from "./IMetanomeJob";
 
-export enum MetanomeResultType {
-  ind = "InclusionDependency",
-  fd = "FunctionalDependency",
-}
 
-export interface IIndexFileEntry {
-  tables: string[];
+export type MetanomeResultType =
+  "InclusionDependency" | "FunctionalDependency";
+
+
+export interface IIndexFileEntry  extends IMetanomeJob {
   dbmsName: string;
   database: string;
   resultType: MetanomeResultType;
-  algorithm: string;
   fileName: string;
-  config: IMetanomeConfig;
   createDate: number;
 }

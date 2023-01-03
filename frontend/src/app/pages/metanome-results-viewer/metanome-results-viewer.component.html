@@ -31,9 +31,9 @@
             {{ item.key }}: {{ item.value }}
           </div>
         </td>
-        <td>{{ entry.algorithm }}</td>
+        <td>{{ entry.algoClass }}</td>
         <td>{{ entry.fileName }}</td>
-        <td>{{ entry.tables.join("\n") }}</td>
+        <td>{{ entry.schemaAndTables.join("\n") }}</td>
         <td class="creation-date">{{ entry.createDate | date: "medium" }}</td>
         <td>
           <button

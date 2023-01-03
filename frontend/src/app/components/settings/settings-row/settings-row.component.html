@@ -1,0 +1,52 @@
+{{tableNames()}}
+<sbb-toggle [formControl]="tabControl">
+  <sbb-toggle-option
+    label="Use no Metanome result"
+    value="no-result"
+    sbbTooltip="Attention: This will cause no contained subtables (for FDs) or no foreign keys (for INDs) to be found. Use only if you don't want to use these features"
+  >
+    <sbb-toggle-details>
+      Don't use Functional Dependencies for this table.
+    </sbb-toggle-details>
+  </sbb-toggle-option>
+  <sbb-toggle-option
+    label="Use existing result"
+    value="existing-result"
+    [disabled]="existingResults.length === 0"
+  >
+    <sbb-toggle-details>
+      <sbb-select [formControl]="existingResultsControl">
+        <sbb-option
+          *ngFor="let result of existingResults"
+          [value]="result"
+          [sbbTooltip]="existingResultInfo(result)"
+        >
+          {{ existingResultInfo(result) }}
+        </sbb-option>
+      </sbb-select>
+    </sbb-toggle-details>
+  </sbb-toggle-option>
+
+  <sbb-toggle-option
+    [label]="item.key"
+    [value]="item.key"
+    *ngFor="let item of defaultConfigs | keyvalue"
+    [sbbTooltip]="algoTooltips[item.key]"
+  >
+    <sbb-toggle-details>
+      <app-settings-element
+        [control]="control.value"
+        [name]="control.key"
+        *ngFor="let control of controlsFor(item.key) | keyvalue"
+      ></app-settings-element>
+      <button
+        *ngIf="applyToAllTables.observed"
+        class="apply-to-all"
+        sbb-button
+        (click)="applyToAllTables.emit(currentJobWithoutTable())"
+      >
+        Apply this settings to all tables
+      </button>
+    </sbb-toggle-details>
+  </sbb-toggle-option>
+</sbb-toggle>
