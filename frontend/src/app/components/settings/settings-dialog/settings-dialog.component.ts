@@ -25,7 +25,7 @@ export class SettingsDialogComponent {
 
   public fdConfigs: Record<string, JobWithoutTable> = { 'HyFD': { config: defaulHyfdConfig, algoClass: hyfdAlgorithmName } }
   public indConfigs: Record<string, JobWithoutTable> = {
-    'FAIDA': { config: defaultFaidaConfig, algoClass: faidaAlgorithmName }, 'BINDER': { config: defaultBinderConfig, algoClass: binderAlgorithmName }
+    'BINDER': { config: defaultBinderConfig, algoClass: binderAlgorithmName }, 'FAIDA': { config: defaultFaidaConfig, algoClass: faidaAlgorithmName }
   };
 
   public configs: MetanomeSettings = new Map()

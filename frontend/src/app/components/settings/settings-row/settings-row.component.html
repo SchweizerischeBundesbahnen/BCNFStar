@@ -1,4 +1,4 @@
-{{tableNames()}}
+{{tableNames().join(', ')}}
 <sbb-toggle [formControl]="tabControl">
   <sbb-toggle-option
     label="Use no Metanome result"
@@ -45,7 +45,7 @@
         sbb-button
         (click)="applyToAllTables.emit(currentJobWithoutTable())"
       >
-        Apply this settings to all tables
+        Apply this config to all tables
       </button>
     </sbb-toggle-details>
   </sbb-toggle-option>

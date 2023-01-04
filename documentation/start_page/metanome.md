@@ -10,7 +10,7 @@ Currently supported are the algorithms HyFD for functional dependency discovery 
 
 ![](../images/metanome_hyfd.PNG)  
 
-### Binder  
+### BINDER  
 
 ![](../images/metanome_binder.PNG)  
 

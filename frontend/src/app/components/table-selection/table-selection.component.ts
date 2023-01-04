@@ -151,7 +151,7 @@ export class TableSelectionComponent implements OnInit {
           filenamePromise.then((filename) => { if (filename) set(filename) })
         }
       })
-      Promise.all(promises)
+      await Promise.all(promises)
       const schema = await this.schemaCreationService.createSchema(
         tables,
         fdFiles,

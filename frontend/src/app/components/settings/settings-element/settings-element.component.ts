@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -13,9 +13,16 @@ import { FormControl } from '@angular/forms';
  * and the name of the option.
  * Displays a checkbox if the control contains a boolean value, otherwise a textbox.
  */
-export class SettingsElementComponent {
+export class SettingsElementComponent implements OnInit {
   @Input() public control!: FormControl;
   @Input() public name!: string;
+
+  public isBool: boolean = false;
+
+
+  ngOnInit(): void {
+    this.isBool = typeof this.control.value == 'boolean'
+  }
 
   // Tooltips specific for one setting
   public tooltips: Record<string, string> = {
@@ -28,8 +35,4 @@ export class SettingsElementComponent {
     INPUT_ROW_LIMIT: 'Only look at the first n lines when searching FDs. May be faster on big datasets, but is not recommended because it produces incorrect results. -1 means no limit'
     // FAIDA
   };
-
-  public isBool() {
-    return typeof this.control.value == 'boolean'
-  }
 }

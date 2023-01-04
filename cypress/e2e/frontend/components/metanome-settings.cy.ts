@@ -40,12 +40,12 @@ describe("The metanome settings dialog", () => {
       3
     );
     cy.get('sbb-toggle-option:contains("HyFD")').should("have.length", 2);
-    cy.get('sbb-toggle-option:contains("Binder")').should("have.length", 1);
+    cy.get('sbb-toggle-option:contains("BINDER")').should("have.length", 1);
     cy.get('sbb-toggle-option:contains("FAIDA")').should("have.length", 1);
   });
 
   it("displays default configuration parameters", () => {
-    // all HyFD and Binder parameters
+    // all HyFD and BINDER parameters
     cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').should(
       "have.length",
       2
@@ -53,7 +53,7 @@ describe("The metanome settings dialog", () => {
     cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
       .first()
       .click({ multiple: true });
-    cy.contains("Binder").click();
+    cy.contains("BINDER").click();
 
     cy.get('sbb-checkbox:contains("ENABLE_MEMORY_GUARDIAN")').should(
       "have.length",
@@ -142,7 +142,7 @@ describe("The metanome settings dialog", () => {
     );
   });
 
-  it("selects HyFD and Binder tab when no results exists", () => {
+  it("selects HyFD and BINDER tab when no results exists", () => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/metanome-results");
     cy.get(".delete-all-btn").click();
     cy.visitFrontend();
@@ -155,14 +155,14 @@ describe("The metanome settings dialog", () => {
       "have.class",
       "sbb-toggle-option-selected"
     );
-    cy.get("sbb-toggle-option:contains('Binder')")
+    cy.get("sbb-toggle-option:contains('BINDER')")
       .last()
       .should("have.class", "sbb-toggle-option-selected");
   });
 
   it("displays the 'Apply this setting to all HyFD Configs' button", () => {
-    cy.contains("Apply this settings to all HyFD Configs");
-    cy.get("button:contains('Apply this settings to all HyFD Configs')").should(
+    cy.contains("Apply this config to all tables");
+    cy.get("button:contains('Apply this config to all tables')").should(
       "have.length",
       2
     );
@@ -177,7 +177,7 @@ describe("The metanome settings dialog", () => {
     cy.get(".MAX_DETERMINANT_SIZE").first().clear().type("4");
     cy.get(".NULL_EQUALS_NULL").first().click();
 
-    cy.contains("Apply this settings to all HyFD Configs").click();
+    cy.contains("Apply this config to all tables").click();
 
     cy.get(".memory").eq(1).should("have.value", "1G");
     cy.get(".MAX_DETERMINANT_SIZE").eq(1).should("have.value", "4");
@@ -190,7 +190,7 @@ describe("The metanome settings dialog", () => {
     });
 
     cy.get(".INPUT_ROW_LIMIT").first().clear().type("5");
-    cy.contains("Apply this settings to all HyFD Configs").click();
+    cy.contains("Apply this config to all tables").click();
     cy.get(".INPUT_ROW_LIMIT").eq(1).should("have.value", "5");
 
     cy.get(".MAX_DETERMINANT_SIZE").first().clear().type("4");
@@ -213,11 +213,11 @@ describe("The metanome settings dialog", () => {
     cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
   });
 
-  it("chooses new default configuration settings (HyFD, HyFD, Binder) and loads schema editing page", () => {
+  it("chooses new default configuration settings (HyFD, HyFD, BINDER) and loads schema editing page", () => {
     cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")')
       .first()
       .click({ multiple: true });
-    cy.contains("Binder").click();
+    cy.contains("BINDER").click();
 
     cy.contains("Ok").click();
     cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
@@ -377,9 +377,9 @@ describe("The metanome settings dialog", () => {
     ).contains("memory:");
   });
 
-  it("chooses new random configuration settings (HyFD, HyFD, Binder) and loads schema editing page", () => {
+  it("chooses new random configuration settings (HyFD, HyFD, BINDER) and loads schema editing page", () => {
     cy.get("sbb-toggle-option:contains('HyFD')").click({ multiple: true });
-    cy.contains("Binder").click();
+    cy.contains("BINDER").click();
 
     cy.get(".memory").first().clear().type("1G");
     cy.get(".NULL_EQUALS_NULL").first().click();

@@ -70,8 +70,10 @@ export class SettingsRowComponent implements OnInit, OnChanges {
     }
 
     // update the settings in setting-dialog initially and whenever something changes
-    this.emitConfig()
+    console.log(this.algoFormGroups)
     this.formGroup = new FormGroup(this.algoFormGroups)
+    
+    this.emitConfig()
     this.formGroup.valueChanges.subscribe(() => this.emitConfig())
     this.tabControl.valueChanges.subscribe(() => this.emitConfig())
   }

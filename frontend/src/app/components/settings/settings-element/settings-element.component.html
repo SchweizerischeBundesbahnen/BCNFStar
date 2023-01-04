@@ -1,9 +1,14 @@
 <div>
-  <sbb-checkbox *ngIf="isBool()" [formControl]="control" [sbbTooltip]="tooltips[name]">
+  <sbb-checkbox
+    *ngIf="isBool"
+    [formControl]="control"
+    [sbbTooltip]="tooltips[name]"
+    [class]="name"
+  >
     {{ name }}
   </sbb-checkbox>
-  <div *ngIf="!isBool()" [sbbTooltip]="tooltips[name]" style="width: fit-content;">
+  <div *ngIf="!isBool" [sbbTooltip]="tooltips[name]" style="width: fit-content">
     <sbb-label>{{ name }}</sbb-label>
-    <input sbbInput [formControl]="control" />
+    <input sbbInput [formControl]="control" [class]="name" />
   </div>
 </div>
