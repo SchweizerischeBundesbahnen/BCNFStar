@@ -497,7 +497,7 @@ describe("The metanome settings dialog", () => {
     cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
-    ).should("not.exist");
+    );
     cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
@@ -506,7 +506,7 @@ describe("The metanome settings dialog", () => {
 
   it("does not calculate fds and inds when using use no Metanome result tab for one table", () => {
     cy.get('.sbb-toggle-option:contains("Use no Metanome result")')
-      .eq(0)
+      .eq(1)
       .click();
     cy.contains("Ok").click();
     cy.url({ timeout: 2 * 60 * 1000 }).should("contain", "edit-schema");
@@ -516,7 +516,7 @@ describe("The metanome settings dialog", () => {
     cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
-    );
+    ).should("not.exist");
     cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"
@@ -527,7 +527,7 @@ describe("The metanome settings dialog", () => {
     cy.visitContainedSubtableTab();
     cy.contains(
       "No contained subtables were found with the current filter for this table"
-    ).should("not.exist");
+    );
     cy.visitPossibleForeignKeysTab();
     cy.contains(
       "No possible foreign keys were found with the current filter for this table"

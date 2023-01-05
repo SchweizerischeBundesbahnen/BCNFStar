@@ -63,7 +63,7 @@ export class TableSelectionComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const rowCountPromise = this.dataService.loadTableRowCounts();
-    this.tables = await this.dataService.loadTables();
+    this.tables = await this.dataService.getTables();
 
     for (const table of this.tables) {
       this.selectedTables.set(table, false);

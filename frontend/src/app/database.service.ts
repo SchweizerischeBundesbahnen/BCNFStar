@@ -21,11 +21,7 @@ export class DatabaseService {
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
 
   // eslint-disable-next-line no-unused-vars
-  constructor(private http: HttpClient) {}
-
-  public async loadTables(): Promise<Array<Table>> {
-    return this.getTables();
-  }
+  constructor(private http: HttpClient) { }
 
   public async getDmbsName(): Promise<string> {
     return firstValueFrom(
@@ -39,7 +35,7 @@ export class DatabaseService {
     );
   }
 
-  private async getTables(): Promise<Array<Table>> {
+  public async getTables(): Promise<Array<Table>> {
     const iTables = await firstValueFrom(
       this.http.get<Array<ITable>>(this.baseUrl + '/tables')
     );
@@ -50,7 +46,7 @@ export class DatabaseService {
         rowCounts[iTable.schemaName + '.' + iTable.name]?.entries ?? 0
       );
     });
-    return tables;
+    return tables.sort((t1, t2) => t1.fullName < t2.fullName ? -1 : 1);
   }
 
   public async runMetanome(entry: IMetanomeJob) {
@@ -79,7 +75,7 @@ export class DatabaseService {
     return await firstValueFrom(
       this.http.get<number>(
         this.baseUrl +
-          `/redundances?tableSql=${tableSql}&&fdColumns=[${columns}]`
+        `/redundances?tableSql=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }
@@ -96,7 +92,7 @@ export class DatabaseService {
     return await firstValueFrom(
       this.http.get<number>(
         this.baseUrl +
-          `/redundances/length?tableSql=${tableSql}&&fdColumns=[${columns}]`
+        `/redundances/length?tableSql=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }

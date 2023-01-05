@@ -6,7 +6,7 @@
     sbbTooltip="Attention: This will cause no contained subtables (for FDs) or no foreign keys (for INDs) to be found. Use only if you don't want to use these features"
   >
     <sbb-toggle-details>
-      Don't use Functional Dependencies for this table.
+      Don't use results for {{tableNames().length > 1 ? 'these tables' : 'this table'}}.
     </sbb-toggle-details>
   </sbb-toggle-option>
   <sbb-toggle-option
