@@ -2,7 +2,7 @@ FROM node:16-buster
 
 # updates, install JAVA
 RUN apt-get update && \
-    apt-get upgrade && \
+    apt-get upgrade -y && \
     apt-get install -y openjdk-11-jdk ca-certificates-java dos2unix && \
     apt-get clean
 

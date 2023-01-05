@@ -37,7 +37,7 @@ If you change the persisting of the model in [SaveSchemaState.ts](/frontend/src/
 
 How to generate these files
 
-1. If not already done for testing, load the test database from `cypress/mssql_1MB_testdata_denormalized.sql` or `cypress/mssql_1MB_testdata_denormalized.sql`
+1. If not already done for testing, load the test database from `cypress/mssql_1MB_testdata_denormalized.sql` or `cypress/postgres_1MB_testdata_denormalized.sql`
 1. Make sure to update the database connection details (see Database section of the README)
 1. Start BCNFStar with `npm run dev` and visit `http://localhost:4200`
 1. Select the tables `public.nation_region_denormalized` and `public.part_partsupp_supplier_denormalized`

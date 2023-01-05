@@ -29,19 +29,19 @@ describe("The schema editing page", () => {
   });
 
   it("displays existing primary keys", () => {
-    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+    cy.get('[data-cy="graph-element-columns"].pk').should(
       "have.length",
       3
     );
-    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+    cy.get('[data-cy="graph-element-columns"].pk').should(
       "contain",
       "ps_partkey"
     );
-    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+    cy.get('[data-cy="graph-element-columns"].pk').should(
       "contain",
       "ps_suppkey"
     );
-    cy.get('[data-cy="graph-element-columns"][class="ellipsis pk"]').should(
+    cy.get('[data-cy="graph-element-columns"].pk').should(
       "contain",
       "ps_supplycost"
     );

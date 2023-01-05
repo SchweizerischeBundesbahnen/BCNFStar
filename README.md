@@ -92,5 +92,5 @@ Something doesn't work? Always try to run `npm install && npm run build` first.
 
 There are two types of documentation for this project.  
 
-1. A documentation close to the source code that is auto-generated for the [frontend](frontend/documentation/) and the [backend](server/documentation/) respectively.
+1. A documentation close to the source code that is auto-generated for the [frontend](https://schweizerischebundesbahnen.github.io/BCNFStar/frontend/) and the [backend](https://schweizerischebundesbahnen.github.io/BCNFStar/server/) respectively.
 2. A documentation for all the features the tool implements. This can be found [here](documentation/index.md).
