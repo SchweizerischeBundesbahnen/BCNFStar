@@ -4,17 +4,22 @@ describe("The integration start page", () => {
   beforeEach(() => {
     cy.visit(Cypress.env("FRONTEND_BASEURL") + "/#/integration");
 
-    cy.selectTablesAndGo();
+    cy.get('app-table-selection.left').within(() => {
+      cy.selectTablesAndGo();
+    })
     cy.contains("Ok").click();
-    cy.get(".sbb-dialog-container").should("not.exist");
-    cy.get("sbb-expansion-panel").contains("public").click();
-    cy.contains("denormalized_data").click();
-    cy.contains("Go").click();
 
+    cy.get(".sbb-dialog-container").should("not.exist");
+    cy.get('app-table-selection.right').within(() => {
+      cy.get("sbb-expansion-panel").contains("public").click();
+      cy.contains("denormalized_data").click();
+      cy.contains("Go").click();
+    })
     cy.get('sbb-toggle-option:contains("Use no Metanome result")').click({
       multiple: true,
     });
     cy.contains("Ok").click();
+
     cy.wait(100);
     cy.contains("Start integration").click();
 
