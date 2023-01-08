@@ -1,3 +1,4 @@
+import { NotNullDataQuery } from '@/src/app/dataquery';
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
@@ -30,6 +31,7 @@ export class SplitDialogComponent {
   public pkViolation!: boolean;
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
+  public useNull!: boolean;
 
   public minimalDeterminants!: Array<ColumnCombination>;
   public hull!: ColumnCombination;
@@ -59,6 +61,7 @@ export class SplitDialogComponent {
     });
     this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
     this.updateViolations();
+    this.checkUseNull();
   }
 
   public get table() {
@@ -84,8 +87,8 @@ export class SplitDialogComponent {
     return !this.minimalDeterminants.some((det) => det.equals(this.fd.lhs));
   }
 
-  public async updateViolations() {
-    this.minimalDeterminants = await this.table.minimalDeterminantsOf(
+  public updateViolations() {
+    this.minimalDeterminants = this.table.minimalDeterminantsOf(
       this.selectedColumnsCC()
     );
     this.pkViolation = this.schemaService.schema.fdSplitPKViolationOf(
@@ -101,6 +104,14 @@ export class SplitDialogComponent {
         this.fd,
         this.table
       );
+  }
+
+  public async checkUseNull() {
+    const dataQuery: NotNullDataQuery = await NotNullDataQuery.Create(
+      this.table,
+      this.fd.lhs.asArray()
+    );
+    this.useNull = !(await dataQuery.result());
   }
 
   public isFullyDetermined() {

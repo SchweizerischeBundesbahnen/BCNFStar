@@ -19,6 +19,7 @@ import {
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
+import { IRequestBodyNotNull } from "@/definitions/IRequestBodyNotNull";
 export default class PostgresSqlUtils extends SqlUtils {
   protected config: PoolConfig;
   public constructor(
@@ -145,6 +146,16 @@ export default class PostgresSqlUtils extends SqlUtils {
 
     if (result.rows[0].count == 0) return KeyUnionability.allowed;
     return KeyUnionability.forbidden;
+  }
+
+  public override async testNotNullConstraint(
+    t: IRequestBodyNotNull
+  ): Promise<boolean> {
+    const _sql: string = this.testNotNullSql(t);
+
+    const result = await this.pool.query<{ notnull: boolean }>(_sql);
+
+    return result.rows[0].notnull;
   }
 
   /** The "null"-check is relevant for unionability-checks. */

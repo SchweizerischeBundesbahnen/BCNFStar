@@ -39,6 +39,7 @@ import getRedudanceGroupLength from "./routes/rankingRedudanceGroupLength";
 import getMaxValue from "./routes/maxValue";
 import getColumnSample from "./routes/columnSample";
 import getSchemaMatching from "./routes/schemaMatching";
+import checkNotNull from "./routes/checkNotNullConstraint";
 
 const app = express();
 
@@ -131,6 +132,12 @@ app.post(
   "/unionedkeys",
   [body("tableSql").trim().custom(isValidSql())],
   checkUnionedKeys
+);
+
+app.post(
+  "/notnull",
+  [body("tableSql").trim().custom(isValidSql())],
+  checkNotNull
 );
 
 app.post(

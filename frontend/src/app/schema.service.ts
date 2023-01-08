@@ -338,7 +338,7 @@ export class SchemaService {
 
     if (!rowCount) {
       const error_message =
-        'There was a backend error while checking this IND. Check the browser and server logs for details';
+        'There was a backend error while checking this FD. Check the browser and server logs for details';
       this.notification.open(error_message, { type: 'error' });
       throw new Error(error_message);
     }

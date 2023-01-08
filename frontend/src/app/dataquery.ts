@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import IRequestBodyINDViolatingRows from '@server/definitions/IRequestBodyINDViolatingRows';
+import { IRequestBodyNotNull } from '@server/definitions/IRequestBodyNotNull';
 import IRowCounts from '@server/definitions/IRowCounts';
 import ITablePage from '@server/definitions/ITablePage';
 import { firstValueFrom } from 'rxjs';
@@ -13,7 +14,7 @@ import TableRelationship from '../model/schema/TableRelationship';
 import Table from '../model/schema/Table';
 import { InjectorInstance } from './app.module';
 
-export abstract class DataQuery {
+export abstract class Query {
   protected baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   protected http: HttpClient;
 
@@ -40,7 +41,9 @@ export abstract class DataQuery {
   constructor() {
     this.http = InjectorInstance.get<HttpClient>(HttpClient);
   }
+}
 
+export abstract class DataQuery extends Query {
   public abstract loadTablePage(
     offset: number,
     limit: number
@@ -58,17 +61,9 @@ export abstract class DataQuery {
   }
 }
 
-export class TableQuery extends DataQuery {
+export class TableQuery extends Query {
   constructor(private table: Table) {
     super();
-  }
-
-  public override async loadTablePage(): Promise<ITablePage> {
-    return new Promise<ITablePage>(() => {});
-  }
-
-  public override async loadRowCount(): Promise<IRowCounts> {
-    return new Promise<IRowCounts>(() => {});
   }
 
   public async getTableSQL() {
@@ -248,5 +243,38 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
       limit: limit,
     };
     return data;
+  }
+}
+
+export class NotNullDataQuery extends Query {
+  public static async Create(
+    table: Table,
+    cols: Array<Column>
+  ): Promise<NotNullDataQuery> {
+    const notNullDataQuery = new NotNullDataQuery(table, cols);
+    await notNullDataQuery.initPersisting();
+    return notNullDataQuery;
+  }
+
+  private constructor(protected table: Table, protected cols: Array<Column>) {
+    super();
+  }
+
+  public result(): Promise<boolean> {
+    return firstValueFrom(
+      this.http.post<boolean>(`${this.baseUrl}/notnull`, this.body())
+    );
+  }
+
+  private body(): IRequestBodyNotNull {
+    return {
+      tableSql: this.SqlGeneration!.selectStatement(
+        this.table,
+        this.table.columns.asArray(),
+        [],
+        true
+      ),
+      expectedKey: this.cols.map((c) => c.name),
+    };
   }
 }

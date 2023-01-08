@@ -13,6 +13,7 @@ import {
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
+import { IRequestBodyNotNull } from "@/definitions/IRequestBodyNotNull";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -102,6 +103,10 @@ export default abstract class SqlUtils {
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability>;
 
+  public abstract testNotNullConstraint(
+    t: IRequestBodyNotNull
+  ): Promise<boolean>;
+
   public abstract escape(str: string): string;
 
   public generateColumnString(columns: string[]): string {
@@ -139,6 +144,18 @@ export default abstract class SqlUtils {
     )} HAVING COUNT (*) > 1
   ) as y
 `;
+  }
+
+  public testNotNullSql(nn: IRequestBodyNotNull): string {
+    const sql = `
+    SELECT NOT EXISTS(
+      SELECT *
+      FROM (${nn.tableSql}) as X
+      WHERE ${nn.expectedKey
+        .map((name) => `${this.escape(name)} IS NULL`)
+        .join("\n\t\tOR")}
+    ) as notnull`;
+    return sql;
   }
 
   public abstract testTypeCasting(

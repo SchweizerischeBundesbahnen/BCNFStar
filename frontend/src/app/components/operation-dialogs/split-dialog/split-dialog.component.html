@@ -60,6 +60,12 @@
       </li>
     </ul>
   </div>
+
+  <div *ngIf="useNull" class="violation">
+    The key of the created table would contain null values. Please specify a
+    value with which to replace the null values.
+  </div>
+
   <div sbbDialogActions>
     <button
       sbb-button
