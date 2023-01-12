@@ -35,6 +35,7 @@ export class ContainedSubtablesComponent {
   constructor(public schemaService: SchemaService, private dialog: SbbDialog) {
     this.schemaService.selectedTableChanged.subscribe(() => {
       this._fdClusterFilter = [];
+      this.updateFdClusters();
     });
   }
 
@@ -57,11 +58,6 @@ export class ContainedSubtablesComponent {
   }
 
   public cachedClusters = this.table.rankedFdClusters();
-
-  public selectionChanged() {
-    this.updateFdClusters();
-  }
-
   
   /**
    * 

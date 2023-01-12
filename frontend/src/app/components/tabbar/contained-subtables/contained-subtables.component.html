@@ -7,7 +7,7 @@
       multiple
       placeholder="Filter columns"
       [(ngModel)]="_fdClusterFilter"
-      (selectionChange)="selectionChanged()"
+      (selectionChange)="updateFdClusters()"
     >
       <app-sbb-option-all
         [(current)]="_fdClusterFilter"
