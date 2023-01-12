@@ -10,7 +10,7 @@
       <app-settings-row
         [tables]="[table]"
         [defaultConfigs]="fdConfigs"
-        [existingResults]="existingFdResultsFor(table)"
+        [existingResults]="existingFdResults.get(table)"
         [overwriteConfig]="overwriteConfig"
         (config)="configs.set(table, $event)"
         (applyToAllTables)="overwriteConfig = $event"
@@ -20,13 +20,13 @@
     <app-settings-row
       [tables]="tables"
       [defaultConfigs]="indConfigs"
-      [existingResults]="existingIndResults()"
+      [existingResults]="existingIndResults"
       (config)="configs.set('ind', $event)"
 
     ></app-settings-row>
   </div>
   <!-- existing results have not been loaded yset -->
-  <div sbbDialogContent *ngElse>
+  <div sbbDialogContent *ngIf="!loadedExistingMetanomeResults">
     <sbb-loading mode="big"></sbb-loading>
   </div>
   <div sbbDialogActions>

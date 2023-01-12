@@ -33,13 +33,16 @@ export class SettingsDialogComponent {
   public overwriteConfig?: JobWithoutTable;
 
   public loadedExistingMetanomeResults = false;
-  private existingMetanomeResults: Array<IIndexFileEntry> = []
+
+  public existingIndResults: Array<IIndexFileEntry> = []
+  public existingFdResults: Map<Table, Array<IIndexFileEntry>> = new Map()
 
   constructor(public dialogRef: SbbDialogRef<SettingsDialogComponent, MetanomeSettings>,
     @Inject(SBB_DIALOG_DATA) public tables: Array<Table>,
     private http: HttpClient,
     private dataService: DatabaseService) {
     this.loadExistingMetanomeResults()
+    this.tables.forEach(t => this.existingFdResults.set(t, []))
   }
 
   public runMetanome() {
@@ -54,35 +57,26 @@ export class SettingsDialogComponent {
   }
 
   public async loadExistingMetanomeResults() {
-    this.existingMetanomeResults = await firstValueFrom(
+    const existingMetanomeResults = (await firstValueFrom(
       this.http.get<Array<IIndexFileEntry>>(
         this.dataService.baseUrl + '/metanomeResults'
-      ))
-    this.loadedExistingMetanomeResults = true;
-  }
-
-  public existingFdResultsFor(table: Table) {
-    return this.existingMetanomeResults
-      .filter(
-        (res) =>
-          res.resultType === 'FunctionalDependency' &&
-          res.schemaAndTables[0] === table.fullName
-      )
-      .sort(function (table, otherTable) {
+      ))).sort(function (table, otherTable) {
         return otherTable.createDate - table.createDate;
-      });
-  }
+      })
 
-  public existingIndResults() {
-    return this.existingMetanomeResults
+    existingMetanomeResults
+      .filter((res) => res.resultType === 'FunctionalDependency'
+      ).forEach(entry => {
+        const table = this.tables.find(t => entry.schemaAndTables.includes(t.fullName))
+        if(table) this.existingFdResults.get(table)?.push(entry);
+      })
+
+    this.existingIndResults = existingMetanomeResults
       .filter(
         (res) =>
           res.resultType === 'InclusionDependency' &&
           this.tables.every((t) => res.schemaAndTables.includes(t.fullName))
       )
-      .sort(function (table, otherTable) {
-        return otherTable.createDate - table.createDate;
-      });
+    this.loadedExistingMetanomeResults = true;
   }
-
 }
