@@ -10,7 +10,7 @@
       <app-settings-row
         [tables]="[table]"
         [defaultConfigs]="fdConfigs"
-        [existingResults]="existingFdResults.get(table)"
+        [existingResults]="existingFdResults.get(table)!"
         [overwriteConfig]="overwriteConfig"
         (config)="configs.set(table, $event)"
         (applyToAllTables)="overwriteConfig = $event"
