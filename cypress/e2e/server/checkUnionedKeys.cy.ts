@@ -20,23 +20,26 @@ describe("The /unionedkeys route", () => {
 
   it("returns 'allowed' correctly 2", () => {
     cy.fixture("unionedKeysBody.json").then((body) => {
-      body.key1 = body.key2;
-      body.unionedColumns[0] = body.unionedColumns[1];
-      cy.request("post", route, body).should((result) => {
-        expect(result.body).equal("allowed");
-      });
+      (body.tableSql =
+        "SELECT n_nationkey, n_name FROM public.nation_region_denormalized UNION SELECT n_nationkey, n_name FROM public.nation_region_denormalized"),
+        cy.request("post", route, body).should((result) => {
+          expect(result.body).equal("allowed");
+        });
     });
   });
 
   it("returns 'forbidden' correctly", () => {
     cy.fixture("unionedKeysBody.json").then((body) => {
-      body.key1.attributes = ["n_nationkey"];
-      body.key2.attributes = ["n_regionkey"];
+      (body.tableSql =
+        "SELECT n_nationkey, n_regionkey, r_comment FROM public.nation_region_denormalized UNION SELECT n_regionkey, n_nationkey, r_comment FROM public.nation_region_denormalized"),
+        (body.expectedKey.attributes = ["n_nationkey"]);
 
-      body.unionedColumns = [
-        ["n_nationkey", "n_regionkey", "r_comment"],
-        ["n_regionkey", "n_nationkey", "r_comment"],
-      ];
+      body.expectedKey = {
+        table_schema: "public",
+        table_name: "nation_region_denormalized",
+        attributes: ["n_nationkey"],
+      };
+
       cy.request("post", route, body).should((result) => {
         expect(result.body).equal("forbidden");
       });
@@ -45,15 +48,28 @@ describe("The /unionedkeys route", () => {
 
   it("returns 'forbidden' on null-columns", () => {
     cy.fixture("unionedKeysBody.json").then((body) => {
-      body.key1.attributes = ["n_nationkey"];
-      body.key2.attributes = ["null"];
+      (body.tableSql =
+        "SELECT n_nationkey, n_regionkey, r_comment FROM public.nation_region_denormalized UNION SELECT null, n_nationkey, r_comment FROM public.nation_region_denormalized"),
+        (body.expectedKey.attributes = ["n_nationkey"]);
 
+      cy.request("post", route, body).should((result) => {
+        expect(result.body).equal("forbidden");
+      });
+    });
+  });
+
+  it("returns error on empty sql", () => {
+    cy.fixture("unionedKeysBody.json").then((body) => {
+      body.table1Sql = "";
       body.unionedColumns = [
         ["n_nationkey", "n_regionkey", "r_comment"],
         ["null", "n_nationkey", "r_comment"],
       ];
-      cy.request("post", route, body).should((result) => {
-        expect(result.body).equal("forbidden");
+      cy.request({
+        method: "post",
+        url: route,
+        body: body,
+        failOnStatusCode: false,
       });
     });
   });

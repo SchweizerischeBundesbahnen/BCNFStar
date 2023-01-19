@@ -1,9 +1,8 @@
 import IPrimaryKey from "./IPrimaryKey";
 
 export interface IRequestBodyUnionedKeys {
-  key1: IPrimaryKey;
-  key2: IPrimaryKey;
-  unionedColumns: Array<Array<string>>;
+  tableSql: string;
+  expectedKey: IPrimaryKey;
 }
 
 export enum KeyUnionability {

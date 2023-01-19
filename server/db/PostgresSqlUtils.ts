@@ -140,7 +140,9 @@ export default class PostgresSqlUtils extends SqlUtils {
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability> {
     const _sql: string = this.testKeyUnionabilitySql(t);
+
     const result = await this.pool.query<{ count: number }>(_sql);
+
     if (result.rows[0].count == 0) return KeyUnionability.allowed;
     return KeyUnionability.forbidden;
   }
