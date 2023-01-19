@@ -40,17 +40,17 @@ export default class FdScore {
   }
 
   /**
-   * should be only used for testing
+   * should be only used for (automatic) testing
    * @returns all single scores
    */
   public testingScore() {
-    return Object.fromEntries(Object.entries(this.allScores()).map(
-      ([type, scoreFunction]) => [type, scoreFunction.bind(this)()]
+    return Object.fromEntries(Object.entries(this.allScoreFunctions()).map(
+      ([type, scoreFunction]) => [type, scoreFunction()]
     ))
   }
 
-  private allScores(): Record<string, () => number> {
-    return {
+  private allScoreFunctions(): Record<string, () => number> {
+    const functions: Record<string, () => number> = {
       length: this.fdLengthScore,
       keyValue: this.fdKeyValueScore,
       position: this.fdPositionScore,
@@ -59,6 +59,10 @@ export default class FdScore {
       redundanceMetanome: this.fdRedundanceScoreMetanome,
       similarity: this.fdSimilarityScore
     };
+    for(const weightName in functions)
+      functions[weightName] = functions[weightName].bind(this)
+
+    return functions;
   }
 
   /**
@@ -67,9 +71,9 @@ export default class FdScore {
    */
   private calculate(): number {
     let score = 0
-    for (const [weightName, scoreFunction] of Object.entries(this.allScores())) {
+    for (const [weightName, scoreFunction] of Object.entries(this.allScoreFunctions())) {
       const weight: number = (window as any).DEFAULT_RANKING_WEIGHTS[weightName] ?? 0
-      if (weight !== 0) score += weight * scoreFunction.bind(this)()
+      if (weight !== 0) score += weight * scoreFunction()
     }
     return score
   }
@@ -89,7 +93,7 @@ export default class FdScore {
   private rhsLengthScore(): number {
     return this.table.numColumns > 2
       ? this.fd.rhs.copy().setMinus(this.fd.lhs).cardinality /
-          (this.table.numColumns - 2)
+      (this.table.numColumns - 2)
       : 0;
   }
 
