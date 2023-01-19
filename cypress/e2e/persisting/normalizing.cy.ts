@@ -30,7 +30,7 @@ describe("The persist-button should create executable SQL", () => {
   });
 
   it("creates keys", () => {
-    cy.get('[data-cy="graph-element-columns"].pk]').should(
+    cy.get('[data-cy="graph-element-columns"].pk').should(
       "have.length",
       1
     );
