@@ -24,6 +24,7 @@
   </div>
   <div
     class="table-head ellipsis"
+    [ngStyle]="{'height.px': headerHeight}"
     [sbbTooltip]="table.fullName"
     [ngClass]="{
       fact: isFact,
@@ -47,7 +48,8 @@
         fk: isFkColumn(column),
         highlighted: isHighlightedColumn(column)
       }"
-      class="ellipsis column-name"
+      [ngStyle]="{'height.px': columnHeight}"
+      class="ellipsis"
       data-cy="graph-element-columns"
     >
       {{ column.name }}

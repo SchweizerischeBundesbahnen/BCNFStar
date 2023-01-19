@@ -8,6 +8,7 @@ import { SchemaService } from '@/src/app/schema.service';
 import BasicTable from '@/src/model/schema/BasicTable';
 import { IntegrationService } from '@/src/app/integration.service';
 import { SchemaMergingService } from '@/src/app/schema-merging.service';
+import { graphElementColumnHeight, graphElementHeaderHeight } from '../constants';
 
 type GraphStorageItem = {
   jointjsEl: joint.dia.Element;
@@ -42,8 +43,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
   @Input() public links: Iterable<LinkDefinition> = [];
   protected panzoomTransform: Transform = { x: 0, y: 0, scale: 1 };
 
-  // if you change this, also change graph-element.component.css > .column-name > height
-  protected columnHeight = 23;
+  protected columnHeight = graphElementColumnHeight;
 
   public graphStorage = new Map<BasicTable, GraphStorageItem>();
 
@@ -220,8 +220,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
     }
   }
 
-  // if you change this, also change graph-element.component.css > .table-head > height
-  protected graphElementHeaderHeight: number = 25;
+  protected headerHeight: number = graphElementHeaderHeight;
   private generatePortMarkup(
     counter: number,
     side: PortSide,
@@ -239,7 +238,7 @@ export class SchemaGraphComponent implements AfterContentInit, OnChanges {
           cx,
           fill,
            cy:
-            this.graphElementHeaderHeight + this.columnHeight * (counter + 0.5),
+            this.headerHeight + this.columnHeight * (counter + 0.5),
         },
       },
     ];
