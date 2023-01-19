@@ -5,6 +5,7 @@ import BasicColumn from '@/src/model/types/BasicColumn';
 import { Component, Input, OnInit } from '@angular/core';
 import Table from 'src/model/schema/Table';
 import { IntegrationService } from '@/src/app/integration.service';
+import { graphElementColumnHeight, graphElementHeaderHeight } from '../constants';
 
 @Component({
   selector: 'app-graph-element',
@@ -24,6 +25,9 @@ export class GraphElementComponent implements OnInit {
     public schemaService: SchemaService,
     public intService: IntegrationService
   ) {}
+
+  public readonly columnHeight = graphElementColumnHeight;
+  public readonly headerHeight = graphElementHeaderHeight;
 
   ngOnInit(): void {
     if (!this.schemaService.starMode) return;

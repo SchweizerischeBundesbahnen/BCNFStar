@@ -84,8 +84,6 @@
 
 .table-head {
   background-color: lightgray;
-  /* if you change this, also change graphElementHeaderHeight in schema-graph.component.ts */
-  height: 25px;
   border-top: solid 3px #2d327d;
   font-weight: bold;
   font-size: 1rem;
