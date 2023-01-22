@@ -31,7 +31,6 @@ export class SplitDialogComponent {
   public pkViolation!: boolean;
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
-  public useNull!: boolean;
 
   public minimalDeterminants!: Array<ColumnCombination>;
   public hull!: ColumnCombination;
@@ -39,6 +38,9 @@ export class SplitDialogComponent {
   public selectedColumns = new Map<Column, boolean>();
 
   public tableName: string;
+
+  public nullCols!: Array<Column>;
+  public nullSubstitutes!: Map<Column, string>;
 
   constructor(
     // eslint-disable-next-line no-unused-vars
@@ -107,11 +109,25 @@ export class SplitDialogComponent {
   }
 
   public async checkUseNull() {
-    const dataQuery: NotNullDataQuery = await NotNullDataQuery.Create(
-      this.table,
-      this.fd.lhs.asArray()
-    );
-    this.useNull = !(await dataQuery.result());
+    let queries = new Map<Column, Promise<boolean>>();
+    for (let column of this.fd.lhs) {
+      const dataQuery: NotNullDataQuery = await NotNullDataQuery.Create(
+        this.table,
+        [column]
+      );
+      queries.set(column, dataQuery.result());
+    }
+
+    this.nullCols = new Array<Column>();
+    this.nullSubstitutes = new Map<Column, string>();
+
+    for (let column of this.fd.lhs) {
+      if (!(await queries.get(column))) {
+        this.nullCols.push(column);
+        this.nullSubstitutes.set(column, '');
+      }
+    }
+    console.log(this.nullCols);
   }
 
   public isFullyDetermined() {

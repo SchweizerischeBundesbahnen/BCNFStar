@@ -61,9 +61,30 @@
     </ul>
   </div>
 
-  <div *ngIf="useNull" class="violation">
+  <div *ngIf="nullCols && nullCols.length > 0" class="violation">
     The key of the created table would contain null values. Please specify a
     value with which to replace the null values.
+    <br />
+    <table>
+      <tr>
+        <th>name</th>
+        <th>datatype</th>
+        <th>substitute</th>
+      </tr>
+      <tr *ngFor="let col of nullCols">
+        <td>{{ col.name }}</td>
+        <td>{{ col.dataType }}</td>
+        <td>
+          <input
+            type="text"
+            sbbInput
+            placeholder="substitute for null values"
+            [ngModel]="nullSubstitutes.get(col)"
+            (ngModelChange)="nullSubstitutes.set(col, $event)"
+          />
+        </td>
+      </tr>
+    </table>
   </div>
 
   <div sbbDialogActions>
