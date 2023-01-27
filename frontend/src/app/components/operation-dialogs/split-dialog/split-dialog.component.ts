@@ -1,4 +1,4 @@
-import { NotNullDataQuery } from '@/src/app/dataquery';
+import { NewValueDataQuery } from '@/src/app/dataquery';
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
@@ -15,6 +15,7 @@ export interface SplitDialogResponse {
 export interface FdSplitResponse extends SplitDialogResponse {
   fd: FunctionalDependency;
   name: string;
+  nullSubstitutes: Map<Column, string>;
 }
 
 export interface ChangeKeyResponse extends SplitDialogResponse {
@@ -41,6 +42,8 @@ export class SplitDialogComponent {
 
   public nullCols!: Array<Column>;
   public nullSubstitutes!: Map<Column, string>;
+  public nullSubstituteErrors!: Map<Column, string>;
+  public nullSubstituteCheckValid: boolean = false;
 
   constructor(
     // eslint-disable-next-line no-unused-vars
@@ -63,7 +66,7 @@ export class SplitDialogComponent {
     });
     this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
     this.updateViolations();
-    this.checkUseNull();
+    this.initNullSubstitutes();
   }
 
   public get table() {
@@ -108,26 +111,36 @@ export class SplitDialogComponent {
       );
   }
 
-  public async checkUseNull() {
-    let queries = new Map<Column, Promise<boolean>>();
-    for (let column of this.fd.lhs) {
-      const dataQuery: NotNullDataQuery = await NotNullDataQuery.Create(
-        this.table,
-        [column]
-      );
-      queries.set(column, dataQuery.result());
-    }
-
+  public initNullSubstitutes() {
     this.nullCols = new Array<Column>();
     this.nullSubstitutes = new Map<Column, string>();
+    this.nullSubstituteErrors = new Map<Column, string>();
 
     for (let column of this.fd.lhs) {
-      if (!(await queries.get(column))) {
+      if (column.sourceColumn.nullable) {
         this.nullCols.push(column);
-        this.nullSubstitutes.set(column, '');
+        this.nullSubstitutes.set(column, column.nullSubstitute ?? '');
       }
     }
-    console.log(this.nullCols);
+    this.checkNullSubstitutes();
+  }
+
+  public async checkNullSubstitutes() {
+    for (let column of this.nullCols) {
+      this.nullSubstituteErrors.set(column, '');
+      if (!this.nullSubstitutes.get(column)) {
+        this.nullSubstituteErrors.set(column, 'No substitute specified.');
+        continue;
+      }
+      const dataQuery: NewValueDataQuery = await NewValueDataQuery.Create(
+        column.sourceColumn,
+        this.nullSubstitutes.get(column)!
+      );
+      if (!(await dataQuery.result())) {
+        this.nullSubstituteErrors.set(column, 'substitute exists in data.');
+      }
+    }
+    this.nullSubstituteCheckValid = true;
   }
 
   public isFullyDetermined() {
@@ -137,7 +150,9 @@ export class SplitDialogComponent {
   public canConfirm() {
     return (
       [...this.selectedColumns.values()].some((bool) => bool) &&
-      this.isFullyDetermined()
+      this.isFullyDetermined() &&
+      this.nullSubstituteCheckValid &&
+      [...this.nullSubstituteErrors.values()].every((error) => !error)
     );
   }
 
@@ -146,6 +161,7 @@ export class SplitDialogComponent {
       type: 'fdSplit',
       fd: this.fd,
       name: this.tableName,
+      nullSubstitutes: this.nullSubstitutes,
     });
   }
 

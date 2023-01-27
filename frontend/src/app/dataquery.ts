@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import IRequestBodyINDViolatingRows from '@server/definitions/IRequestBodyINDViolatingRows';
+import IRequestBodyNewValue from '@server/definitions/IRequestBodyNewValue';
 import { IRequestBodyNotNull } from '@server/definitions/IRequestBodyNotNull';
 import IRowCounts from '@server/definitions/IRowCounts';
 import ITablePage from '@server/definitions/ITablePage';
@@ -13,6 +14,7 @@ import SQLPersisting from '../model/schema/persisting/SQLPersisting';
 import TableRelationship from '../model/schema/TableRelationship';
 import Table from '../model/schema/Table';
 import { InjectorInstance } from './app.module';
+import SourceColumn from '../model/schema/SourceColumn';
 
 export abstract class Query {
   protected baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
@@ -275,6 +277,37 @@ export class NotNullDataQuery extends Query {
         true
       ),
       expectedKey: this.cols.map((c) => c.name),
+    };
+  }
+}
+
+export class NewValueDataQuery extends Query {
+  public static async Create(
+    col: SourceColumn,
+    value: string
+  ): Promise<NewValueDataQuery> {
+    const newValueDataQuery = new NewValueDataQuery(col, value);
+    await newValueDataQuery.initPersisting();
+    return newValueDataQuery;
+  }
+
+  private constructor(protected col: SourceColumn, protected value: string) {
+    super();
+  }
+
+  public result(): Promise<boolean> {
+    return firstValueFrom(
+      this.http.post<boolean>(`${this.baseUrl}/newvalue`, this.body())
+    );
+  }
+
+  private body(): IRequestBodyNewValue {
+    return {
+      schemaName: this.col.table.schemaName,
+      tableName: this.col.table.name,
+      columnName: this.col.name,
+      dataType: this.col.dataType,
+      value: this.value,
     };
   }
 }

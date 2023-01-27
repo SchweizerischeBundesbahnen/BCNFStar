@@ -81,10 +81,21 @@
             placeholder="substitute for null values"
             [ngModel]="nullSubstitutes.get(col)"
             (ngModelChange)="nullSubstitutes.set(col, $event)"
+            (ngModelChange)="nullSubstituteCheckValid = false"
           />
+        </td>
+        <td>
+          {{ nullSubstituteErrors.get(col) }}
         </td>
       </tr>
     </table>
+    <button
+      sbb-button
+      [disabled]="nullSubstituteCheckValid"
+      (click)="checkNullSubstitutes()"
+    >
+      Check Substitutes
+    </button>
   </div>
 
   <div sbbDialogActions>

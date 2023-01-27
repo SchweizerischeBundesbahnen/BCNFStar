@@ -195,10 +195,20 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async split(fd: FunctionalDependency, name?: string) {
+  public async split(
+    fd: FunctionalDependency,
+    nullSubstitutes: Map<Column, string>,
+    name?: string
+  ) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');
-    let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
+    let command = new SplitCommand(
+      this._schema,
+      this.selectedTable!,
+      fd,
+      nullSubstitutes,
+      name
+    );
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);

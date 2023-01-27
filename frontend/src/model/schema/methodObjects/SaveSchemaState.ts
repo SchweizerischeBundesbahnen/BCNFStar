@@ -81,6 +81,7 @@ interface JSONColumnCombination {
 interface JSONColumn {
   sourceTableInstance: JSONSourceTableInstance;
   sourceColumn: JSONSourceColumn;
+  nullSubstitute: string;
   userAlias?: string;
   includeSourceName: boolean;
   _maxValue: number;
@@ -286,6 +287,7 @@ export default class SaveSchemaState {
     let column = new Column(
       this.findSourceTableInstance(col.sourceTableInstance, table.sources),
       this.parseSourceColumn(col.sourceColumn),
+      col.nullSubstitute,
       col.userAlias
     );
     column.includeSourceName = col.includeSourceName;

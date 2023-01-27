@@ -298,9 +298,14 @@ ALTER TABLE ${this.tableIdentifier(
     dataType: string = ''
   ): string {
     if (column == null) return ` CAST (null AS ${dataType}) `;
-    return `${this.escape(column.sourceTableInstance.alias)}.${this.escape(
-      column.sourceColumn.name
-    )}`;
+    let identifier = `${this.escape(
+      column.sourceTableInstance.alias
+    )}.${this.escape(column.sourceColumn.name)}`;
+    if (column.nullSubstitute) {
+      return `COALESCE(${identifier}, '${column.nullSubstitute}')`;
+    } else {
+      return identifier;
+    }
   }
 
   public abstract surrogateKeyString(name: string): string;

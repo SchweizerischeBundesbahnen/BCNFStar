@@ -12,12 +12,16 @@ export default class Split {
   public constructor(
     private table: Table,
     private fd: FunctionalDependency,
+    private nullSubstitutes?: Map<Column, string>,
     private generatingName?: string
   ) {
     this.split();
   }
 
   private split() {
+    for (let col of this.nullSubstitutes?.keys() ?? []) {
+      col.nullSubstitute = this.nullSubstitutes?.get(col);
+    }
     let remaining: Table = new Delete(
       this.table,
       this.fd.rhs.copy().setMinus(this.fd.lhs)

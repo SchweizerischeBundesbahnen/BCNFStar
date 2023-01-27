@@ -40,6 +40,7 @@ import getMaxValue from "./routes/maxValue";
 import getColumnSample from "./routes/columnSample";
 import getSchemaMatching from "./routes/schemaMatching";
 import checkNotNull from "./routes/checkNotNullConstraint";
+import checkNewValue from "./routes/checkNewValue";
 
 const app = express();
 
@@ -139,6 +140,8 @@ app.post(
   [body("tableSql").trim().custom(isValidSql())],
   checkNotNull
 );
+
+app.post("/newvalue", [], checkNewValue);
 
 app.post(
   "/violatingRows/fd",

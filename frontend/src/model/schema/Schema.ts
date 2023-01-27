@@ -748,7 +748,8 @@ export default class Schema {
     return (
       this.fdSplitFKViolationsOf(fd, table).length == 0 &&
       this.fdSplitReferenceViolationsOf(fd, table).length == 0 &&
-      !this.fdSplitPKViolationOf(fd, table)
+      !this.fdSplitPKViolationOf(fd, table) &&
+      fd.lhs.asArray().every((col) => !col.sourceColumn.nullable)
     );
   }
 

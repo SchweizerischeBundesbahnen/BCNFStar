@@ -14,6 +14,7 @@ import {
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
 import { IRequestBodyNotNull } from "@/definitions/IRequestBodyNotNull";
+import IRequestBodyNewValue from "@/definitions/IRequestBodyNewValue";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -107,6 +108,8 @@ export default abstract class SqlUtils {
     t: IRequestBodyNotNull
   ): Promise<boolean>;
 
+  public abstract testNewValue(t: IRequestBodyNewValue): Promise<boolean>;
+
   public abstract escape(str: string): string;
 
   public generateColumnString(columns: string[]): string {
@@ -155,6 +158,18 @@ export default abstract class SqlUtils {
         .map((name) => `${this.escape(name)} IS NULL`)
         .join("\n\t\tOR")}
     ) as notnull`;
+    return sql;
+  }
+
+  public testNewValueSql(nv: IRequestBodyNewValue): string {
+    const sql = `
+    SELECT NOT EXISTS (
+      SELECT ${this.escape(nv.columnName)}
+      FROM ${this.escape(nv.schemaName)}.${nv.tableName}
+      WHERE ${this.escape(nv.columnName)} = CAST('${nv.value}' AS ${
+      nv.dataType
+    })
+    ) as new;`;
     return sql;
   }
 

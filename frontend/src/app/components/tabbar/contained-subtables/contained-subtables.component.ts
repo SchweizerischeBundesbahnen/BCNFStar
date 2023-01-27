@@ -57,7 +57,7 @@ export class ContainedSubtablesComponent {
   }
 
   /**
-   * 
+   *
    * @returns fd clusters (further infos in Table.ts) eventually filterd by columns from user input
    */
   public fdClusters(): Array<FdCluster> {
@@ -97,7 +97,11 @@ export class ContainedSubtablesComponent {
     switch (response.type) {
       case 'fdSplit': {
         const fdResponse = response as FdSplitResponse;
-        this.schemaService.split(fdResponse.fd, fdResponse.name);
+        this.schemaService.split(
+          fdResponse.fd,
+          fdResponse.nullSubstitutes,
+          fdResponse.name
+        );
         break;
       }
       case 'changeKey': {
