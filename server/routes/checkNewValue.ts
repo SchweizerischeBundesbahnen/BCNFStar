@@ -25,6 +25,8 @@ export default async function checkNewValue(
       .json(await sqlUtils.testNewValue(req.body as IRequestBodyNewValue));
   } catch (error) {
     console.error(error);
-    res.status(502).json({ error: "Error while trying to test nullability." });
+    res
+      .status(502)
+      .json({ error: "Error while trying to test uniqueness of a new value." });
   }
 }

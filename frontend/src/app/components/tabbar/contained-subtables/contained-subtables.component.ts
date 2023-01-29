@@ -57,7 +57,6 @@ export class ContainedSubtablesComponent {
   }
 
   /**
-   *
    * @returns fd clusters (further infos in Table.ts) eventually filterd by columns from user input
    */
   public fdClusters(): Array<FdCluster> {
