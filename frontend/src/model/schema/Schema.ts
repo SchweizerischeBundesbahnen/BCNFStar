@@ -749,7 +749,7 @@ export default class Schema {
       this.fdSplitFKViolationsOf(fd, table).length == 0 &&
       this.fdSplitReferenceViolationsOf(fd, table).length == 0 &&
       !this.fdSplitPKViolationOf(fd, table) &&
-      fd.lhs.asArray().every((col) => !col.sourceColumn.nullable)
+      fd.lhs.asArray().every((col) => !col.sourceColumn.safeInferredNullable)
     );
   }
 

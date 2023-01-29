@@ -13,6 +13,7 @@ import { DatabaseService } from '../../../database.service';
 })
 export class PersistSchemaComponent {
   public schemaName: string = '';
+  public constraintPolicy: string = 'maximal';
 
   constructor(
     public dataService: DatabaseService,
@@ -32,7 +33,10 @@ export class PersistSchemaComponent {
 
   public async persistSchema(): Promise<string> {
     const persisting = await this.initPersisting();
-    return persisting.createSQL(this.schemaService.schema);
+    return persisting.createSQL(
+      this.schemaService.schema,
+      this.constraintPolicy
+    );
   }
 
   async download(): Promise<void> {

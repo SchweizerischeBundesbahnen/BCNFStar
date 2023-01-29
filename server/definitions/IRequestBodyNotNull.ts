@@ -1,4 +1,5 @@
 export interface IRequestBodyNotNull {
-  tableSql: string;
-  expectedKey: Array<string>;
+  schemaName: string;
+  tableName: string;
+  columnName: string;
 }

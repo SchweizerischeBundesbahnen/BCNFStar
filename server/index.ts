@@ -135,11 +135,7 @@ app.post(
   checkUnionedKeys
 );
 
-app.post(
-  "/notnull",
-  [body("tableSql").trim().custom(isValidSql())],
-  checkNotNull
-);
+app.post("/notnull", [], checkNotNull);
 
 app.post("/newvalue", [], checkNewValue);
 

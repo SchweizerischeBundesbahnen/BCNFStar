@@ -99,7 +99,8 @@ interface JSONSourceColumn {
   name: string;
   table: JSONSourceTable;
   dataType: string;
-  nullable: boolean;
+  schemaNullable: boolean;
+  inferredNullable?: boolean;
 }
 
 interface JSONSourceTable {
@@ -351,7 +352,8 @@ export default class SaveSchemaState {
       sc.name,
       newSourceTable,
       sc.dataType,
-      sc.nullable
+      sc.schemaNullable,
+      sc.inferredNullable
     );
 
     let existingCol = this.existingSourceColumns.find((other) =>

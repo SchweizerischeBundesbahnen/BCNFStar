@@ -249,16 +249,13 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
 }
 
 export class NotNullDataQuery extends Query {
-  public static async Create(
-    table: Table,
-    cols: Array<Column>
-  ): Promise<NotNullDataQuery> {
-    const notNullDataQuery = new NotNullDataQuery(table, cols);
+  public static async Create(col: SourceColumn): Promise<NotNullDataQuery> {
+    const notNullDataQuery = new NotNullDataQuery(col);
     await notNullDataQuery.initPersisting();
     return notNullDataQuery;
   }
 
-  private constructor(protected table: Table, protected cols: Array<Column>) {
+  private constructor(protected col: SourceColumn) {
     super();
   }
 
@@ -270,13 +267,9 @@ export class NotNullDataQuery extends Query {
 
   private body(): IRequestBodyNotNull {
     return {
-      tableSql: this.SqlGeneration!.selectStatement(
-        this.table,
-        this.table.columns.asArray(),
-        [],
-        true
-      ),
-      expectedKey: this.cols.map((c) => c.name),
+      schemaName: this.col.table.schemaName,
+      tableName: this.col.table.name,
+      columnName: this.col.name,
     };
   }
 }

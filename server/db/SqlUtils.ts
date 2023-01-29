@@ -153,10 +153,8 @@ export default abstract class SqlUtils {
     const sql = `
     SELECT NOT EXISTS(
       SELECT *
-      FROM (${nn.tableSql}) as X
-      WHERE ${nn.expectedKey
-        .map((name) => `${this.escape(name)} IS NULL`)
-        .join("\n\t\tOR")}
+      FROM ${this.escape(nn.schemaName)}.${nn.tableName}
+      WHERE ${this.escape(nn.columnName)} IS NULL
     ) as notnull`;
     return sql;
   }

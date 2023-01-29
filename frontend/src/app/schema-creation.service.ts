@@ -14,6 +14,7 @@ import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import { DatabaseService } from './database.service';
 import { SchemaService } from './schema.service';
+import { NotNullDataQuery } from './dataquery';
 
 @Injectable({
   providedIn: 'root',
@@ -204,6 +205,14 @@ export class SchemaCreationService {
     }
   }
 
+  private async inferNullability(...columns: Array<SourceColumn>) {
+    for (let col of columns) {
+      let dataquery = await NotNullDataQuery.Create(col);
+      let inferredNotNullability = await dataquery.result();
+      col.inferredNullable = !inferredNotNullability;
+    }
+  }
+
   /**
    * Creates InputSchema for use on edit-schema page with the supplied tables
    * @param tables used on edit-schema page
@@ -230,6 +239,7 @@ export class SchemaCreationService {
 
     await this.determineMaxColumnValueOf(tables);
     await this.determineBloomfilters(tables);
+    await this.inferNullability(...sourceColumns.values());
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);

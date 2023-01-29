@@ -117,7 +117,7 @@ export class SplitDialogComponent {
     this.nullSubstituteErrors = new Map<Column, string>();
 
     for (let column of this.fd.lhs) {
-      if (column.sourceColumn.nullable) {
+      if (column.sourceColumn.safeInferredNullable) {
         this.nullCols.push(column);
         this.nullSubstitutes.set(column, column.nullSubstitute ?? '');
       }

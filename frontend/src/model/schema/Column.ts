@@ -79,7 +79,17 @@ export default class Column implements BasicColumn {
   }
 
   public get nullable() {
-    return this.sourceColumn.nullable && !this.nullSubstitute;
+    return this.nullableConstraint('maximal');
+  }
+
+  public nullableConstraint(constraintPolicy: string) {
+    if (this.nullSubstitute) return false;
+    if (constraintPolicy == 'minimal') return true;
+    else if (constraintPolicy == 'schema')
+      return this.sourceColumn.schemaNullable;
+    else if (constraintPolicy == 'maximal')
+      return this.sourceColumn.safeInferredNullable;
+    throw Error();
   }
 
   public get dataTypeString() {

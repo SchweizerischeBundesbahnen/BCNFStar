@@ -13,10 +13,10 @@ export default abstract class SQLPersisting {
 
   public abstract escape(str: string): string;
 
-  public createSQL(schema: Schema): string {
+  public createSQL(schema: Schema, constraintPolicy: string): string {
     let SQL = '';
     SQL += this.schemaPreparation(schema);
-    SQL += this.tableCreation(schema);
+    SQL += this.tableCreation(schema, constraintPolicy);
     SQL += this.dataTransfer([...schema.tables]);
     SQL += this.primaryKeys([...schema.regularTables]);
     SQL += this.foreignKeys(schema);
@@ -31,12 +31,14 @@ export default abstract class SQLPersisting {
    */
   public tableCreation(
     schema: Schema,
+    constraintPolicy: string,
     tables: Iterable<BasicTable> = schema.tables,
     keepSchema = false
   ): string {
     let Sql: string = '';
     for (const table of tables) {
-      Sql += this.createTableSql(schema, table, keepSchema) + '\n';
+      Sql +=
+        this.createTableSql(schema, table, constraintPolicy, keepSchema) + '\n';
     }
     return Sql;
   }
@@ -47,6 +49,7 @@ export default abstract class SQLPersisting {
   public createTableSql(
     schema: Schema,
     table: BasicTable,
+    constraintPolicy: string,
     keepSchema = false
   ): string {
     let columnStrings: string[] = [];
@@ -64,7 +67,7 @@ export default abstract class SQLPersisting {
 
     for (const column of columns) {
       let columnString: string = `${column.name} ${column.dataType} `;
-      if (!column.nullable) {
+      if (!column.nullableConstraint(constraintPolicy)) {
         columnString += 'NOT ';
       }
       columnString += 'NULL';
