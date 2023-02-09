@@ -10,6 +10,7 @@ import MetanomeAlgorithm from "./metanomeAlgorithm";
 import BINDER from "./BINDER";
 import HyFD from "./HyFD";
 import FAIDA from "./FAIDA";
+import RustFD from "./RustFD";
 
 const queueName = "metanome";
 const connection = {
@@ -70,7 +71,7 @@ function executeCommand(
  * @returns instance of a metanome algorithm built from the job data
  */
 function getAlgoInstance(data: IMetanomeJob): MetanomeAlgorithm {
-  const singleFileAlgos = [HyFD];
+  const singleFileAlgos = [HyFD, RustFD];
   const multiFileAlgos = [FAIDA, BINDER];
   for (const singleFileAlgo of singleFileAlgos) {
     const algo = new singleFileAlgo(data.schemaAndTables[0], data.config);

@@ -13,9 +13,6 @@ import { hyfdAlgorithmName } from "@/definitions/IHyFD";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "temp");
 
-export function outputPath(schemaAndTable: string): string {
-  return join(OUTPUT_DIR, schemaAndTable + "-hyfd_extended.txt");
-}
 
 export default class HyFDExtended extends FunctionalDependencyAlgorithm {
   protected override algoJarPath(): string {
