@@ -30,7 +30,7 @@ describe("The metanome settings dialog", () => {
 
   it("displays all tabbars", () => {
     cy.get("sbb-toggle").should("have.length", 3);
-    cy.get("sbb-toggle-option").should("have.length", 10);
+    cy.get("sbb-toggle-option").should("have.length", 12);
     cy.get('sbb-toggle-option:contains("Use no Metanome result")').should(
       "have.length",
       3
