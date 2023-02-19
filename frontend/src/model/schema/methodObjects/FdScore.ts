@@ -40,19 +40,29 @@ export default class FdScore {
   }
 
   /**
-   * should be only used for testing
+   * should be only used for (automatic) testing
    * @returns all single scores
    */
   public testingScore() {
-    return {
-      length: this.fdLengthScore(),
-      keyValue: this.fdKeyValueScore(),
-      position: this.fdPositionScore(),
-      redundanceTeam: this.fdRedundanceScoreTeam(),
-      redundanceWeiLink: this.fdRedundanceScoreWeiLink(),
-      redundanceMetanome: this.fdRedundanceScoreMetanome(),
-      similarity: this.fdSimilarityScore(),
+    return Object.fromEntries(Object.entries(this.allScoreFunctions()).map(
+      ([type, scoreFunction]) => [type, scoreFunction()]
+    ))
+  }
+
+  private allScoreFunctions(): Record<string, () => number> {
+    const functions: Record<string, () => number> = {
+      length: this.fdLengthScore,
+      keyValue: this.fdKeyValueScore,
+      position: this.fdPositionScore,
+      redundanceTeam: this.fdRedundanceScoreTeam,
+      redundanceWeiLink: this.fdRedundanceScoreWeiLink,
+      redundanceMetanome: this.fdRedundanceScoreMetanome,
+      similarity: this.fdSimilarityScore
     };
+    for(const weightName in functions)
+      functions[weightName] = functions[weightName].bind(this)
+
+    return functions;
   }
 
   /**
@@ -60,21 +70,12 @@ export default class FdScore {
    * @returns a ranking score used different ranking approaches 
    */
   private calculate(): number {
-    return (
-      (window as any).DEFAULT_RANKING_WEIGHTS.length * this.fdLengthScore() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.keyValue *
-        this.fdKeyValueScore() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.position *
-        this.fdPositionScore() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceTeam *
-        this.fdRedundanceScoreTeam() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceWeiLink *
-        this.fdRedundanceScoreWeiLink() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.redundanceMetanome *
-        this.fdRedundanceScoreMetanome() +
-      (window as any).DEFAULT_RANKING_WEIGHTS.similarity *
-        this.fdSimilarityScore()
-    );
+    let score = 0
+    for (const [weightName, scoreFunction] of Object.entries(this.allScoreFunctions())) {
+      const weight: number = (window as any).DEFAULT_RANKING_WEIGHTS[weightName] ?? 0
+      if (weight !== 0) score += weight * scoreFunction()
+    }
+    return score
   }
 
   /**
@@ -92,7 +93,7 @@ export default class FdScore {
   private rhsLengthScore(): number {
     return this.table.numColumns > 2
       ? this.fd.rhs.copy().setMinus(this.fd.lhs).cardinality /
-          (this.table.numColumns - 2)
+      (this.table.numColumns - 2)
       : 0;
   }
 

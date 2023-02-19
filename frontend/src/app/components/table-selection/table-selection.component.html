@@ -51,7 +51,7 @@
     </h3>
     <app-database-table-viewer
       [dataService]="dataQuery!"
-      [rowCount]="tableRowCounts.get(hoveredTable)!"
+      [rowCount]="{groups: hoveredTable!.rowCount, entries: hoveredTable.rowCount}"
     ></app-database-table-viewer>
   </div>
 </div>

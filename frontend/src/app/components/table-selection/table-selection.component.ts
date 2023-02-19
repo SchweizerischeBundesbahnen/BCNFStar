@@ -19,7 +19,6 @@ import { firstValueFrom } from 'rxjs';
 import { SchemaCreationService } from '../../schema-creation.service';
 import Schema from '@/src/model/schema/Schema';
 import { DataQuery, TablePreviewDataQuery } from '../../dataquery';
-import IRowCounts from '@server/definitions/IRowCounts';
 
 @Component({
   selector: 'app-table-selection',
@@ -33,8 +32,6 @@ export class TableSelectionComponent implements OnInit {
 
   @Input() public withContentPreview: boolean = true;
   @Output() public schema = new EventEmitter<Schema>();
-
-  public tableRowCounts: Map<Table, IRowCounts> = new Map();
 
   public loadingStatus: Map<IIndexFileEntry, 'done' | 'error' | 'loading'> =
     new Map();
@@ -60,7 +57,6 @@ export class TableSelectionComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    const rowCountPromise = this.dataService.loadTableRowCounts();
     this.tables = await this.dataService.loadTables();
 
     for (const table of this.tables) {
@@ -69,9 +65,6 @@ export class TableSelectionComponent implements OnInit {
         this.tablesInSchema[table.schemaName] = [];
       this.tablesInSchema[table.schemaName].push(table);
     }
-    const rowCounts = await rowCountPromise;
-    for (const table of this.tables)
-      this.tableRowCounts.set(table, rowCounts[table.fullName]);
   }
 
   public hasSelectedTables(): boolean {

@@ -480,7 +480,7 @@ export default class Table extends BasicTable {
   /**
    * calculates for every fd in the clusters a ranking score
    * @param fdClusters 
-   * @returns fdc lusters with fds with ranking scores
+   * @returns fd clusters with fds with ranking scores
    */
   private scoreFdInFdClusters(fdClusters: Array<FdCluster>): Array<FdCluster> {
     fdClusters.forEach((cluster) =>
