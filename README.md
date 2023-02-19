@@ -14,52 +14,12 @@ It ensures that all transformations are valid for a given data instance and gene
 
 ## Setup
 
-### Java
+You can either setup BCNFStar manually with nodejs or use our docker image. For most users, we recommend Docker as it is easier to setup.
 
-This project uses [metanome](https://github.com/sekruse/metanome-cli), which requires [java](https://www.java.com/de/download/manual.jsp). We recommend Java 8-11.
+### Using Docker
 
-### Node
-
-This project requires [nodejs](https://nodejs.org/en/download/). After installing node, you need to execute
-
-```bash
-npm install
-```
-
-from the project root folder, which will also install all dependencies in the server and frontend projects.
-
-### Database
-
-BCNFStar currently works on Postgres and Microsoft SQL Server databases. You need to set an environment variable called DB_TYPE to either postgres, mssql (or sqledge). Regardless of the database type, a [.pgpass-like](https://www.postgresql.org/docs/9.3/libpq-pgpass.html) is needed. Its path needs to be in an environment variable called DB_PASSFILE. Environment variables can be placed in a file called .env.local in the project root like this:
-
-```dotenv
-DB_TYPE="postgres"
-DB_PASSFILE="~/.pgpass"
-```
-
-### Redis
-
-Since metanome jobs might take a lot of time and resources, we queue them. This requires running a [Redis](https://redis.io/) instance for storing the queue through server restarts, which can be obtained from many standard package managers on Unix or from a [tarball](https://redis.io/download). On Windows, you can use [this download](https://github.com/zkteco-home/redis-windows). If you host Redis on a different machine or change its config, you may pass REDIS_HOST and REDIS_PORT env variables.
-
-## Deploying
-
-To build the production app, run
-
-```bash
-npm run build
-```
-
-from the project root, which will build both the server and the frontend. After that, you can start the server by invoking
-
-```bash
-npm run start
-```
-
-### Docker
-
-If you want to use a docker container for deployment you can skip the steps above. Just follow the next commands.
-
-First set up your personal DB configuration in [](docker-compose.yml). By default we use a standard postgres database configuration.
+The docker image does not include a database as BCNFStar is intended to run on your existing data.
+You can configure the database connection in [docker-compose.yml](docker-compose.yml). By default we use a standard postgres database configuration. The available options for DB_TYPE are `postgres` and `mssql` (for Microsoft SQL Server based databases)
 
 ```yml
 - DB_HOST=host.docker.internal
@@ -80,15 +40,58 @@ to create docker containers for redis and BCNFStar.
 
 You can open BCNFStar on `http://localhost/#/`.
 
-### Configure FD-Ranking
+### Manual
+
+#### Java
+
+This project uses [metanome](https://github.com/sekruse/metanome-cli), which requires [java](https://www.java.com/de/download/manual.jsp). We recommend Java 8-11.
+
+#### Node
+
+This project requires [nodejs](https://nodejs.org/en/download/). After installing node, you need to execute
+
+```bash
+npm install
+```
+
+from the project root folder, which will also install all dependencies in the server and frontend projects.
+
+#### Database
+
+BCNFStar currently works on Postgres and Microsoft SQL Server databases. You need to set an environment variable called DB_TYPE to either postgres, mssql (or sqledge). Regardless of the database type, a [.pgpass-like](https://www.postgresql.org/docs/9.3/libpq-pgpass.html) is needed. Its path needs to be in an environment variable called DB_PASSFILE. Environment variables can be placed in a file called .env.local in the project root like this:
+
+```dotenv
+DB_TYPE="postgres"
+DB_PASSFILE="~/.pgpass"
+```
+
+#### Redis
+
+Since metanome jobs might take a lot of time and resources, we queue them. This requires running a [Redis](https://redis.io/) instance for storing the queue through server restarts, which can be obtained from many standard package managers on Unix or from a [tarball](https://redis.io/download). On Windows, you can use [this download](https://github.com/zkteco-home/redis-windows). If you host Redis on a different machine or change its config, you may pass REDIS_HOST and REDIS_PORT env variables.
+
+#### Deploying
+
+To build the production app, run
+
+```bash
+npm run build
+```
+
+from the project root, which will build both the server and the frontend. After that, you can start the server by invoking
+
+```bash
+npm run start
+```
+
+## Configure FD-Ranking
 
 To better assess the subject-specific correctness of functional dependencies, the functional dependencies can be evaluated using various ranking approaches. The defaultRankingWeights constant in the [FdScore.ts](frontend/src/model/schema/methodObjects/FdScore.ts) file can be used to specify whether and to what extent a ranking approach is included in the overall ranking calculation. By default, only the keyValue ranking is used. The attributes of defaultRankingWeights may only have values between 0 and 1 and the sum of all attributes must be 1.
 
-### Troubleshooting
+## Troubleshooting
 
 Something doesn't work? Always try to run `npm install && npm run build` first.
 
-### Documentation
+## Documentation
 
 There are two types of documentation for this project.  
 

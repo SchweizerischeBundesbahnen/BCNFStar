@@ -3,7 +3,7 @@
   <sbb-toggle-option
     label="Use no Metanome result"
     value="no-result"
-    sbbTooltip="Attention: This will cause no contained subtables (for FDs) or no foreign keys (for INDs) to be found. Use only if you don't want to use these features"
+    sbbTooltip="Attention: This will cause no contained subtables (for FDs) or no foreign keys (for INDs) to be found. Use only if you don't want to use these features."
   >
     <sbb-toggle-details>
       Don't use results for {{tableNames().length > 1 ? 'these tables' : 'this table'}}.
@@ -28,16 +28,16 @@
   </sbb-toggle-option>
 
   <sbb-toggle-option
+  *ngFor="let item of defaultConfigs | keyvalue"
     [label]="item.key"
     [value]="item.key"
-    *ngFor="let item of defaultConfigs | keyvalue"
     [sbbTooltip]="algoTooltips[item.key]"
   >
     <sbb-toggle-details>
       <app-settings-element
+      *ngFor="let control of controlsFor(item.key) | keyvalue"
         [control]="control.value"
         [name]="control.key"
-        *ngFor="let control of controlsFor(item.key) | keyvalue"
       ></app-settings-element>
       <button
         *ngIf="applyToAllTables.observed"

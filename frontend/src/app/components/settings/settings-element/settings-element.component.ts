@@ -25,7 +25,7 @@ export class SettingsElementComponent implements OnInit {
   }
 
   // Tooltips specific for one setting
-  public tooltips: Record<string, string> = {
+  public readonly tooltips: Record<string, string> = {
     // all
     memory:
       'Maxmimum allowed memory usage of metanome. Java memory string, e.g. 512M or 4G. If empty: 75% of total memory. Ineffective for rust',
@@ -35,4 +35,6 @@ export class SettingsElementComponent implements OnInit {
     INPUT_ROW_LIMIT: 'Only look at the first n lines when searching FDs. May be faster on big datasets, but is not recommended because it produces incorrect results. -1 means no limit'
     // FAIDA
   };
+
+
 }

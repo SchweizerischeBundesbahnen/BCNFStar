@@ -36,9 +36,9 @@ export class SettingsRowComponent implements OnInit, OnChanges {
   public existingResultsControl = new FormControl();
   public formGroup: FormGroup = new FormGroup({});
 
-  public algoTooltips: Record<string, string> = {
+  public readonly algoTooltips: Record<string, string> = {
     RustFD: 'Experimental new FD algorithm implemented in Rust. 10x faster than HyFD in our tests',
-    HyFD: 'Fastest Metanome algorithm to find FDs',
+    HyFD: 'Fastest Metanome algorithm without approximations to find FDs',
     BINDER: 'Slower than FAIDA, but guaranteed to produce correct results',
     FAIDA: 'Recommended. Very fast, but approximate. Never produces false negatives, but might produce some false positives on small datasets.'
   }
@@ -71,7 +71,6 @@ export class SettingsRowComponent implements OnInit, OnChanges {
     }
 
     // update the settings in setting-dialog initially and whenever something changes
-    console.log(this.algoFormGroups)
     this.formGroup = new FormGroup(this.algoFormGroups)
     
     this.emitConfig()
