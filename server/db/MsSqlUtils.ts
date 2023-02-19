@@ -1,5 +1,5 @@
 import ITablePage from "@/definitions/ITablePage";
-import sql, { IRow } from "mssql";
+import sql from "mssql";
 import SqlUtils, {
   DbmsType,
   ForeignKeyResult,
@@ -7,7 +7,6 @@ import SqlUtils, {
   SchemaQueryRow,
   SchemaRowsQueryRow,
 } from "./SqlUtils";
-import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
 import ITemptableScript from "@/definitions/ITemptableScripts";
 import {
@@ -33,7 +32,11 @@ export default class MsSqlUtils extends SqlUtils {
     database: string,
     user: string,
     password: string,
-    port: number = 1433
+    port: number = 1433,
+    options: unknown = {
+      encrypt: true, // for azure
+      trustServerCertificate: true, // change to true for local dev / self-signed certs
+    }
   ) {
     super();
     this.config = {
@@ -42,10 +45,7 @@ export default class MsSqlUtils extends SqlUtils {
       password,
       server,
       port,
-      options: {
-        encrypt: true, // for azure
-        trustServerCertificate: true, // change to true for local dev / self-signed certs
-      },
+      options,
       requestTimeout: 180000,
     };
   }
@@ -134,7 +134,7 @@ export default class MsSqlUtils extends SqlUtils {
   /** The "null"-check is relevant for unionability-checks. */
   public override escape(str: string): string {
     if (str.toLowerCase() == "null") return "null";
-    return `[${str}]`;
+    return "`${str}`";
   }
 
   public override async testKeyUnionability(

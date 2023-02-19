@@ -3,13 +3,9 @@ import { join } from "path";
 
 import InclusionDependencyAlgorithm from "./InclusionDependencyAlgorithm";
 import { readFile, writeFile } from "fs/promises";
-import IInclusionDependency, {
-  IColumnIdentifier,
-} from "@/definitions/IInclusionDependency";
-import { sqlUtils } from "@/db";
-import { splitTableString } from "@/utils/databaseUtils";
-import { DbmsType } from "@/db/SqlUtils";
+import IInclusionDependency from "@/definitions/IInclusionDependency";
 import { faidaAlgorithmName } from "@/definitions/IFaida";
+import { splitTableIdentifier } from "./utils";
 
 const OUTPUT_DIR = join(absoluteServerDir, "metanome", "results");
 
@@ -56,28 +52,4 @@ export default class FAIDA extends InclusionDependencyAlgorithm {
   }
 }
 
-/**
- * This function takes a metanome result column identifier, which just
- * includes a table- and columnIdentifier, and adds a schemaIdentifier to it
- * @param cId column identifier obtained from metanome output
- * @param tablesWithSchema list of tables metanome was executed on
- */
-function splitTableIdentifier(
-  cId: IColumnIdentifier,
-  tablesWithSchema: string[]
-) {
-  // Depending on the database type, tableIdentifier might contain both schema-
-  // amd table name, or just the table name
-  let tableWithSchema: string;
-  if ([DbmsType.mssql, DbmsType.synapse, DbmsType.spark].includes(sqlUtils.getDbmsName()))
-    tableWithSchema = cId.tableIdentifier;
-  else if (sqlUtils.getDbmsName() == DbmsType.postgres)
-    tableWithSchema = tablesWithSchema.find((entry) => {
-      const entryTable = splitTableString(entry)[1];
-      return cId.tableIdentifier == entryTable;
-    });
-  else throw Error("unknown dbms type");
 
-  cId.schemaIdentifier = splitTableString(tableWithSchema)[0];
-  cId.tableIdentifier = splitTableString(tableWithSchema)[1];
-}

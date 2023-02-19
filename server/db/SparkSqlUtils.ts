@@ -1,13 +1,6 @@
 import ITablePage from "@/definitions/ITablePage";
-const hive = require('hive-driver');
-const { TCLIService, TCLIService_types } = hive.thrift;
-const client = new hive.HiveClient(
-    TCLIService,
-    TCLIService_types
-);
-const utils = new hive.HiveUtils(
-    TCLIService_types
-);
+const hive = require('hive-driver')
+
 
 import SqlUtils, {
   DbmsType,
@@ -16,7 +9,6 @@ import SqlUtils, {
   SchemaQueryRow,
   SchemaRowsQueryRow,
 } from "./SqlUtils";
-import ITable from "@/definitions/ITable";
 import { IColumnRelationship } from "@/definitions/IRelationship";
 import ITemptableScript from "@/definitions/ITemptableScripts";
 import {
@@ -28,12 +20,6 @@ import {
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
-import { Console } from "console";
-import { Dictionary, List } from "lodash";
-import { HiveClient } from "hive-driver";
-import HiveDriver from "hive-driver/dist/hive/HiveDriver";
-import GetResultSetMetadataCommand from "hive-driver/dist/hive/Commands/GetResultSetMetadataCommand";
-import { privateEncrypt } from "crypto";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -42,7 +28,9 @@ import { privateEncrypt } from "crypto";
 
 
 export default class SparkSqlUtils extends SqlUtils {
-  private conf=[];
+  private conf = [];
+  private client; //hive.HiveClient
+  private utils // hive.HiveUtils;
   public constructor(
     server: string,
     user: string,
@@ -50,51 +38,62 @@ export default class SparkSqlUtils extends SqlUtils {
     port: number = 10009
   ) {
     super();
-    this.conf=[{
+    this.conf = [{
       host: server,
       port: port
-        },
-        new hive.connections.TcpConnection(),
-        new hive.auth.PlainTcpAuthentication({
+    },
+    new hive.connections.TcpConnection(),
+    new hive.auth.PlainTcpAuthentication({
       username: user,
-      password: password})]
+      password: password
+    })]
+    const { TCLIService, TCLIService_types } = hive.thrift;
+    
+    this.client = new hive.HiveClient(
+      TCLIService,
+      TCLIService_types
+    );
+    this.utils = new hive.HiveUtils(
+      TCLIService_types
+    );
   };
 
-  public async init() {}
+  public async init() { }
 
   public UNIVERSAL_DATATYPE(): string {
     return "STRING";
   }
 
 
-  private async executeStatement(statement){
-    return await client.connect(...this.conf).then(async client => {
-        return await client.openSession({
-            client_protocol: TCLIService_types.TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V10}).then(async session => {
-              
-              const result = await session.executeStatement(statement).then(this.handleOperation, { runAsync: true });
-              session.close();
-              return result;
-        })
+  private async executeStatement(statement) {
+    return await this.client.connect(...this.conf).then(async client => {
+      return await client.openSession({
+        client_protocol: hive.TCLIService_types.TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V10
+      }).then(async session => {
+
+        const result = await session.executeStatement(statement).then(this.handleOperation.bind(this), { runAsync: true });
+        session.close();
+        return result;
+      })
     })
   };
 
   private handleOperation = (operation) => {
-    return utils.waitUntilReady(operation, false, () => {})
-    /*return utils.waitUntilReady(operation, true, (stateResponse) => {
-        console.log("Before null?")
-        console.log(stateResponse.taskStatus);
-        console.log("After null?")
-    })*/
-    .then((operation) => {
-        return utils.fetchAll(operation);
-    })
-    .then((operation) => {
+    return this.utils.waitUntilReady(operation, false, () => { })
+      /*return utils.waitUntilReady(operation, true, (stateResponse) => {
+          console.log("Before null?")
+          console.log(stateResponse.taskStatus);
+          console.log("After null?")
+      })*/
+      .then((operation) => {
+        return this.utils.fetchAll(operation);
+      })
+      .then((operation) => {
         return operation.close();
-    })
-    .then(() => {
-        return utils.getResult(operation).getValue();
-    })
+      })
+      .then(() => {
+        return this.utils.getResult(operation).getValue();
+      })
   };
 
 
@@ -123,7 +122,7 @@ export default class SparkSqlUtils extends SqlUtils {
     await createTableOperation.close();
     return x.name;*/
     return new Promise<string>((resolve, reject) => {
-      
+
     })
   }
 
@@ -132,18 +131,18 @@ export default class SparkSqlUtils extends SqlUtils {
     await utils.waitUntilReady(dropTableOperation, false, () => {});
     await dropTableOperation.close();*/
     return new Promise<void>((resolve, reject) => {
-      
+
     })
   }
 
   public async getSchema(): Promise<SchemaQueryRow[]> {
 
-      const result: Promise<SchemaQueryRow[]> = await this.executeStatement(
-          "SELECT table_name, column_name, data_type, is_nullable, table_schema FROM metadata.column_meta"
-        );
-      
-      return result
-    }
+    const result: Promise<SchemaQueryRow[]> = await this.executeStatement(
+      "SELECT table_name, column_name, data_type, is_nullable, table_schema FROM metadata.column_meta"
+    );
+
+    return result
+  }
 
 
   public async getTablePage(
@@ -154,7 +153,7 @@ export default class SparkSqlUtils extends SqlUtils {
   ): Promise<ITablePage> {
     const tableExists = await this.tableExistsInSchema(schemaname, tablename);
     if (tableExists) {
-        const result  = await this.executeStatement(`SELECT * FROM ( SELECT *, ROW_NUMBER() OVER 
+      const result = await this.executeStatement(`SELECT * FROM ( SELECT *, ROW_NUMBER() OVER 
         (ORDER BY (SELECT NULL)) AS RowNum FROM ${schemaname}.${tablename}) AS tr 
         WHERE ${offset} < RowNum ORDER BY (SELECT NULL) LIMIT ${limit};`
       );
@@ -183,7 +182,7 @@ export default class SparkSqlUtils extends SqlUtils {
     if (result.recordset[0].count == 0) return KeyUnionability.allowed;
     return KeyUnionability.forbidden;*/
     return new Promise<KeyUnionability>((resolve, reject) => {
-      
+
     })
   }
 
@@ -192,7 +191,7 @@ export default class SparkSqlUtils extends SqlUtils {
     const result: sql.IResult<any> = await sql.query<{ name: string }>(_sql);
     return result.recordset.map((record) => record.name);*/
     return new Promise<string[]>((resolve, reject) => {
-      
+
     })
   }
 
@@ -210,7 +209,7 @@ export default class SparkSqlUtils extends SqlUtils {
       return TypeCasting.forbidden;
     }*/
     return new Promise<TypeCasting>((resolve, reject) => {
-      
+
     })
   }
 
@@ -218,23 +217,23 @@ export default class SparkSqlUtils extends SqlUtils {
     table: string,
     schema: string
   ): Promise<IRowCounts> {
-      //NOT IMPLEMENTED!!!!!
-      return new Promise<IRowCounts>((resolve, reject) => {
-      
+    //NOT IMPLEMENTED!!!!!
+    return new Promise<IRowCounts>((resolve, reject) => {
+
     })
   }
 
 
-public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
+  public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
 
-      const result: Promise<Array<SchemaRowsQueryRow>> = await this.executeStatement(`SELECT
+    const result: Promise<Array<SchemaRowsQueryRow>> = await this.executeStatement(`SELECT
         table_schema,
         table_name,
         count 
         FROM metadata.row_count`);
 
-      return result;
-}
+    return result;
+  }
 
 
   /**
@@ -267,7 +266,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
       ps.unprepare();
     }*/
     return new Promise<boolean>((resolve, reject) => {
-      
+
     })
   }
 
@@ -292,7 +291,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
     const result = await ps.execute({ schema });
     return result.recordset.length > 0;*/
     return new Promise<boolean>((resolve, reject) => {
-      
+
     })
   }
 
@@ -309,7 +308,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
 
     return query_result.recordset[0][""];*/
     return new Promise<boolean>((resolve, reject) => {
-      
+
     })
   }
 
@@ -325,7 +324,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
     );
     return query_result.recordset[0][""];*/
     return new Promise<boolean>((resolve, reject) => {
-      
+
     })
   }
 
@@ -348,7 +347,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
     );
     return query_result.recordset;*/
     return new Promise<any>((resolve, reject) => {
-      
+
     })
   }
 
@@ -374,7 +373,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
       attributes: Object.keys(result.recordset.columns),
     };*/
     return new Promise<ITablePage>((resolve, reject) => {
-      
+
     })
   }
 
@@ -414,7 +413,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
     };*/
 
     return new Promise<ITablePage>((resolve, reject) => {
-      
+
     })
   }
 
@@ -441,7 +440,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
 
     return result.recordset[0];*/
     return new Promise<IRowCounts>((resolve, reject) => {
-      
+
     })
   }
 
@@ -457,7 +456,7 @@ public async getTableRowCounts(): Promise<Array<SchemaRowsQueryRow>> {
     this.dropTempTable(table);
     return result.recordset[0];*/
     return new Promise<IRowCounts>((resolve, reject) => {
-      
+
     })
   }
 
