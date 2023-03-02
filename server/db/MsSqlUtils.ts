@@ -154,7 +154,7 @@ export default class MsSqlUtils extends SqlUtils {
     const _sql: string = this.testNotNullSql(t);
     const result: sql.IResult<any> = await sql.query(_sql);
 
-    return result.recordset[0].notnull;
+    return result.recordset.length == 0;
   }
 
   public override async testNewValue(
@@ -163,7 +163,7 @@ export default class MsSqlUtils extends SqlUtils {
     const _sql: string = this.testNewValueSql(t);
     const result: sql.IResult<any> = await sql.query(_sql);
 
-    return result.recordset[0].new;
+    return result.recordset.length == 0;
   }
 
   public override async getDatatypes(): Promise<string[]> {

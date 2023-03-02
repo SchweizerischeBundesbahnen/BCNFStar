@@ -156,7 +156,7 @@ export default class PostgresSqlUtils extends SqlUtils {
 
     const result = await this.pool.query<{ notnull: boolean }>(_sql);
 
-    return result.rows[0].notnull;
+    return result.rows.length == 0;
   }
 
   public override async testNewValue(
@@ -166,7 +166,7 @@ export default class PostgresSqlUtils extends SqlUtils {
 
     const result = await this.pool.query<{ new: boolean }>(_sql);
 
-    return result.rows[0].new;
+    return result.rows.length == 0;
   }
 
   /** The "null"-check is relevant for unionability-checks. */

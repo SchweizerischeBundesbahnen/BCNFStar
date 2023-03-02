@@ -151,23 +151,20 @@ export default abstract class SqlUtils {
 
   public testNotNullSql(nn: IRequestBodyNotNull): string {
     const sql = `
-    SELECT NOT EXISTS(
-      SELECT *
-      FROM ${this.escape(nn.schemaName)}.${nn.tableName}
+      SELECT 1
+      FROM ${this.escape(nn.schemaName)}.${this.escape(nn.tableName)}
       WHERE ${this.escape(nn.columnName)} IS NULL
-    ) as notnull`;
+    `;
     return sql;
   }
 
   public testNewValueSql(nv: IRequestBodyNewValue): string {
     const sql = `
-    SELECT NOT EXISTS (
       SELECT ${this.escape(nv.columnName)}
-      FROM ${this.escape(nv.schemaName)}.${nv.tableName}
+      FROM ${this.escape(nv.schemaName)}.${this.escape(nv.tableName)}
       WHERE ${this.escape(nv.columnName)} = CAST('${nv.value}' AS ${
       nv.dataType
-    })
-    ) as new;`;
+    })`;
     return sql;
   }
 
