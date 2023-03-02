@@ -1,12 +1,14 @@
-import { NewValueDataQuery } from '@/src/app/dataquery';
+import { DatabaseService } from '@/src/app/database.service';
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
+import { firstValueFrom } from 'rxjs';
 
 export interface SplitDialogResponse {
   type: string;
@@ -52,6 +54,8 @@ export class SplitDialogComponent {
       FdSplitResponse | ChangeKeyResponse
     >,
     public schemaService: SchemaService,
+    private dataService: DatabaseService,
+    private http: HttpClient,
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA)
     data: { fd: FunctionalDependency }
@@ -132,11 +136,18 @@ export class SplitDialogComponent {
         this.nullSubstituteErrors.set(column, 'No substitute specified.');
         continue;
       }
-      const dataQuery: NewValueDataQuery = await NewValueDataQuery.Create(
-        column.sourceColumn,
-        this.nullSubstitutes.get(column)!
+      const sourceColumn = column.sourceColumn;
+      const body = {
+        schemaName: sourceColumn.table.schemaName,
+        tableName: sourceColumn.table.name,
+        columnName: sourceColumn.name,
+        dataType: sourceColumn.dataType,
+        value: this.nullSubstitutes.get(column)!,
+      };
+      const isNewValue = await firstValueFrom(
+        this.http.post<boolean>(`${this.dataService.baseUrl}/newvalue`, body)
       );
-      if (!(await dataQuery.result())) {
+      if (!isNewValue) {
         this.nullSubstituteErrors.set(column, 'substitute exists in data.');
       }
     }

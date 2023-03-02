@@ -14,7 +14,6 @@ import SourceRelationship from '../model/schema/SourceRelationship';
 import Table from '../model/schema/Table';
 import { DatabaseService } from './database.service';
 import { SchemaService } from './schema.service';
-import { NotNullDataQuery } from './dataquery';
 
 @Injectable({
   providedIn: 'root',
@@ -206,11 +205,19 @@ export class SchemaCreationService {
   }
 
   private async inferNullability(...columns: Array<SourceColumn>) {
-    for (let col of columns) {
-      let dataquery = await NotNullDataQuery.Create(col);
-      let inferredNotNullability = await dataquery.result();
-      col.inferredNullable = !inferredNotNullability;
-    }
+    return Promise.all(
+      columns.map(async (col) => {
+        const body = {
+          schemaName: col.table.schemaName,
+          tableName: col.table.name,
+          columnName: col.name,
+        };
+        const inferredNotNullability = await firstValueFrom(
+          this.http.post<boolean>(`${this.dataService.baseUrl}/notnull`, body)
+        );
+        col.inferredNullable = !inferredNotNullability;
+      })
+    );
   }
 
   /**
