@@ -61,9 +61,11 @@
     </ul>
   </div>
 
-  <div *ngIf="nullCols && nullCols.length > 0" class="violation">
-    The key of the created table would contain null values. Please specify a
-    value with which to replace the null values.
+  <div *ngIf="nullCols && nullCols.length > 0">
+    <div class="violation">
+      The key of the created table would contain null values. Please specify a
+      value with which to replace the null values.
+    </div>
     <br />
     <table>
       <tr>
@@ -85,7 +87,14 @@
           />
         </td>
         <td>
-          {{ nullSubstituteErrors.get(col) }}
+          <div *ngIf="nullSubstituteErrors.get(col)" class="violation">
+            {{ nullSubstituteErrors.get(col) }}
+          </div>
+          <sbb-icon
+            svgIcon="kom:tick-medium"
+            style="color: green"
+            *ngIf="!nullSubstituteErrors.get(col)"
+          ></sbb-icon>
         </td>
       </tr>
     </table>
