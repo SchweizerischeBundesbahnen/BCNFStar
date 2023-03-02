@@ -28,14 +28,14 @@
   </sbb-toggle-option>
 
   <sbb-toggle-option
-  *ngFor="let item of defaultConfigs | keyvalue"
+    *ngFor="let item of defaultConfigs | keyvalue"
     [label]="item.key"
     [value]="item.key"
     [sbbTooltip]="algoTooltips[item.key]"
   >
     <sbb-toggle-details>
       <app-settings-element
-      *ngFor="let control of controlsFor(item.key) | keyvalue"
+        *ngFor="let control of controlsFor(item.key) | keyvalue"
         [control]="control.value"
         [name]="control.key"
       ></app-settings-element>
