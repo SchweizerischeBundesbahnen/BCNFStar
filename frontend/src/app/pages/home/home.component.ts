@@ -1,8 +1,6 @@
 import Schema from '@/src/model/schema/Schema';
 import { Component } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { IntegrationService } from '../../integration.service';
-import { SchemaMergingService } from '../../schema-merging.service';
+import { Router } from '@angular/router';
 import { SchemaService } from '../../schema.service';
 
 @Component({
@@ -11,10 +9,7 @@ import { SchemaService } from '../../schema.service';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  constructor(
-    private schemaService: SchemaService,
-    private router: Router
-  ) {}
+  constructor(private schemaService: SchemaService, private router: Router) {}
 
   public setSchemaAndGo(schema: Schema) {
     this.schemaService.schema = schema;
