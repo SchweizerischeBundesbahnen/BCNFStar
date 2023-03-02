@@ -1,12 +1,13 @@
-<div>Null Constraints in exported schema:</div>
-<sbb-toggle [(ngModel)]="constraintPolicy">
-  <sbb-toggle-option label="minimal" value="minimal"></sbb-toggle-option>
-  <sbb-toggle-option
-    label="use original constraints"
-    value="schema"
-  ></sbb-toggle-option>
-  <sbb-toggle-option label="maximal" value="maximal"></sbb-toggle-option>
-</sbb-toggle>
+<div class="mx-1 mb-2">
+  <sbb-toggle [(ngModel)]="constraintPolicy">
+    <sbb-toggle-option label="minimal null constraints" value="minimal"></sbb-toggle-option>
+    <sbb-toggle-option
+      label="original null constraints"
+      value="schema"
+    ></sbb-toggle-option>
+    <sbb-toggle-option label="maximal null constraints" value="maximal"></sbb-toggle-option>
+  </sbb-toggle>
+</div>
 
 <div class="grid-container mx-1">
   <input

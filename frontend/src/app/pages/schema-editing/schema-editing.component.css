@@ -20,7 +20,7 @@ app-union-sidebar {
 .grid-container-sidebar {
   display: grid;
   grid-template-columns: auto;
-  grid-template-rows: auto;
+  grid-template-rows: calc(var(--export-schema-sidebar-height)) auto;
   height: 100%;
 }
 
@@ -36,6 +36,7 @@ app-union-sidebar {
 
 h2 {
   text-align: center;
+  height: calc(var(--h2-high));
 }
 
 .item-sidebar {
