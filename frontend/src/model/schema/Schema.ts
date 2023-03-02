@@ -741,15 +741,14 @@ export default class Schema {
   }
 
   /**
-   * Returns true if no primary key, foreign key or referenced key of the table
-   * would be destroyed when performing a split based on this fd.
+   * Returns true if this fd can be split automatically with no user input. This is used by the autoNormalize process.
    */
   private isFdSplittable(fd: FunctionalDependency, table: Table): boolean {
     return (
       this.fdSplitFKViolationsOf(fd, table).length == 0 &&
       this.fdSplitReferenceViolationsOf(fd, table).length == 0 &&
       !this.fdSplitPKViolationOf(fd, table) &&
-      fd.lhs.asArray().every((col) => !col.sourceColumn.safeInferredNullable)
+      fd.lhs.asArray().every((col) => !col.sourceColumn.safeInferredNullable) // required because autoNormalize doesn't automatically generate null substitute values.
     );
   }
 
