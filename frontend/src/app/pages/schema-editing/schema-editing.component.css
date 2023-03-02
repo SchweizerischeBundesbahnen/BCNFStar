@@ -18,13 +18,9 @@ app-union-sidebar {
 }
 
 .grid-container-sidebar {
-  --export-schema-sidebar-height: calc(
-    1.6666666667rem + 2 * var(--sbb-button-height) + 0.25rem +
-      var(--sbb-divider-medium) + var(--sbb-divider-small)
-  );
   display: grid;
   grid-template-columns: auto;
-  grid-template-rows: calc(var(--export-schema-sidebar-height)) auto;
+  grid-template-rows: auto;
   height: 100%;
 }
 
@@ -65,7 +61,7 @@ sbb-toggle-option {
   align-self: center
 }
 
-.a {
+.padded {
   padding: 1rem;
 }
 
