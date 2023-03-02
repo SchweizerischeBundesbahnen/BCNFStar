@@ -87,14 +87,19 @@
           />
         </td>
         <td>
-          <div *ngIf="nullSubstituteErrors.get(col)" class="violation">
-            {{ nullSubstituteErrors.get(col) }}
+          <div *ngIf="nullSubstituteCheckValid">
+            <div *ngIf="nullSubstituteErrors.get(col)" class="violation">
+              {{ nullSubstituteErrors.get(col) }}
+            </div>
+            <sbb-icon
+              svgIcon="kom:tick-medium"
+              style="color: green"
+              *ngIf="!nullSubstituteErrors.get(col)"
+            ></sbb-icon>
           </div>
-          <sbb-icon
-            svgIcon="kom:tick-medium"
-            style="color: green"
-            *ngIf="!nullSubstituteErrors.get(col)"
-          ></sbb-icon>
+          <div *ngIf="!nullSubstituteCheckValid" class="violation">
+            Please check the substitutes with the button below!
+          </div>
         </td>
       </tr>
     </table>
