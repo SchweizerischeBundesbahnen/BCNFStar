@@ -109,7 +109,7 @@ interface JSONSourceTable {
   rowCount: number;
 }
 
-export default class SaveSchemaState {
+export default class RestoreSchemaState {
   private newSchema: Schema = new Schema();
   constructor() {}
 
