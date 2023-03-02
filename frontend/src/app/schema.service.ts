@@ -49,6 +49,11 @@ export class SchemaService {
   public hasSchema = false;
   private _schema: Schema = new Schema();
   public set schema(schema: Schema) {
+    this.selectedTable = undefined;
+    this.starMode = false;
+    this.highlightedColumns = undefined;
+    this.commandProcessor = new CommandProcessor();
+
     this._schema = schema;
     this.hasSchema = true;
     this.notifyAboutSchemaChanges();
