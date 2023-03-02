@@ -8,7 +8,7 @@ export default interface BasicColumn {
   dataType: string;
   nullable: boolean;
   dataTypeString: string;
-  nullableConstraint(constraintPolicy: ConstraintPolicy): boolean;
+  persistedNullConstraint(constraintPolicy: ConstraintPolicy): boolean;
 }
 
 export function surrogateKeyColumn(name: string): BasicColumn {
@@ -17,7 +17,8 @@ export function surrogateKeyColumn(name: string): BasicColumn {
     dataType: 'integer',
     nullable: false,
     dataTypeString: '(integer, not null)',
-    nullableConstraint: () => false,
+    persistedNullConstraint: (constraintPolicy: ConstraintPolicy) =>
+      constraintPolicy == 'minimal',
   };
 }
 
@@ -31,6 +32,7 @@ export function newBasicColumn(
     dataType: dataType,
     nullable: nullable,
     dataTypeString: `(${dataType}, ${nullable ? 'null' : 'not null'})`,
-    nullableConstraint: () => nullable,
+    persistedNullConstraint: (constraintPolicy: ConstraintPolicy) =>
+      constraintPolicy == 'minimal' || nullable,
   };
 }

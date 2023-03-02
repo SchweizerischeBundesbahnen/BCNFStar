@@ -68,7 +68,7 @@ export default abstract class SQLPersisting {
 
     for (const column of columns) {
       let columnString: string = `${column.name} ${column.dataType} `;
-      if (!column.nullableConstraint(constraintPolicy)) {
+      if (!column.persistedNullConstraint(constraintPolicy)) {
         columnString += 'NOT ';
       }
       columnString += 'NULL';
