@@ -13,7 +13,7 @@ describe("The save schema editing", () => {
 
   it("renders filename input", () => {
     cy.get("input")
-      .eq(3)
+      .eq(6)
       .invoke("attr", "placeholder")
       .should("contain", "file name");
   });
@@ -23,7 +23,7 @@ describe("The save schema editing", () => {
   });
 
   it("saves schema", () => {
-    cy.get("input").eq(3).type("savedSchema");
+    cy.get("input").eq(6).type("savedSchema");
     cy.contains("Save current schema state").click();
     cy.get("sbb-simple-notification").contains("Schema download");
     cy.readFile("cypress/downloads/savedSchema.zip").should("exist");
