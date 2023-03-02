@@ -26,14 +26,18 @@ export async function getIndexContent(
   const contentString = await readFile(indexFileLocation, {
     encoding: "utf-8",
   });
-  const entries: Array<IIndexFileEntry> = JSON.parse(contentString);
+  const entries: Array<IIndexFileEntry> = JSON.parse(contentString).map((entry: IIndexFileEntry) => {
+    if (!entry.algoClass) entry.algoClass = (entry as any).algorithm
+    if (!entry.schemaAndTables) entry.schemaAndTables = (entry as any).tables
+    return entry;
+  });
   return getAll
     ? entries
     : entries.filter(
-        (entry) =>
-          entry.dbmsName == sqlUtils.getDbmsName() &&
-          entry.database == process.env.DB_DATABASE
-      );
+      (entry) =>
+        entry.dbmsName == sqlUtils.getDbmsName() &&
+        entry.database == process.env.DB_DATABASE
+    );
 }
 
 /**

@@ -83,7 +83,7 @@ describe("The table selection page", () => {
     cy.get('[class="sbb-toggle-option-button-label"]:contains("HyFD")').click({
       multiple: true,
     });
-    cy.contains("Binder").click();
+    cy.contains("BINDER").click();
     cy.contains("Ok").click();
 
     cy.get('[class="sbb-dialog-title ng-star-inserted"]').contains(

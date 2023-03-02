@@ -13,12 +13,14 @@ import { DatabaseService } from 'src/app/database.service';
 import { SbbTable } from '@sbb-esta/angular/table';
 import { Router } from '@angular/router';
 import { SbbDialog } from '@sbb-esta/angular/dialog';
-import { MetanomeSettingsComponent } from '../metanome-settings/metanome-settings.component';
-import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
+import { MetanomeSettings, SettingsDialogComponent } from '../settings/settings-dialog/settings-dialog.component';
+import { isIIndexFileEntry } from '@server/definitions/IIndexFileEntry.guard';
 import { firstValueFrom } from 'rxjs';
 import { SchemaCreationService } from '../../schema-creation.service';
 import Schema from '@/src/model/schema/Schema';
 import { DataQuery, TablePreviewDataQuery } from '../../dataquery';
+import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
+import { isIMetanomeJob } from '@server/definitions/IMetanomeJob.guard';
 
 @Component({
   selector: 'app-table-selection',
@@ -33,7 +35,7 @@ export class TableSelectionComponent implements OnInit {
   @Input() public withContentPreview: boolean = true;
   @Output() public schema = new EventEmitter<Schema>();
 
-  public loadingStatus: Map<IIndexFileEntry, 'done' | 'error' | 'loading'> =
+  public loadingStatus: Map<IMetanomeJob, 'done' | 'error' | 'loading'> =
     new Map();
 
   public hoveredTable?: Table;
@@ -57,7 +59,7 @@ export class TableSelectionComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.tables = await this.dataService.loadTables();
+    this.tables = await this.dataService.getTables();
 
     for (const table of this.tables) {
       this.selectedTables.set(table, false);
@@ -72,14 +74,10 @@ export class TableSelectionComponent implements OnInit {
   }
 
   public clickSelectAll(schema: string) {
-    if (this.areAllSelectedIn(schema)) {
-      this.tablesInSchema[schema].forEach((table) =>
-        this.selectedTables.set(table, false)
-      );
-    } else
-      this.tablesInSchema[schema].forEach((table) =>
-        this.selectedTables.set(table, true)
-      );
+    const shouldAllBeSelected = !this.areAllSelectedIn(schema)
+    this.tablesInSchema[schema].forEach((table) =>
+      this.selectedTables.set(table, shouldAllBeSelected)
+    );
   }
 
   public areAllSelectedIn(schema: string) {
@@ -89,25 +87,28 @@ export class TableSelectionComponent implements OnInit {
   }
 
   public areZeroSelectedIn(schema: string) {
-    return !this.tablesInSchema[schema].some((table) =>
-      this.selectedTables.get(table)
+    return this.tablesInSchema[schema].every((table) =>
+      !this.selectedTables.get(table)
     );
   }
 
-  public async runMetanome(entries: Array<IIndexFileEntry>) {
-    const jobs = entries.map((entry) => {
-      return { promise: this.dataService.runMetanome(entry), entry };
-    });
-    jobs.forEach((j) => this.loadingStatus.set(j.entry, 'loading'));
+  /**
+   * 
+   * @param job 
+   * @returns filename of the resulting file
+   */
+  public async runMetanome(job: IMetanomeJob): Promise<string | null> {
 
-    for (const job of jobs) {
-      try {
-        const result = await job.promise;
-        this.loadingStatus.set(job.entry, 'done');
-        job.entry.fileName = result.fileName;
-      } catch (e) {
-        this.loadingStatus.set(job.entry, 'error');
-      }
+    const promise = this.dataService.runMetanome(job)
+    this.loadingStatus.set(job, 'loading')
+
+    try {
+      const result = await promise;
+      this.loadingStatus.set(job, 'done');
+      return result.fileName;
+    } catch (e) {
+      this.loadingStatus.set(job, 'error');
+      return null;
     }
   }
 
@@ -115,36 +116,39 @@ export class TableSelectionComponent implements OnInit {
     const tables = this.tables.filter((table) =>
       this.selectedTables.get(table)
     );
-    const dialogRef = this.dialog.open(MetanomeSettingsComponent, {
+    const dialogRef = this.dialog.open(SettingsDialogComponent, {
       data: tables,
     });
-    const { values }: { values: Record<string, IIndexFileEntry> } =
-      await firstValueFrom(dialogRef.afterClosed());
+    const settings: MetanomeSettings = await firstValueFrom(dialogRef.afterClosed())
 
-    if (!values) return;
+    if (!settings) return;
 
     this.loadingStatus.clear();
 
     const loadingDialog = this.dialog.open(this.loadingDialog);
 
     try {
-      await this.runMetanome(
-        Object.values(values).filter(
-          (entry) => !entry.fileName && entry.algorithm != 'no-result'
-        )
-      );
-      let fdResults = new Map<Table, string>();
-      for (let [name, config] of Object.entries(values)) {
-        if (name != 'ind')
-          fdResults.set(
-            [...this.tables].find((t) => t.fullName === config.tables[0])!,
-            config.fileName
-          );
-      }
+
+      const fdFiles: Map<Table, string> = new Map();
+      let indFile: string | undefined;
+      // we handle the promises with .then, this is just for synchronisation
+      const promises: Array<Promise<unknown>> = []
+
+      settings.forEach(async (job, table) => {
+        const set = (filename: string) => table === 'ind' ? indFile = filename : fdFiles.set(table, filename)
+        if (isIIndexFileEntry(job)) {
+          set(job.fileName)
+        } else if (isIMetanomeJob(job)) {
+          const filenamePromise = this.runMetanome(job)
+          promises.push(filenamePromise)
+          filenamePromise.then((filename) => { if (filename) set(filename) })
+        }
+      })
+      await Promise.all(promises)
       const schema = await this.schemaCreationService.createSchema(
         tables,
-        fdResults,
-        values['ind'].fileName
+        fdFiles,
+        indFile
       );
       this.schema.emit(schema);
     } catch (e) {

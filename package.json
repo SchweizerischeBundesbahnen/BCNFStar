@@ -21,7 +21,7 @@
     "dev:frontend": "cd frontend && npm run dev",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "generateTypeGuards": "ts-auto-guard --export-all --debug server/definitions/*",
+    "generateTypeGuards": "ts-auto-guard --export-all server/definitions/*",
     "prepare": "husky install",
     "lint": "run-s lint:*",
     "lint:frontend": "cd frontend && npm run lint",

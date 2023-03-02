@@ -4,8 +4,8 @@ export const binderAlgorithmName = "de.metanome.algorithms.binder.BINDERFile";
 
 export interface IBinderConfig extends IMetanomeConfig {
   // whether to detect nary inds at all
-  // should be set automatically
-  DETECT_NARY?: boolean; //=false
+  // should be set automatically, therefore commented out to not be in the UI
+  // DETECT_NARY?: boolean; //=false
   // how many columns an  IND might reference
   MAX_NARY_LEVEL: number; //=-1
   CLEAN_TEMP: boolean; //=true

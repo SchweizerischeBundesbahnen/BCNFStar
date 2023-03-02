@@ -13,7 +13,7 @@ export default abstract class FunctionalDependencyAlgorithm extends MetanomeAlgo
   }
 
   protected resultType(): MetanomeResultType {
-    return MetanomeResultType.fd;
+    return 'FunctionalDependency';
   }
 
   get schemaAndTable(): string {
