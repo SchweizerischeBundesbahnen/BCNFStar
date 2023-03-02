@@ -173,6 +173,7 @@ export default class Schema {
   }
 
   public addInds(...inds: SourceRelationship[]) {
+    console.log(inds)
     this._inds.push(...inds);
     this.tableIndsValid = false;
   }
@@ -554,7 +555,7 @@ export default class Schema {
     const newTable = new Join(relationship).newTable;
     return (
       newTable.columns.cardinality >
-        relationship.referencingTable.columns.cardinality &&
+      relationship.referencingTable.columns.cardinality &&
       relationship.referencedTable != relationship.referencingTable
     );
   }

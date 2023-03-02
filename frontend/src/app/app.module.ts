@@ -31,7 +31,7 @@ import { MetanomeResultsViewerComponent } from './pages/metanome-results-viewer/
 import { UnionSidebarComponent } from './components/union/union-sidebar/union-sidebar.component';
 import { UnionDialogComponent } from './components/union/union-dialog/union-dialog.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { MetanomeSettingsComponent } from './components/metanome-settings/metanome-settings.component';
+import { SettingsDialogComponent } from './components/settings/settings-dialog/settings-dialog.component';
 import { SbbFormFieldModule } from '@sbb-esta/angular/form-field';
 import { SbbToggleModule } from '@sbb-esta/angular/toggle';
 import { CustomFunctionalDependencySideBarComponent } from '@/src/app/components/check-dependencies/check-fd/check-fd.component';
@@ -54,6 +54,8 @@ import { ForeignKeysComponent } from './components/tabbar/foreign-keys/foreign-k
 import { SbbOptionAllComponent } from './components/ui/sbb-option-all/sbb-option-all.component';
 import { IntegrationStartComponent } from './components/integration/integration-start/integration-start.component';
 import { IntegrationBarComponent } from './components/integration/integration-bar/integration-bar.component';
+import { SettingsElementComponent } from './components/settings/settings-element/settings-element.component';
+import { SettingsRowComponent } from './components/settings/settings-row/settings-row.component';
 export let InjectorInstance: Injector;
 
 @NgModule({
@@ -72,7 +74,7 @@ export let InjectorInstance: Injector;
     MetanomeResultsViewerComponent,
     UnionSidebarComponent,
     UnionDialogComponent,
-    MetanomeSettingsComponent,
+    SettingsDialogComponent,
     CustomFunctionalDependencySideBarComponent,
     ViolatingRowsViewComponent,
     CheckIndComponent,
@@ -89,6 +91,8 @@ export let InjectorInstance: Injector;
     SbbOptionAllComponent,
     IntegrationStartComponent,
     IntegrationBarComponent,
+    SettingsElementComponent,
+    SettingsRowComponent,
   ],
   imports: [
     BrowserModule,

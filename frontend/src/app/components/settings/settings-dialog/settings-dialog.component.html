@@ -1,0 +1,36 @@
+<div class="metanome-settings-dialog">
+  <div sbbDialogTitle>Metanome configuration settings</div>
+  <div
+    sbbDialogContent
+    *ngIf="loadedExistingMetanomeResults"
+    class="sbb-form-group-vertical"
+  >
+    <h2>Functional Dependencies</h2>
+    <div *ngFor="let table of tables">
+      <app-settings-row
+        [tables]="[table]"
+        [defaultConfigs]="fdConfigs"
+        [existingResults]="existingFdResults.get(table)!"
+        [overwriteConfig]="overwriteConfig"
+        (config)="configs.set(table, $event)"
+        (applyToAllTables)="overwriteConfig = $event"
+        ></app-settings-row>
+    </div>
+    <h2>Inclusion Dependencies</h2>
+    <app-settings-row
+      [tables]="tables"
+      [defaultConfigs]="indConfigs"
+      [existingResults]="existingIndResults"
+      (config)="configs.set('ind', $event)"
+
+    ></app-settings-row>
+  </div>
+  <!-- existing results have not been loaded yset -->
+  <div sbbDialogContent *ngIf="!loadedExistingMetanomeResults">
+    <sbb-loading mode="big"></sbb-loading>
+  </div>
+  <div sbbDialogActions>
+    <button (click)="runMetanome()" sbb-button cdkFocusInitial>Ok</button>
+    <button sbb-secondary-button sbbDialogClose>Cancel</button>
+  </div>
+</div>

@@ -40,8 +40,8 @@ export default abstract class MetanomeAlgorithm {
    */
   public addToIndexFile(): Promise<void> {
     return addToIndex({
-      tables: this.schemaAndTables,
-      algorithm: this.algoClass(),
+      schemaAndTables: this.schemaAndTables,
+      algoClass: this.algoClass(),
       dbmsName: sqlUtils.getDbmsName(),
       resultType: this.resultType(),
       database: process.env.DB_DATABASE,
@@ -103,9 +103,9 @@ export default abstract class MetanomeAlgorithm {
     const metadata = await getIndexContent();
     const entries = metadata.filter((entry) => {
       return (
-        _.isEqual(this.schemaAndTables, entry.tables) &&
+        _.isEqual(this.schemaAndTables, entry.schemaAndTables) &&
         _.isEqual(this.config, entry.config) &&
-        entry.algorithm == this.algoClass()
+        entry.algoClass == this.algoClass()
       );
     });
     if (!entries.length) throw { code: "ENOENT" };

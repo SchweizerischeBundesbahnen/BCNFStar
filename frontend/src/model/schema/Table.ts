@@ -423,17 +423,18 @@ export default class Table extends BasicTable {
    */
   public fdClusters(withPkFd: boolean = false): Array<FdCluster> {
     let allFds: Array<FunctionalDependency> = [...this.violatingFds()];
-    if (withPkFd && this.pk) {
-      let newFd = new FunctionalDependency(
-        this.pk!.copy(),
-        this.columns.copy()
-      );
-      // because lhs is primary key there are so much groups like tuples in table
-      newFd._uniqueTuplesLhs = this.rowCount;
-      // because lhs is primary key there are no redundant data
-      newFd._redundantTuples = 0;
-      allFds.push(newFd);
-    }
+    // do we need this?
+    // if (withPkFd && this.pk) {
+    //   let newFd = new FunctionalDependency(
+    //     this.pk!.copy(),
+    //     this.columns.copy()
+    //   );
+    //   // because lhs is primary key there are so much groups like tuples in table
+    //   newFd._uniqueTuplesLhs = this.rowCount;
+    //   // because lhs is primary key there are no redundant data
+    //   newFd._redundantTuples = 0;
+    //   allFds.push(newFd);
+    // }
 
     const fdClusterTree = new ColumnsTree<FdCluster>();
     for (let fd of allFds) {

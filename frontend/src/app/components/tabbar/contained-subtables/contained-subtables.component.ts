@@ -58,6 +58,11 @@ export class ContainedSubtablesComponent {
   }
 
   public cachedClusters = this.table.rankedFdClusters();
+
+  public selectionChanged() {
+    this.updateFdClusters();
+  }
+
   
   /**
    * @returns fd clusters (further infos in Table.ts) eventually filterd by columns from user input

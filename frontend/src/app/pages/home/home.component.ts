@@ -1,7 +1,6 @@
 import Schema from '@/src/model/schema/Schema';
 import { Component } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { IntegrationService } from '../../integration.service';
+import { Router } from '@angular/router';
 import { SchemaService } from '../../schema.service';
 
 @Component({
@@ -10,21 +9,7 @@ import { SchemaService } from '../../schema.service';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  constructor(
-    private schemaService: SchemaService,
-    private intService: IntegrationService,
-    private router: Router
-  ) {
-    // reset edited schema and integration when going to home page
-    this.router.events.subscribe((evt) => {
-      if (evt instanceof NavigationEnd) {
-        if (evt.url === '') {
-          this.intService.stopIntegration();
-          this.schemaService.hasSchema = false;
-        }
-      }
-    });
-  }
+  constructor(private schemaService: SchemaService, private router: Router) {}
 
   public setSchemaAndGo(schema: Schema) {
     this.schemaService.schema = schema;

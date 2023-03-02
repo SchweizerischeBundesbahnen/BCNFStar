@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import ITable from '@server/definitions/ITable';
 import Table from '../model/schema/Table';
 import { firstValueFrom } from 'rxjs';
-import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
 import { IMetanomeJob } from '@server/definitions/IMetanomeJob';
 import IRowCounts from '@server/definitions/IRowCounts';
 import Column from '../model/schema/Column';
@@ -22,11 +21,7 @@ export class DatabaseService {
   public baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
 
   // eslint-disable-next-line no-unused-vars
-  constructor(private http: HttpClient) {}
-
-  public async loadTables(): Promise<Array<Table>> {
-    return this.getTables();
-  }
+  constructor(private http: HttpClient) { }
 
   public async getDmbsName(): Promise<string> {
     return firstValueFrom(
@@ -40,7 +35,7 @@ export class DatabaseService {
     );
   }
 
-  private async getTables(): Promise<Array<Table>> {
+  public async getTables(): Promise<Array<Table>> {
     const iTables = await firstValueFrom(
       this.http.get<Array<ITable>>(this.baseUrl + '/tables')
     );
@@ -51,14 +46,14 @@ export class DatabaseService {
         rowCounts[iTable.schemaName + '.' + iTable.name]?.entries ?? 0
       );
     });
-    return tables;
+    return tables.sort((t1, t2) => t1.fullName < t2.fullName ? -1 : 1);
   }
 
-  public async runMetanome(entry: IIndexFileEntry) {
+  public async runMetanome(entry: IMetanomeJob) {
     const job: IMetanomeJob = {
-      algoClass: entry.algorithm,
+      algoClass: entry.algoClass,
       config: entry.config,
-      schemaAndTables: entry.tables,
+      schemaAndTables: entry.schemaAndTables,
     };
     return await firstValueFrom(
       this.http.post<{ message: string; fileName: string }>(
@@ -80,7 +75,7 @@ export class DatabaseService {
     return await firstValueFrom(
       this.http.get<number>(
         this.baseUrl +
-          `/redundances?tableSql=${tableSql}&&fdColumns=[${columns}]`
+        `/redundances?tableSql=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }
@@ -97,7 +92,7 @@ export class DatabaseService {
     return await firstValueFrom(
       this.http.get<number>(
         this.baseUrl +
-          `/redundances/length?tableSql=${tableSql}&&fdColumns=[${columns}]`
+        `/redundances/length?tableSql=${tableSql}&&fdColumns=[${columns}]`
       )
     );
   }
