@@ -1,3 +1,5 @@
+import { ConstraintPolicy } from './ConstraintPolicy';
+
 /**
  * Containes the necessary information to display an object as a column in the schema graph
  */
@@ -6,7 +8,7 @@ export default interface BasicColumn {
   dataType: string;
   nullable: boolean;
   dataTypeString: string;
-  nullableConstraint(constraintPolicy: string): boolean;
+  nullableConstraint(constraintPolicy: ConstraintPolicy): boolean;
 }
 
 export function surrogateKeyColumn(name: string): BasicColumn {

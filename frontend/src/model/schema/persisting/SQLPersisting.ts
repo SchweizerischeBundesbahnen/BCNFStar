@@ -7,13 +7,14 @@ import BasicTable from '../BasicTable';
 import UnionedTable from '../UnionedTable';
 import BasicColumn from '../../types/BasicColumn';
 import BasicTableRelationship from '../BasicTableRelationship';
+import { ConstraintPolicy } from '../../types/ConstraintPolicy';
 
 export default abstract class SQLPersisting {
   public constructor(protected schemaName: string) {}
 
   public abstract escape(str: string): string;
 
-  public createSQL(schema: Schema, constraintPolicy: string): string {
+  public createSQL(schema: Schema, constraintPolicy: ConstraintPolicy): string {
     let SQL = '';
     SQL += this.schemaPreparation(schema);
     SQL += this.tableCreation(schema, constraintPolicy);
@@ -31,7 +32,7 @@ export default abstract class SQLPersisting {
    */
   public tableCreation(
     schema: Schema,
-    constraintPolicy: string,
+    constraintPolicy: ConstraintPolicy,
     tables: Iterable<BasicTable> = schema.tables,
     keepSchema = false
   ): string {
@@ -49,7 +50,7 @@ export default abstract class SQLPersisting {
   public createTableSql(
     schema: Schema,
     table: BasicTable,
-    constraintPolicy: string,
+    constraintPolicy: ConstraintPolicy,
     keepSchema = false
   ): string {
     let columnStrings: string[] = [];
