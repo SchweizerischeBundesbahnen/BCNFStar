@@ -144,14 +144,19 @@ export class SplitDialogComponent {
         dataType: sourceColumn.dataType,
         value: this.nullSubstitutes.get(column)!,
       };
-      const isNewValue = await firstValueFrom(
-        this.http.post<boolean>(`${this.dataService.baseUrl}/newvalue`, body)
-      );
-      if (!isNewValue) {
-        this.nullSubstituteErrors.set(column, 'substitute exists in data.');
+      try {
+        const isNewValue = await firstValueFrom(
+          this.http.post<boolean>(`${this.dataService.baseUrl}/newvalue`, body)
+        );
+        if (!isNewValue) {
+          this.nullSubstituteErrors.set(column, 'substitute exists in data.');
+        }
+        this.nullSubstituteCheckValid = true;
+      }
+      catch(e){
+        this.nullSubstituteErrors.set(column, "Error checking substitute. Is the datatype correct?")
       }
     }
-    this.nullSubstituteCheckValid = true;
   }
 
   public isFullyDetermined() {
