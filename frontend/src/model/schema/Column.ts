@@ -3,7 +3,6 @@ import BasicColumn from '../types/BasicColumn';
 import SourceColumn from './SourceColumn';
 import SourceTableInstance from './SourceTableInstance';
 import BloomFilter from './methodObjects/BloomFilter';
-import { ConstraintPolicy } from '../types/ConstraintPolicy';
 
 /**
  * These objects uniquely identify a column within a table.
@@ -81,14 +80,6 @@ export default class Column implements BasicColumn {
 
   public get nullable() {
     return this.sourceColumn.safeInferredNullable && !this.nullSubstitute;
-  }
-
-  public persistedNullConstraint(constraintPolicy: ConstraintPolicy): boolean {
-    if (constraintPolicy == 'minimal') return true;
-    else if (constraintPolicy == 'schema')
-      return this.sourceColumn.schemaNullable;
-    else if (constraintPolicy == 'maximal') return this.nullable;
-    throw Error();
   }
 
   public get dataTypeString() {

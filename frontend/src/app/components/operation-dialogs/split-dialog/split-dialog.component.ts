@@ -151,12 +151,14 @@ export class SplitDialogComponent {
         if (!isNewValue) {
           this.nullSubstituteErrors.set(column, 'substitute exists in data.');
         }
-        this.nullSubstituteCheckValid = true;
-      }
-      catch(e){
-        this.nullSubstituteErrors.set(column, "Error checking substitute. Is the datatype correct?")
+      } catch (e) {
+        this.nullSubstituteErrors.set(
+          column,
+          'Error checking substitute. Is the datatype correct?'
+        );
       }
     }
+    this.nullSubstituteCheckValid = true;
   }
 
   public isFullyDetermined() {

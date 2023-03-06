@@ -13,6 +13,7 @@ import ColumnsTree from './ColumnsTree';
 import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
 import JaroWinklerDistance from './methodObjects/JaroWinklerDistance';
+import { ConstraintPolicy } from '../types/ConstraintPolicy';
 
 /** A working table that is the result of any number of split and join operations. */
 export default class Table extends BasicTable {
@@ -416,6 +417,18 @@ export default class Table extends BasicTable {
     return this._violatingFds;
   }
 
+  public nullConstraintFor(
+    column: Column,
+    constraintPolicy: ConstraintPolicy
+  ): boolean {
+    if (this.pk?.includes(column)) return false;
+    if (constraintPolicy == 'minimal') return true;
+    else if (constraintPolicy == 'schema')
+      return column.sourceColumn.schemaNullable;
+    else if (constraintPolicy == 'maximal') return column.nullable;
+    throw Error();
+  }
+
   /**
    * @param withPkFd returns cluster with or without pkFd, not needed when calculating data for redundance ranking
    * @returns FdClusters, which group functional dependencies that have the same right hand side.
@@ -480,7 +493,7 @@ export default class Table extends BasicTable {
 
   /**
    * calculates for every fd in the clusters a ranking score
-   * @param fdClusters 
+   * @param fdClusters
    * @returns fd clusters with fds with ranking scores
    */
   private scoreFdInFdClusters(fdClusters: Array<FdCluster>): Array<FdCluster> {
