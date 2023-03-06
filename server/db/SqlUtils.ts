@@ -151,7 +151,7 @@ export default abstract class SqlUtils {
 
   public testNotNullSql(nn: IRequestBodyNotNull): string {
     const sql = `
-      SELECT 1
+      SELECT DISTINCT(1)
       FROM ${this.escape(nn.schemaName)}.${this.escape(nn.tableName)}
       WHERE ${this.escape(nn.columnName)} IS NULL
     `;
@@ -160,7 +160,7 @@ export default abstract class SqlUtils {
 
   public testNewValueSql(nv: IRequestBodyNewValue): string {
     const sql = `
-      SELECT ${this.escape(nv.columnName)}
+      SELECT DISTINCT(1)
       FROM ${this.escape(nv.schemaName)}.${this.escape(nv.tableName)}
       WHERE ${this.escape(nv.columnName)} = CAST('${nv.value}' AS ${
       nv.dataType
