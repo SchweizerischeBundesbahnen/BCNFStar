@@ -8,7 +8,7 @@ export interface IRustFdConfig extends IMetanomeConfig {
 }
 
 export const defaultRustFdConfig: IRustFdConfig = {
-
+  MAX_DETERMINANT_SIZE: -1,
   memory: "",
 };
 
