@@ -207,12 +207,6 @@ export default abstract class SqlUtils {
    */
   public abstract tempTableScripts(Sql: string, name: string): ITemptableScript;
 
-  /**
-   * @param sql The Sql that queries the information the temp-table should contain
-   * @param name The name of the temp-table. Relevant for multiple temp-table in one query
-   */
-  public abstract createTempTable(sql: string): Promise<string> | ITemptableScript;
-
   public abstract dropTempTable(name: string): Promise<void>;
 
   protected randomName(): string {
