@@ -10,6 +10,7 @@ import { SchemaService } from '@/src/app/schema.service';
 import TableRelationship from '@/src/model/schema/TableRelationship';
 import IRowCounts from '@server/definitions/IRowCounts';
 import { SbbNotificationToast } from '@sbb-esta/angular/notification-toast';
+import { DatabaseService } from '@/src/app/database.service';
 
 @Component({
   selector: 'app-check-ind',
@@ -37,6 +38,7 @@ export class CheckIndComponent {
   public isValid: boolean = false;
 
   constructor(
+    private dataService: DatabaseService,
     public schemaService: SchemaService,
     private notification: SbbNotificationToast,
     public dialog: SbbDialog
@@ -89,7 +91,7 @@ export class CheckIndComponent {
       this.referencingTable,
       this.referencedTable!
     );
-    const dataQuery = await ViolatingINDRowsDataQuery.Create(relationship);
+    const dataQuery = await ViolatingINDRowsDataQuery.Create(relationship, this.dataService);
 
     this.isLoading = true;
     const rowCount: IRowCounts | void = await dataQuery

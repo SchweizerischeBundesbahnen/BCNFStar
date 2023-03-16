@@ -208,6 +208,8 @@ export class IntegrationService {
     src: Iterable<Table> = srcSchema.regularTables,
     target: Iterable<Table> = targetSchema.regularTables
   ): Promise<Array<ISchemaMatchingResponse>> {
+    // this is just used to send SQL to the schema matcher, the specific
+    // database system and therefore persister does not matter
     const srcPersister = new MsSqlPersisting('__schema_matching_temp_src');
     const targetPersister = new MsSqlPersisting(
       '__schema_matching_temp_target'

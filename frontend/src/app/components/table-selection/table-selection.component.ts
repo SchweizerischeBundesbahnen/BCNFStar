@@ -165,6 +165,6 @@ export class TableSelectionComponent implements OnInit {
 
   public mouseEnter(table: Table) {
     this.hoveredTable = table;
-    this.dataQuery = new TablePreviewDataQuery(table);
+    this.dataQuery = new TablePreviewDataQuery(table, this.dataService);
   }
 }

@@ -75,7 +75,7 @@ export class DatabaseService {
     let columns: Array<string> = [];
     lhs.forEach((col) => columns.push('"' + col.name + '"'));
 
-    const tableSql = await new TableQuery(table).getTableSQL();
+    const tableSql = await new TableQuery(table,this).getTableSQL();
 
     return await firstValueFrom(
       this.http.get<number>(
@@ -92,7 +92,7 @@ export class DatabaseService {
     let columns: Array<string> = [];
     lhs.forEach((col) => columns.push('"' + col.name + '"'));
 
-    const tableSql = await new TableQuery(table).getTableSQL();
+    const tableSql = await new TableQuery(table,this).getTableSQL();
 
     return await firstValueFrom(
       this.http.get<number>(

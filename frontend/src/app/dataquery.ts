@@ -1,5 +1,4 @@
 import { HttpClient } from '@angular/common/http';
-import { isDevMode } from '@angular/core';
 import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import IRequestBodyINDViolatingRows from '@server/definitions/IRequestBodyINDViolatingRows';
 import IRowCounts from '@server/definitions/IRowCounts';
@@ -14,21 +13,15 @@ import SparkSqlPersisting from '../model/schema/persisting/SparkSqlPersisting';
 import TableRelationship from '../model/schema/TableRelationship';
 import Table from '../model/schema/Table';
 import { InjectorInstance } from './app.module';
+import { DatabaseService } from './database.service';
 
 export abstract class DataQuery {
-  protected baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   protected http: HttpClient;
 
   protected SqlGeneration?: SQLPersisting;
 
-  public async getDmbsName(): Promise<string> {
-    return firstValueFrom(
-      this.http.get<string>(`${this.baseUrl}/persist/dbmsname`)
-    );
-  }
-
   public async initPersisting(): Promise<void> {
-    const dbmsName: string = await this.getDmbsName();
+    const dbmsName: string = await this.dataService.getDmbsName();
     if (dbmsName == 'postgres') {
       this.SqlGeneration = new PostgreSQLPersisting('XXXXXXXXXXXX');
     } else if (dbmsName == 'mssql') {
@@ -42,7 +35,7 @@ export abstract class DataQuery {
     }
   }
 
-  constructor() {
+  constructor(protected dataService: DatabaseService) {
     this.http = InjectorInstance.get<HttpClient>(HttpClient);
   }
 
@@ -64,16 +57,16 @@ export abstract class DataQuery {
 }
 
 export class TableQuery extends DataQuery {
-  constructor(private table: Table) {
-    super();
+  constructor(private table: Table, dataService: DatabaseService) {
+    super(dataService);
   }
 
   public override async loadTablePage(): Promise<ITablePage> {
-    return new Promise<ITablePage>(() => {});
+    return new Promise<ITablePage>(() => { });
   }
 
   public override async loadRowCount(): Promise<IRowCounts> {
-    return new Promise<IRowCounts>(() => {});
+    return new Promise<IRowCounts>(() => { });
   }
 
   public async getTableSQL() {
@@ -86,13 +79,13 @@ export class TableQuery extends DataQuery {
 }
 
 export class TablePreviewDataQuery extends DataQuery {
-  constructor(protected table: Table) {
-    super();
+  constructor(protected table: Table, dataService: DatabaseService) {
+    super(dataService);
   }
   public loadTablePage(offset: number, limit: number): Promise<ITablePage> {
     return firstValueFrom(
       this.http.get<ITablePage>(
-        `${this.baseUrl}/tables/page?schema=${this.table.schemaName}&table=${this.table.name}&offset=${offset}&limit=${limit}`
+        `${this.dataService.baseUrl}/tables/page?schema=${this.table.schemaName}&table=${this.table.name}&offset=${offset}&limit=${limit}`
       )
     );
   }
@@ -120,15 +113,16 @@ export class TablePreviewDataQuery extends DataQuery {
 
 export class ViolatingINDRowsDataQuery extends DataQuery {
   public static async Create(
-    relationship: TableRelationship
+    relationship: TableRelationship,
+    dataService: DatabaseService
   ): Promise<ViolatingINDRowsDataQuery> {
-    const indRowDataQuery = new ViolatingINDRowsDataQuery(relationship);
+    const indRowDataQuery = new ViolatingINDRowsDataQuery(relationship, dataService);
     await indRowDataQuery.initPersisting();
     return indRowDataQuery;
   }
 
-  private constructor(protected tableRelationship: TableRelationship) {
-    super();
+  private constructor(protected tableRelationship: TableRelationship, dataService: DatabaseService) {
+    super(dataService);
   }
 
   public override async loadTablePage(
@@ -137,7 +131,7 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
   ): Promise<ITablePage> {
     const data = this.body(offset, limit);
     return firstValueFrom(
-      this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/ind`, data)
+      this.http.post<ITablePage>(`${this.dataService.baseUrl}/violatingRows/ind`, data)
     );
   }
 
@@ -145,7 +139,7 @@ export class ViolatingINDRowsDataQuery extends DataQuery {
     const data = this.body();
     return firstValueFrom(
       this.http.post<IRowCounts>(
-        `${this.baseUrl}/violatingRows/rowcount/ind`,
+        `${this.dataService.baseUrl}/violatingRows/rowcount/ind`,
         data
       )
     );
@@ -178,9 +172,10 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
   public static async Create(
     table: Table,
     lhs: Array<Column>,
-    rhs: Array<Column>
+    rhs: Array<Column>,
+    dataService: DatabaseService
   ): Promise<ViolatingFDRowsDataQuery> {
-    const fdRowDataQuery = new ViolatingFDRowsDataQuery(table, lhs, rhs);
+    const fdRowDataQuery = new ViolatingFDRowsDataQuery(table, lhs, rhs, dataService);
     await fdRowDataQuery.initPersisting();
     return fdRowDataQuery;
   }
@@ -188,9 +183,9 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
   private constructor(
     protected table: Table,
     protected lhs: Array<Column>,
-    protected rhs: Array<Column>
-  ) {
-    super();
+    protected rhs: Array<Column>, 
+    dataService: DatabaseService) {
+    super(dataService);
   }
 
   public override async loadTablePage(
@@ -201,7 +196,7 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     const lhsNames = this.lhs.map((c) => c.name);
     const data = this.body(offset, limit);
     const result = await firstValueFrom(
-      this.http.post<ITablePage>(`${this.baseUrl}/violatingRows/fd`, data)
+      this.http.post<ITablePage>(`${this.dataService.baseUrl}/violatingRows/fd`, data)
     );
     if (!withSeparators) return result;
     // before every new lhs value, add a separator announcing that value
@@ -233,7 +228,7 @@ export class ViolatingFDRowsDataQuery extends DataQuery {
     const data = this.body();
     return firstValueFrom(
       this.http.post<IRowCounts>(
-        `${this.baseUrl}/violatingRows/rowcount/fd`,
+        `${this.dataService.baseUrl}/violatingRows/rowcount/fd`,
         data
       )
     );

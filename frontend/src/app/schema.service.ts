@@ -327,7 +327,8 @@ export class SchemaService {
       await ViolatingFDRowsDataQuery.Create(
         table,
         fd.lhs.asArray(),
-        fd.rhs.copy().setMinus(table.hull(fd.lhs)).asArray()
+        fd.rhs.copy().setMinus(table.hull(fd.lhs)).asArray(),
+        this.dataService
       );
 
     const rowCount: IRowCounts | void = await dataQuery
