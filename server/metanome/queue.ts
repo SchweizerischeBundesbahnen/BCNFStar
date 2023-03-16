@@ -14,7 +14,7 @@ import FAIDA from "./FAIDA";
 const queueName = "metanome";
 const connection = {
   host: process.env.REDIS_HOST || "localhost",
-  port: process.env.REDIS_PORT || 6379,
+  port: +process.env.REDIS_PORT || 6379,
 };
 
 export const metanomeQueue = new Queue<IMetanomeJob, string, string>(
