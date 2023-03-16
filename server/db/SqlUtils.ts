@@ -207,12 +207,6 @@ export default abstract class SqlUtils {
    */
   public abstract tempTableScripts(Sql: string, name: string): ITemptableScript;
 
-  /**
-   * @param sql The Sql that queries the information the temp-table should contain
-   * @param name The name of the temp-table. Relevant for multiple temp-table in one query
-   */
-  public abstract createTempTable(sql: string): Promise<string>;
-
   public abstract dropTempTable(name: string): Promise<void>;
 
   protected randomName(): string {
@@ -231,7 +225,7 @@ WHERE EXISTS (
 	SELECT 1 FROM (
 		SELECT ${lhs.join(",")} FROM (
 			SELECT ${[...new Set(lhs.concat(rhs))].join(",")}
-			FROM ${tableName} 
+			FROM ${tableName}
 			GROUP BY ${[...new Set(lhs.concat(rhs))].join(",")}
 		) AS Z  -- removes duplicates
 		GROUP BY ${lhs.join(",")} 
