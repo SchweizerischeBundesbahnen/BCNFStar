@@ -35,7 +35,10 @@
     or check the violations and clean the data.
   </div>
 
-  <div *ngIf="isFullyDetermined() && isKeyNonMinimal()" class="violation">
+  <div
+    *ngIf="isFullyDetermined() && minimalDeterminantViolation"
+    class="violation"
+  >
     A simpler key could determine all the selected attributes. We strongly
     advise to choose other key.
   </div>

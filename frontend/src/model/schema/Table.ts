@@ -362,23 +362,21 @@ export default class Table extends BasicTable {
     return fd.rhs.equals(this.columns);
   }
 
-  /** Returns the minimal columnCombinations which determine the given columns. */
-  public minimalDeterminantsOf(
-    columns: ColumnCombination
-  ): Array<ColumnCombination> {
-    const allClusters = Array.from(this.fdClusters(true)).sort(
-      (cluster1, cluster2) =>
-        cluster1.columns.cardinality - cluster2.columns.cardinality
-    );
-    const determinants = new Array<ColumnCombination>();
-    for (const cluster of allClusters) {
-      if (!columns.isSubsetOf(cluster.columns)) continue;
-      for (const fd of cluster.fds) {
-        if (!determinants.some((other) => other.isSubsetOf(fd.lhs)))
-          determinants.push(fd.lhs);
+  /** Returns whether there is an fd that also determines the columns, but has a smaller lhs. */
+  public hasSmallerDeterminant(
+    columns: ColumnCombination,
+    determinant: ColumnCombination
+  ): boolean {
+    for (const fd of this.violatingFds()) {
+      if (
+        fd.lhs.isSubsetOf(determinant) &&
+        !fd.lhs.equals(determinant) &&
+        columns.isSubsetOf(fd.rhs)
+      ) {
+        return true;
       }
     }
-    return determinants;
+    return false;
   }
 
   public isKey(columns: ColumnCombination): boolean {

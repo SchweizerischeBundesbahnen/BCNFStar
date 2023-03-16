@@ -34,8 +34,8 @@ export class SplitDialogComponent {
   public pkViolation!: boolean;
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
+  public minimalDeterminantViolation!: boolean;
 
-  public minimalDeterminants!: Array<ColumnCombination>;
   public hull!: ColumnCombination;
 
   public selectedColumns = new Map<Column, boolean>();
@@ -92,13 +92,10 @@ export class SplitDialogComponent {
     );
   }
 
-  public isKeyNonMinimal() {
-    return !this.minimalDeterminants.some((det) => det.equals(this.fd.lhs));
-  }
-
   public updateViolations() {
-    this.minimalDeterminants = this.table.minimalDeterminantsOf(
-      this.selectedColumnsCC()
+    this.minimalDeterminantViolation = this.table.hasSmallerDeterminant(
+      this.selectedColumnsCC(),
+      this.fd.lhs
     );
     this.pkViolation = this.schemaService.schema.fdSplitPKViolationOf(
       this.fd,

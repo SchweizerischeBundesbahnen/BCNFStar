@@ -11,6 +11,7 @@
     >
       <app-sbb-option-all
         [(current)]="_fdClusterFilter"
+        (currentChange)="selectionChanged()"
         [available]="table.columns.asArray()"
       ></app-sbb-option-all>
       <sbb-option
