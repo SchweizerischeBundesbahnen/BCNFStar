@@ -30,8 +30,10 @@ export class AppRoutingModule {
     this.router.events.subscribe((evt) => {
       if (evt instanceof NavigationEnd) {
         if (evt.url === '/' || evt.url === '/integration') {
-          this.mergeService.cancel();
-          this.intService.stopIntegration();
+          if (this.mergeService.isMerging)
+            this.mergeService.cancel();
+          if (this.intService.isIntegrating)
+            this.intService.stopIntegration();
           this.schemaService.hasSchema = false;
         }
       }
