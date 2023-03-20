@@ -8,7 +8,7 @@ describe("The integration start page", () => {
       cy.selectTablesAndGo();
     });
     cy.contains("Ok").click();
-    cy.wait(1000);
+    cy.wait(500);
 
     cy.get(".sbb-dialog-container").should("not.exist");
     cy.get("app-table-selection.right").within(() => {
@@ -21,7 +21,7 @@ describe("The integration start page", () => {
     });
     cy.contains("Ok").click();
 
-    cy.wait(5000);
+    cy.wait(500);
     cy.contains("Start integration").click();
 
     // cy.loadMetanomeConfigAndOk();
