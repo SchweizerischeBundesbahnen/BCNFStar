@@ -1,6 +1,3 @@
-// for the oldest version using actual HyFD with js fd extender see d8ceac79c3c6dea194ca803650481ee7fcbb956c
-// HyFDExtended is basically just Normi without the actual normalization step with more HyFD settings,
-// or HyFD with fd extension, and was written by us
 import { join } from "path";
 
 import { absoluteServerDir } from "@/utils/files";
