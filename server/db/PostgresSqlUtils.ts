@@ -93,7 +93,11 @@ export default class PostgresSqlUtils extends SqlUtils {
     return ITemptableScript;
   }
 
-  public override async createTempTable(_sql: string): Promise<string> {
+  /**
+   * @param sql The Sql that queries the information the temp-table should contain
+   * @param name The name of the temp-table. Relevant for multiple temp-table in one query
+   */
+  public async createTempTable(_sql: string): Promise<string> {
     const x: ITemptableScript = this.tempTableScripts(_sql);
     await this.pool.query(x.createScript);
     return x.name;

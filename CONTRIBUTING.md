@@ -52,6 +52,10 @@ How to generate these files
 Something doesn't work? Always try to run `npm install && npm run build` first. This may be required after changes to files in the `server/definitions` folder or to any dependency.
 You don't know what this monster function is supposed to do? Maybe our documentation will help you: [index.html](/docs/index.html).
 
+## Custom Metanome algorithms
+
+The source code of our custom metanome algorithms JARs (HyFDExtended and RustFD) can be found [here](https://github.com/PaulVII/HyFDExtended)
+
 ## Pull Request checklist
 
 Make sure that...

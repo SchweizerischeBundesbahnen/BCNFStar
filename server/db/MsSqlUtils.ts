@@ -77,12 +77,6 @@ export default class MsSqlUtils extends SqlUtils {
     return ITemptableScript;
   }
 
-  public override async createTempTable(_sql: string): Promise<string> {
-    const x: ITemptableScript = this.tempTableScripts(_sql);
-    await sql.query(x.createScript);
-    return x.name;
-  }
-
   public override async dropTempTable(name: string): Promise<void> {
     await sql.query(this.dropTable_SQL(name));
   }
@@ -320,9 +314,9 @@ export default class MsSqlUtils extends SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const table: string = await this.createTempTable(_sql);
-
-    const result: sql.IResult<any> = await sql.query(
+    const tempTableScript = this.tempTableScripts(_sql)
+    const table: string = tempTableScript.name;
+    const result: sql.IResult<any> = await sql.query(tempTableScript.createScript +
       this.violatingRowsForFD_SQL(table, lhs, rhs) +
         ` ORDER BY ${lhs.join(",")}
           OFFSET ${offset} ROWS
@@ -343,14 +337,18 @@ export default class MsSqlUtils extends SqlUtils {
     offset: number,
     limit: number
   ): Promise<ITablePage> {
-    const referencingTable: string = await this.createTempTable(
+    const referencingTableScript = this.tempTableScripts(
       referencingTableSql
     );
-    const referencedTable: string = await this.createTempTable(
+    const referencedTableScript = this.tempTableScripts(
       referencedTableSql
     );
 
+    const referencingTable: string = referencingTableScript.name;
+    const referencedTable: string =  referencedTableScript.name;
+
     const result: sql.IResult<any> = await sql.query(
+      referencingTableScript.createScript + "\n" + referencedTableScript.createScript + "\n" +
       this.violatingRowsForSuggestedIND_SQL(
         referencingTable,
         referencedTable,
@@ -377,13 +375,17 @@ export default class MsSqlUtils extends SqlUtils {
     referencedTableSql: string,
     columnRelationships: IColumnRelationship[]
   ): Promise<IRowCounts> {
-    const referencingTable: string = await this.createTempTable(
+    const referencingTableScript = this.tempTableScripts(
       referencingTableSql
     );
-    const referencedTable: string = await this.createTempTable(
+    const referencedTableScript = this.tempTableScripts(
       referencedTableSql
     );
+    const referencingTable = referencingTableScript.name;
+    const referencedTable = referencedTableScript.name;
+
     const result = await sql.query<IRowCounts>(
+      referencingTableScript.createScript + "\n" + referencedTableScript.createScript + "\n" +
       this.getViolatingRowsForINDCount_Sql(
         referencingTable,
         referencedTable,
@@ -401,9 +403,12 @@ export default class MsSqlUtils extends SqlUtils {
     lhs: Array<string>,
     rhs: Array<string>
   ): Promise<IRowCounts> {
-    const table: string = await this.createTempTable(_sql);
+    const tempTableScript = this.tempTableScripts(_sql);
+    const table: string = tempTableScript.name;
+
     const result = await sql.query<IRowCounts>(
-      this.getViolatingRowsForFDCount_Sql(_sql, lhs, rhs)
+      tempTableScript.createScript + "\n" +
+      this.getViolatingRowsForFDCount_Sql(table, lhs, rhs)
     );
     this.dropTempTable(table);
     return result.recordset[0];
