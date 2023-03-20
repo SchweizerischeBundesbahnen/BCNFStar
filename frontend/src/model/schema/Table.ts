@@ -13,6 +13,7 @@ import ColumnsTree from './ColumnsTree';
 import SourceRelationship from './SourceRelationship';
 import TableRelationship from './TableRelationship';
 import JaroWinklerDistance from './methodObjects/JaroWinklerDistance';
+import { ConstraintPolicy } from '../types/ConstraintPolicy';
 
 /** A working table that is the result of any number of split and join operations. */
 export default class Table extends BasicTable {
@@ -361,23 +362,21 @@ export default class Table extends BasicTable {
     return fd.rhs.equals(this.columns);
   }
 
-  /** Returns the minimal columnCombinations which determine the given columns. */
-  public minimalDeterminantsOf(
-    columns: ColumnCombination
-  ): Array<ColumnCombination> {
-    const allClusters = Array.from(this.fdClusters(true)).sort(
-      (cluster1, cluster2) =>
-        cluster1.columns.cardinality - cluster2.columns.cardinality
-    );
-    const determinants = new Array<ColumnCombination>();
-    for (const cluster of allClusters) {
-      if (!columns.isSubsetOf(cluster.columns)) continue;
-      for (const fd of cluster.fds) {
-        if (!determinants.some((other) => other.isSubsetOf(fd.lhs)))
-          determinants.push(fd.lhs);
+  /** Returns whether there is an fd that also determines the columns, but has a smaller lhs. */
+  public hasSmallerDeterminant(
+    columns: ColumnCombination,
+    determinant: ColumnCombination
+  ): boolean {
+    for (const fd of this.violatingFds()) {
+      if (
+        fd.lhs.isSubsetOf(determinant) &&
+        !fd.lhs.equals(determinant) &&
+        columns.isSubsetOf(fd.rhs)
+      ) {
+        return true;
       }
     }
-    return determinants;
+    return false;
   }
 
   public isKey(columns: ColumnCombination): boolean {
@@ -414,6 +413,18 @@ export default class Table extends BasicTable {
       this._violatingFds = this.fds.filter((fd) => this.isBCNFViolating(fd));
     }
     return this._violatingFds;
+  }
+
+  public nullConstraintFor(
+    column: Column,
+    constraintPolicy: ConstraintPolicy
+  ): boolean {
+    if (this.pk?.includes(column)) return false;
+    if (constraintPolicy == 'minimal') return true;
+    else if (constraintPolicy == 'schema')
+      return column.sourceColumn.schemaNullable;
+    else if (constraintPolicy == 'maximal') return column.nullable;
+    throw Error();
   }
 
   /**
@@ -480,7 +491,7 @@ export default class Table extends BasicTable {
 
   /**
    * calculates for every fd in the clusters a ranking score
-   * @param fdClusters 
+   * @param fdClusters
    * @returns fd clusters with fds with ranking scores
    */
   private scoreFdInFdClusters(fdClusters: Array<FdCluster>): Array<FdCluster> {

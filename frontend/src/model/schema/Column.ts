@@ -16,6 +16,7 @@ export default class Column implements BasicColumn {
   public constructor(
     public sourceTableInstance: SourceTableInstance,
     public sourceColumn: SourceColumn,
+    public nullSubstitute?: string,
     public userAlias?: string
   ) {}
 
@@ -65,6 +66,7 @@ export default class Column implements BasicColumn {
     let col = new Column(
       this.sourceTableInstance,
       this.sourceColumn,
+      this.nullSubstitute,
       this.userAlias
     );
     // for value ranking, sufficient to update maxValues after splitting
@@ -77,7 +79,7 @@ export default class Column implements BasicColumn {
   }
 
   public get nullable() {
-    return this.sourceColumn.nullable;
+    return this.sourceColumn.safeInferredNullable && !this.nullSubstitute;
   }
 
   public get dataTypeString() {
@@ -101,6 +103,7 @@ export default class Column implements BasicColumn {
     return new Column(
       mapping.get(this.sourceTableInstance) || this.sourceTableInstance,
       this.sourceColumn,
+      this.nullSubstitute,
       this.userAlias
     );
   }

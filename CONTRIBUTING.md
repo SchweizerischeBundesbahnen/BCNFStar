@@ -52,9 +52,11 @@ How to generate these files
 Something doesn't work? Always try to run `npm install && npm run build` first. This may be required after changes to files in the `server/definitions` folder or to any dependency.
 You don't know what this monster function is supposed to do? Maybe our documentation will help you: [index.html](/docs/index.html).
 
-## Custom Metanome algorithms
+## Metanome modifications
 
-The source code of our custom metanome algorithms JARs (HyFDExtended and RustFD) can be found [here](https://github.com/PaulVII/HyFDExtended)
+The source code of our custom metanome algorithms JARs (HyFDExtended and RustFD) can be found at [HyFDExtended](https://github.com/PaulVII/HyFDExtended)
+
+We also use a custom version of [metanome-cli](https://github.com/rothaarlappen/metanome-cli) enabling Microsoft SQL Server support. This is required because Microsoft SQL Server has a special JDBC URL format. The relevant changes are in `src/main/java/de/metanome/cli/App.java` in the method `loadConfigurationSettingDatabaseConnection`. For completeness, we also added an MsSql database type and the mssql JDBC drivers as a dependency to [Metanome](https://github.com/rothaarlappen/metanome), but this is likely optional since the JDBC driver JAR file has to be specified whenever metanome-cli is called
 
 ## Pull Request checklist
 

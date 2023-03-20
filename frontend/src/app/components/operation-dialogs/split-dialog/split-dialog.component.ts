@@ -1,11 +1,14 @@
+import { DatabaseService } from '@/src/app/database.service';
 import { SchemaService } from '@/src/app/schema.service';
 import Column from '@/src/model/schema/Column';
 import ColumnCombination from '@/src/model/schema/ColumnCombination';
 import FunctionalDependency from '@/src/model/schema/FunctionalDependency';
 import Table from '@/src/model/schema/Table';
 import TableRelationship from '@/src/model/schema/TableRelationship';
+import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
+import { firstValueFrom } from 'rxjs';
 
 export interface SplitDialogResponse {
   type: string;
@@ -14,6 +17,7 @@ export interface SplitDialogResponse {
 export interface FdSplitResponse extends SplitDialogResponse {
   fd: FunctionalDependency;
   name: string;
+  nullSubstitutes: Map<Column, string>;
 }
 
 export interface ChangeKeyResponse extends SplitDialogResponse {
@@ -30,13 +34,18 @@ export class SplitDialogComponent {
   public pkViolation!: boolean;
   public fkViolations!: Array<TableRelationship>;
   public referenceViolations!: Array<TableRelationship>;
+  public minimalDeterminantViolation!: boolean;
 
-  public minimalDeterminants!: Array<ColumnCombination>;
   public hull!: ColumnCombination;
 
   public selectedColumns = new Map<Column, boolean>();
 
   public tableName: string;
+
+  public nullCols!: Array<Column>;
+  public nullSubstitutes!: Map<Column, string>;
+  public nullSubstituteErrors!: Map<Column, string>;
+  public nullSubstituteCheckValid: boolean = false;
 
   constructor(
     // eslint-disable-next-line no-unused-vars
@@ -45,6 +54,8 @@ export class SplitDialogComponent {
       FdSplitResponse | ChangeKeyResponse
     >,
     public schemaService: SchemaService,
+    private dataService: DatabaseService,
+    private http: HttpClient,
     // eslint-disable-next-line no-unused-vars
     @Inject(SBB_DIALOG_DATA)
     data: { fd: FunctionalDependency }
@@ -59,6 +70,7 @@ export class SplitDialogComponent {
     });
     this.tableName = this.fd.lhs.columnNames().join('_').substring(0, 50);
     this.updateViolations();
+    this.initNullSubstitutes();
   }
 
   public get table() {
@@ -80,13 +92,10 @@ export class SplitDialogComponent {
     );
   }
 
-  public isKeyNonMinimal() {
-    return !this.minimalDeterminants.some((det) => det.equals(this.fd.lhs));
-  }
-
-  public async updateViolations() {
-    this.minimalDeterminants = await this.table.minimalDeterminantsOf(
-      this.selectedColumnsCC()
+  public updateViolations() {
+    this.minimalDeterminantViolation = this.table.hasSmallerDeterminant(
+      this.selectedColumnsCC(),
+      this.fd.lhs
     );
     this.pkViolation = this.schemaService.schema.fdSplitPKViolationOf(
       this.fd,
@@ -103,6 +112,52 @@ export class SplitDialogComponent {
       );
   }
 
+  public initNullSubstitutes() {
+    this.nullCols = new Array<Column>();
+    this.nullSubstitutes = new Map<Column, string>();
+    this.nullSubstituteErrors = new Map<Column, string>();
+
+    for (let column of this.fd.lhs) {
+      if (column.sourceColumn.safeInferredNullable) {
+        this.nullCols.push(column);
+        this.nullSubstitutes.set(column, column.nullSubstitute ?? '');
+      }
+    }
+    this.checkNullSubstitutes();
+  }
+
+  public async checkNullSubstitutes() {
+    for (let column of this.nullCols) {
+      this.nullSubstituteErrors.set(column, '');
+      if (!this.nullSubstitutes.get(column)) {
+        this.nullSubstituteErrors.set(column, 'No substitute specified.');
+        continue;
+      }
+      const sourceColumn = column.sourceColumn;
+      const body = {
+        schemaName: sourceColumn.table.schemaName,
+        tableName: sourceColumn.table.name,
+        columnName: sourceColumn.name,
+        dataType: sourceColumn.dataType,
+        value: this.nullSubstitutes.get(column)!,
+      };
+      try {
+        const isNewValue = await firstValueFrom(
+          this.http.post<boolean>(`${this.dataService.baseUrl}/newvalue`, body)
+        );
+        if (!isNewValue) {
+          this.nullSubstituteErrors.set(column, 'substitute exists in data.');
+        }
+      } catch (e) {
+        this.nullSubstituteErrors.set(
+          column,
+          'Error checking substitute. Is the datatype correct?'
+        );
+      }
+    }
+    this.nullSubstituteCheckValid = true;
+  }
+
   public isFullyDetermined() {
     return this.selectedColumnsCC().isSubsetOf(this.hull);
   }
@@ -110,7 +165,9 @@ export class SplitDialogComponent {
   public canConfirm() {
     return (
       [...this.selectedColumns.values()].some((bool) => bool) &&
-      this.isFullyDetermined()
+      this.isFullyDetermined() &&
+      this.nullSubstituteCheckValid &&
+      [...this.nullSubstituteErrors.values()].every((error) => !error)
     );
   }
 
@@ -119,6 +176,7 @@ export class SplitDialogComponent {
       type: 'fdSplit',
       fd: this.fd,
       name: this.tableName,
+      nullSubstitutes: this.nullSubstitutes,
     });
   }
 

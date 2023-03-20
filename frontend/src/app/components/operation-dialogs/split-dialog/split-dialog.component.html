@@ -35,7 +35,10 @@
     or check the violations and clean the data.
   </div>
 
-  <div *ngIf="isFullyDetermined() && isKeyNonMinimal()" class="violation">
+  <div
+    *ngIf="isFullyDetermined() && minimalDeterminantViolation"
+    class="violation"
+  >
     A simpler key could determine all the selected attributes. We strongly
     advise to choose other key.
   </div>
@@ -60,6 +63,58 @@
       </li>
     </ul>
   </div>
+
+  <div *ngIf="nullCols && nullCols.length > 0">
+    <div class="violation">
+      The key of the created table would contain null values. Please specify a
+      value with which to replace the null values.
+    </div>
+    <br />
+    <table>
+      <tr class="text-left">
+        <th>name</th>
+        <th>datatype</th>
+        <th>substitute</th>
+      </tr>
+      <tr *ngFor="let col of nullCols">
+        <td>{{ col.name }}</td>
+        <td>{{ col.dataType }}</td>
+        <td>
+          <input
+            type="text"
+            sbbInput
+            placeholder="substitute for null values"
+            [ngModel]="nullSubstitutes.get(col)"
+            (ngModelChange)="nullSubstitutes.set(col, $event)"
+            (ngModelChange)="nullSubstituteCheckValid = false"
+          />
+        </td>
+        <td>
+          <div *ngIf="nullSubstituteCheckValid">
+            <div *ngIf="nullSubstituteErrors.get(col)" class="violation">
+              {{ nullSubstituteErrors.get(col) }}
+            </div>
+            <sbb-icon
+              svgIcon="kom:tick-medium"
+              style="color: green"
+              *ngIf="!nullSubstituteErrors.get(col)"
+            ></sbb-icon>
+          </div>
+          <div *ngIf="!nullSubstituteCheckValid" class="violation">
+            Please check the substitutes with the button below!
+          </div>
+        </td>
+      </tr>
+    </table>
+    <button
+      sbb-button
+      [disabled]="nullSubstituteCheckValid"
+      (click)="checkNullSubstitutes()"
+    >
+      Check Substitutes
+    </button>
+  </div>
+
   <div sbbDialogActions>
     <button
       sbb-button

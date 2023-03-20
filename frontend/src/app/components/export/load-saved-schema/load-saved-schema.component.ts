@@ -3,7 +3,7 @@ import Schema from '@/src/model/schema/Schema';
 import { Router } from '@angular/router';
 import { parse } from 'zipson';
 import * as JSZip from 'jszip';
-import SaveSchemaState from '@/src/model/schema/methodObjects/SaveSchemaState';
+import RestoreSchemaState from '@/src/model/schema/methodObjects/RestoreSchemaState';
 import { SchemaService } from '@/src/app/schema.service';
 
 @Component({
@@ -43,6 +43,6 @@ export class LoadSavedSchemaComponent {
 
   public getSchema(savedZipedSchemaEntry: string) {
     let schemaObject = parse(savedZipedSchemaEntry);
-    this.newSchema = new SaveSchemaState().parseSchema(schemaObject);
+    this.newSchema = new RestoreSchemaState().parseSchema(schemaObject);
   }
 }

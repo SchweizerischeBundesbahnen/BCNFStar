@@ -7,16 +7,17 @@ import BasicTable from '../BasicTable';
 import UnionedTable from '../UnionedTable';
 import BasicColumn from '../../types/BasicColumn';
 import BasicTableRelationship from '../BasicTableRelationship';
+import { ConstraintPolicy } from '../../types/ConstraintPolicy';
 
 export default abstract class SQLPersisting {
   public constructor(protected schemaName: string) {}
 
   public abstract escape(str: string): string;
 
-  public createSQL(schema: Schema): string {
+  public createSQL(schema: Schema, constraintPolicy: ConstraintPolicy): string {
     let SQL = '';
     SQL += this.schemaPreparation(schema);
-    SQL += this.tableCreation(schema);
+    SQL += this.tableCreation(schema, constraintPolicy);
     SQL += this.dataTransfer([...schema.tables]);
     SQL += this.primaryKeys([...schema.regularTables]);
     SQL += this.foreignKeys(schema);
@@ -31,12 +32,14 @@ export default abstract class SQLPersisting {
    */
   public tableCreation(
     schema: Schema,
+    constraintPolicy: ConstraintPolicy,
     tables: Iterable<BasicTable> = schema.tables,
     keepSchema = false
   ): string {
     let Sql: string = '';
     for (const table of tables) {
-      Sql += this.createTableSql(schema, table, keepSchema) + '\n';
+      Sql +=
+        this.createTableSql(schema, table, constraintPolicy, keepSchema) + '\n';
     }
     return Sql;
   }
@@ -47,6 +50,7 @@ export default abstract class SQLPersisting {
   public createTableSql(
     schema: Schema,
     table: BasicTable,
+    constraintPolicy: ConstraintPolicy,
     keepSchema = false
   ): string {
     let columnStrings: string[] = [];
@@ -64,7 +68,7 @@ export default abstract class SQLPersisting {
 
     for (const column of columns) {
       let columnString: string = `${column.name} ${column.dataType} `;
-      if (!column.nullable) {
+      if (!table.nullConstraintFor(column, constraintPolicy)) {
         columnString += 'NOT ';
       }
       columnString += 'NULL';
@@ -298,9 +302,14 @@ ALTER TABLE ${this.tableIdentifier(
     dataType: string = ''
   ): string {
     if (column == null) return ` CAST (null AS ${dataType}) `;
-    return `${this.escape(column.sourceTableInstance.alias)}.${this.escape(
-      column.sourceColumn.name
-    )}`;
+    let identifier = `${this.escape(
+      column.sourceTableInstance.alias
+    )}.${this.escape(column.sourceColumn.name)}`;
+    if (column.nullSubstitute) {
+      return `COALESCE(${identifier}, '${column.nullSubstitute}')`;
+    } else {
+      return identifier;
+    }
   }
 
   public abstract surrogateKeyString(name: string): string;

@@ -5,6 +5,7 @@ import { Component } from '@angular/core';
 import MsSqlPersisting from '@/src/model/schema/persisting/MsSqlPersisting';
 import * as saveAs from 'file-saver';
 import { DatabaseService } from '../../../database.service';
+import { ConstraintPolicy } from '@/src/model/types/ConstraintPolicy';
 
 @Component({
   selector: 'app-persist-schema',
@@ -13,6 +14,7 @@ import { DatabaseService } from '../../../database.service';
 })
 export class PersistSchemaComponent {
   public schemaName: string = '';
+  public constraintPolicy: ConstraintPolicy = 'maximal';
 
   constructor(
     public dataService: DatabaseService,
@@ -32,7 +34,10 @@ export class PersistSchemaComponent {
 
   public async persistSchema(): Promise<string> {
     const persisting = await this.initPersisting();
-    return persisting.createSQL(this.schemaService.schema);
+    return persisting.createSQL(
+      this.schemaService.schema,
+      this.constraintPolicy
+    );
   }
 
   async download(): Promise<void> {

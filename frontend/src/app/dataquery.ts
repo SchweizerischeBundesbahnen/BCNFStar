@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import IRequestBodyFDViolatingRows from '@server/definitions/IRequestBodyFDViolatingRows';
 import IRequestBodyINDViolatingRows from '@server/definitions/IRequestBodyINDViolatingRows';
+import IRequestBodyNewValue from '@server/definitions/IRequestBodyNewValue';
+import { IRequestBodyNotNull } from '@server/definitions/IRequestBodyNotNull';
 import IRowCounts from '@server/definitions/IRowCounts';
 import ITablePage from '@server/definitions/ITablePage';
 import { firstValueFrom } from 'rxjs';
@@ -12,8 +14,9 @@ import SQLPersisting from '../model/schema/persisting/SQLPersisting';
 import TableRelationship from '../model/schema/TableRelationship';
 import Table from '../model/schema/Table';
 import { InjectorInstance } from './app.module';
+import SourceColumn from '../model/schema/SourceColumn';
 
-export abstract class DataQuery {
+export abstract class Query {
   protected baseUrl: string = isDevMode() ? 'http://localhost:80' : '';
   protected http: HttpClient;
 
@@ -40,7 +43,9 @@ export abstract class DataQuery {
   constructor() {
     this.http = InjectorInstance.get<HttpClient>(HttpClient);
   }
+}
 
+export abstract class DataQuery extends Query {
   public abstract loadTablePage(
     offset: number,
     limit: number
@@ -58,17 +63,9 @@ export abstract class DataQuery {
   }
 }
 
-export class TableQuery extends DataQuery {
+export class TableQuery extends Query {
   constructor(private table: Table) {
     super();
-  }
-
-  public override async loadTablePage(): Promise<ITablePage> {
-    return new Promise<ITablePage>(() => {});
-  }
-
-  public override async loadRowCount(): Promise<IRowCounts> {
-    return new Promise<IRowCounts>(() => {});
   }
 
   public async getTableSQL() {

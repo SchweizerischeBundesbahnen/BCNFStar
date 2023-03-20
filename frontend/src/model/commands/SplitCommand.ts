@@ -1,3 +1,4 @@
+import Column from '../schema/Column';
 import FunctionalDependency from '../schema/FunctionalDependency';
 import Split from '../schema/methodObjects/Split';
 import Schema from '../schema/Schema';
@@ -13,6 +14,7 @@ export default class SplitCommand extends Command {
     private schema: Schema,
     public table: Table,
     private fd: FunctionalDependency,
+    private nullSubstitutes?: Map<Column, string>,
     generatingName?: string
   ) {
     super();
@@ -23,6 +25,7 @@ export default class SplitCommand extends Command {
     this.children = new Split(
       this.table,
       this.fd,
+      this.nullSubstitutes,
       this.generatingName
     ).newTables;
     this._redo();

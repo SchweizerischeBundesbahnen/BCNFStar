@@ -204,6 +204,22 @@ export class SchemaCreationService {
     }
   }
 
+  private async inferNullability(...columns: Array<SourceColumn>) {
+    return Promise.all(
+      columns.map(async (col) => {
+        const body = {
+          schemaName: col.table.schemaName,
+          tableName: col.table.name,
+          columnName: col.name,
+        };
+        const inferredNotNullability = await firstValueFrom(
+          this.http.post<boolean>(`${this.dataService.baseUrl}/notnull`, body)
+        );
+        col.inferredNullable = !inferredNotNullability;
+      })
+    );
+  }
+
   /**
    * Creates InputSchema for use on edit-schema page with the supplied tables
    * @param tables used on edit-schema page
@@ -230,6 +246,7 @@ export class SchemaCreationService {
 
     await this.determineMaxColumnValueOf(tables);
     await this.determineBloomfilters(tables);
+    await this.inferNullability(...sourceColumns.values());
     const fdPromise = this.setFds(fdFiles, sourceColumns);
     const fkPromise = this.getForeignKeys(sourceColumns);
     const pkPromise = this.getPrimaryKeys(tables);

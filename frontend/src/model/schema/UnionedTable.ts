@@ -1,4 +1,5 @@
 import BasicColumn, { newBasicColumn } from '../types/BasicColumn';
+import { ConstraintPolicy } from '../types/ConstraintPolicy';
 import BasicTable from './BasicTable';
 import BasicTableRelationship from './BasicTableRelationship';
 import Column from './Column';
@@ -46,6 +47,13 @@ export default class UnionedTable extends BasicTable {
       primaryCol.dataType,
       !prefCol || prefCol.nullable || !altCol || altCol.nullable
     );
+  }
+
+  public nullConstraintFor(
+    column: BasicColumn,
+    constraintPolicy: ConstraintPolicy
+  ): boolean {
+    return constraintPolicy == 'minimal' || column.nullable;
   }
 
   /**

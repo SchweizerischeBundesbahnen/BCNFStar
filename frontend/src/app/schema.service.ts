@@ -200,10 +200,20 @@ export class SchemaService {
     this.notifyAboutSchemaChanges();
   }
 
-  public async split(fd: FunctionalDependency, name?: string) {
+  public async split(
+    fd: FunctionalDependency,
+    nullSubstitutes: Map<Column, string>,
+    name?: string
+  ) {
     if (!(this.selectedTable instanceof Table))
       throw Error('splitting not implemented for unioned tables');
-    let command = new SplitCommand(this._schema, this.selectedTable!, fd, name);
+    let command = new SplitCommand(
+      this._schema,
+      this.selectedTable!,
+      fd,
+      nullSubstitutes,
+      name
+    );
 
     command.onDo = () => (this.selectedTable = command.children![0]);
     command.onUndo = () => (this.selectedTable = command.table);
@@ -343,7 +353,7 @@ export class SchemaService {
 
     if (!rowCount) {
       const error_message =
-        'There was a backend error while checking this IND. Check the browser and server logs for details';
+        'There was a backend error while checking this FD. Check the browser and server logs for details';
       this.notification.open(error_message, { type: 'error' });
       throw new Error(error_message);
     }

@@ -18,6 +18,8 @@ import {
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
+import { IRequestBodyNotNull } from "@/definitions/IRequestBodyNotNull";
+import IRequestBodyNewValue from "@/definitions/IRequestBodyNewValue";
 
 // WARNING: make sure to always unprepare a PreparedStatement after everything's done
 // (or failed*), otherwise it will eternally use one of the connections from the pool and
@@ -138,6 +140,24 @@ export default class MsSqlUtils extends SqlUtils {
 
     if (result.recordset[0].count == 0) return KeyUnionability.allowed;
     return KeyUnionability.forbidden;
+  }
+
+  public override async testNotNullConstraint(
+    t: IRequestBodyNotNull
+  ): Promise<boolean> {
+    const _sql: string = this.testNotNullSql(t);
+    const result: sql.IResult<any> = await sql.query(_sql);
+
+    return result.recordset.length == 0;
+  }
+
+  public override async testNewValue(
+    t: IRequestBodyNewValue
+  ): Promise<boolean> {
+    const _sql: string = this.testNewValueSql(t);
+    const result: sql.IResult<any> = await sql.query(_sql);
+
+    return result.recordset.length == 0;
   }
 
   public override async getDatatypes(): Promise<string[]> {

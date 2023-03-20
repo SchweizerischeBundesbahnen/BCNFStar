@@ -13,6 +13,8 @@ import {
   KeyUnionability,
 } from "@/definitions/IUnionedKeys";
 import IRowCounts from "@/definitions/IRowCounts";
+import { IRequestBodyNotNull } from "@/definitions/IRequestBodyNotNull";
+import IRequestBodyNewValue from "@/definitions/IRequestBodyNewValue";
 
 export type SchemaQueryRow = {
   table_name: string;
@@ -102,6 +104,12 @@ export default abstract class SqlUtils {
     t: IRequestBodyUnionedKeys
   ): Promise<KeyUnionability>;
 
+  public abstract testNotNullConstraint(
+    t: IRequestBodyNotNull
+  ): Promise<boolean>;
+
+  public abstract testNewValue(t: IRequestBodyNewValue): Promise<boolean>;
+
   public abstract escape(str: string): string;
 
   public generateColumnString(columns: string[]): string {
@@ -139,6 +147,25 @@ export default abstract class SqlUtils {
     )} HAVING COUNT (*) > 1
   ) as y
 `;
+  }
+
+  public testNotNullSql(nn: IRequestBodyNotNull): string {
+    const sql = `
+      SELECT DISTINCT(1)
+      FROM ${this.escape(nn.schemaName)}.${this.escape(nn.tableName)}
+      WHERE ${this.escape(nn.columnName)} IS NULL
+    `;
+    return sql;
+  }
+
+  public testNewValueSql(nv: IRequestBodyNewValue): string {
+    const sql = `
+      SELECT DISTINCT(1)
+      FROM ${this.escape(nv.schemaName)}.${this.escape(nv.tableName)}
+      WHERE ${this.escape(nv.columnName)} = CAST('${nv.value}' AS ${
+      nv.dataType
+    })`;
+    return sql;
   }
 
   public abstract testTypeCasting(

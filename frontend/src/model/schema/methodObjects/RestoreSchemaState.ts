@@ -81,6 +81,7 @@ interface JSONColumnCombination {
 interface JSONColumn {
   sourceTableInstance: JSONSourceTableInstance;
   sourceColumn: JSONSourceColumn;
+  nullSubstitute: string;
   userAlias?: string;
   includeSourceName: boolean;
   _maxValue: number;
@@ -98,7 +99,8 @@ interface JSONSourceColumn {
   name: string;
   table: JSONSourceTable;
   dataType: string;
-  nullable: boolean;
+  schemaNullable: boolean;
+  inferredNullable?: boolean;
 }
 
 interface JSONSourceTable {
@@ -107,7 +109,7 @@ interface JSONSourceTable {
   rowCount: number;
 }
 
-export default class SaveSchemaState {
+export default class RestoreSchemaState {
   private newSchema: Schema = new Schema();
   constructor() {}
 
@@ -286,6 +288,7 @@ export default class SaveSchemaState {
     let column = new Column(
       this.findSourceTableInstance(col.sourceTableInstance, table.sources),
       this.parseSourceColumn(col.sourceColumn),
+      col.nullSubstitute,
       col.userAlias
     );
     column.includeSourceName = col.includeSourceName;
@@ -349,7 +352,8 @@ export default class SaveSchemaState {
       sc.name,
       newSourceTable,
       sc.dataType,
-      sc.nullable
+      sc.schemaNullable,
+      sc.inferredNullable
     );
 
     let existingCol = this.existingSourceColumns.find((other) =>

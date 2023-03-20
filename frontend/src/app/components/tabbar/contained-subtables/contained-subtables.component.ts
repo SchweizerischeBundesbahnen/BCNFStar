@@ -63,9 +63,7 @@ export class ContainedSubtablesComponent {
     this.updateFdClusters();
   }
 
-  
   /**
-   * 
    * @returns fd clusters (further infos in Table.ts) eventually filterd by columns from user input
    */
   public updateFdClusters(): void {
@@ -73,18 +71,18 @@ export class ContainedSubtablesComponent {
     const clusters = this.table.rankedFdClusters();
 
     if (cc.cardinality == 0) {
-      this.cachedClusters = clusters
+      this.cachedClusters = clusters;
     } else {
       let filteredCluster = clusters
         .filter((cluster) => cc.isSubsetOf(cluster.columns))
         .map((value, index) => [value, index] as [FdCluster, number]);
 
-        filteredCluster.sort(([cluster1, index1], [cluster2, index2]) => {
-          const count1 = cluster1.columns.copy().setMinus(cc).asArray().length;
-          const count2 = cluster2.columns.copy().setMinus(cc).asArray().length;
-          // if count is the same, use original order (stable sort)
-          return count1 - count2 || index1 - index2;
-        });
+      filteredCluster.sort(([cluster1, index1], [cluster2, index2]) => {
+        const count1 = cluster1.columns.copy().setMinus(cc).asArray().length;
+        const count2 = cluster2.columns.copy().setMinus(cc).asArray().length;
+        // if count is the same, use original order (stable sort)
+        return count1 - count2 || index1 - index2;
+      });
       this.cachedClusters = filteredCluster.map(([value]) => value);
     }
   }
@@ -109,12 +107,17 @@ export class ContainedSubtablesComponent {
     switch (response.type) {
       case 'fdSplit': {
         const fdResponse = response as FdSplitResponse;
-        this.schemaService.split(fdResponse.fd, fdResponse.name);
+        this.schemaService.split(
+          fdResponse.fd,
+          fdResponse.nullSubstitutes,
+          fdResponse.name
+        );
         break;
       }
       case 'changeKey': {
         const keyResponse = response as ChangeKeyResponse;
         this._fdClusterFilter = keyResponse.rhs.asArray();
+        this.selectionChanged();
         this.containedSubtablesPanel.open();
         break;
       }

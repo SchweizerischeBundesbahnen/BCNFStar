@@ -1,3 +1,23 @@
+<div class="mx-1 mb-2">
+  <sbb-toggle [(ngModel)]="constraintPolicy">
+    <sbb-toggle-option
+      label="minimal null constraints"
+      value="minimal"
+      sbbTooltip="Use NOT NULL only for keys"
+    ></sbb-toggle-option>
+    <sbb-toggle-option
+      label="original null constraints"
+      value="schema"
+      sbbTooltip="Use NOT NULL constraints as in the original schema"
+    ></sbb-toggle-option>
+    <sbb-toggle-option
+      label="maximal null constraints"
+      value="maximal"
+      sbbTooltip="Use NOT NULL constraints whereever possible"
+    ></sbb-toggle-option>
+  </sbb-toggle>
+</div>
+
 <div class="grid-container mx-1">
   <input
     class="me-1"

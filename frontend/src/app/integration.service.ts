@@ -213,8 +213,13 @@ export class IntegrationService {
       '__schema_matching_temp_target'
     );
     const body: ISchemaMatchingRequest = {
-      srcSql: srcPersister.tableCreation(srcSchema, src, true),
-      targetSql: targetPersister.tableCreation(targetSchema, target, true),
+      srcSql: srcPersister.tableCreation(srcSchema, 'maximal', src, true),
+      targetSql: targetPersister.tableCreation(
+        targetSchema,
+        'maximal',
+        target,
+        true
+      ),
       thesaurus: this.thesaurus,
     };
     const result = await firstValueFrom(
