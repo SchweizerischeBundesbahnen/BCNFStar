@@ -12,6 +12,8 @@ BCNFStar is a tool for interactive database schema management. It helps you to
 
 It ensures that all transformations are valid for a given data instance and generates SQL downloads for transforming
 
+For a gmore comprehensive overview, please consult our [demo paper and video](https://dl.acm.org/doi/10.1145/3555041.3589712) from the SIGMOD 2023 conference.
+
 ## Setup
 
 You can either setup BCNFStar manually with nodejs or use our docker image. For most users, we recommend Docker as it is easier to setup.
