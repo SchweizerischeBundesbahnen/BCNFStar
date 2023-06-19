@@ -22,7 +22,7 @@ describe("The integration start page", () => {
     cy.contains("Ok").click();
 
     cy.wait(500);
-    cy.get(".sbb-dialog-container", {timeout: 20* 1000}).should("not.exist");
+    cy.get(".sbb-dialog-container", {timeout: 20 * 1000}).should("not.exist");
     cy.contains("Start integration").click();
 
     // cy.loadMetanomeConfigAndOk();
