@@ -4,6 +4,7 @@ import { SbbDialogRef, SBB_DIALOG_DATA } from '@sbb-esta/angular/dialog';
 import { defaulHyfdConfig, hyfdAlgorithmName } from '@server/definitions/IHyFD';
 import { defaultFaidaConfig, faidaAlgorithmName } from '@server/definitions/IFaida';
 import { binderAlgorithmName, defaultBinderConfig } from '@server/definitions/IBinder';
+import { defaultRustFdConfig, rustAlgorithmName } from '@server/definitions/IRustFd';
 import { firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { IIndexFileEntry } from '@server/definitions/IIndexFileEntry';
@@ -23,7 +24,7 @@ export type MetanomeSettings = Map<Table | 'ind', MetanoemSettingsRowResult>;
 })
 export class SettingsDialogComponent {
 
-  public fdConfigs: Record<string, JobWithoutTable> = { 'HyFD': { config: defaulHyfdConfig, algoClass: hyfdAlgorithmName } }
+  public fdConfigs: Record<string, JobWithoutTable> = { 'HyFD': { config: defaulHyfdConfig, algoClass: hyfdAlgorithmName }, 'RustFD': { config: defaultRustFdConfig, algoClass: rustAlgorithmName } }
   public indConfigs: Record<string, JobWithoutTable> = {
     'BINDER': { config: defaultBinderConfig, algoClass: binderAlgorithmName }, 'FAIDA': { config: defaultFaidaConfig, algoClass: faidaAlgorithmName }
   };

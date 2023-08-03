@@ -1,0 +1,9 @@
+---
+files:
+  - input.csv
+config:
+  header: true
+  double_quote: true
+  quoting: true
+  delimiter: 44
+  escape:

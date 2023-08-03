@@ -7,6 +7,7 @@ server/metanome/temp
 server/metanome/BINDER_temp
 server/metanome/results
 server/metanome/bcnfstar_results
+rustfd_result_info.json
 
 # local env files
 .env.local
